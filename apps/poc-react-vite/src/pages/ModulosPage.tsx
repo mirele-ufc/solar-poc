@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
-import imgRectangle30 from "../../assets/22ebf3a06cf8215c6bd0946f42302bc2204ed790.png";
+import imgRectangle30 from "@/assets/22ebf3a06cf8215c6bd0946f42302bc2204ed790.png";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { useEnrollmentGuard } from "../hooks/useEnrollmentGuard";
-import { useApp } from "../context/AppContext";
+import { useEnrollmentGuard } from "@/app/hooks/useEnrollmentGuard";
+import { useApp } from "@/app/context/AppContext";
 
 // ─── Arrow / Check SVG paths ─────────────────────────────────────────────────
 const ARROW_PATH = "M6 7L12 13L18 7L20 9L12 17L4 9L6 7Z";

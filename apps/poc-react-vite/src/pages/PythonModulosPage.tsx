@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { useEnrollmentGuard } from "../hooks/useEnrollmentGuard";
-import { useApp } from "../context/AppContext";
+import { useEnrollmentGuard } from "@/app/hooks/useEnrollmentGuard";
+import { useApp } from "@/app/context/AppContext";
 
 const ARROW_PATH = "M6 7L12 13L18 7L20 9L12 17L4 9L6 7Z";
 const CHECK_PATH = "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z";

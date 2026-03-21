@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
-import { PYTHON_QUESTIONS, PYTHON_OPTION_LABELS } from "../data/pythonProvaData";
-import { useEnrollmentGuard } from "../hooks/useEnrollmentGuard";
+import { PYTHON_QUESTIONS, PYTHON_OPTION_LABELS } from "@/app/data/pythonProvaData";
+import { useEnrollmentGuard } from "@/app/hooks/useEnrollmentGuard";
 
 const TOTAL_SECONDS = 20 * 60; // 20 minutos
 

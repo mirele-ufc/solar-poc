@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { useApp } from "../context/AppContext";
-import svgPaths from "../../imports/svg-ppphmxjoa5";
-import imgUfcLogo1 from "../../assets/9098abf5bf97a1aac4c76f171ec108cee92cfddb.png";
-import imgAtivo224X1 from "../../assets/a17a08a750e97ba9bb12c3ad582c426a8debf0fa.png";
+import { useApp } from "@/app/context/AppContext";
+import svgPaths from "@/imports/svg-ppphmxjoa5";
+import imgUfcLogo1 from "@/assets/9098abf5bf97a1aac4c76f171ec108cee92cfddb.png";
+import imgAtivo224X1 from "@/assets/a17a08a750e97ba9bb12c3ad582c426a8debf0fa.png";
 
 export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);

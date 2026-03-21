@@ -1,7 +1,7 @@
 import { useNavigate, useParams, useLocation } from "react-router";
-import imgRectangle30 from "../../assets/22ebf3a06cf8215c6bd0946f42302bc2204ed790.png";
+import imgRectangle30 from "@/assets/22ebf3a06cf8215c6bd0946f42302bc2204ed790.png";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { useEnrollmentGuard } from "../hooks/useEnrollmentGuard";
+import { useEnrollmentGuard } from "@/app/hooks/useEnrollmentGuard";
 import { useEffect, useState } from "react";
 
 // ─── Data ───────────────────────────────────────────────────────────────────

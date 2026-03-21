@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { ChevronLeft, ChevronDown, ChevronUp, Inbox } from "lucide-react";
-import { useApp, type SentMessage } from "../context/AppContext";
+import { useApp, type SentMessage } from "@/app/context/AppContext";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

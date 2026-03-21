@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router";
-import { useApp } from "../context/AppContext";
+import { useApp } from "@/app/context/AppContext";
 import { PageHeader } from "@/components/shared/PageHeader";
 
 const fileImagePath =

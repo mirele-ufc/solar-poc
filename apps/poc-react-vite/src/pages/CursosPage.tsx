@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { useApp } from "../context/AppContext";
+import { useApp } from "@/app/context/AppContext";
 import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
 import { useState } from "react";
 

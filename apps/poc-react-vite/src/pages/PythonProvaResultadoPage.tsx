@@ -1,7 +1,7 @@
 import { useNavigate, useLocation } from "react-router";
-import { PYTHON_QUESTIONS, PYTHON_OPTION_LABELS } from "../data/pythonProvaData";
+import { PYTHON_QUESTIONS, PYTHON_OPTION_LABELS } from "@/app/data/pythonProvaData";
 import { useRef } from "react";
-import { useEnrollmentGuard } from "../hooks/useEnrollmentGuard";
+import { useEnrollmentGuard } from "@/app/hooks/useEnrollmentGuard";
 
 const checkSvg = (color: string) => (
   <svg className="size-[13px]" fill="none" viewBox="0 0 20 16">
