@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { useEnrollmentGuard } from "@/app/hooks/useEnrollmentGuard";
+import { useEnrollmentGuard } from "@/hooks/useEnrollmentGuard";
 
 // ── Aula content ──────────────────────────────────────────────────────────────
 
