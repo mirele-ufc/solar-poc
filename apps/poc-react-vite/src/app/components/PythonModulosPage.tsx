@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
-import { PageHeader } from "./PageHeader";
+import { PageHeader } from "@/components/shared/PageHeader";
 import { useEnrollmentGuard } from "../hooks/useEnrollmentGuard";
 import { useApp } from "../context/AppContext";
 

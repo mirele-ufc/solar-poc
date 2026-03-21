@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import { useApp } from "../context/AppContext";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
 import { useState } from "react";
 
 // ── Course thumbnail map ──────────────────────────────────────────────────────

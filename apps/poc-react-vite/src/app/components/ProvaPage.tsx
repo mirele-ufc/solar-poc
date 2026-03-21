@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { PROVA_QUESTIONS, OPTION_LABELS } from "../data/provaData";
-import { PageHeader } from "./PageHeader";
+import { PageHeader } from "@/components/shared/PageHeader";
 import { useEnrollmentGuard } from "../hooks/useEnrollmentGuard";
 
 const clockPath =

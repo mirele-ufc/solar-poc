@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { PageHeader } from "./PageHeader";
+import { PageHeader } from "@/components/shared/PageHeader";
 import { useEnrollmentGuard } from "../hooks/useEnrollmentGuard";
 
 export function ProvaInstrucoesPage() {

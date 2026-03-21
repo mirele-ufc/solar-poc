@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router";
 import type { CourseInfoData } from "./CriarCursoPage";
-import { PageHeader } from "./PageHeader";
+import { PageHeader } from "@/components/shared/PageHeader";
 
 // ── SVG paths ──────────────────────────────────────────────────────────────────
 const docPath =

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useApp } from "../context/AppContext";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { PageHeader } from "./PageHeader";
+import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
+import { PageHeader } from "@/components/shared/PageHeader";
 import { toast } from "sonner";
 
 const HERO_IMAGE =

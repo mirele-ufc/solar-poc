@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import { useApp } from "../context/AppContext";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { PageHeader } from "./PageHeader";
+import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
+import { PageHeader } from "@/components/shared/PageHeader";
 
 const ALL_COURSES: Record<string, { title: string; hours: string; category: string; image: string }> = {
   "power-bi": {

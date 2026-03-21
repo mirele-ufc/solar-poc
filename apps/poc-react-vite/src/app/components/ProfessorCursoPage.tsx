@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
 
 // ── Mock quiz response data ────────────────────────────────────────────────────
 const mockStats = [

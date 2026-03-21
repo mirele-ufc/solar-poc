@@ -1,7 +1,7 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
 import { toast } from "sonner";
 
 // ── SVG paths ─────────────────────────────────────────────────────────────────

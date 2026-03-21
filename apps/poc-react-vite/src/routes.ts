@@ -2,7 +2,7 @@ import { createBrowserRouter } from "react-router";
 import { LoginPage } from "./app/components/LoginPage";
 import { CadastrarPage } from "./app/components/CadastrarPage";
 import { EsqueceuSenhaPage } from "./app/components/EsqueceuSenhaPage";
-import { AuthLayout } from "./app/components/AuthLayout";
+import { AuthLayout } from "./components/shared/AuthLayout";
 import { CursosPage } from "./app/components/CursosPage";
 import { CursoDetailPage } from "./app/components/CursoDetailPage";
 import { InscricaoPage } from "./app/components/InscricaoPage";

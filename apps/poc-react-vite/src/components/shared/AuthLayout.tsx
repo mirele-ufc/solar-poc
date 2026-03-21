@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Outlet, useNavigate } from "react-router";
-import svgPaths from "../../imports/svg-3imqnb48ew";
-import { useApp } from "../context/AppContext";
+import svgPaths from "@/imports/svg-3imqnb48ew";
+import { useApp } from "@/context/AppContext";
 import { Toaster } from "sonner";
 
 // ── Common SVG icons ──────────────────────────────────────────────────────────
