@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router";
-import type { CourseInfoData } from "./CriarCursoPage";
+import type { CourseInfoData } from "../../pages/CriarCursoPage";
 
 // ── SVG paths ─────────────────────────────────────────────────────────────────
 const CLOSE_SM = "M10.657 12.071L5 6.414L6.414 5L12.071 10.657L17.728 5L19.142 6.414L13.485 12.071L19.142 17.728L17.728 19.142L12.071 13.485L6.414 19.142L5 17.728L10.657 12.071Z";
