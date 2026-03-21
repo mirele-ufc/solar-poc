@@ -8,6 +8,7 @@ Você deve transformar o repositório atual para que cumpra 100% dos requisitos 
 * **NUNCA** remova, altere ou adicione classes do Tailwind CSS que afetem o posicionamento, tamanho, espaçamento ou aparência estrutural dos componentes, a menos que seja para corrigir uma falha crítica de acessibilidade ou aplicar as cores oficiais (Design Tokens), e mesmo assim, o impacto visual deve ser nulo.
 * Mantenha a estrutura dos componentes da interface (Shadcn UI) intacta.
 * Suas alterações devem ser estritamente voltadas para: refatoração lógica, tipagem, integração de APIs, segurança, acessibilidade (atributos ARIA) e separação de responsabilidades.
+* As alterações serão feitas de forma gradual. Não altere os arquivos para além do que for definido nos prompts.
 
 ---
 
