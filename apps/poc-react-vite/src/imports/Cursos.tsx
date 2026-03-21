@@ -1,5 +1,5 @@
 import svgPaths from "./svg-xz30l7l57d";
-import imgRectangle8 from "figma:asset/22ebf3a06cf8215c6bd0946f42302bc2204ed790.png";
+import imgRectangle8 from "../assets/22ebf3a06cf8215c6bd0946f42302bc2204ed790.png";
 
 function Wrapper1({ children }: React.PropsWithChildren<{}>) {
   return (

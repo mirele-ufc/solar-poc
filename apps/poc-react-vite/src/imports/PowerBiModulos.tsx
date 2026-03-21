@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import svgPaths from "./svg-4wl31d3x0f";
-import imgRectangle9 from "figma:asset/d421f0a44cfce0e154b3aad4cdf4a80b5a9a8f81.png";
-import imgRectangle8 from "figma:asset/3d8f253ebd03bf9edb558ea8d8c27be67d2e49c7.png";
+import imgRectangle9 from "../assets/d421f0a44cfce0e154b3aad4cdf4a80b5a9a8f81.png";
+import imgRectangle8 from "../assets/3d8f253ebd03bf9edb558ea8d8c27be67d2e49c7.png";
 
 function Wrapper1({ children }: React.PropsWithChildren<{}>) {
   return (

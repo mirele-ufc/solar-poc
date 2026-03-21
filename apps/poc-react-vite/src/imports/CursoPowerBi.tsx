@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import svgPaths from "./svg-vej51lnf8d";
-import imgImage from "figma:asset/054dfe02e425078fdd66113858fbed2e929f9c10.png";
-import imgRectangle9 from "figma:asset/22ebf3a06cf8215c6bd0946f42302bc2204ed790.png";
+import imgImage from "../assets/054dfe02e425078fdd66113858fbed2e929f9c10.png";
+import imgRectangle9 from "../assets/22ebf3a06cf8215c6bd0946f42302bc2204ed790.png";
 type Wrapper1Props = {
   additionalClassNames?: string;
 };

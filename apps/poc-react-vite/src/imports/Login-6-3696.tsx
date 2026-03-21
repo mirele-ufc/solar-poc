@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import svgPaths from "./svg-wbqstdrmu5";
-import imgUfcLogo1 from "figma:asset/9098abf5bf97a1aac4c76f171ec108cee92cfddb.png";
-import imgAtivo224X1 from "figma:asset/a17a08a750e97ba9bb12c3ad582c426a8debf0fa.png";
+import imgUfcLogo1 from "../assets/9098abf5bf97a1aac4c76f171ec108cee92cfddb.png";
+import imgAtivo224X1 from "../assets/a17a08a750e97ba9bb12c3ad582c426a8debf0fa.png";
 
 function Wrapper({ children }: React.PropsWithChildren<{}>) {
   return (

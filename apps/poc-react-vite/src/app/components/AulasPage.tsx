@@ -1,7 +1,8 @@
 import { useNavigate, useParams, useLocation } from "react-router";
-import imgRectangle30 from "figma:asset/22ebf3a06cf8215c6bd0946f42302bc2204ed790.png";
+import imgRectangle30 from "../../assets/22ebf3a06cf8215c6bd0946f42302bc2204ed790.png";
 import { PageHeader } from "./PageHeader";
 import { useEnrollmentGuard } from "../hooks/useEnrollmentGuard";
+import { useEffect, useState } from "react";
 
 // ─── Data ───────────────────────────────────────────────────────────────────
 const ARROW_PATH = "M6 7L12 13L18 7L20 9L12 17L4 9L6 7Z";

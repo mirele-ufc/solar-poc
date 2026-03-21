@@ -1,5 +1,5 @@
 import svgPaths from "./svg-ypsfft9be4";
-import imgRectangle30 from "figma:asset/22ebf3a06cf8215c6bd0946f42302bc2204ed790.png";
+import imgRectangle30 from "../assets/22ebf3a06cf8215c6bd0946f42302bc2204ed790.png";
 
 function ArrowDown() {
   return (

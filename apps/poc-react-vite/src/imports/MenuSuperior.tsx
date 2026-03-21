@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import svgPaths from "./svg-3imqnb48ew";
-import imgImage from "figma:asset/054dfe02e425078fdd66113858fbed2e929f9c10.png";
+import imgImage from "../assets/054dfe02e425078fdd66113858fbed2e929f9c10.png";
 
 function MenuSuperiorHelper({ children }: React.PropsWithChildren<{}>) {
   return (
