@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
-import { PROVA_QUESTIONS, OPTION_LABELS } from "@/app/data/provaData";
+import { PROVA_QUESTIONS, OPTION_LABELS } from "@/services/provaData";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { useEnrollmentGuard } from "@/hooks/useEnrollmentGuard";
 

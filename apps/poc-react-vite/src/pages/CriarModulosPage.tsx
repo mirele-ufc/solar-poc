@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router";
-import type { CourseInfoData } from "../../pages/CriarCursoPage";
+import type { CourseInfoData } from "./CriarCursoPage";
 import { PageHeader } from "@/components/shared/PageHeader";
 
 // ── SVG paths ──────────────────────────────────────────────────────────────────

@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router";
-import { PYTHON_QUESTIONS, PYTHON_OPTION_LABELS } from "@/app/data/pythonProvaData";
+import { PYTHON_QUESTIONS, PYTHON_OPTION_LABELS } from "@/services/pythonProvaData";
 import { useRef } from "react";
 import { useEnrollmentGuard } from "@/hooks/useEnrollmentGuard";
 

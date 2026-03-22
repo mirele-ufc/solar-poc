@@ -1,6 +1,6 @@
 import { useRef, useState, useId } from "react";
 import { useNavigate } from "react-router";
-import { useApp } from "@/app/context/AppContext";
+import { useApp } from "@/context/AppContext";
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 function maskCPF(raw: string) {

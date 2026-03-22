@@ -10,6 +10,7 @@ export type UserProfile = {
   email: string;
   photoUrl: string | null;
   role: "professor" | "estudante";
+  password?: string;
 };
 
 export type SentMessage = {

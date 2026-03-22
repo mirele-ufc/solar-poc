@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router";
-import { PROVA_QUESTIONS, OPTION_LABELS } from "@/app/data/provaData";
+import { PROVA_QUESTIONS, OPTION_LABELS } from "@/services/provaData";
 import { useRef } from "react";
 import { useEnrollmentGuard } from "@/hooks/useEnrollmentGuard";
 

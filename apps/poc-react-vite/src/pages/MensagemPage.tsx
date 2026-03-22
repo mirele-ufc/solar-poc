@@ -1,7 +1,7 @@
 import { useState, useId } from "react";
 import { useNavigate } from "react-router";
 import { ChevronLeft } from "lucide-react";
-import { useApp } from "@/app/context/AppContext";
+import { useApp } from "@/context/AppContext";
 
 // ⚠️ PROTÓTIPO: dados mockados no cliente.
 // Em produção, a lista de cursos e estudantes deve vir de uma API autenticada.
