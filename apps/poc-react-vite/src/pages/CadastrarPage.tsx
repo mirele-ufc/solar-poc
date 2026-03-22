@@ -178,7 +178,7 @@ export function CadastrarPage() {
     }
 
     // Se passou na validação, navega para cursos
-    navigate("/cursos");
+    navigate("/courses");
   };
 
   const genderOptions = [

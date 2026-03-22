@@ -165,8 +165,8 @@ export function CursosPage() {
   const isProfessor = user.role === "professor";
 
   const goToCourse = (id: string) => {
-    if (id === "power-bi") navigate("/cursos/power-bi");
-    else if (id === "python") navigate("/cursos/python");
+    if (id === "power-bi") navigate("/courses/power-bi");
+    else if (id === "python") navigate("/courses/python");
   };
 
   if (isProfessor) {
@@ -178,7 +178,7 @@ export function CursosPage() {
           </h1>
           <button
             type="button"
-            onClick={() => navigate("/criar-curso")}
+            onClick={() => navigate("/create-course")}
             className="bg-[#ffeac4] cursor-pointer h-[48px] w-full rounded-[26px] hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px]"
           >
             <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">Criar curso</span>
@@ -198,8 +198,8 @@ export function CursosPage() {
                     id={c.id}
                     title={c.title}
                     onClick={() => c.id === "python"
-                      ? navigate("/cursos/python")
-                      : navigate(`/cursos/${c.id}/gerenciar`)}
+                      ? navigate("/courses/python")
+                      : navigate(`/courses/${c.id}/manage`)}
                     isActive
                   />
                 </div>
@@ -212,8 +212,8 @@ export function CursosPage() {
                   id={c.id}
                   title={c.title}
                   onClick={() => c.id === "python"
-                    ? navigate("/cursos/python")
-                    : navigate(`/cursos/${c.id}/gerenciar`)}
+                    ? navigate("/courses/python")
+                    : navigate(`/courses/${c.id}/manage`)}
                   isActive
                 />
               ))}

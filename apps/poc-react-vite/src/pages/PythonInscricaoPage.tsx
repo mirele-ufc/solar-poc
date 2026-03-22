@@ -77,7 +77,7 @@ export function PythonInscricaoPage() {
     topRef.current?.scrollIntoView({ behavior: "smooth" });
 
     setTimeout(() => {
-      navigate("/cursos/python/modulos");
+      navigate("/courses/python/modules");
     }, 1800);
   };
 

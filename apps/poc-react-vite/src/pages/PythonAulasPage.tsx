@@ -27,12 +27,12 @@ export function PythonAulasPage() {
 
         <PageHeader
           title={AULA.subtitle}
-          backPath="/cursos/python/modulos"
+          backPath="/courses/python/modules"
           crumbs={[
-            { label: "Cursos", path: "/cursos" },
-            { label: "Python Iniciante", path: "/cursos/python" },
-            { label: "Módulos", path: "/cursos/python/modulos" },
-            { label: "Módulo 01" },
+            { label: "Courses", path: "/courses" },
+            { label: "Python Beginner", path: "/courses/python" },
+            { label: "Modules", path: "/courses/python/modules" },
+            { label: "Module 01" },
           ]}
         />
 
@@ -83,7 +83,7 @@ print(saudacao(nome))`}
         <div className="flex gap-[12px] mt-[12px]">
           <button
             type="button"
-            onClick={() => navigate("/cursos/python/modulos")}
+            onClick={() => navigate("/courses/python/modules")}
             className="flex items-center gap-[8px] h-[48px] px-[20px] border-2 border-[#021b59] rounded-[26px] hover:bg-[#021b59]/5 transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px]"
             aria-label="Voltar para lista de módulos"
           >
@@ -97,7 +97,7 @@ print(saudacao(nome))`}
 
           <button
             type="button"
-            onClick={() => navigate("/cursos/python/prova/instrucoes")}
+            onClick={() => navigate("/courses/python/exam/instructions")}
             className="flex-1 h-[48px] bg-[#ffeac4] rounded-[26px] hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px]"
             aria-label="Ir para a prova do módulo"
           >

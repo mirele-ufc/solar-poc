@@ -11,14 +11,14 @@ export function PythonProvaInstrucoesPage() {
       <div className="max-w-[900px] mx-auto flex flex-col gap-[28px] px-[20px] md:px-[40px] pt-[30px] w-full">
 
         <PageHeader
-          title="Instruções"
-          backPath="/cursos/python/modulos"
+          title="Instructions"
+          backPath="/courses/python/modules"
           crumbs={[
-            { label: "Cursos", path: "/cursos" },
-            { label: "Python Iniciante", path: "/cursos/python" },
-            { label: "Módulos", path: "/cursos/python/modulos" },
-            { label: "Módulo 01", path: "/cursos/python/modulos/1" },
-            { label: "Prova 01" },
+            { label: "Courses", path: "/courses" },
+            { label: "Python Beginner", path: "/courses/python" },
+            { label: "Modules", path: "/courses/python/modules" },
+            { label: "Module 01", path: "/courses/python/modules/1" },
+            { label: "Exam 01" },
           ]}
         />
 
@@ -53,7 +53,7 @@ export function PythonProvaInstrucoesPage() {
         <div className="w-full max-w-[900px]">
           <button
             type="button"
-            onClick={() => navigate("/cursos/python/prova")}
+            onClick={() => navigate("/courses/python/exam")}
             className="bg-[#ffeac4] h-[50px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px]"
           >
             <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">

@@ -39,8 +39,8 @@ export function PythonDetailPage() {
   const [showCancelModal, setShowCancelModal] = useState(false);
 
   const handleInscrever = () => {
-    if (enrolled) navigate("/cursos/python/modulos");
-    else navigate("/cursos/python/inscricao");
+    if (enrolled) navigate("/courses/python/modules");
+    else navigate("/courses/python/enrollment");
   };
 
   const handleConfirmCancel = () => {

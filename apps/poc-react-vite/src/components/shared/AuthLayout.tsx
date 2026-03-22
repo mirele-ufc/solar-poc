@@ -178,7 +178,7 @@ export function AuthLayout() {
                     role="menuitem"
                     type="button"
                     className="w-full flex items-center gap-[15px] px-[20px] py-[11px] hover:bg-[#042e99] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#ffeac4] focus-visible:outline-offset-[-2px] transition-colors"
-                    onClick={() => { setProfileOpen(false); navigate("/perfil"); }}
+                    onClick={() => { setProfileOpen(false); navigate("/profile"); }}
                   >
                     <svg className="shrink-0 size-[22px]" fill="none" viewBox="0 0 20 20" aria-hidden="true">
                       <path d={svgPaths.pe3d9c80} fill="#FFEAC4" />
@@ -192,7 +192,7 @@ export function AuthLayout() {
                       role="menuitem"
                       type="button"
                       className="w-full flex items-center gap-[15px] px-[20px] py-[11px] hover:bg-[#042e99] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#ffeac4] focus-visible:outline-offset-[-2px] transition-colors"
-                      onClick={() => { setProfileOpen(false); navigate("/mensagens"); }}
+                      onClick={() => { setProfileOpen(false); navigate("/messages"); }}
                     >
                       <svg className="shrink-0 size-[22px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z" fill="#FFEAC4" />
@@ -201,13 +201,13 @@ export function AuthLayout() {
                     </button>
                   )}
                   
-                  {/* Meus Cursos — para professores e estudantes */}
+                  {/* My Courses — for professors and students */}
                   {user.role === "professor" && (
                     <button
                       role="menuitem"
                       type="button"
                       className="w-full flex items-center gap-[15px] px-[20px] py-[11px] hover:bg-[#042e99] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#ffeac4] focus-visible:outline-offset-[-2px] transition-colors"
-                      onClick={() => { setProfileOpen(false); navigate("/meus-cursos"); }}
+                      onClick={() => { setProfileOpen(false); navigate("/my-courses"); }}
                     >
                       <svg className="shrink-0 size-[22px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 14H8v-2h8v2zm0-4H8v-2h8v2zm0-4H8V6h8v2z" fill="#FFEAC4" />
@@ -216,13 +216,13 @@ export function AuthLayout() {
                     </button>
                   )}
                   
-                  {/* Meus Cursos — somente para estudantes */}
+                  {/* My Courses — students only */}
                   {user.role === "estudante" && (
                     <button
                       role="menuitem"
                       type="button"
                       className="w-full flex items-center gap-[15px] px-[20px] py-[11px] hover:bg-[#042e99] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#ffeac4] focus-visible:outline-offset-[-2px] transition-colors"
-                      onClick={() => { setProfileOpen(false); navigate("/meus-cursos"); }}
+                      onClick={() => { setProfileOpen(false); navigate("/my-courses"); }}
                     >
                       <svg className="shrink-0 size-[22px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 14H8v-2h8v2zm0-4H8v-2h8v2zm0-4H8V6h8v2z" fill="#FFEAC4" />
@@ -237,7 +237,7 @@ export function AuthLayout() {
                       role="menuitem"
                       type="button"
                       className="w-full flex items-center gap-[15px] px-[20px] py-[11px] hover:bg-[#042e99] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#ffeac4] focus-visible:outline-offset-[-2px] transition-colors"
-                      onClick={() => { setProfileOpen(false); navigate("/mensagens-recebidas"); }}
+                      onClick={() => { setProfileOpen(false); navigate("/received-messages"); }}
                     >
                       <svg className="shrink-0 size-[22px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z" fill="#FFEAC4" />

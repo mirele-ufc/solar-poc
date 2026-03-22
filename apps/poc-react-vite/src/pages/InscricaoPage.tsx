@@ -99,7 +99,7 @@ export function InscricaoPage() {
 
     // Navigate after brief delay so user can see success message
     setTimeout(() => {
-      navigate("/cursos/power-bi/modulos");
+      navigate("/courses/power-bi/modules");
     }, 1800);
   };
 

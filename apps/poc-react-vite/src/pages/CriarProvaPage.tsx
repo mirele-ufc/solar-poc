@@ -717,7 +717,7 @@ export function CriarProvaPage() {
         <div className="w-full max-w-[900px]">
           <button
             type="button"
-            onClick={() => navigate("/cursos")}
+            onClick={() => navigate("/courses")}
             className="bg-[#ffeac4] h-[50px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59]"
           >
             <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">Finalizar curso</span>

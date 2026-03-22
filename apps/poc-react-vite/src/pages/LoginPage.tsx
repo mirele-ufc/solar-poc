@@ -35,7 +35,7 @@ export function LoginPage() {
     if (ok) {
       setGeneralError("");
       setShowErrors(false);
-      navigate("/cursos");
+      navigate("/courses");
     } else {
       setGeneralError("Usuário ou senha incorretos");
       setShowErrors(true);
@@ -150,7 +150,7 @@ export function LoginPage() {
 
           {/* Forgot */}
           <div className="flex justify-end w-full">
-            <button type="button" onClick={() => navigate("/esqueceu-senha")} className="font-['Figtree:Regular',sans-serif] font-normal leading-[24px] text-[#ffeac4] text-[16px] hover:underline underline-offset-2 focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#ffeac4] rounded-sm">
+            <button type="button" onClick={() => navigate("/forgot-password")} className="font-['Figtree:Regular',sans-serif] font-normal leading-[24px] text-[#ffeac4] text-[16px] hover:underline underline-offset-2 focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#ffeac4] rounded-sm">
               Esqueceu a sua senha?
             </button>
           </div>
@@ -160,7 +160,7 @@ export function LoginPage() {
             <button type="submit" className="bg-[#ffeac4] cursor-pointer w-full h-[50px] rounded-[26px] hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-white focus-visible:outline-offset-[3px]">
               <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">Acessar</span>
             </button>
-            <button type="button" onClick={() => navigate("/cadastrar")} className="bg-transparent border-2 border-[#ffeac4] cursor-pointer w-full h-[50px] rounded-[26px] hover:bg-white/10 transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#ffeac4] focus-visible:outline-offset-[2px]">
+            <button type="button" onClick={() => navigate("/register")} className="bg-transparent border-2 border-[#ffeac4] cursor-pointer w-full h-[50px] rounded-[26px] hover:bg-white/10 transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#ffeac4] focus-visible:outline-offset-[2px]">
               <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#ffeac4] text-[20px]">Cadastrar</span>
             </button>
           </div>

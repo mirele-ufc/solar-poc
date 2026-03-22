@@ -309,7 +309,7 @@ export function CriarModulosPage() {
       return;
     }
     setError("");
-    navigate("/criar-curso/prova", { state: { courseData, modules } });
+    navigate("/create-course/exam", { state: { courseData, modules } });
   };
 
   return (
@@ -327,11 +327,11 @@ export function CriarModulosPage() {
         {/* Page header with back + breadcrumb */}
         <PageHeader
           title="Estrutura de Módulos"
-          backPath="/criar-curso"
+          backPath="/create-course"
           crumbs={[
-            { label: "Cursos", path: "/cursos" },
-            { label: "Criar Curso", path: "/criar-curso" },
-            { label: "Módulos" },
+            { label: "Courses", path: "/courses" },
+            { label: "Create Course", path: "/create-course" },
+            { label: "Modules" },
           ]}
         />
 

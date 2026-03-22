@@ -40,8 +40,8 @@ export function CursoDetailPage() {
   const [showCancelModal, setShowCancelModal] = useState(false);
 
   const handleInscrever = () => {
-    if (enrolled) navigate("/cursos/power-bi/modulos");
-    else navigate("/cursos/power-bi/inscricao");
+    if (enrolled) navigate("/courses/power-bi/modules");
+    else navigate("/courses/power-bi/enrollment");
   };
 
   const handleConfirmCancel = () => {
@@ -51,7 +51,7 @@ export function CursoDetailPage() {
       description: "Seu acesso ao conteúdo de Power BI - Fundamentos foi removido.",
       duration: 5000,
     });
-    navigate("/cursos");
+    navigate("/courses");
   };
 
   return (

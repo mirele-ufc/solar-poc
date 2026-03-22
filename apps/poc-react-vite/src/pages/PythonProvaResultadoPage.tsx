@@ -271,7 +271,7 @@ export function PythonProvaResultadoPage() {
   const { normalizedAnswers, totalCorrect, allCorrect } = processedRef.current;
 
   function handleReturn() {
-    navigate("/cursos/python/modulos");
+    navigate("/courses/python/modules");
   }
 
   if (allCorrect) {

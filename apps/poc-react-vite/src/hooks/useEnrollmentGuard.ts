@@ -3,15 +3,15 @@ import { useNavigate } from "react-router";
 import { useApp } from "@/context/AppContext";
 
 /**
- * Redireciona para /cursos imediatamente se o aluno não possuir
- * matrícula ativa no curso indicado.
+ * Redirects to /courses immediately if the student does not have
+ * active enrollment in the indicated course.
  *
- * Princípio de privilégio mínimo por contexto:
- * - Professores têm acesso irrestrito aos seus próprios cursos (bypass total).
- * - Para cursos em que o professor possui papel de aluno (courseStudentRoles),
- *   o guard aplica as mesmas regras de matrícula de um estudante.
+ * Principle of least privilege by context:
+ * - Professors have unrestricted access to their own courses (total bypass).
+ * - For courses where the professor has a student role (courseStudentRoles),
+ *   the guard applies the same enrollment rules as a student.
  *
- * ⚠️ Segurança: controle de acesso real deve ser validado no servidor.
+ * ⚠️ Security: real access control must be validated on the server.
  */
 export function useEnrollmentGuard(courseId: string) {
   const { isEnrolled, user, hasCourseStudentRole } = useApp();
@@ -22,7 +22,7 @@ export function useEnrollmentGuard(courseId: string) {
       // Se o professor tem papel de aluno neste curso, aplica a regra de matrícula
       if (hasCourseStudentRole(courseId)) {
         if (!isEnrolled(courseId)) {
-          navigate("/cursos", { replace: true });
+          navigate("/courses", { replace: true });
         }
       }
       // Caso contrário, professor tem acesso irrestrito
@@ -31,7 +31,7 @@ export function useEnrollmentGuard(courseId: string) {
 
     // Estudante: verifica matrícula normalmente
     if (!isEnrolled(courseId)) {
-      navigate("/cursos", { replace: true });
+      navigate("/courses", { replace: true });
     }
   }, [courseId, isEnrolled, navigate, user.role, hasCourseStudentRole]);
 }

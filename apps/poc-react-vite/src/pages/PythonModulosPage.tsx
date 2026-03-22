@@ -543,9 +543,9 @@ export function PythonModulosPage() {
     });
 
     if (type === "prova") {
-      navigate("/cursos/python/prova/instrucoes");
+      navigate("/courses/python/exam/instructions");
     } else {
-      navigate("/cursos/python/modulos/1", { state: { aulaIndex: 0 } });
+      navigate("/courses/python/modules/1", { state: { aulaIndex: 0 } });
     }
   };
 

@@ -50,7 +50,7 @@ export function PythonProvaPage() {
       ? answers
       : answers;
 
-    navigate("/cursos/python/prova/resultado", { state: { answers: finalAnswers } });
+    navigate("/courses/python/exam/results", { state: { answers: finalAnswers } });
   };
 
   const answeredCount = Object.keys(answers).length;

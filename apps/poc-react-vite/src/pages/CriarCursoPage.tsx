@@ -108,7 +108,7 @@ export function CriarCursoPage() {
     }
 
     setError("");
-    navigate("/criar-curso/modulos", { state: { courseData: form } });
+    navigate("/create-course/modules", { state: { courseData: form } });
   };
 
   return (

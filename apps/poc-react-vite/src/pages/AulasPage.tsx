@@ -187,7 +187,7 @@ export function AulasPage() {
   const handleNext = () => {
     if (isLastAula) {
       // Last aula → go to prova
-      navigate("/cursos/power-bi/prova/instrucoes");
+      navigate("/courses/power-bi/exam/instructions");
     } else {
       const nextIdx = aulaIndex + 1;
       setAulaIndex(nextIdx);

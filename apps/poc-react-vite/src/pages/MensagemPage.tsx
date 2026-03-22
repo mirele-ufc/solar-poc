@@ -82,7 +82,7 @@ export function MensagemPage() {
           <div className="mb-[16px]">
             <button
               type="button"
-              onClick={() => navigate("/cursos")}
+              onClick={() => navigate("/courses")}
               className="flex items-center gap-[8px] text-[#ffeac4] hover:text-white transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#ffeac4] rounded-[6px] min-h-[44px]"
               aria-label="Voltar para cursos"
             >
@@ -96,7 +96,7 @@ export function MensagemPage() {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigate("/cursos")}
+                    onClick={() => navigate("/courses")}
                     className="font-['Figtree:Regular',sans-serif] text-[rgba(255,234,196,0.7)] hover:text-[#ffeac4] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#ffeac4] rounded-[4px] min-h-[44px] inline-flex items-center"
                   >
                     Cursos
