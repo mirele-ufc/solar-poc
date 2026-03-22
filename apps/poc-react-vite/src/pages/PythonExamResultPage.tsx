@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router";
-import { PYTHON_QUESTIONS, PYTHON_OPTION_LABELS } from "@/services/pythonProvaData";
-import { useRef } from "react";
+import { fetchPythonExamQuestions, fetchOptionLabels, type Question } from "@/services/mocks/pythonExamMock";
+import { useRef, useState, useEffect } from "react";
 import { useEnrollmentGuard } from "@/hooks/useEnrollmentGuard";
 
 const checkSvg = (color: string) => (
@@ -17,7 +17,7 @@ const xSvg = (color: string) => (
 
 // ── All correct screen ────────────────────────────────────────────────────────
 
-function CorrectScreen({ onReturn }: { onReturn: () => void }) {
+function CorrectScreen({ onReturn, questions, optionLabels }: { onReturn: () => void; questions: Question[]; optionLabels: string[] }) {
   return (
     <div className="bg-white min-h-screen pb-[60px]">
       <div className="max-w-[900px] mx-auto flex flex-col items-center gap-[28px] px-[20px] md:px-[40px] pt-[40px]">
@@ -37,7 +37,7 @@ function CorrectScreen({ onReturn }: { onReturn: () => void }) {
             100%
           </span>
           <span className="font-['Figtree:Regular',sans-serif] text-[#ffeac4] text-[13px] mt-[6px]">
-            {PYTHON_QUESTIONS.length}/{PYTHON_QUESTIONS.length} acertos
+            {questions.length}/{questions.length} acertos
           </span>
         </div>
 
@@ -53,7 +53,7 @@ function CorrectScreen({ onReturn }: { onReturn: () => void }) {
 
         {/* Gabarito */}
         <div className="flex flex-col gap-[16px] w-full">
-          {PYTHON_QUESTIONS.map((q, qIdx) => (
+          {questions.map((q, qIdx) => (
             <div key={q.id} className="border border-[#28a745] rounded-[12px] p-[16px] bg-[#f0faf3] flex flex-col gap-[10px]">
               <div className="flex items-start justify-between gap-[12px]">
                 <div className="flex-1 min-w-0">
@@ -80,7 +80,7 @@ function CorrectScreen({ onReturn }: { onReturn: () => void }) {
                         {isCorrect && checkSvg("white")}
                       </div>
                       <span className="font-['Figtree:Medium',sans-serif] font-medium text-[15px] text-[#021b59] shrink-0">
-                        {PYTHON_OPTION_LABELS[idx]})
+                        {optionLabels[idx]})
                       </span>
                       <span className={`font-['Figtree:Regular',sans-serif] text-[15px] leading-[22px] flex-1 ${isCorrect ? "text-[#155724]" : "text-black"}`}>
                         {opt}
@@ -112,11 +112,11 @@ function CorrectScreen({ onReturn }: { onReturn: () => void }) {
 // ── Incorrect screen ──────────────────────────────────────────────────────────
 
 function IncorrectScreen({
-  answers, totalCorrect, onReturn,
+  answers, totalCorrect, onReturn, questions, optionLabels
 }: {
-  answers: Record<string, number>; totalCorrect: number; onReturn: () => void;
+  answers: Record<string, number>; totalCorrect: number; onReturn: () => void; questions: Question[]; optionLabels: string[];
 }) {
-  const percentage = Math.round((totalCorrect / PYTHON_QUESTIONS.length) * 100);
+  const percentage = Math.round((totalCorrect / questions.length) * 100);
 
   return (
     <div className="bg-white min-h-screen pb-[60px]">
@@ -133,11 +133,11 @@ function IncorrectScreen({
         <div className="flex items-center justify-between px-[20px] py-[16px] rounded-[12px] bg-[#801436]">
           <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#ffeac4] text-[18px]">Resultado</p>
           <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#ffeac4] text-[18px]">
-            {totalCorrect}/{PYTHON_QUESTIONS.length} acertos ({percentage}%)
+            {totalCorrect}/{questions.length} acertos ({percentage}%)
           </p>
         </div>
 
-        {PYTHON_QUESTIONS.map((q, qIdx) => {
+        {questions.map((q, qIdx) => {
           const userIdx = answers[q.id];
           const isCorrect = userIdx === q.correctIndex;
 
@@ -196,7 +196,7 @@ function IncorrectScreen({
                         {boxContent}
                       </div>
                       <span className="font-['Figtree:Medium',sans-serif] font-medium text-[15px] text-[#021b59] shrink-0">
-                        {PYTHON_OPTION_LABELS[idx]})
+                        {optionLabels[idx]})
                       </span>
                       <span className={`font-['Figtree:Regular',sans-serif] text-[15px] leading-[23px] flex-1 ${textCls}`}>
                         {opt}
@@ -235,13 +235,37 @@ export function PythonExamResultPage() {
   useEnrollmentGuard("python");
   const location = useLocation();
 
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [optionLabels, setOptionLabels] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const processedRef = useRef<{
     normalizedAnswers: Record<string, number>;
     totalCorrect: number;
     allCorrect: boolean;
   } | null>(null);
 
-  if (!processedRef.current) {
+  // Fetch exam data on mount
+  useEffect(() => {
+    const loadExamData = async () => {
+      try {
+        const [questionsData, labelsData] = await Promise.all([
+          fetchPythonExamQuestions(),
+          fetchOptionLabels(),
+        ]);
+        setQuestions(questionsData);
+        setOptionLabels(labelsData);
+      } catch (error) {
+        console.error("Failed to load exam data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadExamData();
+  }, []);
+
+  // Process answers only after questions are loaded
+  if (questions.length > 0 && !processedRef.current) {
     let answers: Record<string, number> = location.state?.answers ?? {};
 
     if (Object.keys(answers).length === 0) {
@@ -262,21 +286,33 @@ export function PythonExamResultPage() {
       normalized[key] = typeof value === "number" ? value : parseInt(String(value), 10);
     });
 
-    const correct = PYTHON_QUESTIONS.filter((q) => normalized[q.id] === q.correctIndex).length;
-    const all = correct === PYTHON_QUESTIONS.length;
+    const correct = questions.filter((q) => normalized[q.id] === q.correctIndex).length;
+    const all = correct === questions.length;
 
     processedRef.current = { normalizedAnswers: normalized, totalCorrect: correct, allCorrect: all };
   }
 
-  const { normalizedAnswers, totalCorrect, allCorrect } = processedRef.current;
+  const { normalizedAnswers, totalCorrect, allCorrect } = processedRef.current ?? {
+    normalizedAnswers: {},
+    totalCorrect: 0,
+    allCorrect: false,
+  };
 
   function handleReturn() {
     navigate("/courses/python/modules");
   }
 
-  if (allCorrect) {
-    return <CorrectScreen onReturn={handleReturn} />;
+  if (isLoading) {
+    return (
+      <div className="bg-white min-h-screen pb-[60px] flex items-center justify-center">
+        <p className="text-center text-[#606060]">Carregando resultados...</p>
+      </div>
+    );
   }
 
-  return <IncorrectScreen answers={normalizedAnswers} totalCorrect={totalCorrect} onReturn={handleReturn} />;
+  if (allCorrect) {
+    return <CorrectScreen onReturn={handleReturn} questions={questions} optionLabels={optionLabels} />;
+  }
+
+  return <IncorrectScreen answers={normalizedAnswers} totalCorrect={totalCorrect} onReturn={handleReturn} questions={questions} optionLabels={optionLabels} />;
 }

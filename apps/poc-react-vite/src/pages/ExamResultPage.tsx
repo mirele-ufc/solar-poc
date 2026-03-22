@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router";
-import { PROVA_QUESTIONS, OPTION_LABELS } from "@/services/provaData";
-import { useRef } from "react";
+import { fetchExamQuestions, fetchOptionLabels, type Question } from "@/services/mocks/examMock";
+import { useRef, useState, useEffect } from "react";
 import { useEnrollmentGuard } from "@/hooks/useEnrollmentGuard";
 
 const checkSvg = (color: string) => (
@@ -16,7 +16,7 @@ const xSvg = (color: string) => (
 );
 
 // ── Tela: TODAS corretas ───────────────────────────────────────────────────────
-function CorrectScreen({ onReturn }: { onReturn: () => void }) {
+function CorrectScreen({ onReturn, questions, optionLabels }: { onReturn: () => void; questions: Question[]; optionLabels: string[] }) {
   return (
     <div className="bg-white min-h-screen pb-[60px]">
       <div className="max-w-[900px] mx-auto flex flex-col items-center gap-[28px] px-[20px] md:px-[40px] pt-[40px]">
@@ -42,7 +42,7 @@ function CorrectScreen({ onReturn }: { onReturn: () => void }) {
             100%
           </span>
           <span className="font-['Figtree:Regular',sans-serif] text-[#ffeac4] text-[13px] mt-[6px]">
-            {PROVA_QUESTIONS.length}/{PROVA_QUESTIONS.length} acertos
+            {questions.length}/{questions.length} acertos
           </span>
         </div>
 
@@ -61,7 +61,7 @@ function CorrectScreen({ onReturn }: { onReturn: () => void }) {
 
         {/* Gabarito — todas verdes */}
         <div className="flex flex-col gap-[16px] w-full">
-          {PROVA_QUESTIONS.map((q, qIdx) => (
+          {questions.map((q, qIdx) => (
             <div key={q.id} className="border border-[#28a745] rounded-[12px] p-[16px] bg-[#f0faf3] flex flex-col gap-[10px]">
               <div className="flex items-start justify-between gap-[12px]">
                 <div className="flex-1 min-w-0">
@@ -98,7 +98,7 @@ function CorrectScreen({ onReturn }: { onReturn: () => void }) {
                         {isCorrect && checkSvg("white")}
                       </div>
                       <span className="font-['Figtree:Medium',sans-serif] font-medium text-[15px] text-[#021b59] shrink-0">
-                        {OPTION_LABELS[idx]})
+                        {optionLabels[idx]})
                       </span>
                       <span className={`font-['Figtree:Regular',sans-serif] text-[15px] leading-[22px] flex-1 ${isCorrect ? "text-[#155724]" : "text-black"}`}>
                         {opt}
@@ -136,12 +136,16 @@ function IncorrectScreen({
   answers,
   totalCorrect,
   onReturn,
+  questions,
+  optionLabels,
 }: {
   answers: Record<string, number>;
   totalCorrect: number;
   onReturn: () => void;
+  questions: Question[];
+  optionLabels: string[];
 }) {
-  const percentage = Math.round((totalCorrect / PROVA_QUESTIONS.length) * 100);
+  const percentage = Math.round((totalCorrect / questions.length) * 100);
 
   return (
     <div className="bg-white min-h-screen pb-[60px]">
@@ -162,12 +166,12 @@ function IncorrectScreen({
         <div className="flex items-center justify-between px-[20px] py-[16px] rounded-[12px] bg-[#801436]">
           <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#ffeac4] text-[18px]">Resultado</p>
           <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#ffeac4] text-[18px]">
-            {totalCorrect}/{PROVA_QUESTIONS.length} acertos ({percentage}%)
+            {totalCorrect}/{questions.length} acertos ({percentage}%)
           </p>
         </div>
 
         {/* Por questão */}
-        {PROVA_QUESTIONS.map((q, qIdx) => {
+        {questions.map((q, qIdx) => {
           const userIdx = answers[q.id]; // the index the student chose
           const isCorrect = userIdx === q.correctIndex;
 
@@ -244,7 +248,7 @@ function IncorrectScreen({
                         {boxContent}
                       </div>
                       <span className="font-['Figtree:Medium',sans-serif] font-medium text-[15px] text-[#021b59] shrink-0">
-                        {OPTION_LABELS[idx]})
+                        {optionLabels[idx]})
                       </span>
                       <span className={`font-['Figtree:Regular',sans-serif] text-[15px] leading-[23px] flex-1 ${textCls}`}>
                         {opt}
@@ -286,6 +290,10 @@ export function ExamResultPage() {
   useEnrollmentGuard("power-bi");
   const location = useLocation();
 
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [optionLabels, setOptionLabels] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   // useRef garante que processamos as respostas apenas uma vez
   const processedRef = useRef<{
     normalizedAnswers: Record<string, number>;
@@ -293,7 +301,27 @@ export function ExamResultPage() {
     allCorrect: boolean;
   } | null>(null);
 
-  if (!processedRef.current) {
+  // Fetch exam data on mount
+  useEffect(() => {
+    const loadExamData = async () => {
+      try {
+        const [questionsData, labelsData] = await Promise.all([
+          fetchExamQuestions(),
+          fetchOptionLabels(),
+        ]);
+        setQuestions(questionsData);
+        setOptionLabels(labelsData);
+      } catch (error) {
+        console.error("Failed to load exam data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadExamData();
+  }, []);
+
+  // Process answers only after questions are loaded
+  if (questions.length > 0 && !processedRef.current) {
     // Recuperar respostas do state de navegação (preferível ao sessionStorage)
     let answers: Record<string, number> = location.state?.answers ?? {};
 
@@ -321,20 +349,20 @@ export function ExamResultPage() {
       normalized[key] = typeof value === 'number' ? value : parseInt(String(value), 10);
     });
 
-    const correct = PROVA_QUESTIONS.filter(
+    const correct = questions.filter(
       (q) => normalized[q.id] === q.correctIndex
     ).length;
 
-    const all = correct === PROVA_QUESTIONS.length;
+    const all = correct === questions.length;
 
     // Debug temporário - REMOVER após verificação
     console.log('=== DEBUG PROVA RESULTADO (PROCESSAMENTO ÚNICO) ===');
     console.log('Respostas recebidas:', answers);
     console.log('Respostas normalizadas:', normalized);
-    console.log('Total de questões:', PROVA_QUESTIONS.length);
+    console.log('Total de questões:', questions.length);
     console.log('Total de acertos:', correct);
     console.log('Todas corretas?', all);
-    PROVA_QUESTIONS.forEach((q) => {
+    questions.forEach((q) => {
       const userAnswer = normalized[q.id];
       const correctIdx = q.correctIndex;
       const isCorrect = userAnswer === correctIdx;
@@ -349,14 +377,26 @@ export function ExamResultPage() {
     };
   }
 
-  const { normalizedAnswers, totalCorrect, allCorrect } = processedRef.current;
+  const { normalizedAnswers, totalCorrect, allCorrect } = processedRef.current ?? {
+    normalizedAnswers: {},
+    totalCorrect: 0,
+    allCorrect: false,
+  };
 
   function handleReturn() {
     navigate("/cursos/power-bi/modulos");
   }
 
+  if (isLoading) {
+    return (
+      <div className="bg-white min-h-screen pb-[60px] flex items-center justify-center">
+        <p className="text-center text-[#606060]">Carregando resultados...</p>
+      </div>
+    );
+  }
+
   if (allCorrect) {
-    return <CorrectScreen onReturn={handleReturn} />;
+    return <CorrectScreen onReturn={handleReturn} questions={questions} optionLabels={optionLabels} />;
   }
 
   return (
@@ -364,6 +404,8 @@ export function ExamResultPage() {
       answers={normalizedAnswers}
       totalCorrect={totalCorrect}
       onReturn={handleReturn}
+      questions={questions}
+      optionLabels={optionLabels}
     />
   );
 }

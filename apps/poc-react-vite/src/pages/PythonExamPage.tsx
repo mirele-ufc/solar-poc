@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
-import { PYTHON_QUESTIONS, PYTHON_OPTION_LABELS } from "@/services/pythonProvaData";
+import { fetchPythonExamQuestions, fetchOptionLabels, type Question } from "@/services/mocks/pythonExamMock";
 import { useEnrollmentGuard } from "@/hooks/useEnrollmentGuard";
 
 const TOTAL_SECONDS = 20 * 60; // 20 minutos
@@ -15,10 +15,32 @@ export function PythonExamPage() {
   const navigate = useNavigate();
   useEnrollmentGuard("python");
 
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [optionLabels, setOptionLabels] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [timeLeft, setTimeLeft] = useState(TOTAL_SECONDS);
   const [submitted, setSubmitted] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Fetch exam data on mount
+  useEffect(() => {
+    const loadExamData = async () => {
+      try {
+        const [questionsData, labelsData] = await Promise.all([
+          fetchPythonExamQuestions(),
+          fetchOptionLabels(),
+        ]);
+        setQuestions(questionsData);
+        setOptionLabels(labelsData);
+      } catch (error) {
+        console.error("Failed to load exam data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadExamData();
+  }, []);
 
   // Countdown timer
   useEffect(() => {
@@ -96,94 +118,100 @@ export function PythonExamPage() {
           </div>
         </div>
 
-        {/* Progress indicator */}
-        <div className="flex items-center gap-[10px]">
-          <div className="flex-1 h-[5px] bg-[#e0e0e0] rounded-full overflow-hidden">
-            <div
-              className="h-full bg-[#042e99] rounded-full transition-all duration-300"
-              style={{ width: `${(answeredCount / PYTHON_QUESTIONS.length) * 100}%` }}
-              aria-hidden="true"
-            />
-          </div>
-          <span className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[12px] shrink-0">
-            {answeredCount}/{PYTHON_QUESTIONS.length} respondidas
-          </span>
-        </div>
+        {isLoading ? (
+          <p className="text-center text-[#606060] py-[40px]">Carregando prova...</p>
+        ) : (
+          <>
+            {/* Progress indicator */}
+            <div className="flex items-center gap-[10px]">
+              <div className="flex-1 h-[5px] bg-[#e0e0e0] rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#042e99] rounded-full transition-all duration-300"
+                  style={{ width: `${(answeredCount / questions.length) * 100}%` }}
+                  aria-hidden="true"
+                />
+              </div>
+              <span className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[12px] shrink-0">
+                {answeredCount}/{questions.length} respondidas
+              </span>
+            </div>
 
-        {/* Questions */}
-        <div className="flex flex-col gap-[32px]">
-          {PYTHON_QUESTIONS.map((q, qIdx) => {
-            const selectedIdx = answers[q.id];
-            return (
-              <fieldset key={q.id} className="flex flex-col gap-[14px]">
-                <legend className="font-['Figtree:Bold',sans-serif] font-bold text-black text-[18px] leading-[28px] mb-[4px]">
-                  <span className="text-[#021b59]">Questão {qIdx + 1} — </span>
-                  {q.text}
-                </legend>
+            {/* Questions */}
+            <div className="flex flex-col gap-[32px]">
+              {questions.map((q, qIdx) => {
+                const selectedIdx = answers[q.id];
+                return (
+                  <fieldset key={q.id} className="flex flex-col gap-[14px]">
+                    <legend className="font-['Figtree:Bold',sans-serif] font-bold text-black text-[18px] leading-[28px] mb-[4px]">
+                      <span className="text-[#021b59]">Questão {qIdx + 1} — </span>
+                      {q.text}
+                    </legend>
 
-                <div className="flex flex-col gap-[8px]" role="radiogroup" aria-labelledby={`q-${q.id}-label`}>
-                  {q.options.map((opt, idx) => {
-                    const isSelected = selectedIdx === idx;
-                    return (
-                      <label
-                        key={idx}
-                        className={[
-                          "flex items-center gap-[12px] px-[16px] py-[14px] rounded-[12px] border-2 cursor-pointer transition-colors",
-                          isSelected
-                            ? "border-[#042e99] bg-[#e8eeff]"
-                            : "border-[#e0e0e0] bg-white hover:border-[#759BFB] hover:bg-[#f5f8ff]",
-                        ].join(" ")}
-                      >
-                        <input
-                          type="radio"
-                          name={`question-${q.id}`}
-                          value={idx}
-                          checked={isSelected}
-                          onChange={() => handleAnswer(q.id, idx)}
-                          className="sr-only"
-                          aria-label={`${PYTHON_OPTION_LABELS[idx]}) ${opt}`}
-                        />
-                        <div
-                          className={[
-                            "shrink-0 size-[22px] rounded-full border-2 flex items-center justify-center transition-colors",
-                            isSelected
-                              ? "border-[#042e99] bg-[#042e99]"
-                              : "border-[#8e8e8e] bg-white",
-                          ].join(" ")}
-                          aria-hidden="true"
-                        >
-                          {isSelected && (
-                            <div className="size-[8px] rounded-full bg-white" />
-                          )}
-                        </div>
-                        <span className={`font-['Figtree:Medium',sans-serif] font-medium text-[15px] shrink-0 ${isSelected ? "text-[#042e99]" : "text-[#021b59]"}`}>
-                          {PYTHON_OPTION_LABELS[idx]})
-                        </span>
-                        <span className={`font-['Figtree:Regular',sans-serif] text-[15px] leading-[24px] flex-1 ${isSelected ? "text-[#021b59]" : "text-[#333]"}`}>
-                          {opt}
-                        </span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </fieldset>
-            );
-          })}
-        </div>
+                    <div className="flex flex-col gap-[8px]" role="radiogroup" aria-labelledby={`q-${q.id}-label`}>
+                      {q.options.map((opt, idx) => {
+                        const isSelected = selectedIdx === idx;
+                        return (
+                          <label
+                            key={idx}
+                            className={[
+                              "flex items-center gap-[12px] px-[16px] py-[14px] rounded-[12px] border-2 cursor-pointer transition-colors",
+                              isSelected
+                                ? "border-[#042e99] bg-[#e8eeff]"
+                                : "border-[#e0e0e0] bg-white hover:border-[#759BFB] hover:bg-[#f5f8ff]",
+                            ].join(" ")}
+                          >
+                            <input
+                              type="radio"
+                              name={`question-${q.id}`}
+                              value={idx}
+                              checked={isSelected}
+                              onChange={() => handleAnswer(q.id, idx)}
+                              className="sr-only"
+                              aria-label={`${optionLabels[idx]}) ${opt}`}
+                            />
+                            <div
+                              className={[
+                                "shrink-0 size-[22px] rounded-full border-2 flex items-center justify-center transition-colors",
+                                isSelected
+                                  ? "border-[#042e99] bg-[#042e99]"
+                                  : "border-[#8e8e8e] bg-white",
+                              ].join(" ")}
+                              aria-hidden="true"
+                            >
+                              {isSelected && (
+                                <div className="size-[8px] rounded-full bg-white" />
+                              )}
+                            </div>
+                            <span className={`font-['Figtree:Medium',sans-serif] font-medium text-[15px] shrink-0 ${isSelected ? "text-[#042e99]" : "text-[#021b59]"}`}>
+                              {optionLabels[idx]})
+                            </span>
+                            <span className={`font-['Figtree:Regular',sans-serif] text-[15px] leading-[24px] flex-1 ${isSelected ? "text-[#021b59]" : "text-[#333]"}`}>
+                              {opt}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </fieldset>
+                );
+              })}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Sticky bottom: submit */}
       <div className="fixed bottom-0 left-0 right-0 bg-white px-[20px] py-[14px] shadow-[0px_-4px_12px_rgba(51,51,51,0.15)] flex justify-center z-10">
         <div className="w-full max-w-[900px] flex flex-col gap-[6px]">
-          {answeredCount < PYTHON_QUESTIONS.length && (
+          {answeredCount < questions.length && (
             <p className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[13px] text-center">
-              Responda todas as questões antes de finalizar ({answeredCount}/{PYTHON_QUESTIONS.length})
+              Responda todas as questões antes de finalizar ({answeredCount}/{questions.length})
             </p>
           )}
           <button
             type="button"
             onClick={() => handleSubmit(false)}
-            disabled={answeredCount < PYTHON_QUESTIONS.length || submitted}
+            disabled={answeredCount < questions.length || submitted}
             className="bg-[#021b59] h-[50px] w-full rounded-[26px] cursor-pointer hover:bg-[#042e99] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#ffeac4] focus-visible:outline-offset-[2px] disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <span className="font-['Figtree:Medium',sans-serif] font-medium text-white text-[20px]">

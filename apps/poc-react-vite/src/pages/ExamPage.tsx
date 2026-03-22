@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
-import { PROVA_QUESTIONS, OPTION_LABELS } from "@/services/provaData";
+import { fetchExamQuestions, fetchOptionLabels, type Question } from "@/services/mocks/examMock";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { useEnrollmentGuard } from "@/hooks/useEnrollmentGuard";
 
@@ -18,12 +18,34 @@ export function ExamPage() {
   const navigate = useNavigate();
   useEnrollmentGuard("power-bi");
 
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [optionLabels, setOptionLabels] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [timeLeft, setTimeLeft] = useState(3600);
   const [timeAnnouncement, setTimeAnnouncement] = useState("");
   const announcedRef = useRef<Set<number>>(new Set());
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Fetch exam data on mount
+  useEffect(() => {
+    const loadExamData = async () => {
+      try {
+        const [questionsData, labelsData] = await Promise.all([
+          fetchExamQuestions(),
+          fetchOptionLabels(),
+        ]);
+        setQuestions(questionsData);
+        setOptionLabels(labelsData);
+      } catch (error) {
+        console.error("Failed to load exam data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadExamData();
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -67,7 +89,7 @@ export function ExamPage() {
   }, [showConfirmModal]);
 
   const answeredCount = Object.keys(answers).length;
-  const totalCount = PROVA_QUESTIONS.length;
+  const totalCount = questions.length;
   const allAnswered = answeredCount === totalCount;
 
   function pick(questionId: string, optionIndex: number) {
@@ -106,129 +128,135 @@ export function ExamPage() {
           ]}
         />
 
-        <p
-          className="font-['Anek_Devanagari:ExtraBold',sans-serif] font-extrabold leading-tight text-black"
-          style={{ fontSize: "clamp(22px, 5vw, 34px)", fontVariationSettings: "'wdth' 100" }}
-        >
-          Power BI - Fundamentos
-        </p>
+        {isLoading ? (
+          <p className="text-center text-[#606060] py-[40px]">Carregando prova...</p>
+        ) : (
+          <>
+            <p
+              className="font-['Anek_Devanagari:ExtraBold',sans-serif] font-extrabold leading-tight text-black"
+              style={{ fontSize: "clamp(22px, 5vw, 34px)", fontVariationSettings: "'wdth' 100" }}
+            >
+              Power BI - Fundamentos
+            </p>
 
-        <div className="flex items-center justify-between border-b border-[#e0e0e0] pb-[16px]">
-          <h2 className="font-['Figtree:Bold',sans-serif] font-bold text-black text-[26px] leading-tight">
-            Prova 01
-          </h2>
-          <div
-            className="flex items-center gap-[8px] bg-[#f5f5f5] px-[14px] py-[6px] rounded-[8px]"
-            aria-live="off"
-            aria-label={`Tempo restante: ${formatTime(timeLeft)}`}
-          >
-            <svg className="size-[20px] shrink-0" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-              <path clipRule="evenodd" d={clockPath} fill="#595959" fillRule="evenodd" />
-            </svg>
-            <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#595959] text-[17px] tabular-nums">
-              {formatTime(timeLeft)}
-            </span>
-          </div>
-        </div>
-
-        {PROVA_QUESTIONS.map((q, qIdx) => {
-          const chosen = answers[q.id];
-          const fieldsetId = `question-${q.id}-legend`;
-          return (
-            <fieldset key={q.id} className="flex flex-col gap-[14px] border-0 p-0 m-0">
-              <legend className="float-left w-full">
-                <div className="flex items-start justify-between gap-[12px]">
-                  <div className="flex-1 min-w-0">
-                    <p
-                      id={fieldsetId}
-                      className="font-['Figtree:Bold',sans-serif] font-bold text-black text-[20px] leading-tight mb-[6px]"
-                    >
-                      Questão {qIdx + 1}
-                    </p>
-                    <p className="font-['Figtree:Medium',sans-serif] font-medium text-black text-[17px] leading-[26px]">
-                      {q.text}
-                    </p>
-                  </div>
-                  <div className="shrink-0 bg-[#f5f5f5] px-[14px] py-[6px] rounded-[8px]">
-                    <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#595959] text-[15px] whitespace-nowrap">
-                      1,0 pt
-                    </span>
-                  </div>
-                </div>
-              </legend>
-
-              <div className="flex flex-col gap-[8px] clear-both">
-                {q.options.map((opt, idx) => {
-                  const isSelected = chosen === idx;
-                  const optId = `${q.id}-opt-${idx}`;
-                  return (
-                    <label
-                      key={optId}
-                      htmlFor={optId}
-                      className={[
-                        "flex items-center gap-[12px] w-full text-left py-[12px] px-[14px] rounded-[12px] border-2 transition-colors cursor-pointer",
-                        "has-[:focus-visible]:outline has-[:focus-visible]:outline-[2px] has-[:focus-visible]:outline-[#021b59] has-[:focus-visible]:outline-offset-[2px]",
-                        isSelected
-                          ? "border-[#021b59] bg-[#ffeac4]"
-                          : "border-[#d0d0d0] bg-white hover:bg-[#f5f5f5]",
-                      ].join(" ")}
-                    >
-                      <input
-                        id={optId}
-                        type="radio"
-                        name={q.id}
-                        value={idx}
-                        checked={isSelected}
-                        onChange={() => pick(q.id, idx)}
-                        className="sr-only"
-                      />
-                      <div
-                        className={[
-                          "shrink-0 size-[22px] border-2 rounded-[4px] flex items-center justify-center transition-colors",
-                          isSelected ? "bg-[#ffeac4] border-[#021b59]" : "bg-white border-[#aaa]",
-                        ].join(" ")}
-                        aria-hidden="true"
-                      >
-                        {isSelected && (
-                          <svg className="size-[13px]" fill="none" viewBox="0 0 22 22">
-                            <path clipRule="evenodd" d="M5 9L3 11L9 17L19 7L17 5L9 13L5 9Z" fill="#021B59" fillRule="evenodd" />
-                          </svg>
-                        )}
-                      </div>
-                      <span className="font-['Figtree:Medium',sans-serif] font-medium text-[15px] text-[#021b59] shrink-0">
-                        {OPTION_LABELS[idx]}
-                      </span>
-                      <span className="font-['Figtree:Regular',sans-serif] font-normal text-[16px] text-black leading-[24px] flex-1">
-                        {opt}
-                      </span>
-                    </label>
-                  );
-                })}
+            <div className="flex items-center justify-between border-b border-[#e0e0e0] pb-[16px]">
+              <h2 className="font-['Figtree:Bold',sans-serif] font-bold text-black text-[26px] leading-tight">
+                Prova 01
+              </h2>
+              <div
+                className="flex items-center gap-[8px] bg-[#f5f5f5] px-[14px] py-[6px] rounded-[8px]"
+                aria-live="off"
+                aria-label={`Tempo restante: ${formatTime(timeLeft)}`}
+              >
+                <svg className="size-[20px] shrink-0" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                  <path clipRule="evenodd" d={clockPath} fill="#595959" fillRule="evenodd" />
+                </svg>
+                <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#595959] text-[17px] tabular-nums">
+                  {formatTime(timeLeft)}
+                </span>
               </div>
-            </fieldset>
-          );
-        })}
+            </div>
 
-        <div className="pt-[8px]">
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={!allAnswered}
-            className={[
-              "h-[52px] w-full rounded-[26px] transition-colors",
-              "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59]",
-              allAnswered
-                ? "bg-[#ffeac4] cursor-pointer hover:bg-[#ffd9a0]"
-                : "bg-[#e0e0e0] cursor-not-allowed opacity-60",
-            ].join(" ")}
-          >
-            <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
-              {allAnswered
-                ? "Enviar"
-                : `Responda todas as questões (${answeredCount}/${totalCount})`}
-            </span>
-          </button>
-        </div>
+            {questions.map((q, qIdx) => {
+              const chosen = answers[q.id];
+              const fieldsetId = `question-${q.id}-legend`;
+              return (
+                <fieldset key={q.id} className="flex flex-col gap-[14px] border-0 p-0 m-0">
+                  <legend className="float-left w-full">
+                    <div className="flex items-start justify-between gap-[12px]">
+                      <div className="flex-1 min-w-0">
+                        <p
+                          id={fieldsetId}
+                          className="font-['Figtree:Bold',sans-serif] font-bold text-black text-[20px] leading-tight mb-[6px]"
+                        >
+                          Questão {qIdx + 1}
+                        </p>
+                        <p className="font-['Figtree:Medium',sans-serif] font-medium text-black text-[17px] leading-[26px]">
+                          {q.text}
+                        </p>
+                      </div>
+                      <div className="shrink-0 bg-[#f5f5f5] px-[14px] py-[6px] rounded-[8px]">
+                        <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#595959] text-[15px] whitespace-nowrap">
+                          1,0 pt
+                        </span>
+                      </div>
+                    </div>
+                  </legend>
+
+                  <div className="flex flex-col gap-[8px] clear-both">
+                    {q.options.map((opt, idx) => {
+                      const isSelected = chosen === idx;
+                      const optId = `${q.id}-opt-${idx}`;
+                      return (
+                        <label
+                          key={optId}
+                          htmlFor={optId}
+                          className={[
+                            "flex items-center gap-[12px] w-full text-left py-[12px] px-[14px] rounded-[12px] border-2 transition-colors cursor-pointer",
+                            "has-[:focus-visible]:outline has-[:focus-visible]:outline-[2px] has-[:focus-visible]:outline-[#021b59] has-[:focus-visible]:outline-offset-[2px]",
+                            isSelected
+                              ? "border-[#021b59] bg-[#ffeac4]"
+                              : "border-[#d0d0d0] bg-white hover:bg-[#f5f5f5]",
+                          ].join(" ")}
+                        >
+                          <input
+                            id={optId}
+                            type="radio"
+                            name={q.id}
+                            value={idx}
+                            checked={isSelected}
+                            onChange={() => pick(q.id, idx)}
+                            className="sr-only"
+                          />
+                          <div
+                            className={[
+                              "shrink-0 size-[22px] border-2 rounded-[4px] flex items-center justify-center transition-colors",
+                              isSelected ? "bg-[#ffeac4] border-[#021b59]" : "bg-white border-[#aaa]",
+                            ].join(" ")}
+                            aria-hidden="true"
+                          >
+                            {isSelected && (
+                              <svg className="size-[13px]" fill="none" viewBox="0 0 22 22">
+                                <path clipRule="evenodd" d="M5 9L3 11L9 17L19 7L17 5L9 13L5 9Z" fill="#021B59" fillRule="evenodd" />
+                              </svg>
+                            )}
+                          </div>
+                          <span className="font-['Figtree:Medium',sans-serif] font-medium text-[15px] text-[#021b59] shrink-0">
+                            {optionLabels[idx]}
+                          </span>
+                          <span className="font-['Figtree:Regular',sans-serif] font-normal text-[16px] text-black leading-[24px] flex-1">
+                            {opt}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </fieldset>
+              );
+            })}
+
+            <div className="pt-[8px]">
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={!allAnswered}
+                className={[
+                  "h-[52px] w-full rounded-[26px] transition-colors",
+                  "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59]",
+                  allAnswered
+                    ? "bg-[#ffeac4] cursor-pointer hover:bg-[#ffd9a0]"
+                    : "bg-[#e0e0e0] cursor-not-allowed opacity-60",
+                ].join(" ")}
+              >
+                <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
+                  {allAnswered
+                    ? "Enviar"
+                    : `Responda todas as questões (${answeredCount}/${totalCount})`}
+                </span>
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
       {showConfirmModal && (
