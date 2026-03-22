@@ -146,9 +146,9 @@ function saveVisited(visited: Set<string>) {
   } catch { /* ignore */ }
 }
 
-// ─── AulasPage ───────────────────────────────────────────────────────────────
+// ─── LessonsPage ─────────────────────────────────────────────────────────────
 
-export function AulasPage() {
+export function LessonsPage() {
   const navigate = useNavigate();
   useEnrollmentGuard("power-bi");
   const { modId } = useParams<{ modId: string }>();

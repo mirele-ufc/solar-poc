@@ -96,7 +96,7 @@ function OptionBar({
 }
 
 // ── Page ───────────────────────────────────────────────────────────────────────
-export function ProfessorCursoPage() {
+export function TeacherCoursePage() {
   const navigate = useNavigate();
 
   return (

@@ -125,7 +125,7 @@ function MessageCard({ message, isExpanded, onToggle }: MessageCardProps) {
 
 // ─── MensagensPage ────────────────────────────────────────────────────────────
 
-export function MensagensPage() {
+export function MessagesPage() {
   const navigate = useNavigate();
   const { user, sentMessages } = useApp();
 

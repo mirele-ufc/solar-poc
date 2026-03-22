@@ -147,7 +147,7 @@ function SelectField({
   );
 }
 
-export function CadastrarPage() {
+export function RegisterPage() {
   const navigate = useNavigate();
   const [agreed, setAgreed] = useState(false);
   const [cpf, setCpf] = useState("");

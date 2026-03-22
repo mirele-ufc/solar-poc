@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router";
-import type { CourseInfoData } from "./CriarCursoPage";
+import type { CourseInfoData } from "./CreateCoursePage";
 import { PageHeader } from "@/components/shared/PageHeader";
 
 // ── SVG paths ──────────────────────────────────────────────────────────────────
@@ -243,7 +243,7 @@ function AddLessonPopup({
 }
 
 // ── Page ───────────────────────────────────────────────────────────────────────
-export function CriarModulosPage() {
+export function CreateModulesPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const courseData = (location.state?.courseData ?? {}) as CourseInfoData;

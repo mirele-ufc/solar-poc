@@ -159,7 +159,7 @@ function ProfessorCourseMenu({ onEdit, onViewResponses, onClose }: ProfessorCour
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
-export function CursosPage() {
+export function CoursesPage() {
   const navigate = useNavigate();
   const { user } = useApp();
   const isProfessor = user.role === "professor";

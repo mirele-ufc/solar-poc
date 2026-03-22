@@ -14,7 +14,7 @@ function formatTime(s: number) {
   return `${h}:${m}:${sec}`;
 }
 
-export function ProvaPage() {
+export function ExamPage() {
   const navigate = useNavigate();
   useEnrollmentGuard("power-bi");
 

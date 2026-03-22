@@ -724,7 +724,7 @@ function CourseDashboard({
 }
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
-export function ProfessorCursoGerenciarPage() {
+export function ManageCoursePage() {
   const navigate = useNavigate();
   const { id = "power-bi" } = useParams<{ id: string }>();
   const course = COURSE_DATA[id] ?? COURSE_DATA["power-bi"];

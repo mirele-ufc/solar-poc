@@ -715,7 +715,7 @@ function RequisitosAlert({ totalAulas, visitedAulas, totalProvas, visitedProvas,
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
-export function ModulosPage() {
+export function ModulesPage() {
   const navigate = useNavigate();
   const { user } = useApp();
   useEnrollmentGuard("power-bi");

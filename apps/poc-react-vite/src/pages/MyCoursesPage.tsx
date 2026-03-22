@@ -96,7 +96,7 @@ function EmptyState({ message, sub }: { message: string; sub: string }) {
   );
 }
 
-export function MeusCursosPage() {
+export function MyCoursesPage() {
   const navigate = useNavigate();
   const { enrolledCourses, courseStudentRoles, user } = useApp();
 

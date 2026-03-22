@@ -175,7 +175,7 @@ function MessageCard({ message, isExpanded, onToggle, isUnread }: MessageCardPro
 
 // ─── MensagensEstudantePage ───────────────────────────────────────────────────
 
-export function MensagensEstudantePage() {
+export function StudentMessagesPage() {
   const navigate = useNavigate();
   const { user, sentMessages, enrolledCourses } = useApp();
 

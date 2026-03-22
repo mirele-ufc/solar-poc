@@ -498,7 +498,7 @@ function RequisitosAlert({
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
-export function PythonModulosPage() {
+export function PythonModulesPage() {
   const navigate = useNavigate();
   const { user } = useApp();
   useEnrollmentGuard("python");

@@ -33,7 +33,7 @@ const preRequisitos = [
   "Não é necessário conhecimento prévio em programação",
 ];
 
-export function CursoDetailPage() {
+export function CourseDetailPage() {
   const navigate = useNavigate();
   const { isEnrolled, unenroll } = useApp();
   const enrolled = isEnrolled("power-bi");

@@ -1,62 +1,62 @@
 import { createBrowserRouter } from "react-router";
 import { LoginPage } from "./pages/LoginPage";
-import { CadastrarPage } from "./pages/CadastrarPage";
-import { EsqueceuSenhaPage } from "./pages/EsqueceuSenhaPage";
+import { RegisterPage } from "./pages/RegisterPage";
+import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
 import { AuthLayout } from "./components/shared/AuthLayout";
-import { CursosPage } from "./pages/CursosPage";
-import { CursoDetailPage } from "./pages/CursoDetailPage";
-import { InscricaoPage } from "./pages/InscricaoPage";
-import { ModulosPage } from "./pages/ModulosPage";
-import { AulasPage } from "./pages/AulasPage";
-import { ProvaInstrucoesPage } from "./pages/ProvaInstrucoesPage";
-import { ProvaPage } from "./pages/ProvaPage";
-import { ProvaResultadoPage } from "./pages/ProvaResultadoPage";
+import { CoursesPage } from "./pages/CoursesPage";
+import { CourseDetailPage } from "./pages/CourseDetailPage";
+import { EnrollmentPage } from "./pages/EnrollmentPage";
+import { ModulesPage } from "./pages/ModulesPage";
+import { LessonsPage } from "./pages/LessonsPage";
+import { ExamInstructionsPage } from "./pages/ExamInstructionsPage";
+import { ExamPage } from "./pages/ExamPage";
+import { ExamResultPage } from "./pages/ExamResultPage";
 import { ProfilePage } from "./pages/ProfilePage";
-import { CriarCursoPage } from "./pages/CriarCursoPage";
-import { CriarModulosPage } from "./pages/CriarModulosPage";
-import { CriarProvaPage } from "./pages/CriarProvaPage";
-import { ProfessorCursoPage } from "./pages/ProfessorCursoPage";
-import { ProfessorCursoGerenciarPage } from "./pages/ProfessorCursoGerenciarPage";
-import { MeusCursosPage } from "./pages/MeusCursosPage";
-import { MensagemPage } from "./pages/MensagemPage";
-import { MensagensPage } from "./pages/MensagensPage";
-import { MensagensEstudantePage } from "./pages/MensagensEstudantePage";
+import { CreateCoursePage } from "./pages/CreateCoursePage";
+import { CreateModulesPage } from "./pages/CreateModulesPage";
+import { CreateExamPage } from "./pages/CreateExamPage";
+import { TeacherCoursePage } from "./pages/TeacherCoursePage";
+import { ManageCoursePage } from "./pages/ManageCoursePage";
+import { MyCoursesPage } from "./pages/MyCoursesPage";
+import { MessagePage } from "./pages/MessagePage";
+import { MessagesPage } from "./pages/MessagesPage";
+import { StudentMessagesPage } from "./pages/StudentMessagesPage";
 // ── Python student-side pages ──────────────────────────────────────────────────
 import { PythonDetailPage } from "./pages/PythonDetailPage";
-import { PythonInscricaoPage } from "./pages/PythonInscricaoPage";
-import { PythonModulosPage } from "./pages/PythonModulosPage";
-import { PythonAulasPage } from "./pages/PythonAulasPage";
-import { PythonProvaInstrucoesPage } from "./pages/PythonProvaInstrucoesPage";
-import { PythonProvaPage } from "./pages/PythonProvaPage";
-import { PythonProvaResultadoPage } from "./pages/PythonProvaResultadoPage";
+import { PythonEnrollmentPage } from "./pages/PythonEnrollmentPage";
+import { PythonModulesPage } from "./pages/PythonModulesPage";
+import { PythonLessonsPage } from "./pages/PythonLessonsPage";
+import { PythonExamInstructionsPage } from "./pages/PythonExamInstructionsPage";
+import { PythonExamPage } from "./pages/PythonExamPage";
+import { PythonExamResultPage } from "./pages/PythonExamResultPage";
 
 export const router = createBrowserRouter([
   { index: true, Component: LoginPage },
-  { path: "register", Component: CadastrarPage },
-  { path: "forgot-password", Component: EsqueceuSenhaPage },
+  { path: "register", Component: RegisterPage },
+  { path: "forgot-password", Component: ForgotPasswordPage },
   {
     path: "courses",
     Component: AuthLayout,
     children: [
-      { index: true, Component: CursosPage },
-      { path: ":id/manage", Component: ProfessorCursoGerenciarPage },
+      { index: true, Component: CoursesPage },
+      { path: ":id/manage", Component: ManageCoursePage },
       // ── Power BI ──────────────────────────────────────────────────────────────
-      { path: "power-bi", Component: CursoDetailPage },
-      { path: "power-bi/enrollment", Component: InscricaoPage },
-      { path: "power-bi/modules", Component: ModulosPage },
-      { path: "power-bi/modules/:modId", Component: AulasPage },
-      { path: "power-bi/exam/instructions", Component: ProvaInstrucoesPage },
-      { path: "power-bi/exam", Component: ProvaPage },
-      { path: "power-bi/exam/results", Component: ProvaResultadoPage },
-      { path: "power-bi/manage", Component: ProfessorCursoGerenciarPage },
+      { path: "power-bi", Component: CourseDetailPage },
+      { path: "power-bi/enrollment", Component: EnrollmentPage },
+      { path: "power-bi/modules", Component: ModulesPage },
+      { path: "power-bi/modules/:modId", Component: LessonsPage },
+      { path: "power-bi/exam/instructions", Component: ExamInstructionsPage },
+      { path: "power-bi/exam", Component: ExamPage },
+      { path: "power-bi/exam/results", Component: ExamResultPage },
+      { path: "power-bi/manage", Component: ManageCoursePage },
       // ── Python (visão de aluno — disponível para professor com papel de aluno) ─
       { path: "python", Component: PythonDetailPage },
-      { path: "python/enrollment", Component: PythonInscricaoPage },
-      { path: "python/modules", Component: PythonModulosPage },
-      { path: "python/modules/:modId", Component: PythonAulasPage },
-      { path: "python/exam/instructions", Component: PythonProvaInstrucoesPage },
-      { path: "python/exam", Component: PythonProvaPage },
-      { path: "python/exam/results", Component: PythonProvaResultadoPage },
+      { path: "python/enrollment", Component: PythonEnrollmentPage },
+      { path: "python/modules", Component: PythonModulesPage },
+      { path: "python/modules/:modId", Component: PythonLessonsPage },
+      { path: "python/exam/instructions", Component: PythonExamInstructionsPage },
+      { path: "python/exam", Component: PythonExamPage },
+      { path: "python/exam/results", Component: PythonExamResultPage },
     ],
   },
   {
@@ -67,30 +67,30 @@ export const router = createBrowserRouter([
   {
     path: "my-courses",
     Component: AuthLayout,
-    children: [{ index: true, Component: MeusCursosPage }],
+    children: [{ index: true, Component: MyCoursesPage }],
   },
   {
     path: "create-course",
     Component: AuthLayout,
     children: [
-      { index: true, Component: CriarCursoPage },
-      { path: "modules", Component: CriarModulosPage },
-      { path: "exam", Component: CriarProvaPage },
+      { index: true, Component: CreateCoursePage },
+      { path: "modules", Component: CreateModulesPage },
+      { path: "exam", Component: CreateExamPage },
     ],
   },
   {
     path: "message",
     Component: AuthLayout,
-    children: [{ index: true, Component: MensagemPage }],
+    children: [{ index: true, Component: MessagePage }],
   },
   {
     path: "messages",
     Component: AuthLayout,
-    children: [{ index: true, Component: MensagensPage }],
+    children: [{ index: true, Component: MessagesPage }],
   },
   {
     path: "received-messages",
     Component: AuthLayout,
-    children: [{ index: true, Component: MensagensEstudantePage }],
+    children: [{ index: true, Component: StudentMessagesPage }],
   },
 ]);

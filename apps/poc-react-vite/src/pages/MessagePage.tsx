@@ -12,7 +12,7 @@ const COURSES = [
   { id: "estrutura-dados", name: "Estrutura de Dados" },
 ];
 
-export function MensagemPage() {
+export function MessagePage() {
   const navigate = useNavigate();
   const { user, sendMessage } = useApp();
   

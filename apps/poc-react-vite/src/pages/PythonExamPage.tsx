@@ -11,7 +11,7 @@ function formatTime(secs: number): string {
   return `${m}:${s}`;
 }
 
-export function PythonProvaPage() {
+export function PythonExamPage() {
   const navigate = useNavigate();
   useEnrollmentGuard("python");
 

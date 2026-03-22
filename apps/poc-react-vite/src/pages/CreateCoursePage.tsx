@@ -57,7 +57,7 @@ function FieldInput({
   );
 }
 
-export function CriarCursoPage() {
+export function CreateCoursePage() {
   const navigate = useNavigate();
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState<CourseInfoData>({

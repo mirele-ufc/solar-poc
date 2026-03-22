@@ -17,7 +17,7 @@ const AULA = {
 
 const ARROW_BACK = "M20 11H7.83L13.42 5.41L12 4L4 12L12 20L13.41 18.59L7.83 13H20V11Z";
 
-export function PythonAulasPage() {
+export function PythonLessonsPage() {
   const navigate = useNavigate();
   useEnrollmentGuard("python");
 
