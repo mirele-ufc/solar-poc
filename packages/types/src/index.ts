@@ -2,7 +2,7 @@ export interface IUserSession {
   id: string;
   name: string;
   email: string;
-  role: 'student' | 'creator' | 'admin';
+  role: "student" | "creator" | "admin";
 }
 
 export interface ICourse {
@@ -26,7 +26,7 @@ export interface ILesson {
   title: string;
   content: string;
   videoUrl?: string;
-  type: 'video' | 'text' | 'quiz';
+  type: "video" | "text" | "quiz";
 }
 
 export interface IQuiz {
@@ -48,4 +48,15 @@ export interface IStudentSubmission {
   courseId: string;
   progressPercentage: number;
   completedLessons: string[];
+}
+
+/**
+ * Standardized error response object
+ * Ensures all API errors are handled consistently across the application
+ */
+export interface IApiError {
+  message: string;
+  status?: number;
+  statusText?: string;
+  timestamp: string;
 }
