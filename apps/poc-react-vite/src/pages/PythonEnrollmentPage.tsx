@@ -1,7 +1,13 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useCourseStore } from "@/store/useCourseStore";
 import { PageHeader } from "@/components/shared/PageHeader";
+import {
+  enrollmentSchema,
+  type EnrollmentFormValues,
+} from "@/validations/enrollmentSchema";
 
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1624953587687-daf255b6b80a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxweXRob24lMjBwcm9ncmFtbWluZyUyMGNvZGUlMjBjb21wdXRlcnxlbnwxfHx8fDE3NzMzMzU2MTd8MA&ixlib=rb-4.1.0&q=80&w=1080";
@@ -72,11 +78,22 @@ function TextField({
 export function PythonEnrollmentPage() {
   const navigate = useNavigate();
   const { enrollInCourse } = useCourseStore();
+  const {
+    watch,
+    setValue,
+    trigger,
+    formState: { errors },
+  } = useForm<EnrollmentFormValues>({
+    resolver: zodResolver(enrollmentSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      city: "",
+      gender: "",
+    },
+  });
 
-  const [nome, setNome] = useState("");
-  const [sobrenome, setSobrenome] = useState("");
-  const [cidade, setCidade] = useState("");
-  const [genero, setGenero] = useState("");
+  const form = watch();
   const [generoOpen, setGeneroOpen] = useState(false);
 
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
@@ -84,13 +101,12 @@ export function PythonEnrollmentPage() {
 
   const topRef = useRef<HTMLDivElement>(null);
 
-  const handleFinalizar = () => {
-    const missing =
-      !nome.trim() || !sobrenome.trim() || !cidade.trim() || !genero;
+  const handleFinalizar = async () => {
+    setShowErrors(true);
+    const isValid = await trigger();
 
-    if (missing) {
+    if (!isValid) {
       setStatus("error");
-      setShowErrors(true);
       topRef.current?.scrollIntoView({ behavior: "smooth" });
       return;
     }
@@ -179,29 +195,44 @@ export function PythonEnrollmentPage() {
             label="Nome"
             placeholder="Insira seu nome"
             id="nome"
-            value={nome}
-            onChange={setNome}
-            hasError={showErrors && !nome.trim()}
-            errorMessage="Nome não informado"
+            value={form.firstName}
+            onChange={(value) =>
+              setValue("firstName", value, {
+                shouldDirty: true,
+                shouldValidate: showErrors,
+              })
+            }
+            hasError={showErrors && !!errors.firstName}
+            errorMessage={errors.firstName?.message}
           />
           <TextField
             label="Sobrenome"
             placeholder="Insira seu sobrenome"
             id="sobrenome"
-            value={sobrenome}
-            onChange={setSobrenome}
-            hasError={showErrors && !sobrenome.trim()}
-            errorMessage="Sobrenome não informado"
+            value={form.lastName}
+            onChange={(value) =>
+              setValue("lastName", value, {
+                shouldDirty: true,
+                shouldValidate: showErrors,
+              })
+            }
+            hasError={showErrors && !!errors.lastName}
+            errorMessage={errors.lastName?.message}
           />
         </div>
         <TextField
           label="Cidade"
           placeholder="Insira o nome da cidade onde você mora"
           id="cidade"
-          value={cidade}
-          onChange={setCidade}
-          hasError={showErrors && !cidade.trim()}
-          errorMessage="Cidade não informada"
+          value={form.city}
+          onChange={(value) =>
+            setValue("city", value, {
+              shouldDirty: true,
+              shouldValidate: showErrors,
+            })
+          }
+          hasError={showErrors && !!errors.city}
+          errorMessage={errors.city?.message}
         />
 
         {/* Gênero */}
@@ -219,12 +250,12 @@ export function PythonEnrollmentPage() {
               aria-haspopup="listbox"
               aria-expanded={generoOpen}
               onClick={() => setGeneroOpen(!generoOpen)}
-              className={`bg-white h-[60px] w-full rounded-[12px] flex items-center gap-[10px] px-[20px] py-[12px] relative ${showErrors && !genero ? "border-2 border-[#c0392b]" : "border border-[#5f5f5f]"}`}
+              className={`bg-white h-[60px] w-full rounded-[12px] flex items-center gap-[10px] px-[20px] py-[12px] relative ${showErrors && !!errors.gender ? "border-2 border-[#c0392b]" : "border border-[#5f5f5f]"}`}
             >
               <span
-                className={`flex-1 text-left font-['Figtree:Regular',sans-serif] font-normal text-[16px] ${genero ? "text-[#333]" : "text-[#595959]"}`}
+                className={`flex-1 text-left font-['Figtree:Regular',sans-serif] font-normal text-[16px] ${form.gender ? "text-[#333]" : "text-[#595959]"}`}
               >
-                {genero || "Selecione uma opção"}
+                {form.gender || "Selecione uma opção"}
               </span>
               <svg
                 className="size-[13px] shrink-0 transition-transform"
@@ -253,9 +284,12 @@ export function PythonEnrollmentPage() {
                       <button
                         type="button"
                         role="option"
-                        aria-selected={genero === g}
+                        aria-selected={form.gender === g}
                         onClick={() => {
-                          setGenero(g);
+                          setValue("gender", g, {
+                            shouldDirty: true,
+                            shouldValidate: showErrors,
+                          });
                           setGeneroOpen(false);
                         }}
                         className="w-full text-left px-[20px] py-[14px] font-['Figtree:Regular',sans-serif] font-normal text-[16px] text-[#333] hover:bg-[#ffeac4]/40 focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
@@ -268,9 +302,9 @@ export function PythonEnrollmentPage() {
               </>
             )}
           </div>
-          {showErrors && !genero && (
+          {showErrors && !!errors.gender && (
             <p className="font-['Figtree:Regular',sans-serif] font-normal text-[14px] mt-[4px] text-[#c0392b]">
-              Gênero não informado
+              {errors.gender.message}
             </p>
           )}
         </div>

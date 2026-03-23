@@ -1,7 +1,13 @@
 import { useState, useId } from "react";
 import { useNavigate } from "react-router";
 import { ChevronLeft } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuthStore } from "@/store/useAuthStore";
+import {
+  composeMessageSchema,
+  type ComposeMessageFormValues,
+} from "@/validations/messageSchema";
 
 // ⚠️ PROTÓTIPO: dados mockados no cliente.
 // Em produção, a lista de cursos e estudantes deve vir de uma API autenticada.
@@ -16,10 +22,24 @@ export function MessagePage() {
   const navigate = useNavigate();
   const { currentUser, sendMessage } = useAuthStore();
 
-  const [recipient, setRecipient] = useState("");
-  const [subject, setSubject] = useState("");
-  const [message, setMessage] = useState("");
+  const {
+    watch,
+    setValue,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ComposeMessageFormValues>({
+    resolver: zodResolver(composeMessageSchema),
+    defaultValues: {
+      recipient: "",
+      subject: "",
+      message: "",
+    },
+  });
+
+  const form = watch();
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showErrors, setShowErrors] = useState(false);
+  const [generalError, setGeneralError] = useState("");
 
   const recipientId = useId();
   const subjectId = useId();
@@ -29,40 +49,43 @@ export function MessagePage() {
   // Em produção, o servidor DEVE validar que o usuário é professor antes de aceitar a mensagem.
   const isTeacher = currentUser.role === "professor";
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // ✅ Validação cliente é apenas UX — servidor DEVE revalidar todos os campos
-    if (!recipient || !subject || !message) {
-      return;
-    }
+  const onSubmitValid = (values: ComposeMessageFormValues) => {
+    setGeneralError("");
+    setShowErrors(false);
 
     // ⚠️ PROTÓTIPO: simulação de envio.
     // Em produção, isso seria uma chamada POST autenticada ao servidor.
     const recipientLabel =
-      recipient === "all"
+      values.recipient === "all"
         ? "Alunos de todos os cursos"
-        : `Alunos de ${COURSES.find((c) => c.id === recipient)?.name ?? recipient}`;
+        : `Alunos de ${COURSES.find((c) => c.id === values.recipient)?.name ?? values.recipient}`;
 
     sendMessage({
-      recipientId: recipient,
+      recipientId: values.recipient,
       recipientLabel,
-      subject,
-      body: message,
+      subject: values.subject,
+      body: values.message,
     });
 
     // Mostrar mensagem de sucesso
     setShowSuccess(true);
 
     // Resetar formulário
-    setRecipient("");
-    setSubject("");
-    setMessage("");
+    setValue("recipient", "");
+    setValue("subject", "");
+    setValue("message", "");
 
     // Esconder mensagem de sucesso após 3 segundos
     setTimeout(() => {
       setShowSuccess(false);
     }, 3000);
+  };
+
+  const onSubmitInvalid = () => {
+    setGeneralError(
+      "Por favor, preencha os campos obrigatórios para enviar a mensagem",
+    );
+    setShowErrors(true);
   };
 
   const initials = currentUser.name
@@ -174,8 +197,22 @@ export function MessagePage() {
           </h1>
         </div>
 
+        {showErrors && generalError && (
+          <div
+            role="alert"
+            className="mb-[20px] bg-[#c0392b] border border-[#c0392b] text-white px-[24px] py-[16px] rounded-[12px]"
+          >
+            <p className="font-['Figtree:Medium',sans-serif] font-medium text-[16px]">
+              {generalError}
+            </p>
+          </div>
+        )}
+
         {/* ✅ Acessibilidade: uso de <form> semântico com labels apropriados */}
-        <form onSubmit={handleSubmit} className="space-y-[20px]">
+        <form
+          onSubmit={handleSubmit(onSubmitValid, onSubmitInvalid)}
+          className="space-y-[20px]"
+        >
           {/* Recipient field */}
           <div>
             <label
@@ -186,10 +223,18 @@ export function MessagePage() {
             </label>
             <select
               id={recipientId}
-              value={recipient}
-              onChange={(e) => setRecipient(e.target.value)}
+              value={form.recipient}
+              onChange={(e) =>
+                setValue("recipient", e.target.value, {
+                  shouldDirty: true,
+                  shouldValidate: showErrors,
+                })
+              }
               required
               aria-required="true"
+              aria-invalid={
+                showErrors && !!errors.recipient ? "true" : undefined
+              }
               className="w-full h-[56px] px-[21px] border border-[#5f5f5f] rounded-[12px] bg-white font-['Figtree:Regular',sans-serif] text-[16px] text-[#333] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:border-[#021b59]"
             >
               <option value="">Selecione um destinatário</option>
@@ -200,6 +245,11 @@ export function MessagePage() {
                 </option>
               ))}
             </select>
+            {showErrors && !!errors.recipient && (
+              <p className="font-['Figtree:Regular',sans-serif] font-normal text-[14px] mt-[4px] text-[#c0392b]">
+                {errors.recipient.message}
+              </p>
+            )}
           </div>
 
           {/* Subject field */}
@@ -213,14 +263,25 @@ export function MessagePage() {
             <input
               type="text"
               id={subjectId}
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
+              value={form.subject}
+              onChange={(e) =>
+                setValue("subject", e.target.value, {
+                  shouldDirty: true,
+                  shouldValidate: showErrors,
+                })
+              }
               required
               aria-required="true"
               maxLength={200}
+              aria-invalid={showErrors && !!errors.subject ? "true" : undefined}
               className="w-full h-[56px] px-[21px] border border-[#5f5f5f] rounded-[12px] bg-white font-['Figtree:Regular',sans-serif] text-[16px] text-[#333] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:border-[#021b59]"
               placeholder="Digite o assunto da mensagem"
             />
+            {showErrors && !!errors.subject && (
+              <p className="font-['Figtree:Regular',sans-serif] font-normal text-[14px] mt-[4px] text-[#c0392b]">
+                {errors.subject.message}
+              </p>
+            )}
           </div>
 
           {/* Message field */}
@@ -233,15 +294,26 @@ export function MessagePage() {
             </label>
             <textarea
               id={messageId}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              value={form.message}
+              onChange={(e) =>
+                setValue("message", e.target.value, {
+                  shouldDirty: true,
+                  shouldValidate: showErrors,
+                })
+              }
               required
               aria-required="true"
               maxLength={2000}
               rows={10}
+              aria-invalid={showErrors && !!errors.message ? "true" : undefined}
               className="w-full px-[21px] py-[16px] border border-[#5f5f5f] rounded-[12px] bg-white font-['Figtree:Regular',sans-serif] text-[16px] text-[#333] resize-vertical min-h-[222px] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:border-[#021b59]"
               placeholder="Digite sua mensagem"
             />
+            {showErrors && !!errors.message && (
+              <p className="font-['Figtree:Regular',sans-serif] font-normal text-[14px] mt-[4px] text-[#c0392b]">
+                {errors.message.message}
+              </p>
+            )}
           </div>
 
           {/* Submit button */}
