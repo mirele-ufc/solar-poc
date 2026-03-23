@@ -1,7 +1,7 @@
 import { useState, useId } from "react";
 import { useNavigate } from "react-router";
 import { ChevronLeft } from "lucide-react";
-import { useApp } from "@/context/AppContext";
+import { useAuthStore } from "@/store/useAuthStore";
 
 // ⚠️ PROTÓTIPO: dados mockados no cliente.
 // Em produção, a lista de cursos e estudantes deve vir de uma API autenticada.
@@ -14,29 +14,29 @@ const COURSES = [
 
 export function MessagePage() {
   const navigate = useNavigate();
-  const { user, sendMessage } = useApp();
-  
+  const { currentUser, sendMessage } = useAuthStore();
+
   const [recipient, setRecipient] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-  
+
   const recipientId = useId();
   const subjectId = useId();
   const messageId = useId();
-  
+
   // ✅ Segurança: verificação de autorização no cliente é apenas UX.
   // Em produção, o servidor DEVE validar que o usuário é professor antes de aceitar a mensagem.
-  const isTeacher = user.role === "professor";
-  
+  const isTeacher = currentUser.role === "professor";
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // ✅ Validação cliente é apenas UX — servidor DEVE revalidar todos os campos
     if (!recipient || !subject || !message) {
       return;
     }
-    
+
     // ⚠️ PROTÓTIPO: simulação de envio.
     // Em produção, isso seria uma chamada POST autenticada ao servidor.
     const recipientLabel =
@@ -44,25 +44,30 @@ export function MessagePage() {
         ? "Alunos de todos os cursos"
         : `Alunos de ${COURSES.find((c) => c.id === recipient)?.name ?? recipient}`;
 
-    sendMessage({ recipientId: recipient, recipientLabel, subject, body: message });
-    
+    sendMessage({
+      recipientId: recipient,
+      recipientLabel,
+      subject,
+      body: message,
+    });
+
     // Mostrar mensagem de sucesso
     setShowSuccess(true);
-    
+
     // Resetar formulário
     setRecipient("");
     setSubject("");
     setMessage("");
-    
+
     // Esconder mensagem de sucesso após 3 segundos
     setTimeout(() => {
       setShowSuccess(false);
     }, 3000);
   };
-  
-  const initials = user.name
+
+  const initials = currentUser.name
     .split(" ")
-    .map((n) => n[0])
+    .map((n: string) => n[0])
     .join("")
     .toUpperCase()
     .substring(0, 2);
@@ -119,9 +124,9 @@ export function MessagePage() {
             {/* Avatar */}
             <div className="relative mb-[12px]">
               <div className="size-[110px] rounded-full bg-[#042e99] border-4 border-[#ffeac4] flex items-center justify-center overflow-hidden">
-                {user.photoUrl ? (
+                {currentUser.photoUrl ? (
                   <img
-                    src={user.photoUrl}
+                    src={currentUser.photoUrl}
                     alt=""
                     className="size-full object-cover"
                   />
@@ -138,10 +143,10 @@ export function MessagePage() {
 
             {/* Name and role */}
             <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#ffeac4] text-[22px]">
-              {user.name}
+              {currentUser.name}
             </p>
             <p className="font-['Figtree:Regular',sans-serif] text-[rgba(255,234,196,0.8)] text-[14px]">
-              {user.role === "professor" ? "Professor" : "Estudante"}
+              {currentUser.role === "professor" ? "Professor" : "Estudante"}
             </p>
           </div>
         </div>
@@ -244,7 +249,9 @@ export function MessagePage() {
             <button
               type="submit"
               className="bg-[#ffeac4] border-2 border-[#ffeac4] h-[50px] px-[32px] rounded-[26px] font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[18px] hover:bg-[#021b59] hover:text-[#ffeac4] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-2"
-            >Enviar mensagem</button>
+            >
+              Enviar mensagem
+            </button>
           </div>
         </form>
 

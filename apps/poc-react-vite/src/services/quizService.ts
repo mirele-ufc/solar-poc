@@ -1,8 +1,6 @@
 import { apiClient } from "./api";
 import {
   IQuiz,
-  IQuestion,
-  IQuestionAnswer,
   ISubmitQuizPayload,
   IQuizSubmissionResult,
 } from "@ava-poc/types";

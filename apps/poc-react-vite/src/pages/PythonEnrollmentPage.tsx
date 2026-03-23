@@ -1,26 +1,43 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router";
-import { useApp } from "@/context/AppContext";
+import { useCourseStore } from "@/store/useCourseStore";
 import { PageHeader } from "@/components/shared/PageHeader";
 
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1624953587687-daf255b6b80a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxweXRob24lMjBwcm9ncmFtbWluZyUyMGNvZGUlMjBjb21wdXRlcnxlbnwxfHx8fDE3NzMzMzU2MTd8MA&ixlib=rb-4.1.0&q=80&w=1080";
 
-const dropdownArrow = "M1.5275 2L6.5 6.96167L11.4725 2L13 3.5275L6.5 10.0275L0 3.5275L1.5275 2Z";
+const dropdownArrow =
+  "M1.5275 2L6.5 6.96167L11.4725 2L13 3.5275L6.5 10.0275L0 3.5275L1.5275 2Z";
 const generos = ["Prefiro não informar", "Masculino", "Feminino", "Outro"];
 
 function TextField({
-  label, placeholder, id, value, onChange, hasError, errorMessage,
+  label,
+  placeholder,
+  id,
+  value,
+  onChange,
+  hasError,
+  errorMessage,
 }: {
-  label: string; placeholder: string; id: string; value: string;
-  onChange: (v: string) => void; hasError?: boolean; errorMessage?: string;
+  label: string;
+  placeholder: string;
+  id: string;
+  value: string;
+  onChange: (v: string) => void;
+  hasError?: boolean;
+  errorMessage?: string;
 }) {
   return (
     <div className="flex flex-col w-full gap-[2px]">
-      <label htmlFor={id} className="font-['Figtree:Medium',sans-serif] font-medium leading-[30px] text-[#333] text-[20px]">
+      <label
+        htmlFor={id}
+        className="font-['Figtree:Medium',sans-serif] font-medium leading-[30px] text-[#333] text-[20px]"
+      >
         {label}
       </label>
-      <div className={`bg-white h-[60px] w-full rounded-[12px] relative ${hasError ? "border-2 border-[#c0392b]" : "border border-[#5f5f5f]"}`}>
+      <div
+        className={`bg-white h-[60px] w-full rounded-[12px] relative ${hasError ? "border-2 border-[#c0392b]" : "border border-[#5f5f5f]"}`}
+      >
         <div className="flex items-center px-[20px] py-[12px] h-full">
           <input
             id={id}
@@ -29,7 +46,9 @@ function TextField({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             aria-invalid={hasError ? "true" : undefined}
-            aria-describedby={hasError && errorMessage ? `${id}-error` : undefined}
+            aria-describedby={
+              hasError && errorMessage ? `${id}-error` : undefined
+            }
             className="flex-1 font-['Figtree:Regular',sans-serif] font-normal text-[16px] text-[#333] placeholder-[#595959] bg-transparent outline-none focus-visible:outline-none"
           />
         </div>
@@ -39,7 +58,10 @@ function TextField({
         />
       </div>
       {hasError && errorMessage && (
-        <p id={`${id}-error`} className="font-['Figtree:Regular',sans-serif] font-normal text-[14px] mt-[4px] text-[#c0392b]">
+        <p
+          id={`${id}-error`}
+          className="font-['Figtree:Regular',sans-serif] font-normal text-[14px] mt-[4px] text-[#c0392b]"
+        >
           {errorMessage}
         </p>
       )}
@@ -49,7 +71,7 @@ function TextField({
 
 export function PythonEnrollmentPage() {
   const navigate = useNavigate();
-  const { enroll } = useApp();
+  const { enrollInCourse } = useCourseStore();
 
   const [nome, setNome] = useState("");
   const [sobrenome, setSobrenome] = useState("");
@@ -63,7 +85,8 @@ export function PythonEnrollmentPage() {
   const topRef = useRef<HTMLDivElement>(null);
 
   const handleFinalizar = () => {
-    const missing = !nome.trim() || !sobrenome.trim() || !cidade.trim() || !genero;
+    const missing =
+      !nome.trim() || !sobrenome.trim() || !cidade.trim() || !genero;
 
     if (missing) {
       setStatus("error");
@@ -72,7 +95,7 @@ export function PythonEnrollmentPage() {
       return;
     }
 
-    enroll("python");
+    enrollInCourse("python");
     setStatus("success");
     topRef.current?.scrollIntoView({ behavior: "smooth" });
 
@@ -83,7 +106,6 @@ export function PythonEnrollmentPage() {
 
   return (
     <div className="bg-white flex flex-col pb-[100px]">
-
       {/* Alert banner */}
       <div ref={topRef}>
         {status === "success" && (
@@ -92,8 +114,19 @@ export function PythonEnrollmentPage() {
             aria-live="polite"
             className="w-full bg-[#e6f9ee] border-l-4 border-[#155724] px-[20px] py-[14px] flex items-center gap-[12px]"
           >
-            <svg className="size-[20px] shrink-0" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#155724" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <svg
+              className="size-[20px] shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                stroke="#155724"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
             <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#155724] text-[15px]">
               Inscrição realizada com sucesso! Redirecionando para os módulos…
@@ -106,7 +139,8 @@ export function PythonEnrollmentPage() {
             role="alert"
           >
             <p className="font-['Figtree:Medium',sans-serif] font-medium text-white text-[15px]">
-              Por favor, preencha os campos destacados para finalizar a inscrição
+              Por favor, preencha os campos destacados para finalizar a
+              inscrição
             </p>
           </div>
         )}
@@ -114,7 +148,11 @@ export function PythonEnrollmentPage() {
 
       {/* Hero */}
       <div className="w-full h-[218px] md:h-[300px] overflow-hidden">
-        <img src={HERO_IMAGE} alt="Python – código e programação" className="w-full h-full object-cover" />
+        <img
+          src={HERO_IMAGE}
+          alt="Python – código e programação"
+          className="w-full h-full object-cover"
+        />
       </div>
 
       {/* Form */}
@@ -137,17 +175,41 @@ export function PythonEnrollmentPage() {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
-          <TextField label="Nome" placeholder="Insira seu nome" id="nome" value={nome} onChange={setNome}
-            hasError={showErrors && !nome.trim()} errorMessage="Nome não informado" />
-          <TextField label="Sobrenome" placeholder="Insira seu sobrenome" id="sobrenome" value={sobrenome} onChange={setSobrenome}
-            hasError={showErrors && !sobrenome.trim()} errorMessage="Sobrenome não informado" />
+          <TextField
+            label="Nome"
+            placeholder="Insira seu nome"
+            id="nome"
+            value={nome}
+            onChange={setNome}
+            hasError={showErrors && !nome.trim()}
+            errorMessage="Nome não informado"
+          />
+          <TextField
+            label="Sobrenome"
+            placeholder="Insira seu sobrenome"
+            id="sobrenome"
+            value={sobrenome}
+            onChange={setSobrenome}
+            hasError={showErrors && !sobrenome.trim()}
+            errorMessage="Sobrenome não informado"
+          />
         </div>
-        <TextField label="Cidade" placeholder="Insira o nome da cidade onde você mora" id="cidade" value={cidade} onChange={setCidade}
-          hasError={showErrors && !cidade.trim()} errorMessage="Cidade não informada" />
+        <TextField
+          label="Cidade"
+          placeholder="Insira o nome da cidade onde você mora"
+          id="cidade"
+          value={cidade}
+          onChange={setCidade}
+          hasError={showErrors && !cidade.trim()}
+          errorMessage="Cidade não informada"
+        />
 
         {/* Gênero */}
         <div className="flex flex-col w-full gap-[2px]">
-          <label htmlFor="genero" className="font-['Figtree:Medium',sans-serif] font-medium leading-[30px] text-[#333] text-[20px]">
+          <label
+            htmlFor="genero"
+            className="font-['Figtree:Medium',sans-serif] font-medium leading-[30px] text-[#333] text-[20px]"
+          >
             Gênero
           </label>
           <div className="relative">
@@ -159,25 +221,43 @@ export function PythonEnrollmentPage() {
               onClick={() => setGeneroOpen(!generoOpen)}
               className={`bg-white h-[60px] w-full rounded-[12px] flex items-center gap-[10px] px-[20px] py-[12px] relative ${showErrors && !genero ? "border-2 border-[#c0392b]" : "border border-[#5f5f5f]"}`}
             >
-              <span className={`flex-1 text-left font-['Figtree:Regular',sans-serif] font-normal text-[16px] ${genero ? "text-[#333]" : "text-[#595959]"}`}>
+              <span
+                className={`flex-1 text-left font-['Figtree:Regular',sans-serif] font-normal text-[16px] ${genero ? "text-[#333]" : "text-[#595959]"}`}
+              >
                 {genero || "Selecione uma opção"}
               </span>
-              <svg className="size-[13px] shrink-0 transition-transform" fill="none" viewBox="0 0 13 10.03" aria-hidden="true"
-                style={{ transform: generoOpen ? "rotate(180deg)" : "none" }}>
+              <svg
+                className="size-[13px] shrink-0 transition-transform"
+                fill="none"
+                viewBox="0 0 13 10.03"
+                aria-hidden="true"
+                style={{ transform: generoOpen ? "rotate(180deg)" : "none" }}
+              >
                 <path d={dropdownArrow} fill="#021B59" />
               </svg>
             </button>
             {generoOpen && (
               <>
-                <div className="fixed inset-0 z-20" onClick={() => setGeneroOpen(false)} aria-hidden="true" />
-                <ul role="listbox" aria-label="Gênero" className="absolute left-0 right-0 top-[60px] bg-white border border-[#5f5f5f] z-30 shadow-lg">
+                <div
+                  className="fixed inset-0 z-20"
+                  onClick={() => setGeneroOpen(false)}
+                  aria-hidden="true"
+                />
+                <ul
+                  role="listbox"
+                  aria-label="Gênero"
+                  className="absolute left-0 right-0 top-[60px] bg-white border border-[#5f5f5f] z-30 shadow-lg"
+                >
                   {generos.map((g) => (
                     <li key={g}>
                       <button
                         type="button"
                         role="option"
                         aria-selected={genero === g}
-                        onClick={() => { setGenero(g); setGeneroOpen(false); }}
+                        onClick={() => {
+                          setGenero(g);
+                          setGeneroOpen(false);
+                        }}
                         className="w-full text-left px-[20px] py-[14px] font-['Figtree:Regular',sans-serif] font-normal text-[16px] text-[#333] hover:bg-[#ffeac4]/40 focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
                       >
                         {g}

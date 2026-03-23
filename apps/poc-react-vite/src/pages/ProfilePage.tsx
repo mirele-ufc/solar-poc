@@ -1,6 +1,6 @@
 import { useRef, useState, useId } from "react";
 import { useNavigate } from "react-router";
-import { useApp } from "@/context/AppContext";
+import { useAuthStore } from "@/store/useAuthStore";
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 function maskCPF(raw: string) {
@@ -11,7 +11,8 @@ function maskCPF(raw: string) {
 
 function initials(name: string) {
   const parts = name.trim().split(/\s+/);
-  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  if (parts.length >= 2)
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   return parts[0].slice(0, 2).toUpperCase();
 }
 
@@ -93,8 +94,18 @@ function PasswordField({
           aria-label={show ? "Ocultar senha" : "Mostrar senha"}
           className="shrink-0 size-[44px] flex items-center justify-center focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded-sm"
         >
-          <svg className="size-[24px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-            <path clipRule="evenodd" d={show ? eyeOffPath : eyePath} fill="#595959" fillRule="evenodd" />
+          <svg
+            className="size-[24px]"
+            fill="none"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path
+              clipRule="evenodd"
+              d={show ? eyeOffPath : eyePath}
+              fill="#595959"
+              fillRule="evenodd"
+            />
           </svg>
         </button>
         <div
@@ -103,7 +114,11 @@ function PasswordField({
         />
       </div>
       {error && (
-        <p id={`${id}-error`} role="alert" className="text-[#c0392b] text-[13px] font-['Figtree:Regular',sans-serif]">
+        <p
+          id={`${id}-error`}
+          role="alert"
+          className="text-[#c0392b] text-[13px] font-['Figtree:Regular',sans-serif]"
+        >
           {error}
         </p>
       )}
@@ -114,7 +129,7 @@ function PasswordField({
 // ── main component ────────────────────────────────────────────────────────────
 export function ProfilePage() {
   const navigate = useNavigate();
-  const { user, updateUser } = useApp();
+  const { currentUser, updateCurrentUser } = useAuthStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // password form state
@@ -132,7 +147,7 @@ export function ProfilePage() {
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result === "string") {
-        updateUser({ photoUrl: reader.result });
+        updateCurrentUser({ photoUrl: reader.result });
       }
     };
     reader.readAsDataURL(file);
@@ -142,16 +157,19 @@ export function ProfilePage() {
   const handlePasswordSave = () => {
     const errors: Record<string, string> = {};
     if (!currentPw) errors.current = "Informe a senha atual.";
-    else if (currentPw !== user.password) errors.current = "Senha atual incorreta.";
+    else if (currentPw !== currentUser.password)
+      errors.current = "Senha atual incorreta.";
     if (!newPw) errors.new = "Informe a nova senha.";
-    else if (newPw.length < 6) errors.new = "A nova senha deve ter ao menos 6 caracteres.";
+    else if (newPw.length < 6)
+      errors.new = "A nova senha deve ter ao menos 6 caracteres.";
     if (!confirmPw) errors.confirm = "Confirme a nova senha.";
-    else if (newPw && confirmPw !== newPw) errors.confirm = "As senhas não coincidem.";
+    else if (newPw && confirmPw !== newPw)
+      errors.confirm = "As senhas não coincidem.";
 
     setPwErrors(errors);
     if (Object.keys(errors).length > 0) return;
 
-    updateUser({ password: newPw });
+    updateCurrentUser({ password: newPw });
     setCurrentPw("");
     setNewPw("");
     setConfirmPw("");
@@ -162,7 +180,6 @@ export function ProfilePage() {
 
   return (
     <div className="bg-white flex flex-col min-h-[calc(100vh-70px)]">
-
       {/* ── Blue header band ────────────────────────────────────────────────── */}
       <div className="bg-gradient-to-b from-[#021b59] to-[#042e99] w-full">
         <div className="max-w-[900px] mx-auto flex flex-col items-center gap-[16px] pt-[32px] pb-[48px] px-[20px]">
@@ -174,10 +191,17 @@ export function ProfilePage() {
               aria-label="Voltar"
               className="flex items-center gap-[8px] text-[#ffeac4] hover:text-white transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#ffeac4] rounded-sm w-fit"
             >
-              <svg className="size-[20px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+              <svg
+                className="size-[20px]"
+                fill="none"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
                 <path d={arrowBackPath} fill="currentColor" />
               </svg>
-              <span className="font-['Figtree:Medium',sans-serif] font-medium text-[16px]">Voltar</span>
+              <span className="font-['Figtree:Medium',sans-serif] font-medium text-[16px]">
+                Voltar
+              </span>
             </button>
             {/* Breadcrumb */}
             <nav aria-label="Navegação estrutural" className="pl-[28px]">
@@ -192,8 +216,15 @@ export function ProfilePage() {
                   </button>
                 </li>
                 <li className="flex items-center gap-[4px]">
-                  <span className="text-[#ffeac4]/40 text-[13px]" aria-hidden="true">›</span>
-                  <span className="font-['Figtree:Regular',sans-serif] font-normal text-[#ffeac4]/50 text-[13px]">Perfil</span>
+                  <span
+                    className="text-[#ffeac4]/40 text-[13px]"
+                    aria-hidden="true"
+                  >
+                    ›
+                  </span>
+                  <span className="font-['Figtree:Regular',sans-serif] font-normal text-[#ffeac4]/50 text-[13px]">
+                    Perfil
+                  </span>
                 </li>
               </ol>
             </nav>
@@ -203,18 +234,18 @@ export function ProfilePage() {
           <div className="flex flex-col items-center gap-[12px]">
             <div className="relative group">
               <div className="size-[110px] rounded-full overflow-hidden bg-[#042e99] border-4 border-[#ffeac4] flex items-center justify-center">
-                {user.photoUrl ? (
+                {currentUser.photoUrl && currentUser.photoUrl.length > 0 ? (
                   <img
-                    src={user.photoUrl}
+                    src={currentUser.photoUrl}
                     alt="Foto de perfil"
                     className="size-full object-cover"
                   />
                 ) : (
                   <span
-                    aria-label={`Iniciais de ${user.name}`}
+                    aria-label={`Iniciais de ${currentUser.name}`}
                     className="font-['Figtree:Bold',sans-serif] font-bold text-[#ffeac4] text-[36px] select-none"
                   >
-                    {initials(user.name)}
+                    {initials(currentUser.name)}
                   </span>
                 )}
               </div>
@@ -226,7 +257,12 @@ export function ProfilePage() {
                 aria-label="Alterar foto de perfil"
                 className="absolute bottom-0 right-0 size-[34px] rounded-full bg-[#ffeac4] border-2 border-[#021b59] flex items-center justify-center shadow-md hover:bg-white transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#ffeac4] focus-visible:outline-offset-[2px]"
               >
-                <svg className="size-[18px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                <svg
+                  className="size-[18px]"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
                   <path d={cameraPath} fill="#021B59" />
                 </svg>
               </button>
@@ -245,7 +281,7 @@ export function ProfilePage() {
 
             <div className="text-center">
               <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#ffeac4] text-[22px]">
-                {user.name}
+                {currentUser.name}
               </p>
               <p className="font-['Figtree:Regular',sans-serif] font-normal text-[#ffeac4]/80 text-[14px] mt-[2px]">
                 Estudante
@@ -257,7 +293,6 @@ export function ProfilePage() {
 
       {/* ── White content area ──────────────────────────────────────────────── */}
       <div className="max-w-[900px] mx-auto w-full px-[20px] md:px-[40px] py-[32px] flex flex-col gap-[40px]">
-
         {/* ── Section: Dados pessoais ── */}
         <section aria-labelledby="dados-pessoais-heading">
           <div className="flex items-center gap-[12px] mb-[20px] pb-[12px] border-b-2 border-[#021b59]">
@@ -270,12 +305,13 @@ export function ProfilePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
-            <ReadonlyField label="CPF" value={maskCPF(user.cpf)} />
-            <ReadonlyField label="E-mail" value={user.email} />
+            <ReadonlyField label="CPF" value={maskCPF(currentUser.cpf)} />
+            <ReadonlyField label="E-mail" value={currentUser.email} />
           </div>
           <p className="mt-[10px] font-['Figtree:Regular',sans-serif] font-normal text-[#595959] text-[13px] leading-[20px]">
-            CPF e e-mail são dados de identificação e não podem ser alterados diretamente. Em caso de
-            divergências, entre em contato com o suporte.
+            CPF e e-mail são dados de identificação e não podem ser alterados
+            diretamente. Em caso de divergências, entre em contato com o
+            suporte.
           </p>
         </section>
 
@@ -293,17 +329,25 @@ export function ProfilePage() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-[20px]">
             {/* Preview */}
             <div className="size-[80px] rounded-full overflow-hidden bg-[#042e99] border-2 border-[#021b59] shrink-0 flex items-center justify-center">
-              {user.photoUrl ? (
-                <img src={user.photoUrl} alt="Prévia da foto de perfil" className="size-full object-cover" />
+              {currentUser.photoUrl ? (
+                <img
+                  src={currentUser.photoUrl}
+                  alt="Prévia da foto de perfil"
+                  className="size-full object-cover"
+                />
               ) : (
-                <span aria-hidden="true" className="font-['Figtree:Bold',sans-serif] font-bold text-[#ffeac4] text-[28px] select-none">
-                  {initials(user.name)}
+                <span
+                  aria-hidden="true"
+                  className="font-['Figtree:Bold',sans-serif] font-bold text-[#ffeac4] text-[28px] select-none"
+                >
+                    {initials(currentUser.name)}
                 </span>
               )}
             </div>
             <div className="flex flex-col gap-[10px] flex-1">
               <p className="font-['Figtree:Regular',sans-serif] font-normal text-[#595959] text-[14px] leading-[22px]">
-                Use uma imagem quadrada (JPG, PNG ou GIF) com ao menos 200×200 px para melhor qualidade.
+                Use uma imagem quadrada (JPG, PNG ou GIF) com ao menos 200×200
+                px para melhor qualidade.
               </p>
               <div className="flex gap-[12px] flex-wrap">
                 <button
@@ -311,12 +355,12 @@ export function ProfilePage() {
                   onClick={() => fileInputRef.current?.click()}
                   className="bg-[#ffeac4] h-[44px] px-[24px] rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[15px]"
                 >
-                  {user.photoUrl ? "Trocar foto" : "Adicionar foto"}
+                  {currentUser.photoUrl ? "Trocar foto" : "Adicionar foto"}
                 </button>
-                {user.photoUrl && (
+                {currentUser.photoUrl && (
                   <button
                     type="button"
-                    onClick={() => updateUser({ photoUrl: null })}
+                    onClick={() => updateCurrentUser({ photoUrl: null })}
                     className="h-[44px] px-[24px] rounded-[26px] border-2 border-[#c0392b] cursor-pointer hover:bg-[#fdecea] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#c0392b] font-['Figtree:Medium',sans-serif] font-medium text-[#c0392b] text-[15px]"
                   >
                     Remover foto
@@ -341,7 +385,10 @@ export function ProfilePage() {
           <form
             className="flex flex-col gap-[16px]"
             noValidate
-            onSubmit={(e) => { e.preventDefault(); handlePasswordSave(); }}
+            onSubmit={(e) => {
+              e.preventDefault();
+              handlePasswordSave();
+            }}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
               <PasswordField
@@ -375,7 +422,12 @@ export function ProfilePage() {
                 aria-live="polite"
                 className="flex items-center gap-[10px] bg-[#d4edda] border border-[#c3e6cb] px-[16px] py-[12px] rounded-sm"
               >
-                <svg className="size-[20px] shrink-0" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                <svg
+                  className="size-[20px] shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
                   <path d={checkPath} fill="#155724" />
                 </svg>
                 <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#155724] text-[15px]">
@@ -396,7 +448,6 @@ export function ProfilePage() {
             </div>
           </form>
         </section>
-
       </div>
     </div>
   );

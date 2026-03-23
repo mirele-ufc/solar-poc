@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { useApp } from "@/context/AppContext";
+import { useCourseStore } from "@/store/useCourseStore";
 import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { toast } from "sonner";
@@ -8,8 +8,7 @@ import { toast } from "sonner";
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1759661966728-4a02e3c6ed91?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkYXRhJTIwdmlzdWFsaXphdGlvbiUyMGJ1c2luZXNzJTIwaW50ZWxsaWdlbmNlJTIwZGFzaGJvYXJkfGVufDF8fHx8MTc3MzMzNTYxNHww&ixlib=rb-4.1.0&q=80&w=1080";
 
-const WARN_PATH =
-  "M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z";
+const WARN_PATH = "M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z";
 
 const bullets = [
   "Conceitos básicos de Business Intelligence e análise de dados",
@@ -20,23 +19,27 @@ const bullets = [
   "Publicação e compartilhamento de relatórios no Power BI Service",
 ];
 
-const publicoAlvo = [
-  "Profissionais de diversas áreas que trabalham com análise de dados",
-  "Estudantes e recém-formados interessados em Business Intelligence",
-  "Gestores que desejam tomar decisões baseadas em dados",
-  "Analistas que buscam aprimorar suas habilidades em visualização de dados",
-];
-
-const preRequisitos = [
-  "Conhecimentos básicos de informática e navegação na web",
-  "Familiaridade com planilhas eletrônicas (Excel ou similar)",
-  "Não é necessário conhecimento prévio em programação",
-];
+// TODO: Use these constants when rendering course details UI
+// @future: implement course details section with target audience and prerequisites info
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const courseDetailsData = {
+  publicTarget: [
+    "Profissionais de diversas áreas que trabalham com análise de dados",
+    "Estudantes e recém-formados interessados em Business Intelligence",
+    "Gestores que desejam tomar decisões baseadas em dados",
+    "Analistas que buscam aprimorar suas habilidades em visualização de dados",
+  ],
+  prerequisites: [
+    "Conhecimentos básicos de informática e navegação na web",
+    "Familiaridade com planilhas eletrônicas (Excel ou similar)",
+    "Não é necessário conhecimento prévio em programação",
+  ],
+};
 
 export function CourseDetailPage() {
   const navigate = useNavigate();
-  const { isEnrolled, unenroll } = useApp();
-  const enrolled = isEnrolled("power-bi");
+  const { isEnrolledInCourse, unenrollFromCourse } = useCourseStore();
+  const enrolled = isEnrolledInCourse("power-bi");
   const [showCancelModal, setShowCancelModal] = useState(false);
 
   const handleInscrever = () => {
@@ -45,10 +48,11 @@ export function CourseDetailPage() {
   };
 
   const handleConfirmCancel = () => {
-    unenroll("power-bi");
+    unenrollFromCourse("power-bi");
     setShowCancelModal(false);
     toast.success("Matrícula cancelada com sucesso.", {
-      description: "Seu acesso ao conteúdo de Power BI - Fundamentos foi removido.",
+      description:
+        "Seu acesso ao conteúdo de Power BI - Fundamentos foi removido.",
       duration: 5000,
     });
     navigate("/courses");
@@ -56,7 +60,6 @@ export function CourseDetailPage() {
 
   return (
     <div className="bg-white flex flex-col pb-[100px]">
-
       {/* Hero image - full width */}
       <div className="w-full h-[218px] md:h-[320px] overflow-hidden">
         <ImageWithFallback
@@ -91,10 +94,12 @@ export function CourseDetailPage() {
             Sobre o curso
           </h2>
           <p className="font-['Figtree:Regular',sans-serif] font-normal leading-[26px] text-black text-[16px]">
-            O curso Power BI Fundamentos tem como objetivo introduzir os participantes aos conceitos
-            essenciais de análise de dados e Business Intelligence utilizando o Microsoft Power BI.
-            Ao longo do curso, os alunos aprendem a transformar dados brutos em informações estratégicas
-            por meio da criação de relatórios interativos e dashboards dinâmicos.
+            O curso Power BI Fundamentos tem como objetivo introduzir os
+            participantes aos conceitos essenciais de análise de dados e
+            Business Intelligence utilizando o Microsoft Power BI. Ao longo do
+            curso, os alunos aprendem a transformar dados brutos em informações
+            estratégicas por meio da criação de relatórios interativos e
+            dashboards dinâmicos.
           </p>
         </div>
 
@@ -109,7 +114,9 @@ export function CourseDetailPage() {
           <ul className="flex flex-col gap-[8px] pl-[4px] md:grid md:grid-cols-2 md:gap-x-[20px]">
             {bullets.map((item) => (
               <li key={item} className="flex gap-[8px] items-start">
-                <span aria-hidden="true" className="text-[#021b59] mt-[2px]">•</span>
+                <span aria-hidden="true" className="text-[#021b59] mt-[2px]">
+                  •
+                </span>
                 <span className="font-['Figtree:Regular',sans-serif] font-normal leading-[24px] text-black text-[16px]">
                   {item}
                 </span>
@@ -124,10 +131,11 @@ export function CourseDetailPage() {
             Público-alvo
           </h2>
           <p className="font-['Figtree:Regular',sans-serif] font-normal leading-[26px] text-black text-[16px]">
-            Este curso é destinado a profissionais de diversas áreas que trabalham com análise de dados, 
-            estudantes e recém-formados interessados em Business Intelligence, gestores que desejam tomar 
-            decisões baseadas em dados, e analistas que buscam aprimorar suas habilidades em visualização 
-            de dados.
+            Este curso é destinado a profissionais de diversas áreas que
+            trabalham com análise de dados, estudantes e recém-formados
+            interessados em Business Intelligence, gestores que desejam tomar
+            decisões baseadas em dados, e analistas que buscam aprimorar suas
+            habilidades em visualização de dados.
           </p>
         </div>
 
@@ -137,9 +145,10 @@ export function CourseDetailPage() {
             Pré-requisitos
           </h2>
           <p className="font-['Figtree:Regular',sans-serif] font-normal leading-[26px] text-black text-[16px]">
-            Para realizar este curso, é necessário ter conhecimentos básicos de informática e navegação na 
-            web, além de familiaridade com planilhas eletrônicas (Excel ou similar). Não é necessário 
-            conhecimento prévio em programação.
+            Para realizar este curso, é necessário ter conhecimentos básicos de
+            informática e navegação na web, além de familiaridade com planilhas
+            eletrônicas (Excel ou similar). Não é necessário conhecimento prévio
+            em programação.
           </p>
         </div>
       </div>
@@ -188,11 +197,18 @@ export function CourseDetailPage() {
             className="fixed inset-0 z-50 flex items-center justify-center px-[20px]"
           >
             <div className="bg-white w-full max-w-[420px] rounded-[12px] shadow-2xl p-[28px] flex flex-col gap-[20px]">
-
               {/* Icon + title */}
               <div className="flex flex-col items-center gap-[12px] text-center">
-                <div className="size-[52px] rounded-full bg-[#fde8ef] flex items-center justify-center shrink-0" aria-hidden="true">
-                  <svg className="size-[28px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                <div
+                  className="size-[52px] rounded-full bg-[#fde8ef] flex items-center justify-center shrink-0"
+                  aria-hidden="true"
+                >
+                  <svg
+                    className="size-[28px]"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
                     <path d={WARN_PATH} fill="#de2e66" />
                   </svg>
                 </div>
@@ -211,7 +227,8 @@ export function CourseDetailPage() {
               >
                 Tem certeza que deseja cancelar sua matrícula neste curso?{" "}
                 <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#801436]">
-                  Após o cancelamento, você perderá o acesso ao conteúdo da disciplina
+                  Após o cancelamento, você perderá o acesso ao conteúdo da
+                  disciplina
                 </span>
                 , incluindo aulas, materiais, atividades, provas e fóruns.
               </p>

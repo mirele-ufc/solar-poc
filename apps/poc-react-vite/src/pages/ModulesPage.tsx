@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import imgRectangle30 from "@/assets/22ebf3a06cf8215c6bd0946f42302bc2204ed790.png";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { useEnrollmentGuard } from "@/hooks/useEnrollmentGuard";
-import { useApp } from "@/context/AppContext";
+import { useAuthStore } from "@/store/useAuthStore";
 
 // ─── Arrow / Check SVG paths ─────────────────────────────────────────────────
 const ARROW_PATH = "M6 7L12 13L18 7L20 9L12 17L4 9L6 7Z";
@@ -30,38 +30,102 @@ const MODULOS: ModuloData[] = [
     id: "1",
     title: "Módulo 01",
     items: [
-      { id: "m1-aula-01", label: "Aula 01 - Introdução", type: "aula", modId: "1" },
-      { id: "m1-aula-02", label: "Aula 02 - Conceitos Básicos", type: "aula", modId: "1" },
-      { id: "m1-aula-03", label: "Aula 03 - Prática", type: "aula", modId: "1" },
-      { id: "m1-prova-01", label: "Prova do Módulo", type: "prova", modId: "1" },
+      {
+        id: "m1-aula-01",
+        label: "Aula 01 - Introdução",
+        type: "aula",
+        modId: "1",
+      },
+      {
+        id: "m1-aula-02",
+        label: "Aula 02 - Conceitos Básicos",
+        type: "aula",
+        modId: "1",
+      },
+      {
+        id: "m1-aula-03",
+        label: "Aula 03 - Prática",
+        type: "aula",
+        modId: "1",
+      },
+      {
+        id: "m1-prova-01",
+        label: "Prova do Módulo",
+        type: "prova",
+        modId: "1",
+      },
     ],
   },
   {
     id: "2",
     title: "Módulo 02",
     items: [
-      { id: "m2-aula-01", label: "Aula 01 - Power Query", type: "aula", modId: "2" },
-      { id: "m2-aula-02", label: "Aula 02 - Transformação de Dados", type: "aula", modId: "2" },
-      { id: "m2-aula-03", label: "Aula 03 - Relacionamentos", type: "aula", modId: "2" },
-      { id: "m2-prova-01", label: "Prova do Módulo", type: "prova", modId: "2" },
+      {
+        id: "m2-aula-01",
+        label: "Aula 01 - Power Query",
+        type: "aula",
+        modId: "2",
+      },
+      {
+        id: "m2-aula-02",
+        label: "Aula 02 - Transformação de Dados",
+        type: "aula",
+        modId: "2",
+      },
+      {
+        id: "m2-aula-03",
+        label: "Aula 03 - Relacionamentos",
+        type: "aula",
+        modId: "2",
+      },
+      {
+        id: "m2-prova-01",
+        label: "Prova do Módulo",
+        type: "prova",
+        modId: "2",
+      },
     ],
   },
   {
     id: "3",
     title: "Módulo 03",
     items: [
-      { id: "m3-aula-01", label: "Aula 01 - DAX Básico", type: "aula", modId: "3" },
-      { id: "m3-aula-02", label: "Aula 02 - Visualizações Avançadas", type: "aula", modId: "3" },
-      { id: "m3-aula-03", label: "Aula 03 - Publicação e Compartilhamento", type: "aula", modId: "3" },
-      { id: "m3-prova-01", label: "Prova do Módulo", type: "prova", modId: "3" },
+      {
+        id: "m3-aula-01",
+        label: "Aula 01 - DAX Básico",
+        type: "aula",
+        modId: "3",
+      },
+      {
+        id: "m3-aula-02",
+        label: "Aula 02 - Visualizações Avançadas",
+        type: "aula",
+        modId: "3",
+      },
+      {
+        id: "m3-aula-03",
+        label: "Aula 03 - Publicação e Compartilhamento",
+        type: "aula",
+        modId: "3",
+      },
+      {
+        id: "m3-prova-01",
+        label: "Prova do Módulo",
+        type: "prova",
+        modId: "3",
+      },
     ],
   },
 ];
 
 // Todos os IDs de lições para validar conclusão
 const ALL_LESSON_IDS = MODULOS.flatMap((m) => m.items.map((i) => i.id));
-const ALL_AULA_IDS = MODULOS.flatMap((m) => m.items.filter((i) => i.type === "aula").map((i) => i.id));
-const ALL_PROVA_IDS = MODULOS.flatMap((m) => m.items.filter((i) => i.type === "prova").map((i) => i.id));
+const ALL_AULA_IDS = MODULOS.flatMap((m) =>
+  m.items.filter((i) => i.type === "aula").map((i) => i.id),
+);
+const ALL_PROVA_IDS = MODULOS.flatMap((m) =>
+  m.items.filter((i) => i.type === "prova").map((i) => i.id),
+);
 
 const VISITED_KEY = "solar_visited_lessons";
 
@@ -113,7 +177,12 @@ function ArrowIcon({ up }: { up: boolean }) {
       fill="none"
       viewBox="0 0 24 24"
     >
-      <path clipRule="evenodd" d={ARROW_PATH} fill="#021b59" fillRule="evenodd" />
+      <path
+        clipRule="evenodd"
+        d={ARROW_PATH}
+        fill="#021b59"
+        fillRule="evenodd"
+      />
     </svg>
   );
 }
@@ -179,7 +248,13 @@ interface ModuleCardProps {
   onVisitLesson: (lessonId: string, modId: string, type: ItemType) => void;
 }
 
-function ModuleCard({ modulo, isOpen, onToggle, visited, onVisitLesson }: ModuleCardProps) {
+function ModuleCard({
+  modulo,
+  isOpen,
+  onToggle,
+  visited,
+  onVisitLesson,
+}: ModuleCardProps) {
   const aulaItems = modulo.items.filter((i) => i.type === "aula");
   const visitedCount = aulaItems.filter((i) => visited.has(i.id)).length;
 
@@ -210,10 +285,7 @@ function ModuleCard({ modulo, isOpen, onToggle, visited, onVisitLesson }: Module
         </button>
 
         {isOpen && (
-          <div
-            id={`modulo-${modulo.id}-content`}
-            className="flex flex-col"
-          >
+          <div id={`modulo-${modulo.id}-content`} className="flex flex-col">
             {modulo.items.map((item, idx) => {
               const isVisited = visited.has(item.id);
               const isLast = idx === modulo.items.length - 1;
@@ -222,7 +294,9 @@ function ModuleCard({ modulo, isOpen, onToggle, visited, onVisitLesson }: Module
                 <div key={item.id}>
                   <button
                     type="button"
-                    onClick={() => onVisitLesson(item.id, item.modId, item.type)}
+                    onClick={() =>
+                      onVisitLesson(item.id, item.modId, item.type)
+                    }
                     className="flex items-center justify-between w-full py-[10px] text-left focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:rounded-[4px] focus-visible:outline-offset-[2px] group"
                   >
                     <span className="font-['Figtree:Medium',sans-serif] font-medium text-[20px] leading-[30px] text-black group-hover:text-[#042e99] transition-colors">
@@ -231,7 +305,10 @@ function ModuleCard({ modulo, isOpen, onToggle, visited, onVisitLesson }: Module
                     {isVisited && <CheckIcon />}
                   </button>
                   {!isLast && (
-                    <div className="w-full h-px bg-[#759BFB]" aria-hidden="true" />
+                    <div
+                      className="w-full h-px bg-[#759BFB]"
+                      aria-hidden="true"
+                    />
                   )}
                 </div>
               );
@@ -289,7 +366,6 @@ function DeclaracaoMatriculaModal({
         aria-labelledby="matricula-modal-title"
       >
         <div className="bg-white w-full max-w-[580px] rounded-[12px] shadow-2xl flex flex-col overflow-hidden">
-
           {/* Cabeçalho do modal */}
           <div className="bg-[#021b59] px-[28px] py-[20px] flex items-center justify-between">
             <h2
@@ -304,24 +380,39 @@ function DeclaracaoMatriculaModal({
               aria-label="Fechar declaração de matrícula"
               className="text-white/80 hover:text-white transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-white focus-visible:rounded-[4px] size-[44px] flex items-center justify-center shrink-0"
             >
-              <svg className="size-[22px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+              <svg
+                className="size-[22px]"
+                fill="none"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  d="M18 6L6 18M6 6l12 12"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
               </svg>
             </button>
           </div>
 
           {/* Documento */}
           <div className="px-[28px] md:px-[40px] py-[32px] flex flex-col gap-[20px]">
-
             {/* Brasão / cabeçalho institucional */}
             <div className="text-center flex flex-col gap-[4px] border-b border-[#e0e0e0] pb-[20px]">
               <div className="inline-flex items-center justify-center gap-[10px] mx-auto mb-[8px]">
                 <div className="size-[44px] rounded-full bg-[#021b59] flex items-center justify-center shrink-0">
-                  <span className="font-['Figtree:Bold',sans-serif] font-bold text-white text-[16px]">S</span>
+                  <span className="font-['Figtree:Bold',sans-serif] font-bold text-white text-[16px]">
+                    S
+                  </span>
                 </div>
                 <div className="text-left">
-                  <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[15px] leading-[20px]">SOLAR</p>
-                  <p className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[12px] leading-[16px]">Sistema Online de Aprendizagem</p>
+                  <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[15px] leading-[20px]">
+                    SOLAR
+                  </p>
+                  <p className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[12px] leading-[16px]">
+                    Sistema Online de Aprendizagem
+                  </p>
                 </div>
               </div>
               <p className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[12px]">
@@ -340,10 +431,15 @@ function DeclaracaoMatriculaModal({
             <div className="font-['Figtree:Regular',sans-serif] text-[#333] text-[15px] leading-[26px] text-justify">
               <p>
                 Declaramos, para os devidos fins, que{" "}
-                <span className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59]">{studentName}</span>{" "}
+                <span className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59]">
+                  {studentName}
+                </span>{" "}
                 encontra-se regularmente matriculado(a) no curso{" "}
-                <span className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59]">Power BI - Fundamentos</span>,
-                ofertado pela Universidade Federal do Ceará através da plataforma SOLAR.
+                <span className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59]">
+                  Power BI - Fundamentos
+                </span>
+                , ofertado pela Universidade Federal do Ceará através da
+                plataforma SOLAR.
               </p>
             </div>
 
@@ -353,7 +449,10 @@ function DeclaracaoMatriculaModal({
                 { label: "Aluno(a)", value: studentName },
                 { label: "Curso", value: "Power BI - Fundamentos" },
                 { label: "Carga Horária", value: "30 horas" },
-                { label: "Data de Matrícula", value: formatDate(enrollmentDate) },
+                {
+                  label: "Data de Matrícula",
+                  value: formatDate(enrollmentDate),
+                },
                 { label: "Status da Matrícula", value: "Ativa" },
                 { label: "Data de Emissão", value: formatDate(emissionDate) },
               ].map(({ label, value }) => (
@@ -361,7 +460,9 @@ function DeclaracaoMatriculaModal({
                   <p className="font-['Figtree:Regular',sans-serif] text-[#8e8e8e] text-[11px] leading-[16px] uppercase tracking-wide">
                     {label}
                   </p>
-                  <p className={`font-['Figtree:Medium',sans-serif] font-medium text-[14px] leading-[22px] ${label === "Status da Matrícula" ? "text-[#042e99]" : "text-[#021b59]"}`}>
+                  <p
+                    className={`font-['Figtree:Medium',sans-serif] font-medium text-[14px] leading-[22px] ${label === "Status da Matrícula" ? "text-[#042e99]" : "text-[#021b59]"}`}
+                  >
                     {value}
                   </p>
                 </div>
@@ -377,12 +478,14 @@ function DeclaracaoMatriculaModal({
                 {validationCode}
               </p>
               <p className="font-['Figtree:Regular',sans-serif] text-[#8e8e8e] text-[11px] leading-[16px]">
-                Este código garante a autenticidade do documento e pode ser utilizado para verificação futura.
+                Este código garante a autenticidade do documento e pode ser
+                utilizado para verificação futura.
               </p>
             </div>
 
             <p className="font-['Figtree:Regular',sans-serif] text-[#8e8e8e] text-[12px] leading-[18px] text-center">
-              Documento emitido eletronicamente pelo sistema SOLAR — UFC em {formatDate(emissionDate)}.
+              Documento emitido eletronicamente pelo sistema SOLAR — UFC em{" "}
+              {formatDate(emissionDate)}.
             </p>
           </div>
 
@@ -393,8 +496,19 @@ function DeclaracaoMatriculaModal({
               onClick={handlePrint}
               className="flex-1 h-[48px] bg-[#021b59] rounded-[26px] hover:bg-[#042e99] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px] flex items-center justify-center gap-[8px]"
             >
-              <svg className="size-[18px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6v-8z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <svg
+                className="size-[18px]"
+                fill="none"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6v-8z"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
               <span className="font-['Figtree:Medium',sans-serif] font-medium text-white text-[16px]">
                 Imprimir / Baixar PDF
@@ -459,7 +573,6 @@ function DeclaracaoConclusaoModal({
         aria-labelledby="conclusao-modal-title"
       >
         <div className="bg-white w-full max-w-[580px] rounded-[12px] shadow-2xl flex flex-col overflow-hidden">
-
           {/* Cabeçalho */}
           <div className="bg-[#042e99] px-[28px] py-[20px] flex items-center justify-between">
             <h2
@@ -474,24 +587,39 @@ function DeclaracaoConclusaoModal({
               aria-label="Fechar declaração de conclusão"
               className="text-white/80 hover:text-white transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-white focus-visible:rounded-[4px] size-[44px] flex items-center justify-center shrink-0"
             >
-              <svg className="size-[22px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+              <svg
+                className="size-[22px]"
+                fill="none"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  d="M18 6L6 18M6 6l12 12"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
               </svg>
             </button>
           </div>
 
           {/* Documento */}
           <div className="px-[28px] md:px-[40px] py-[32px] flex flex-col gap-[20px]">
-
             {/* Cabeçalho institucional */}
             <div className="text-center flex flex-col gap-[4px] border-b border-[#e0e0e0] pb-[20px]">
               <div className="inline-flex items-center justify-center gap-[10px] mx-auto mb-[8px]">
                 <div className="size-[44px] rounded-full bg-[#042e99] flex items-center justify-center shrink-0">
-                  <span className="font-['Figtree:Bold',sans-serif] font-bold text-white text-[16px]">S</span>
+                  <span className="font-['Figtree:Bold',sans-serif] font-bold text-white text-[16px]">
+                    S
+                  </span>
                 </div>
                 <div className="text-left">
-                  <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[15px] leading-[20px]">SOLAR</p>
-                  <p className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[12px] leading-[16px]">Sistema Online de Aprendizagem</p>
+                  <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[15px] leading-[20px]">
+                    SOLAR
+                  </p>
+                  <p className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[12px] leading-[16px]">
+                    Sistema Online de Aprendizagem
+                  </p>
                 </div>
               </div>
               <p className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[12px]">
@@ -502,8 +630,16 @@ function DeclaracaoConclusaoModal({
             {/* Ícone de conclusão */}
             <div className="flex justify-center">
               <div className="size-[56px] rounded-full bg-[#c5d6ff] flex items-center justify-center">
-                <svg className="size-[30px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="#021b59" />
+                <svg
+                  className="size-[30px]"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                    fill="#021b59"
+                  />
                 </svg>
               </div>
             </div>
@@ -519,11 +655,16 @@ function DeclaracaoConclusaoModal({
             <div className="font-['Figtree:Regular',sans-serif] text-[#333] text-[15px] leading-[26px] text-justify">
               <p>
                 Declaramos, para os devidos fins, que{" "}
-                <span className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59]">{studentName}</span>{" "}
+                <span className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59]">
+                  {studentName}
+                </span>{" "}
                 concluiu com êxito o curso{" "}
-                <span className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59]">Power BI - Fundamentos</span>,
-                ofertado pela Universidade Federal do Ceará através da plataforma SOLAR, tendo cumprido
-                todos os requisitos necessários para a sua conclusão.
+                <span className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59]">
+                  Power BI - Fundamentos
+                </span>
+                , ofertado pela Universidade Federal do Ceará através da
+                plataforma SOLAR, tendo cumprido todos os requisitos necessários
+                para a sua conclusão.
               </p>
             </div>
 
@@ -533,7 +674,10 @@ function DeclaracaoConclusaoModal({
                 { label: "Aluno(a)", value: studentName },
                 { label: "Curso", value: "Power BI - Fundamentos" },
                 { label: "Carga Horária", value: "30 horas" },
-                { label: "Data de Conclusão", value: formatDate(conclusionDate) },
+                {
+                  label: "Data de Conclusão",
+                  value: formatDate(conclusionDate),
+                },
                 { label: "Status", value: "Concluído" },
                 { label: "Data de Emissão", value: formatDate(emissionDate) },
               ].map(({ label, value }) => (
@@ -541,7 +685,9 @@ function DeclaracaoConclusaoModal({
                   <p className="font-['Figtree:Regular',sans-serif] text-[#8e8e8e] text-[11px] leading-[16px] uppercase tracking-wide">
                     {label}
                   </p>
-                  <p className={`font-['Figtree:Medium',sans-serif] font-medium text-[14px] leading-[22px] ${label === "Status" ? "text-[#042e99]" : "text-[#021b59]"}`}>
+                  <p
+                    className={`font-['Figtree:Medium',sans-serif] font-medium text-[14px] leading-[22px] ${label === "Status" ? "text-[#042e99]" : "text-[#021b59]"}`}
+                  >
                     {value}
                   </p>
                 </div>
@@ -557,12 +703,14 @@ function DeclaracaoConclusaoModal({
                 {validationCode}
               </p>
               <p className="font-['Figtree:Regular',sans-serif] text-[#8e8e8e] text-[11px] leading-[16px]">
-                Este código garante a autenticidade do documento e pode ser utilizado para verificação futura.
+                Este código garante a autenticidade do documento e pode ser
+                utilizado para verificação futura.
               </p>
             </div>
 
             <p className="font-['Figtree:Regular',sans-serif] text-[#8e8e8e] text-[12px] leading-[18px] text-center">
-              Documento emitido eletronicamente pelo sistema SOLAR — UFC em {formatDate(emissionDate)}.
+              Documento emitido eletronicamente pelo sistema SOLAR — UFC em{" "}
+              {formatDate(emissionDate)}.
             </p>
           </div>
 
@@ -573,8 +721,19 @@ function DeclaracaoConclusaoModal({
               onClick={handlePrint}
               className="flex-1 h-[48px] bg-[#042e99] rounded-[26px] hover:bg-[#0643de] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#042e99] focus-visible:outline-offset-[2px] flex items-center justify-center gap-[8px]"
             >
-              <svg className="size-[18px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6v-8z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <svg
+                className="size-[18px]"
+                fill="none"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6v-8z"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
               <span className="font-['Figtree:Medium',sans-serif] font-medium text-white text-[16px]">
                 Imprimir / Baixar PDF
@@ -606,7 +765,13 @@ interface RequisitosAlertProps {
   onClose: () => void;
 }
 
-function RequisitosAlert({ totalAulas, visitedAulas, totalProvas, visitedProvas, onClose }: RequisitosAlertProps) {
+function RequisitosAlert({
+  totalAulas,
+  visitedAulas,
+  totalProvas,
+  visitedProvas,
+  onClose,
+}: RequisitosAlertProps) {
   useEffect(() => {
     function handleEsc(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -630,12 +795,22 @@ function RequisitosAlert({ totalAulas, visitedAulas, totalProvas, visitedProvas,
         aria-describedby="requisitos-desc"
       >
         <div className="bg-white w-full max-w-[420px] rounded-[12px] shadow-2xl p-[28px] flex flex-col gap-[20px]">
-
           {/* Ícone de aviso */}
           <div className="flex flex-col items-center gap-[12px] text-center">
-            <div className="size-[52px] rounded-full bg-[#ffeac4] flex items-center justify-center shrink-0" aria-hidden="true">
-              <svg className="size-[28px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 2L1 21h22L12 2zm0 3.5L20.5 19h-17L12 5.5zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z" fill="#D45900" />
+            <div
+              className="size-[52px] rounded-full bg-[#ffeac4] flex items-center justify-center shrink-0"
+              aria-hidden="true"
+            >
+              <svg
+                className="size-[28px]"
+                fill="none"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  d="M12 2L1 21h22L12 2zm0 3.5L20.5 19h-17L12 5.5zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z"
+                  fill="#D45900"
+                />
               </svg>
             </div>
             <h2
@@ -650,7 +825,8 @@ function RequisitosAlert({ totalAulas, visitedAulas, totalProvas, visitedProvas,
             id="requisitos-desc"
             className="font-['Figtree:Regular',sans-serif] text-[#333] text-[15px] leading-[24px] text-center"
           >
-            Você ainda não cumpriu todos os requisitos necessários para concluir este curso.
+            Você ainda não cumpriu todos os requisitos necessários para concluir
+            este curso.
           </p>
 
           {/* Checklist de requisitos */}
@@ -676,12 +852,31 @@ function RequisitosAlert({ totalAulas, visitedAulas, totalProvas, visitedProvas,
                   aria-hidden="true"
                 >
                   {done ? (
-                    <svg className="size-[12px]" fill="none" viewBox="0 0 24 24">
-                      <path d="M5 12l4 4L19 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <svg
+                      className="size-[12px]"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M5 12l4 4L19 7"
+                        stroke="white"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   ) : (
-                    <svg className="size-[12px]" fill="none" viewBox="0 0 14 14">
-                      <path d="M2 2l10 10M12 2L2 12" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                    <svg
+                      className="size-[12px]"
+                      fill="none"
+                      viewBox="0 0 14 14"
+                    >
+                      <path
+                        d="M2 2l10 10M12 2L2 12"
+                        stroke="white"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
                     </svg>
                   )}
                 </div>
@@ -717,7 +912,7 @@ function RequisitosAlert({ totalAulas, visitedAulas, totalProvas, visitedProvas,
 
 export function ModulesPage() {
   const navigate = useNavigate();
-  const { user } = useApp();
+  const { currentUser } = useAuthStore();
   useEnrollmentGuard("power-bi");
 
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set(["1"]));
@@ -742,7 +937,8 @@ export function ModulesPage() {
   const visitedAulas = ALL_AULA_IDS.filter((id) => visited.has(id)).length;
   const visitedProvas = ALL_PROVA_IDS.filter((id) => visited.has(id)).length;
   const isConcluded =
-    visitedAulas >= ALL_AULA_IDS.length && visitedProvas >= ALL_PROVA_IDS.length;
+    visitedAulas >= ALL_AULA_IDS.length &&
+    visitedProvas >= ALL_PROVA_IDS.length;
 
   const totalProgress = ALL_LESSON_IDS.filter((id) => visited.has(id)).length;
   const overallPct = Math.round((totalProgress / ALL_LESSON_IDS.length) * 100);
@@ -756,7 +952,11 @@ export function ModulesPage() {
     });
   };
 
-  const handleVisitLesson = (lessonId: string, modId: string, type: ItemType) => {
+  const handleVisitLesson = (
+    lessonId: string,
+    modId: string,
+    type: ItemType,
+  ) => {
     setVisited((prev) => {
       const next = new Set(prev);
       next.add(lessonId);
@@ -789,7 +989,6 @@ export function ModulesPage() {
       className="bg-white flex flex-col min-h-screen pb-[110px]"
     >
       <div className="max-w-[900px] mx-auto flex flex-col gap-[20px] px-[16px] md:px-[40px] pt-[20px] w-full">
-
         {/* Breadcrumb + back */}
         <PageHeader
           title="Módulos"
@@ -814,9 +1013,26 @@ export function ModulesPage() {
             className="w-full sm:w-auto sm:self-start flex items-center gap-[10px] px-[20px] h-[46px] border-2 border-[#021b59] rounded-[26px] hover:bg-[#021b59]/5 transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px]"
             aria-label="Emitir declaração de matrícula"
           >
-            <svg className="size-[18px] shrink-0" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#021b59" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="#021b59" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <svg
+              className="size-[18px] shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"
+                stroke="#021b59"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M14 2v6h6M16 13H8M16 17H8M10 9H8"
+                stroke="#021b59"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
             <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[15px]">
               Declaração de Matrícula
@@ -843,7 +1059,11 @@ export function ModulesPage() {
         </div>
 
         {/* Module accordion cards */}
-        <div className="flex flex-col gap-[16px] w-full" role="list" aria-label="Lista de módulos">
+        <div
+          className="flex flex-col gap-[16px] w-full"
+          role="list"
+          aria-label="Lista de módulos"
+        >
           {MODULOS.map((mod) => (
             <div key={mod.id} role="listitem">
               <ModuleCard
@@ -929,7 +1149,7 @@ export function ModulesPage() {
       {showMatriculaModal && (
         <DeclaracaoMatriculaModal
           onClose={() => setShowMatriculaModal(false)}
-          studentName={user.name}
+          studentName={currentUser.name}
           validationCode={matriculaCode}
           emissionDate={emissionDate}
         />
@@ -938,7 +1158,7 @@ export function ModulesPage() {
       {showConclusaoModal && (
         <DeclaracaoConclusaoModal
           onClose={() => setShowConclusaoModal(false)}
-          studentName={user.name}
+          studentName={currentUser.name}
           validationCode={conclusaoCode}
           emissionDate={emissionDate}
           conclusionDate={emissionDate}

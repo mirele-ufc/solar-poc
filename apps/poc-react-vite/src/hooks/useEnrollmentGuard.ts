@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import { useApp } from "@/context/AppContext";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useCourseStore } from "@/store/useCourseStore";
 
 /**
  * Redirects to /courses immediately if the student does not have
@@ -14,14 +15,15 @@ import { useApp } from "@/context/AppContext";
  * ⚠️ Security: real access control must be validated on the server.
  */
 export function useEnrollmentGuard(courseId: string) {
-  const { isEnrolled, user, hasCourseStudentRole } = useApp();
+  const { currentUser } = useAuthStore();
+  const { isEnrolledInCourse, hasCourseStudentRole } = useCourseStore();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user.role === "professor") {
+    if (currentUser.role === "professor") {
       // Se o professor tem papel de aluno neste curso, aplica a regra de matrícula
       if (hasCourseStudentRole(courseId)) {
-        if (!isEnrolled(courseId)) {
+        if (!isEnrolledInCourse(courseId)) {
           navigate("/courses", { replace: true });
         }
       }
@@ -29,9 +31,15 @@ export function useEnrollmentGuard(courseId: string) {
       return;
     }
 
-    // Estudante: verifica matrícula normalmente
-    if (!isEnrolled(courseId)) {
+    // Student: verifica matrícula normalmente
+    if (!isEnrolledInCourse(courseId)) {
       navigate("/courses", { replace: true });
     }
-  }, [courseId, isEnrolled, navigate, user.role, hasCourseStudentRole]);
+  }, [
+    courseId,
+    isEnrolledInCourse,
+    navigate,
+    currentUser.role,
+    hasCourseStudentRole,
+  ]);
 }

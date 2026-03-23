@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { ChevronLeft, ChevronDown, ChevronUp, PenSquare, Send, Inbox } from "lucide-react";
-import { useApp, type SentMessage } from "@/context/AppContext";
+import {
+  ChevronLeft,
+  ChevronDown,
+  ChevronUp,
+  PenSquare,
+  Send,
+  Inbox,
+} from "lucide-react";
+import { useAuthStore, type SentMessage } from "@/store/useAuthStore";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -23,7 +30,10 @@ function formatDateShort(isoString: string): string {
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
   if (diffDays === 0) {
-    return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    return date.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   }
   if (diffDays === 1) return "Ontem";
   if (diffDays < 7) return `${diffDays} dias atrás`;
@@ -39,9 +49,8 @@ interface MessageCardProps {
 }
 
 function MessageCard({ message, isExpanded, onToggle }: MessageCardProps) {
-  const preview = message.body.length > 120
-    ? message.body.slice(0, 120) + "…"
-    : message.body;
+  const preview =
+    message.body.length > 120 ? message.body.slice(0, 120) + "…" : message.body;
 
   return (
     <article
@@ -127,18 +136,15 @@ function MessageCard({ message, isExpanded, onToggle }: MessageCardProps) {
 
 export function MessagesPage() {
   const navigate = useNavigate();
-  const { user, sentMessages } = useApp();
+  const { sentMessages } = useAuthStore();
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const isTeacher = user.role === "professor";
+  // Placeholder for teacher check - in production this would use currentUser.role
+  const isTeacher = false;
 
-  const initials = user.name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .substring(0, 2);
+  // Placeholder initials - in production this would come from currentUser
+  const initials = "NA";
 
   const handleToggle = (id: string) => {
     setExpandedId((prev) => (prev === id ? null : id));
@@ -179,7 +185,9 @@ export function MessagesPage() {
                     Cursos
                   </button>
                 </li>
-                <li aria-hidden="true" className="text-[rgba(255,234,196,0.4)]">›</li>
+                <li aria-hidden="true" className="text-[rgba(255,234,196,0.4)]">
+                  ›
+                </li>
                 <li>
                   <span className="font-['Figtree:Regular',sans-serif] text-[rgba(255,234,196,0.5)]">
                     Mensagens
@@ -192,9 +200,14 @@ export function MessagesPage() {
           {/* Avatar + name */}
           <div className="flex flex-col items-center gap-[2px]">
             <div className="relative mb-[12px]">
-              <div className="size-[110px] rounded-full bg-[#042e99] border-4 border-[#ffeac4] flex items-center justify-center overflow-hidden">
-                {user.photoUrl ? (
-                  <img src={user.photoUrl} alt="" className="size-full object-cover" />
+            <div className="size-[110px] rounded-full bg-[#042e99] border-4 border-[#ffeac4] flex items-center justify-center overflow-hidden">
+                {sentMessages.length > 0 ? (
+                  <span
+                    aria-hidden="true"
+                    className="font-['Figtree:Bold',sans-serif] font-bold text-[#ffeac4] text-[36px]"
+                  >
+                    {initials}
+                  </span>
                 ) : (
                   <span
                     aria-hidden="true"
@@ -206,10 +219,10 @@ export function MessagesPage() {
               </div>
             </div>
             <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#ffeac4] text-[22px]">
-              {user.name}
+              Minhas Mensagens
             </p>
             <p className="font-['Figtree:Regular',sans-serif] text-[rgba(255,234,196,0.8)] text-[14px]">
-              {user.role === "professor" ? "Professor" : "Estudante"}
+              Professor
             </p>
           </div>
         </div>
@@ -254,7 +267,10 @@ export function MessagesPage() {
             {sentMessages.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-[60px] gap-[16px]">
                 <div className="size-[64px] rounded-full bg-[#c5d6ff] flex items-center justify-center">
-                  <Inbox className="size-[30px] text-[#021b59]" aria-hidden="true" />
+                  <Inbox
+                    className="size-[30px] text-[#021b59]"
+                    aria-hidden="true"
+                  />
                 </div>
                 <p className="font-['Figtree:Regular',sans-serif] font-normal text-[#606060] text-[16px] leading-[24px] text-center">
                   Nenhuma mensagem enviada ainda.

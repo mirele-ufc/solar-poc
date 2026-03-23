@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { useApp } from "@/context/AppContext";
+import { useCourseStore } from "@/store/useCourseStore";
 import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { toast } from "sonner";
@@ -34,8 +34,8 @@ const preRequisitos = [
 
 export function PythonDetailPage() {
   const navigate = useNavigate();
-  const { isEnrolled, unenroll } = useApp();
-  const enrolled = isEnrolled("python");
+  const { isEnrolledInCourse, unenrollFromCourse } = useCourseStore();
+  const enrolled = isEnrolledInCourse("python");
   const [showCancelModal, setShowCancelModal] = useState(false);
 
   const handleInscrever = () => {
@@ -44,7 +44,7 @@ export function PythonDetailPage() {
   };
 
   const handleConfirmCancel = () => {
-    unenroll("python");
+    unenrollFromCourse("python");
     setShowCancelModal(false);
     toast.success("Matrícula cancelada com sucesso.", {
       description: "Seu acesso ao conteúdo de Python Iniciante foi removido.",
@@ -55,7 +55,6 @@ export function PythonDetailPage() {
 
   return (
     <div className="bg-white flex flex-col pb-[100px]">
-
       {/* Hero image */}
       <div className="w-full h-[218px] md:h-[320px] overflow-hidden">
         <ImageWithFallback
@@ -91,11 +90,13 @@ export function PythonDetailPage() {
             Sobre o curso
           </h2>
           <p className="font-['Figtree:Regular',sans-serif] font-normal leading-[26px] text-black text-[16px]">
-            O curso Python Iniciante tem como objetivo introduzir os participantes ao universo da programação
-            utilizando a linguagem Python — uma das mais populares e versáteis do mundo. Ao longo do curso,
-            os alunos aprenderão desde os conceitos básicos de lógica de programação até a construção de
-            pequenos programas funcionais, desenvolvendo uma base sólida para avançar em áreas como
-            ciência de dados, automação e desenvolvimento de software.
+            O curso Python Iniciante tem como objetivo introduzir os
+            participantes ao universo da programação utilizando a linguagem
+            Python — uma das mais populares e versáteis do mundo. Ao longo do
+            curso, os alunos aprenderão desde os conceitos básicos de lógica de
+            programação até a construção de pequenos programas funcionais,
+            desenvolvendo uma base sólida para avançar em áreas como ciência de
+            dados, automação e desenvolvimento de software.
           </p>
         </div>
 
@@ -110,7 +111,9 @@ export function PythonDetailPage() {
           <ul className="flex flex-col gap-[8px] pl-[4px] md:grid md:grid-cols-2 md:gap-x-[20px]">
             {bullets.map((item) => (
               <li key={item} className="flex gap-[8px] items-start">
-                <span aria-hidden="true" className="text-[#021b59] mt-[2px]">•</span>
+                <span aria-hidden="true" className="text-[#021b59] mt-[2px]">
+                  •
+                </span>
                 <span className="font-['Figtree:Regular',sans-serif] font-normal leading-[24px] text-black text-[16px]">
                   {item}
                 </span>
@@ -127,7 +130,9 @@ export function PythonDetailPage() {
           <ul className="flex flex-col gap-[8px] pl-[4px]">
             {publicoAlvo.map((item) => (
               <li key={item} className="flex gap-[8px] items-start">
-                <span aria-hidden="true" className="text-[#021b59] mt-[2px]">•</span>
+                <span aria-hidden="true" className="text-[#021b59] mt-[2px]">
+                  •
+                </span>
                 <span className="font-['Figtree:Regular',sans-serif] font-normal leading-[24px] text-black text-[16px]">
                   {item}
                 </span>
@@ -144,7 +149,9 @@ export function PythonDetailPage() {
           <ul className="flex flex-col gap-[8px] pl-[4px]">
             {preRequisitos.map((item) => (
               <li key={item} className="flex gap-[8px] items-start">
-                <span aria-hidden="true" className="text-[#021b59] mt-[2px]">•</span>
+                <span aria-hidden="true" className="text-[#021b59] mt-[2px]">
+                  •
+                </span>
                 <span className="font-['Figtree:Regular',sans-serif] font-normal leading-[24px] text-black text-[16px]">
                   {item}
                 </span>
@@ -199,8 +206,16 @@ export function PythonDetailPage() {
           >
             <div className="bg-white w-full max-w-[420px] rounded-[12px] shadow-2xl p-[28px] flex flex-col gap-[20px]">
               <div className="flex flex-col items-center gap-[12px] text-center">
-                <div className="size-[52px] rounded-full bg-[#fde8ef] flex items-center justify-center shrink-0" aria-hidden="true">
-                  <svg className="size-[28px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                <div
+                  className="size-[52px] rounded-full bg-[#fde8ef] flex items-center justify-center shrink-0"
+                  aria-hidden="true"
+                >
+                  <svg
+                    className="size-[28px]"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
                     <path d={WARN_PATH} fill="#de2e66" />
                   </svg>
                 </div>
@@ -218,7 +233,8 @@ export function PythonDetailPage() {
               >
                 Tem certeza que deseja cancelar sua matrícula neste curso?{" "}
                 <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#801436]">
-                  Após o cancelamento, você perderá o acesso ao conteúdo da disciplina
+                  Após o cancelamento, você perderá o acesso ao conteúdo da
+                  disciplina
                 </span>
                 , incluindo aulas, materiais, atividades, provas e fóruns.
               </p>

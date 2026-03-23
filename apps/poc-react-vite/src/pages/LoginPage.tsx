@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { useApp } from "@/context/AppContext";
+import { useAuthStore } from "@/store/useAuthStore";
 import svgPaths from "@/assets/svg-ppphmxjoa5";
 import imgUfcLogo1 from "@/assets/9098abf5bf97a1aac4c76f171ec108cee92cfddb.png";
 import imgAtivo224X1 from "@/assets/a17a08a750e97ba9bb12c3ad582c426a8debf0fa.png";
@@ -12,7 +12,7 @@ export function LoginPage() {
   const [showErrors, setShowErrors] = useState(false);
   const [generalError, setGeneralError] = useState("");
   const navigate = useNavigate();
-  const { login } = useApp();
+  const { login } = useAuthStore();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { ChevronLeft, ChevronDown, ChevronUp, Inbox } from "lucide-react";
-import { useApp, type SentMessage } from "@/context/AppContext";
+import { useAuthStore, type SentMessage } from "@/store/useAuthStore";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -22,7 +22,10 @@ function formatDateShort(isoString: string): string {
   const diffMs = now.getTime() - date.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   if (diffDays === 0) {
-    return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    return date.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   }
   if (diffDays === 1) return "Ontem";
   if (diffDays < 7) return `${diffDays} dias atrás`;
@@ -42,7 +45,12 @@ interface MessageCardProps {
   isUnread: boolean;
 }
 
-function MessageCard({ message, isExpanded, onToggle, isUnread }: MessageCardProps) {
+function MessageCard({
+  message,
+  isExpanded,
+  onToggle,
+  isUnread,
+}: MessageCardProps) {
   const preview =
     message.body.length > 130 ? message.body.slice(0, 130) + "…" : message.body;
 
@@ -177,7 +185,8 @@ function MessageCard({ message, isExpanded, onToggle, isUnread }: MessageCardPro
 
 export function StudentMessagesPage() {
   const navigate = useNavigate();
-  const { user, sentMessages, enrolledCourses } = useApp();
+  const { currentUser, sentMessages } = useAuthStore();
+  const { enrolledCourses } = useCourseStore();
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [readIds, setReadIds] = useState<Set<string>>(new Set());
@@ -185,8 +194,7 @@ export function StudentMessagesPage() {
   // Filtra mensagens relevantes: destinadas a "all" ou a cursos matriculados
   const receivedMessages = sentMessages.filter(
     (msg) =>
-      msg.recipientId === "all" ||
-      enrolledCourses.includes(msg.recipientId)
+      msg.recipientId === "all" || enrolledCourses.includes(msg.recipientId),
   );
 
   const handleToggle = (id: string) => {
@@ -201,13 +209,13 @@ export function StudentMessagesPage() {
 
   const initials = (() => {
     const parts = user.name.trim().split(/\s+/);
-    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    if (parts.length >= 2)
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     return parts[0].slice(0, 2).toUpperCase();
   })();
 
   return (
     <div className="min-h-screen bg-white">
-
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <header
         className="relative px-[20px] md:px-[40px] py-[32px]"
@@ -241,7 +249,9 @@ export function StudentMessagesPage() {
                     Cursos
                   </button>
                 </li>
-                <li aria-hidden="true" className="text-[rgba(255,234,196,0.4)]">›</li>
+                <li aria-hidden="true" className="text-[rgba(255,234,196,0.4)]">
+                  ›
+                </li>
                 <li>
                   <span className="font-['Figtree:Regular',sans-serif] text-[rgba(255,234,196,0.5)]">
                     Mensagens
@@ -256,7 +266,11 @@ export function StudentMessagesPage() {
             <div className="relative mb-[12px]">
               <div className="size-[110px] rounded-full bg-[#042e99] border-4 border-[#ffeac4] flex items-center justify-center overflow-hidden">
                 {user.photoUrl ? (
-                  <img src={user.photoUrl} alt="" className="size-full object-cover" />
+                  <img
+                    src={user.photoUrl}
+                    alt=""
+                    className="size-full object-cover"
+                  />
                 ) : (
                   <span
                     aria-hidden="true"
@@ -308,17 +322,27 @@ export function StudentMessagesPage() {
             )}
           </div>
           <span className="font-['Figtree:Regular',sans-serif] text-[#8e8e8e] text-[13px]">
-            {receivedMessages.length} mensagem{receivedMessages.length !== 1 ? "s" : ""}
+            {receivedMessages.length} mensagem
+            {receivedMessages.length !== 1 ? "s" : ""}
           </span>
         </div>
 
         {/* Aviso informativo */}
         <div className="bg-[#f5f8ff] border border-[#c5d6ff] rounded-[12px] px-[16px] py-[12px] flex items-start gap-[12px] mb-[24px]">
-          <svg className="size-[18px] shrink-0 mt-[2px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" fill="#021b59" />
+          <svg
+            className="size-[18px] shrink-0 mt-[2px]"
+            fill="none"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+              fill="#021b59"
+            />
           </svg>
           <p className="font-['Figtree:Regular',sans-serif] text-[#021b59] text-[14px] leading-[22px]">
-            Estas são as mensagens enviadas pelo seu professor para os cursos em que você está matriculado.
+            Estas são as mensagens enviadas pelo seu professor para os cursos em
+            que você está matriculado.
           </p>
         </div>
 
@@ -326,13 +350,17 @@ export function StudentMessagesPage() {
         {receivedMessages.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-[60px] gap-[16px]">
             <div className="size-[64px] rounded-full bg-[#c5d6ff] flex items-center justify-center">
-              <Inbox className="size-[30px] text-[#021b59]" aria-hidden="true" />
+              <Inbox
+                className="size-[30px] text-[#021b59]"
+                aria-hidden="true"
+              />
             </div>
             <p className="font-['Figtree:Regular',sans-serif] font-normal text-[#606060] text-[16px] leading-[24px] text-center">
               Nenhuma mensagem recebida ainda.
             </p>
             <p className="font-['Figtree:Regular',sans-serif] text-[#8e8e8e] text-[14px] leading-[22px] text-center max-w-[320px]">
-              As mensagens dos seus professores aparecerão aqui quando você estiver inscrito em um curso.
+              As mensagens dos seus professores aparecerão aqui quando você
+              estiver inscrito em um curso.
             </p>
           </div>
         ) : (

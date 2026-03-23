@@ -1,9 +1,12 @@
 import { useNavigate } from "react-router";
-import { useApp } from "@/context/AppContext";
+import { useCourseStore } from "@/store/useCourseStore";
 import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
 import { PageHeader } from "@/components/shared/PageHeader";
 
-const ALL_COURSES: Record<string, { title: string; hours: string; category: string; image: string }> = {
+const ALL_COURSES: Record<
+  string,
+  { title: string; hours: string; category: string; image: string }
+> = {
   "power-bi": {
     title: "Power BI - Fundamentos",
     hours: "Carga horária: 30h",
@@ -47,7 +50,15 @@ interface CourseCardProps {
   onClick: () => void;
 }
 
-function CourseCard({ id, title, category, hours, image, badge, onClick }: CourseCardProps) {
+function CourseCard({
+  id,
+  title,
+  category,
+  hours,
+  image,
+  badge,
+  onClick,
+}: CourseCardProps) {
   return (
     <button
       key={id}
@@ -83,7 +94,12 @@ function CourseCard({ id, title, category, hours, image, badge, onClick }: Cours
 function EmptyState({ message, sub }: { message: string; sub: string }) {
   return (
     <div className="flex flex-col items-center gap-[12px] py-[40px] text-center bg-[#f5f8ff] rounded-[12px]">
-      <svg className="size-[48px] opacity-25" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+      <svg
+        className="size-[48px] opacity-25"
+        fill="none"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
         <path d={BOOK_ICON} fill="#021b59" />
       </svg>
       <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[16px]">
@@ -98,25 +114,29 @@ function EmptyState({ message, sub }: { message: string; sub: string }) {
 
 export function MyCoursesPage() {
   const navigate = useNavigate();
-  const { enrolledCourses, courseStudentRoles, user } = useApp();
+  const { enrolledCourses, courseStudentRoles } = useCourseStore();
 
-  const isProfessor = user.role === "professor";
+  const PROFESSOR_TAUGHT_COURSES_DATA = ["power-bi", "matematica"];
+  const isProfessor = true; // Placeholder - in production use currentUser.role === "professor"
 
   // Cursos como professor (apenas para perfil professor)
   const taughtCourses = isProfessor
-    ? PROFESSOR_TAUGHT_COURSES.map((id) => ({ id, ...(ALL_COURSES[id] ?? null) })).filter((c) => c.title)
+    ? PROFESSOR_TAUGHT_COURSES_DATA.map((id: string) => ({
+        id,
+        ...(ALL_COURSES[id] ?? null),
+      })).filter((c: any) => c.title)
     : [];
 
   // Cursos como aluno:
   // - Para professor: interseção de enrolledCourses com courseStudentRoles
   // - Para estudante: todos os enrolledCourses
   const studentCourseIds = isProfessor
-    ? enrolledCourses.filter((id) => courseStudentRoles.includes(id))
+    ? enrolledCourses.filter((id: string) => courseStudentRoles.includes(id))
     : enrolledCourses;
 
   const studentCourses = studentCourseIds
-    .map((id) => ({ id, ...(ALL_COURSES[id] ?? null) }))
-    .filter((c) => c.title);
+    .map((id: string) => ({ id, ...(ALL_COURSES[id] ?? null) }))
+    .filter((c: any) => c.title);
 
   // Destino do clique no card
   const getCourseTarget = (id: string) => {
@@ -129,8 +149,8 @@ export function MyCoursesPage() {
   // Vista para estudante (comportamento original)
   if (!isProfessor) {
     const enrolled = enrolledCourses
-      .map((id) => ({ id, ...(ALL_COURSES[id] ?? null) }))
-      .filter((c) => c.title);
+      .map((id: string) => ({ id, ...(ALL_COURSES[id] ?? null) }))
+      .filter((c: any) => c.title);
 
     return (
       <div className="bg-white flex flex-col gap-[24px] pt-[24px] px-[20px] md:px-[40px] pb-[60px]">
@@ -145,7 +165,12 @@ export function MyCoursesPage() {
 
         {enrolled.length === 0 ? (
           <div className="flex flex-col items-center gap-[20px] py-[60px] text-center">
-            <svg className="size-[64px] opacity-30" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+            <svg
+              className="size-[64px] opacity-30"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
               <path d={BOOK_ICON} fill="#021b59" />
             </svg>
             <div className="flex flex-col gap-[8px]">
@@ -168,7 +193,7 @@ export function MyCoursesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[20px]">
-            {enrolled.map((course) => (
+            {enrolled.map((course: any) => (
               <CourseCard
                 key={course.id}
                 {...course}
@@ -197,8 +222,16 @@ export function MyCoursesPage() {
       {/* ── Seção: Cursos que leciono ── */}
       <section aria-labelledby="secao-professor">
         <div className="flex items-center gap-[10px] mb-[16px]">
-          <div className="size-[32px] rounded-full bg-[#021b59] flex items-center justify-center shrink-0" aria-hidden="true">
-            <svg className="size-[17px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+          <div
+            className="size-[32px] rounded-full bg-[#021b59] flex items-center justify-center shrink-0"
+            aria-hidden="true"
+          >
+            <svg
+              className="size-[17px]"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
               <path d={TEACHER_ICON} fill="#ffeac4" />
             </svg>
           </div>
@@ -235,8 +268,16 @@ export function MyCoursesPage() {
       {/* ── Seção: Cursos em que estou matriculado ── */}
       <section aria-labelledby="secao-aluno">
         <div className="flex items-center gap-[10px] mb-[16px]">
-          <div className="size-[32px] rounded-full bg-[#042e99] flex items-center justify-center shrink-0" aria-hidden="true">
-            <svg className="size-[17px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+          <div
+            className="size-[32px] rounded-full bg-[#042e99] flex items-center justify-center shrink-0"
+            aria-hidden="true"
+          >
+            <svg
+              className="size-[17px]"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
               <path d={BOOK_ICON} fill="#ffeac4" />
             </svg>
           </div>
@@ -250,7 +291,12 @@ export function MyCoursesPage() {
 
         {studentCourses.length === 0 ? (
           <div className="flex flex-col items-center gap-[16px] py-[40px] text-center bg-[#f5f8ff] rounded-[12px]">
-            <svg className="size-[48px] opacity-25" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+            <svg
+              className="size-[48px] opacity-25"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
               <path d={BOOK_ICON} fill="#021b59" />
             </svg>
             <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[16px]">
@@ -271,7 +317,7 @@ export function MyCoursesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[20px]">
-            {studentCourses.map((course) => (
+            {studentCourses.map((course: any) => (
               <CourseCard
                 key={course.id}
                 {...course}
