@@ -1,38 +1,11 @@
 import { apiClient } from "./api";
-import { IQuiz, IQuestion } from "@ava-poc/types";
-
-/**
- * Payload interface for quiz answer submission
- * Represents a single answer selected by the student
- */
-interface IQuestionAnswer {
-  questionId: string;
-  selectedAnswerIndex: number;
-}
-
-/**
- * Payload interface for quiz submission
- * Sent when a student completes and submits a quiz
- */
-interface ISubmitQuizPayload {
-  studentId: string;
-  courseId: string;
-  answers: IQuestionAnswer[];
-}
-
-/**
- * Response interface for quiz submission results
- * Contains the score and detailed feedback on the submission
- */
-interface IQuizSubmissionResult {
-  quizId: string;
-  score: number;
-  totalQuestions: number;
-  correctAnswers: number;
-  feedback: string;
-  passedThreshold: boolean;
-  timestamp: string;
-}
+import {
+  IQuiz,
+  IQuestion,
+  IQuestionAnswer,
+  ISubmitQuizPayload,
+  IQuizSubmissionResult,
+} from "@ava-poc/types";
 
 /**
  * Fetch a specific quiz by its ID

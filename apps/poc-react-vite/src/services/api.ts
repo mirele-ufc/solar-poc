@@ -22,13 +22,30 @@ const apiClient: AxiosInstance = axios.create({
  */
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => response,
-  (error: AxiosError) => {
-    const apiError: IApiError = {
-      message: error.message || "An unexpected error occurred",
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      timestamp: new Date().toISOString(),
-    };
+  (error: unknown) => {
+    let apiError: IApiError;
+
+    // Check if error is an AxiosError
+    if (error instanceof AxiosError) {
+      apiError = {
+        message: error.response?.data?.message || error.message || "An unexpected error occurred",
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        timestamp: new Date().toISOString(),
+      };
+    } else if (error instanceof Error) {
+      // Handle generic Error objects
+      apiError = {
+        message: error.message,
+        timestamp: new Date().toISOString(),
+      };
+    } else {
+      // Handle unknown error types
+      apiError = {
+        message: "An unexpected error occurred",
+        timestamp: new Date().toISOString(),
+      };
+    }
 
     // Log error for debugging (in production, this could be sent to a logging service)
     console.error("[API Error]", apiError);

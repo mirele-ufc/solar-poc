@@ -1,26 +1,9 @@
 import { apiClient } from "./api";
-import { ICourse } from "@ava-poc/types";
-
-/**
- * Payload interface for course creation
- * Defines the structure of data sent to the back-end for creating a new course
- */
-interface ICreateCoursePayload {
-  title: string;
-  description: string;
-  thumbnail: string;
-  creatorId: string;
-}
-
-/**
- * Payload interface for course updates
- * Defines the structure of data sent to the back-end for updating a course
- */
-interface IUpdateCoursePayload {
-  title?: string;
-  description?: string;
-  thumbnail?: string;
-}
+import {
+  ICourse,
+  ICreateCoursePayload,
+  IUpdateCoursePayload,
+} from "@ava-poc/types";
 
 /**
  * Fetch all courses from the back-end
