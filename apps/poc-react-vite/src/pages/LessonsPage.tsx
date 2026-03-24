@@ -208,12 +208,12 @@ export function LessonsPage() {
           {/* Breadcrumb + back */}
           <PageHeader
             title={currentAula.title}
-            backPath="/cursos/power-bi/modulos"
+            backPath="/courses/power-bi/modules"
             crumbs={[
-              { label: "Cursos", path: "/cursos" },
-              { label: "Power BI - Fundamentos", path: "/cursos/power-bi" },
-              { label: "Módulos", path: "/cursos/power-bi/modulos" },
-              { label: moduloTitle, path: `/cursos/power-bi/modulos/${mod}` },
+              { label: "Cursos", path: "/courses" },
+              { label: "Power BI - Fundamentos", path: "/courses/power-bi" },
+              { label: "Módulos", path: "/courses/power-bi/modules" },
+              { label: moduloTitle, path: `/courses/power-bi/modules/${mod}` },
               { label: currentAula.title },
             ]}
           />

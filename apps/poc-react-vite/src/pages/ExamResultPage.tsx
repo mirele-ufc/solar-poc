@@ -384,7 +384,7 @@ export function ExamResultPage() {
   };
 
   function handleReturn() {
-    navigate("/cursos/power-bi/modulos");
+    navigate("/courses/power-bi/modules");
   }
 
   if (isLoading) {

@@ -165,7 +165,7 @@ export function MessagesPage() {
           <div className="mb-[16px]">
             <button
               type="button"
-              onClick={() => navigate("/cursos")}
+              onClick={() => navigate("/courses")}
               className="flex items-center gap-[8px] text-[#ffeac4] hover:text-white transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#ffeac4] rounded-[6px] min-h-[44px]"
               aria-label="Voltar para cursos"
             >
@@ -179,7 +179,7 @@ export function MessagesPage() {
                 <li>
                   <button
                     type="button"
-                    onClick={() => navigate("/cursos")}
+                    onClick={() => navigate("/courses")}
                     className="font-['Figtree:Regular',sans-serif] text-[rgba(255,234,196,0.7)] hover:text-[#ffeac4] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#ffeac4] rounded-[4px] min-h-[44px] inline-flex items-center"
                   >
                     Cursos
@@ -239,7 +239,7 @@ export function MessagesPage() {
           {isTeacher && (
             <button
               type="button"
-              onClick={() => navigate("/mensagem")}
+              onClick={() => navigate("/message")}
               className="flex items-center gap-[8px] bg-[#021b59] text-[#ffeac4] h-[44px] px-[20px] rounded-[26px] font-['Figtree:Medium',sans-serif] font-medium text-[15px] hover:bg-[#042e99] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px] shrink-0"
               aria-label="Criar nova mensagem"
             >
@@ -277,7 +277,7 @@ export function MessagesPage() {
                 </p>
                 <button
                   type="button"
-                  onClick={() => navigate("/mensagem")}
+                  onClick={() => navigate("/message")}
                   className="flex items-center gap-[8px] bg-[#021b59] text-[#ffeac4] h-[44px] px-[24px] rounded-[26px] font-['Figtree:Medium',sans-serif] font-medium text-[15px] hover:bg-[#042e99] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px]"
                 >
                   <PenSquare className="size-[16px]" aria-hidden="true" />

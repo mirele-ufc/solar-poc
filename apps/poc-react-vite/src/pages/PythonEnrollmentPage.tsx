@@ -175,10 +175,10 @@ export function PythonEnrollmentPage() {
       <div className="max-w-[900px] mx-auto flex flex-col gap-[16px] px-[20px] md:px-[40px] pt-[24px] w-full">
         <PageHeader
           title="Inscrição"
-          backPath="/cursos/python"
+          backPath="/courses/python"
           crumbs={[
-            { label: "Cursos", path: "/cursos" },
-            { label: "Python Iniciante", path: "/cursos/python" },
+            { label: "Cursos", path: "/courses" },
+            { label: "Python Iniciante", path: "/courses/python" },
             { label: "Inscrição" },
           ]}
         />

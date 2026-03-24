@@ -222,9 +222,9 @@ export function CreateCoursePage() {
         {/* Page header with back + breadcrumb */}
         <PageHeader
           title="Criar Curso"
-          backPath="/cursos"
+          backPath="/courses"
           crumbs={[
-            { label: "Cursos", path: "/cursos" },
+            { label: "Cursos", path: "/courses" },
             { label: "Criar Curso" },
           ]}
         />

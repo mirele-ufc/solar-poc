@@ -13,12 +13,12 @@ export function ExamInstructionsPage() {
         {/* Page header with back + breadcrumb */}
         <PageHeader
           title="Instruções"
-          backPath="/cursos/power-bi/modulos/1"
+          backPath="/courses/power-bi/modules/1"
           crumbs={[
-            { label: "Cursos", path: "/cursos" },
-            { label: "Power BI - Fundamentos", path: "/cursos/power-bi" },
-            { label: "Módulos", path: "/cursos/power-bi/modulos" },
-            { label: "Módulo 01", path: "/cursos/power-bi/modulos/1" },
+            { label: "Cursos", path: "/courses" },
+            { label: "Power BI - Fundamentos", path: "/courses/power-bi" },
+            { label: "Módulos", path: "/courses/power-bi/modules" },
+            { label: "Módulo 01", path: "/courses/power-bi/modules/1" },
             { label: "Prova 01" },
           ]}
         />
@@ -69,7 +69,7 @@ export function ExamInstructionsPage() {
         <div className="w-full max-w-[900px]">
           <button
             type="button"
-            onClick={() => navigate("/cursos/power-bi/prova")}
+            onClick={() => navigate("/courses/power-bi/exam")}
             className="bg-[#ffeac4] h-[50px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px]"
           >
             <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">

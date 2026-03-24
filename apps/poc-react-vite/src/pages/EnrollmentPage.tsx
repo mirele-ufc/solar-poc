@@ -177,10 +177,10 @@ export function EnrollmentPage() {
         {/* Page header with back + breadcrumb */}
         <PageHeader
           title="Inscrição"
-          backPath="/cursos/power-bi"
+          backPath="/courses/power-bi"
           crumbs={[
-            { label: "Cursos", path: "/cursos" },
-            { label: "Power BI - Fundamentos", path: "/cursos/power-bi" },
+            { label: "Cursos", path: "/courses" },
+            { label: "Power BI - Fundamentos", path: "/courses/power-bi" },
             { label: "Inscrição" },
           ]}
         />

@@ -801,7 +801,7 @@ export function ManageCoursePage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" aria-hidden="true" />
         <button
           type="button"
-          onClick={() => navigate("/cursos")}
+          onClick={() => navigate("/courses")}
           aria-label="Voltar para cursos"
           className="absolute top-[16px] left-[16px] size-[36px] rounded-full bg-white/80 flex items-center justify-center hover:bg-white transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
         >
@@ -872,7 +872,7 @@ export function ManageCoursePage() {
 
           <button
             type="button"
-            onClick={() => navigate("/mensagem")}
+            onClick={() => navigate("/message")}
             className="flex-1 flex items-center justify-center h-[46px] border-2 border-[#021b59] rounded-[26px] hover:bg-[#021b59]/5 transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
           >
             <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[16px]">
