@@ -140,7 +140,7 @@ export function MessagesPage() {
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const initials = currentUser.name
+  const initials = (currentUser?.nome ?? "")
     .split(" ")
     .map((namePart) => namePart[0])
     .join("")
@@ -201,7 +201,7 @@ export function MessagesPage() {
           {/* Avatar + name */}
           <div className="flex flex-col items-center gap-[2px]">
             <div className="relative mb-[12px]">
-            <div className="size-[110px] rounded-full bg-[#042e99] border-4 border-[#ffeac4] flex items-center justify-center overflow-hidden">
+              <div className="size-[110px] rounded-full bg-[#042e99] border-4 border-[#ffeac4] flex items-center justify-center overflow-hidden">
                 {sentMessages.length > 0 ? (
                   <span
                     aria-hidden="true"

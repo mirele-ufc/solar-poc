@@ -39,7 +39,7 @@ import { ForgotPasswordPage } from "@/pages/ForgotPasswordPage";
 import { UnauthorizedPage } from "@/pages/UnauthorizedPage";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
 import { useAuthStore } from "@/store/useAuthStore";
-import type { UserProfile } from "@/store/useAuthStore";
+import type { IUserSession } from "@ava-poc/types";
 
 /**
  * Estado inicial de usuário não autenticado
@@ -48,13 +48,7 @@ import type { UserProfile } from "@/store/useAuthStore";
 function buildUnauthenticatedState() {
   return {
     isLoggedIn: false,
-    currentUser: {
-      name: "",
-      cpf: "",
-      email: "",
-      photoUrl: null,
-      role: "student" as UserProfile["role"],
-    },
+    currentUser: null as IUserSession | null,
   };
 }
 
