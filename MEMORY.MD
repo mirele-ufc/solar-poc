@@ -16,13 +16,13 @@
 
 ## SECTION: GLOBAL PROGRESS
 
-| Campo      | Valor                                          |
-| ---------- | ---------------------------------------------- |
-| **Fase**   | 1 — Contratos Canônicos e Tipagem              |
-| **Módulo** | 1.5 — Validar zero `any` em TypeScript         |
-| **Story**  | 1.5 — Tipagem explícita sem `any` em `src/`    |
-| **Status** | DONE                                           |
-| **Branch** | feature/refactor-contratos-tipagem             |
+| Campo      | Valor                                       |
+| ---------- | ------------------------------------------- |
+| **Fase**   | 1 — Contratos Canônicos e Tipagem           |
+| **Módulo** | 1.5 — Validar zero `any` em TypeScript      |
+| **Story**  | 1.5 — Tipagem explícita sem `any` em `src/` |
+| **Status** | DONE                                        |
+| **Branch** | feature/refactor-contratos-tipagem          |
 
 **Status:** Fase 1 em andamento, Story 1.5 ✅ DONE (local), 12/43 total (28%), next: 1.6
 
