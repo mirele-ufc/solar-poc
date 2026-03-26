@@ -1,30 +1,8 @@
 import { create } from "zustand";
+import type { UserProfile, SentMessage } from "@ava-poc/types";
 
-/**
- * User profile data structure
- * Contains public user information used throughout the application
- */
-export interface UserProfile {
-  name: string;
-  cpf: string;
-  email: string;
-  photoUrl: string | null;
-  role: "professor" | "student";
-  password?: string;
-}
-
-/**
- * Message sent by a user to recipients
- * Used in the messaging system
- */
-export interface SentMessage {
-  id: string;
-  recipientId: string;
-  recipientLabel: string;
-  subject: string;
-  body: string;
-  sentAt: string; // ISO date string
-}
+// Re-export types for external imports (tests, components)
+export type { UserProfile, SentMessage };
 
 /**
  * Authentication store state and actions

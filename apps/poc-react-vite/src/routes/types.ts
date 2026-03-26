@@ -1,13 +1,8 @@
 import type { ReactNode } from "react";
+import type { UserRole, ProtectedRouteProps as BaseProtectedRouteProps, RoleBasedRouteProps } from "@ava-poc/types";
 
-export type UserRole = "admin" | "professor" | "student";
+export type { UserRole, RoleBasedRouteProps };
 
-export interface ProtectedRouteProps {
+export interface ProtectedRouteProps extends BaseProtectedRouteProps {
   children?: ReactNode;
-  allowedRoles: ReadonlyArray<UserRole>;
-  redirectTo?: string;
-}
-
-export interface RoleBasedRouteProps extends ProtectedRouteProps {
-  allowedRoles: UserRole[];
 }
