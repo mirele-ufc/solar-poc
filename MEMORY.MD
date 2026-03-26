@@ -8,9 +8,9 @@
 
 ## MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
 
-**Última atualização:** 2026-03-26T16:05:00Z (1.4 concluída e commitada)  
+**Última atualização:** 2026-03-26T16:14:00Z (1.5 validada com zero `any` em `src/`)  
 **Sprint ativo:** Fase 1 — Contratos Canônicos e Tipagem  
-**Status geral:** 26% (11/43 subtarefas)
+**Status geral:** 28% (12/43 subtarefas)
 
 ---
 
@@ -19,12 +19,12 @@
 | Campo      | Valor                                          |
 | ---------- | ---------------------------------------------- |
 | **Fase**   | 1 — Contratos Canônicos e Tipagem              |
-| **Módulo** | 1.4 — Remover tipos locais duplicados de pages |
-| **Story**  | 1.4 — Tipos de pages centralizados             |
+| **Módulo** | 1.5 — Validar zero `any` em TypeScript         |
+| **Story**  | 1.5 — Tipagem explícita sem `any` em `src/`    |
 | **Status** | DONE                                           |
 | **Branch** | feature/refactor-contratos-tipagem             |
 
-**Status:** Fase 1 em andamento, Story 1.4 ✅ DONE, 11/43 total (26%), next: 1.5
+**Status:** Fase 1 em andamento, Story 1.5 ✅ DONE (local), 12/43 total (28%), next: 1.6
 
 ### ✅ Completes
 
@@ -41,33 +41,34 @@
 | 1.2 | Migrar useAuthStore para tipos globais          | ✅     | 26/03/2026 | 6dfa8ae + 146efd2 + 99f8ba3 + 6a664e6 + d285b57 | —   |
 | 1.3 | Centralizar e alinhar schemas Zod               | ✅     | 26/03/2026 | 088d981 + 3b25f55 + 39c4cbe                     | —   |
 | 1.4 | Remover tipos locais duplicados de pages        | ✅     | 26/03/2026 | f0e773e                                         | —   |
+| 1.5 | Validar zero `any` em TypeScript                | ✅     | 26/03/2026 | local (sem commit)                              | —   |
 
 ### 📊 By-Phase Metrics
 
 | Phase     | Complete | Total  | %       | Status             | Start Date | Est. End |
 | --------- | -------- | ------ | ------- | ------------------ | ---------- | -------- |
 | 0         | 7        | 7      | 100%    | ✅ COMPLETA        | 25/03      | 26/03    |
-| 1         | 4        | 6      | 67%     | 🔄 IN_PROGRESS     | 26/03      | —        |
+| 1         | 5        | 6      | 83%     | 🔄 IN_PROGRESS     | 26/03      | —        |
 | 2         | 0        | 7      | 0%      | ⏳ FUTURE          | —          | —        |
 | 3         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
 | 4         | 0        | 7      | 0%      | ⏳ FUTURE          | —          | —        |
 | 5         | 0        | 4      | 0%      | ⏳ FUTURE          | —          | —        |
 | 6         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
-| **TOTAL** | **11**   | **43** | **26%** | **🟢 IN PROGRESS** | 25/03      | —        |
+| **TOTAL** | **12**   | **43** | **28%** | **🟢 IN PROGRESS** | 25/03      | —        |
 
 ### ⏳ Next Ready (First 3)
 
-1. **1.5 — Validar zero `any` em TypeScript**
-   - Duração: 0.5 dia
-   - Dependências: 1.4 ✅
+1. **1.6 — Refatorar componentes com Slots Pattern**
+   - Duração: 1.5 dias
+   - Dependências: 1.5 ✅
    - Status: ⏳ READY NOW
 
-2. **1.6 — Refatorar componentes com Slots Pattern**
-   - Duração: 1.5 dias
+2. **2.1 — Criar authService.ts com endpoints de autenticação**
+   - Duração: 2 dias
    - Status: ⏳ NEXT
 
-3. **2.1 — Criar authService.ts com endpoints de autenticação**
-   - Duração: 2 dias
+3. **2.2 — Implementar Request Interceptor em api.ts**
+   - Duração: 1 dia
    - Status: ⏳ FUTURE
 
 ### ⛔ Blockers
@@ -95,18 +96,19 @@
 8. `1.2.1` — `useAuthStore` migrado para tipos globais, com ajustes de null-safety e compatibilidade.
 9. `1.3.1` — Schemas Zod alinhados ao contrato e suíte de erro expandida para `auth`, `course`, `enrollment`, `exam`, `file` e `message`.
 10. `1.4.1` — Tipos duplicados de módulos e mensagens centralizados em `@ava-poc/types` e consumidores migrados.
+11. `1.5.1` — Varredura de `src/` validada sem ocorrências de `any`, com `type-check` aprovado.
 
-**Resumo:** Fase 0 concluída (7/7). Fase 1 com 4/6 subtarefas concluídas. Últimas entregas: 1.3 (schemas Zod + testes de erro) e 1.4 (centralização de tipos duplicados).
+**Resumo:** Fase 0 concluída (7/7). Fase 1 com 5/6 subtarefas concluídas. Últimas entregas: 1.4 (centralização de tipos duplicados) e 1.5 (zero `any` validado em `src/`).
 
 ### Last Action
 
-- **Date:** 26/03/2026 16:05 UTC
+- **Date:** 26/03/2026 16:14 UTC
 - **Machine:** local
-- **What:** Subtarefa 1.4 concluída — tipos duplicados de pages centralizados
-- **Testes executados:** Type-check ✅ PASSED; Vitest app ✅ 61/61
+- **What:** Subtarefa 1.5 validada — `src/` sem ocorrências de `any`
+- **Testes executados:** Busca por `any` em `apps/poc-react-vite/src/**` sem ocorrências; Type-check ✅ PASSED
 - **Commits realizados (mais recentes):** `ec2f739`, `f0e773e`, `6b413f6`
-- **Status:** Story 1.4 concluída e registrada em git; tipos compartilhados aplicados em modules/messages pages
-- **Próxima:** 1.5 (Validar zero `any` em TypeScript) — READY NOW
+- **Status:** Story 1.5 concluída localmente; critério do plano atendido sem necessidade de alteração de código além da rastreabilidade
+- **Próxima:** 1.6 (Refatorar componentes com Slots Pattern) — READY NOW
 
 ### Observações Contratuais da 0.2
 
@@ -120,13 +122,13 @@ Quando você voltar para continuar:
 # 1. Antes de tudo, validar contexto
 /status-refactoring
 
-# 2. Começar Fase 1.5
-Implemente 1.5 (Validar zero `any` em TypeScript)
+# 2. Começar Fase 1.6
+Implemente 1.6 (Refatorar componentes com Slots Pattern)
 ```
 
 ## 📝 Arquivos em Edição
 
-Nenhum arquivo pendente no working tree no momento.
+Somente `MEMORY.md` está pendente no working tree no momento.
 
 ## 🚦 Bloqueadores
 
@@ -134,10 +136,9 @@ Nenhum blocker ativo no momento.
 
 ## 💡 Notas Rápidas
 
-- Story 1.4 concluída e commitada com centralização de tipos de módulos e mensagens em `@ava-poc/types`.
-- `type-check` passou após a refatoração.
-- Suite de testes da aplicação: 61/61 passando.
-- Próxima subtarefa operacional: 1.5 — validar zero `any` em TypeScript.
+- Story 1.5 validada: nenhuma ocorrência de `any` encontrada em `apps/poc-react-vite/src`.
+- `type-check` passou como verificação formal da subtarefa.
+- Próxima subtarefa operacional: 1.6 — refatorar componentes com Slots Pattern.
 
 ## 🔗 Links de Referência
 
