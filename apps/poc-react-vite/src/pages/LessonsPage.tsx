@@ -172,7 +172,7 @@ export function LessonsPage() {
     Math.min(initialIndex, aulas.length - 1),
   );
 
-  const [visited, setVisited] = useState<Set<string>>(() => loadVisited());
+  const [, setVisited] = useState<Set<string>>(() => loadVisited());
 
   const currentAula = aulas[aulaIndex];
   const isLastAula = aulaIndex === aulas.length - 1;
