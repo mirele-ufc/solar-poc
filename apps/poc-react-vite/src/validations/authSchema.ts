@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { ILoginRequest } from "@ava-poc/types";
 
 const cpfRegex = /^(\d{3}\.\d{3}\.\d{3}-\d{2}|\d{11})$/;
 
@@ -37,6 +38,11 @@ export const loginSchema = z.object({
   password: z.string().trim().min(1, "Senha não informada"),
 });
 
+export const loginRequestSchema = z.object({
+  email: z.email("Email inválido"),
+  senha: z.string().trim().min(6, "A senha deve ter ao menos 6 caracteres"),
+}) satisfies z.ZodType<ILoginRequest>;
+
 export const forgotPasswordSchema = z.object({
   email: z
     .string()
@@ -47,3 +53,10 @@ export const forgotPasswordSchema = z.object({
 
 export type LoginFormValues = z.infer<typeof loginSchema>;
 export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
+
+export function toLoginRequest(values: LoginFormValues): ILoginRequest {
+  return {
+    email: values.username.trim(),
+    senha: values.password,
+  };
+}
