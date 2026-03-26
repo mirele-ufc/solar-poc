@@ -129,8 +129,19 @@ describe("useAuthStore", () => {
     it("currentUser deve ser tipado como IUserSession | null", () => {
       const state = useAuthStore.getState();
 
-      // Should accept null
-      expect(state.currentUser === null || state.currentUser.id).toBeDefined();
+      expect(state.currentUser).toBeNull();
+
+      const user: IUserSession = {
+        id: "prof-999",
+        nome: "Professor Nullable",
+        cpf: "99999999999",
+        email: "prof.nullable@ufc.br",
+        role: "professor",
+        status: "ATIVO",
+      };
+
+      useAuthStore.setState({ currentUser: user, isLoggedIn: true });
+      expect(useAuthStore.getState().currentUser?.id).toBe("prof-999");
     });
   });
 
