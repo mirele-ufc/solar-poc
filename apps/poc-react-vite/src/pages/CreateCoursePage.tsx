@@ -91,6 +91,7 @@ export function CreateCoursePage() {
   const form = watch();
   const [error, setError] = useState("");
   const [showFieldErrors, setShowFieldErrors] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const setField = (
     key: "title" | "description" | "category" | "hours",
@@ -146,6 +147,7 @@ export function CreateCoursePage() {
       return;
     }
 
+    setIsLoading(true);
     setError("");
     const courseData: CourseInfoData = {
       image: imagePreview,
@@ -316,10 +318,12 @@ export function CreateCoursePage() {
           <button
             type="button"
             onClick={handleNext}
-            className="bg-[#ffeac4] h-[50px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59]"
+            disabled={isLoading}
+            aria-busy={isLoading}
+            className="bg-[#ffeac4] h-[50px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
-              Próximo
+              {isLoading ? "Processando..." : "Próximo"}
             </span>
           </button>
         </div>

@@ -117,97 +117,45 @@ export function MyCoursesPage() {
   const { enrolledCourses, courseStudentRoles } = useCourseStore();
 
   const PROFESSOR_TAUGHT_COURSES_DATA = ["power-bi", "matematica"];
-  const isProfessor = true; // Placeholder - in production use currentUser.role === "professor"
 
-  // Cursos como professor (apenas para perfil professor)
-  const taughtCourses = isProfessor
-    ? PROFESSOR_TAUGHT_COURSES_DATA.map((id: string) => ({
-        id,
-        ...(ALL_COURSES[id] ?? null),
-      })).filter((c: any) => c.title)
-    : [];
+  const taughtCourses = PROFESSOR_TAUGHT_COURSES_DATA.map((id: string) => ({
+    id,
+    ...(ALL_COURSES[id] ?? null),
+  })).filter(
+    (
+      course,
+    ): course is {
+      id: string;
+      title: string;
+      hours: string;
+      category: string;
+      image: string;
+    } => Boolean(course.title),
+  );
 
-  // Cursos como aluno:
-  // - Para professor: interseção de enrolledCourses com courseStudentRoles
-  // - Para estudante: todos os enrolledCourses
-  const studentCourseIds = isProfessor
-    ? enrolledCourses.filter((id: string) => courseStudentRoles.includes(id))
-    : enrolledCourses;
-
-  const studentCourses = studentCourseIds
+  const studentCourses = enrolledCourses
+    .filter((id: string) => courseStudentRoles.includes(id))
     .map((id: string) => ({ id, ...(ALL_COURSES[id] ?? null) }))
-    .filter((c: any) => c.title);
+    .filter(
+      (
+        course,
+      ): course is {
+        id: string;
+        title: string;
+        hours: string;
+        category: string;
+        image: string;
+      } => Boolean(course.title),
+    );
 
   // Destino do clique no card
   const getCourseTarget = (id: string) => {
-    if (isProfessor && PROFESSOR_TAUGHT_COURSES.includes(id)) {
+    if (PROFESSOR_TAUGHT_COURSES.includes(id)) {
       return `/courses/${id}/manage`;
     }
     return `/courses/${id}`;
   };
 
-  // Vista para estudante (comportamento original)
-  if (!isProfessor) {
-    const enrolled = enrolledCourses
-      .map((id: string) => ({ id, ...(ALL_COURSES[id] ?? null) }))
-      .filter((c: any) => c.title);
-
-    return (
-      <div className="bg-white flex flex-col gap-[24px] pt-[24px] px-[20px] md:px-[40px] pb-[60px]">
-        <PageHeader
-          title="Meus Cursos"
-          backPath="/courses"
-          crumbs={[
-            { label: "Cursos", path: "/courses" },
-            { label: "Meus Cursos" },
-          ]}
-        />
-
-        {enrolled.length === 0 ? (
-          <div className="flex flex-col items-center gap-[20px] py-[60px] text-center">
-            <svg
-              className="size-[64px] opacity-30"
-              fill="none"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path d={BOOK_ICON} fill="#021b59" />
-            </svg>
-            <div className="flex flex-col gap-[8px]">
-              <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[18px]">
-                Você ainda não está matriculado em nenhum curso
-              </p>
-              <p className="font-['Figtree:Regular',sans-serif] font-normal text-[#595959] text-[15px]">
-                Explore os cursos disponíveis e realize sua inscrição.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => navigate("/courses")}
-              className="bg-[#ffeac4] h-[46px] px-[32px] rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59]"
-            >
-              <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[17px]">
-                Ver cursos disponíveis
-              </span>
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[20px]">
-            {enrolled.map((course: any) => (
-              <CourseCard
-                key={course.id}
-                {...course}
-                badge={{ label: "Matriculado", bg: "#e6f9ee", text: "#155724" }}
-                onClick={() => navigate(`/courses/${course.id}`)}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // Vista para professor — duas seções
   return (
     <div className="bg-white flex flex-col gap-[32px] pt-[24px] px-[20px] md:px-[40px] pb-[60px]">
       <PageHeader
@@ -245,8 +193,8 @@ export function MyCoursesPage() {
 
         {taughtCourses.length === 0 ? (
           <EmptyState
-            message="Nenhum curso ativo como professor"
-            sub="Você não possui cursos ativos como professor no momento."
+            message="Crie seu primeiro curso"
+            sub="Você ainda não possui cursos como professor. Comece criando um novo curso."
           />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[20px]">
@@ -317,7 +265,7 @@ export function MyCoursesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[20px]">
-            {studentCourses.map((course: any) => (
+            {studentCourses.map((course) => (
               <CourseCard
                 key={course.id}
                 {...course}

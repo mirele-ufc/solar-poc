@@ -136,15 +136,16 @@ function MessageCard({ message, isExpanded, onToggle }: MessageCardProps) {
 
 export function MessagesPage() {
   const navigate = useNavigate();
-  const { sentMessages } = useAuthStore();
+  const { currentUser, sentMessages } = useAuthStore();
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  // Placeholder for teacher check - in production this would use currentUser.role
-  const isTeacher = false;
-
-  // Placeholder initials - in production this would come from currentUser
-  const initials = "NA";
+  const initials = currentUser.name
+    .split(" ")
+    .map((namePart) => namePart[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 
   const handleToggle = (id: string) => {
     setExpandedId((prev) => (prev === id ? null : id));
@@ -236,70 +237,52 @@ export function MessagesPage() {
             Mensagens enviadas
           </h1>
 
-          {isTeacher && (
+          <button
+            type="button"
+            onClick={() => navigate("/message")}
+            className="flex items-center gap-[8px] bg-[#021b59] text-[#ffeac4] h-[44px] px-[20px] rounded-[26px] font-['Figtree:Medium',sans-serif] font-medium text-[15px] hover:bg-[#042e99] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px] shrink-0"
+            aria-label="Criar nova mensagem"
+          >
+            <PenSquare className="size-[16px]" aria-hidden="true" />
+            Nova mensagem
+          </button>
+        </div>
+
+        {/* Message list */}
+        {sentMessages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-[60px] gap-[16px]">
+            <div className="size-[64px] rounded-full bg-[#c5d6ff] flex items-center justify-center">
+              <Inbox
+                className="size-[30px] text-[#021b59]"
+                aria-hidden="true"
+              />
+            </div>
+            <p className="font-['Figtree:Regular',sans-serif] font-normal text-[#606060] text-[16px] leading-[24px] text-center">
+              Nenhuma mensagem enviada ainda.
+            </p>
             <button
               type="button"
               onClick={() => navigate("/message")}
-              className="flex items-center gap-[8px] bg-[#021b59] text-[#ffeac4] h-[44px] px-[20px] rounded-[26px] font-['Figtree:Medium',sans-serif] font-medium text-[15px] hover:bg-[#042e99] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px] shrink-0"
-              aria-label="Criar nova mensagem"
+              className="flex items-center gap-[8px] bg-[#021b59] text-[#ffeac4] h-[44px] px-[24px] rounded-[26px] font-['Figtree:Medium',sans-serif] font-medium text-[15px] hover:bg-[#042e99] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px]"
             >
               <PenSquare className="size-[16px]" aria-hidden="true" />
-              Nova mensagem
+              Criar primeira mensagem
             </button>
-          )}
-        </div>
-
-        {/* Access guard for non-teachers */}
-        {!isTeacher && (
-          <div
-            role="alert"
-            className="bg-[#c0392b] text-white px-[24px] py-[16px] rounded-[12px] mb-[24px]"
-          >
-            <p className="font-['Figtree:Medium',sans-serif] font-medium text-[16px]">
-              Acesso restrito a professores.
-            </p>
           </div>
-        )}
-
-        {/* Message list */}
-        {isTeacher && (
-          <>
-            {sentMessages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-[60px] gap-[16px]">
-                <div className="size-[64px] rounded-full bg-[#c5d6ff] flex items-center justify-center">
-                  <Inbox
-                    className="size-[30px] text-[#021b59]"
-                    aria-hidden="true"
-                  />
-                </div>
-                <p className="font-['Figtree:Regular',sans-serif] font-normal text-[#606060] text-[16px] leading-[24px] text-center">
-                  Nenhuma mensagem enviada ainda.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => navigate("/message")}
-                  className="flex items-center gap-[8px] bg-[#021b59] text-[#ffeac4] h-[44px] px-[24px] rounded-[26px] font-['Figtree:Medium',sans-serif] font-medium text-[15px] hover:bg-[#042e99] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px]"
-                >
-                  <PenSquare className="size-[16px]" aria-hidden="true" />
-                  Criar primeira mensagem
-                </button>
-              </div>
-            ) : (
-              <div
-                className="flex flex-col gap-[12px]"
-                aria-label={`${sentMessages.length} mensagem${sentMessages.length !== 1 ? "s" : ""} enviada${sentMessages.length !== 1 ? "s" : ""}`}
-              >
-                {sentMessages.map((msg) => (
-                  <MessageCard
-                    key={msg.id}
-                    message={msg}
-                    isExpanded={expandedId === msg.id}
-                    onToggle={() => handleToggle(msg.id)}
-                  />
-                ))}
-              </div>
-            )}
-          </>
+        ) : (
+          <div
+            className="flex flex-col gap-[12px]"
+            aria-label={`${sentMessages.length} mensagem${sentMessages.length !== 1 ? "s" : ""} enviada${sentMessages.length !== 1 ? "s" : ""}`}
+          >
+            {sentMessages.map((msg) => (
+              <MessageCard
+                key={msg.id}
+                message={msg}
+                isExpanded={expandedId === msg.id}
+                onToggle={() => handleToggle(msg.id)}
+              />
+            ))}
+          </div>
         )}
       </main>
     </div>

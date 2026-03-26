@@ -26,9 +26,15 @@ const menuItems = [
 
 export function AuthLayout() {
   const navigate = useNavigate();
-  const { currentUser } = useAuthStore();
+  const { currentUser, logout } = useAuthStore();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+
+  const handleLogout = (): void => {
+    setProfileOpen(false);
+    logout();
+    navigate("/");
+  };
 
   // Refs para gestão de foco
   const hamburgerRef = useRef<HTMLButtonElement>(null);
@@ -354,10 +360,7 @@ export function AuthLayout() {
                     role="menuitem"
                     type="button"
                     className="w-full flex items-center gap-[15px] px-[20px] py-[11px] hover:bg-[#042e99] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#ffeac4] focus-visible:outline-offset-[-2px] transition-colors"
-                    onClick={() => {
-                      setProfileOpen(false);
-                      navigate("/");
-                    }}
+                    onClick={handleLogout}
                   >
                     <svg
                       className="shrink-0 size-[22px]"

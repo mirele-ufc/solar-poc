@@ -45,10 +45,6 @@ export function MessagePage() {
   const subjectId = useId();
   const messageId = useId();
 
-  // ✅ Segurança: verificação de autorização no cliente é apenas UX.
-  // Em produção, o servidor DEVE validar que o usuário é professor antes de aceitar a mensagem.
-  const isTeacher = currentUser.role === "professor";
-
   const onSubmitValid = (values: ComposeMessageFormValues) => {
     setGeneralError("");
     setShowErrors(false);
@@ -169,7 +165,7 @@ export function MessagePage() {
               {currentUser.name}
             </p>
             <p className="font-['Figtree:Regular',sans-serif] text-[rgba(255,234,196,0.8)] text-[14px]">
-              {currentUser.role === "professor" ? "Professor" : "Estudante"}
+              Professor
             </p>
           </div>
         </div>
@@ -326,18 +322,6 @@ export function MessagePage() {
             </button>
           </div>
         </form>
-
-        {/* ⚠️ Segurança: Aviso sobre autenticação */}
-        {!isTeacher && (
-          <div
-            role="alert"
-            className="mt-[20px] bg-[#c0392b] text-white px-[24px] py-[16px] rounded-[12px]"
-          >
-            <p className="font-['Figtree:Medium',sans-serif] font-medium text-[16px]">
-              Acesso restrito a professores.
-            </p>
-          </div>
-        )}
       </main>
     </div>
   );

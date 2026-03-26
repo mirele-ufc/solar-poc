@@ -450,7 +450,8 @@ export function CreateModulesPage() {
     const isValid = await trigger("modules");
 
     if (!isValid) {
-      const firstModuleError = errors.modules?.find(
+      const moduleErrors = Array.isArray(errors.modules) ? errors.modules : [];
+      const firstModuleError = moduleErrors.find(
         (moduleError) => moduleError?.imageFile?.message,
       )?.imageFile?.message;
       setError(
@@ -496,228 +497,239 @@ export function CreateModulesPage() {
         </h2>
 
         {/* Module cards */}
-        {modules.map((mod, modIndex) => {
-          const moduleError = errors.modules?.[modIndex]?.imageFile?.message;
-          const imgMissing = showErrors && !!moduleError;
-          return (
-            <div
-              key={mod.id}
-              className={`border w-full rounded-[8px] overflow-hidden ${imgMissing ? "border-[#c0392b]" : "border-black"}`}
-            >
-              <div className="flex flex-col gap-[14px] p-[16px] pb-0">
-                <div className="flex items-center justify-between gap-[8px]">
-                  <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[20px] leading-[30px]">
-                    {mod.name}
-                  </p>
-                  {modules.length > 1 && (
-                    <button
-                      type="button"
-                      aria-label={`Excluir ${mod.name}`}
-                      onClick={() => removeModule(mod.id)}
-                      className="shrink-0 flex items-center gap-[6px] px-[12px] h-[32px] rounded-[26px] border border-[#801436] text-[#801436] hover:bg-[#801436]/10 transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#801436]"
-                    >
-                      <svg
-                        className="size-[14px]"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                      >
-                        <path
-                          d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"
-                          stroke="#801436"
-                          strokeWidth="1.8"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      <span className="font-['Figtree:Medium',sans-serif] font-medium text-[13px] leading-none">
-                        Excluir módulo
-                      </span>
-                    </button>
-                  )}
-                </div>
-
-                {/* Module image upload */}
-                <button
-                  type="button"
-                  aria-label={`Adicionar imagem para ${mod.name} (obrigatório)`}
-                  onClick={() => imgRefs.current[mod.id]?.click()}
-                  className={`w-full h-[140px] rounded-[8px] overflow-hidden flex flex-col items-center justify-center transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] ${mod.image ? "" : imgMissing ? "bg-[#c0392b]/10 border-2 border-dashed border-[#c0392b]" : "bg-[#f0f0f0] border-2 border-dashed border-[#8e8e8e] hover:bg-[#e8e8e8]"}`}
-                >
-                  {mod.image ? (
-                    <img
-                      src={mod.image}
-                      alt={`Imagem de ${mod.name}`}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <>
-                      <svg
-                        className="size-[32px] mb-[6px]"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                      >
-                        <path
-                          d={imgIconPath}
-                          stroke={imgMissing ? "#c0392b" : "#595959"}
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      <p
-                        className={`font-['Figtree:Regular',sans-serif] text-[14px] ${imgMissing ? "text-[#c0392b]" : "text-[#595959]"}`}
-                      >
-                        {imgMissing
-                          ? moduleError
-                          : "Clique para adicionar imagem do módulo"}
-                      </p>
-                    </>
-                  )}
-                </button>
-                <input
-                  ref={(el) => {
-                    imgRefs.current[mod.id] = el;
-                  }}
-                  type="file"
-                  accept="image/jpeg,image/png"
-                  className="hidden"
-                  aria-hidden="true"
-                  tabIndex={-1}
-                  onChange={(e) => handleModuleImageChange(mod.id, e)}
-                />
-
-                {/* Lessons */}
-                {mod.lessons.length === 0 && (
-                  <div className="bg-[#efbbdc] h-[52px] flex items-center px-[20px] rounded-[4px]">
-                    <p className="font-['Figtree:Medium',sans-serif] font-medium text-black text-[17px]">
-                      Nenhuma aula adicionada
+        {modules.length === 0 ? (
+          <div className="flex flex-col items-center gap-[12px] py-[40px] text-center bg-[#f5f8ff] rounded-[12px]">
+            <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[16px]">
+              Adicione módulos ao curso
+            </p>
+            <p className="font-['Figtree:Regular',sans-serif] font-normal text-[#595959] text-[14px]">
+              Clique em &quot;Adicionar módulo&quot; para estruturar o conteúdo.
+            </p>
+          </div>
+        ) : (
+          modules.map((mod, modIndex) => {
+            const moduleError = errors.modules?.[modIndex]?.imageFile?.message;
+            const imgMissing = showErrors && !!moduleError;
+            return (
+              <div
+                key={mod.id}
+                className={`border w-full rounded-[8px] overflow-hidden ${imgMissing ? "border-[#c0392b]" : "border-black"}`}
+              >
+                <div className="flex flex-col gap-[14px] p-[16px] pb-0">
+                  <div className="flex items-center justify-between gap-[8px]">
+                    <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[20px] leading-[30px]">
+                      {mod.name}
                     </p>
-                  </div>
-                )}
-                {mod.lessons.map((lesson) => (
-                  <div
-                    key={lesson.id}
-                    className="bg-[#c5d6ff] h-[52px] flex items-center justify-between px-[16px] rounded-[4px]"
-                  >
-                    <p className="font-['Figtree:Medium',sans-serif] font-medium text-black text-[17px] flex-1 min-w-0 truncate">
-                      {lesson.name}
-                      {lesson.file && (
-                        <span className="ml-[8px] font-['Figtree:Regular',sans-serif] font-normal text-[13px] text-[#021b59]/70">
-                          · {lesson.file}
-                        </span>
-                      )}
-                    </p>
-                    <div className="flex items-center gap-[6px] shrink-0 ml-[10px]">
-                      {/* Edit file button */}
-                      <label
-                        aria-label={`Editar arquivo de ${lesson.name}`}
-                        title={`Editar arquivo de ${lesson.name}`}
-                        className="shrink-0 size-[26px] flex items-center justify-center cursor-pointer rounded hover:bg-[#021b59]/10 transition-colors focus-within:outline focus-within:outline-[2px] focus-within:outline-[#021b59]"
+                    {modules.length > 1 && (
+                      <button
+                        type="button"
+                        aria-label={`Excluir ${mod.name}`}
+                        onClick={() => removeModule(mod.id)}
+                        className="shrink-0 flex items-center gap-[6px] px-[12px] h-[32px] rounded-[26px] border border-[#801436] text-[#801436] hover:bg-[#801436]/10 transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#801436]"
                       >
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png,application/pdf"
-                          className="sr-only"
-                          onChange={(e) => {
-                            const f = e.target.files?.[0];
-                            if (!f) return;
-                            const parsed = uploadFileSchema.safeParse(f);
-                            if (!parsed.success) {
-                              setError(
-                                parsed.error.issues[0]?.message ??
-                                  "Arquivo inválido",
-                              );
-                              setShowErrors(true);
-                              return;
-                            }
-                            setModules((prev) =>
-                              prev.map((m) =>
-                                m.id === mod.id
-                                  ? {
-                                      ...m,
-                                      lessons: m.lessons.map((l) =>
-                                        l.id === lesson.id
-                                          ? { ...l, file: f.name }
-                                          : l,
-                                      ),
-                                    }
-                                  : m,
-                              ),
-                            );
-                          }}
-                        />
                         <svg
-                          className="size-[16px]"
+                          className="size-[14px]"
                           fill="none"
                           viewBox="0 0 24 24"
                           aria-hidden="true"
                         >
                           <path
-                            d="M15.232 5.232l3.536 3.536M9 11l6.586-6.586a2 2 0 012.828 0l.172.172a2 2 0 010 2.828L12 14H9v-3z"
-                            stroke="#021b59"
+                            d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"
+                            stroke="#801436"
                             strokeWidth="1.8"
                             strokeLinecap="round"
                             strokeLinejoin="round"
                           />
-                          <path
-                            d="M5 19h14"
-                            stroke="#021b59"
-                            strokeWidth="1.8"
-                            strokeLinecap="round"
-                          />
                         </svg>
-                      </label>
-                      {/* Remove button */}
-                      <button
-                        type="button"
-                        aria-label={`Remover ${lesson.name}`}
-                        onClick={() => removeLesson(mod.id, lesson.id)}
-                        className="shrink-0 size-[26px] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded"
-                      >
+                        <span className="font-['Figtree:Medium',sans-serif] font-medium text-[13px] leading-none">
+                          Excluir módulo
+                        </span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Module image upload */}
+                  <button
+                    type="button"
+                    aria-label={`Adicionar imagem para ${mod.name} (obrigatório)`}
+                    onClick={() => imgRefs.current[mod.id]?.click()}
+                    className={`w-full h-[140px] rounded-[8px] overflow-hidden flex flex-col items-center justify-center transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] ${mod.image ? "" : imgMissing ? "bg-[#c0392b]/10 border-2 border-dashed border-[#c0392b]" : "bg-[#f0f0f0] border-2 border-dashed border-[#8e8e8e] hover:bg-[#e8e8e8]"}`}
+                  >
+                    {mod.image ? (
+                      <img
+                        src={mod.image}
+                        alt={`Imagem de ${mod.name}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <>
                         <svg
-                          className="size-full"
+                          className="size-[32px] mb-[6px]"
                           fill="none"
-                          viewBox="0 0 28 28"
+                          viewBox="0 0 24 24"
                           aria-hidden="true"
                         >
                           <path
-                            clipRule="evenodd"
-                            d={closeLgPath}
-                            fill="#801436"
-                            fillRule="evenodd"
+                            d={imgIconPath}
+                            stroke={imgMissing ? "#c0392b" : "#595959"}
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           />
                         </svg>
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Add lesson button — inside the module card */}
-              <div className="p-[16px]">
-                <button
-                  type="button"
-                  onClick={() => setActiveModuleId(mod.id)}
-                  className="h-[48px] w-full border-2 border-[#021b59] rounded-[26px] flex items-center justify-center gap-[8px] cursor-pointer hover:bg-[#021b59]/5 transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
-                >
-                  <svg
-                    className="size-[24px] shrink-0"
-                    fill="none"
-                    viewBox="0 0 32 32.6667"
+                        <p
+                          className={`font-['Figtree:Regular',sans-serif] text-[14px] ${imgMissing ? "text-[#c0392b]" : "text-[#595959]"}`}
+                        >
+                          {imgMissing
+                            ? moduleError
+                            : "Clique para adicionar imagem do módulo"}
+                        </p>
+                      </>
+                    )}
+                  </button>
+                  <input
+                    ref={(el) => {
+                      imgRefs.current[mod.id] = el;
+                    }}
+                    type="file"
+                    accept="image/jpeg,image/png"
+                    className="hidden"
                     aria-hidden="true"
+                    tabIndex={-1}
+                    onChange={(e) => handleModuleImageChange(mod.id, e)}
+                  />
+
+                  {/* Lessons */}
+                  {mod.lessons.length === 0 && (
+                    <div className="bg-[#efbbdc] h-[52px] flex items-center px-[20px] rounded-[4px]">
+                      <p className="font-['Figtree:Medium',sans-serif] font-medium text-black text-[17px]">
+                        Nenhuma aula adicionada
+                      </p>
+                    </div>
+                  )}
+                  {mod.lessons.map((lesson) => (
+                    <div
+                      key={lesson.id}
+                      className="bg-[#c5d6ff] h-[52px] flex items-center justify-between px-[16px] rounded-[4px]"
+                    >
+                      <p className="font-['Figtree:Medium',sans-serif] font-medium text-black text-[17px] flex-1 min-w-0 truncate">
+                        {lesson.name}
+                        {lesson.file && (
+                          <span className="ml-[8px] font-['Figtree:Regular',sans-serif] font-normal text-[13px] text-[#021b59]/70">
+                            · {lesson.file}
+                          </span>
+                        )}
+                      </p>
+                      <div className="flex items-center gap-[6px] shrink-0 ml-[10px]">
+                        {/* Edit file button */}
+                        <label
+                          aria-label={`Editar arquivo de ${lesson.name}`}
+                          title={`Editar arquivo de ${lesson.name}`}
+                          className="shrink-0 size-[26px] flex items-center justify-center cursor-pointer rounded hover:bg-[#021b59]/10 transition-colors focus-within:outline focus-within:outline-[2px] focus-within:outline-[#021b59]"
+                        >
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,application/pdf"
+                            className="sr-only"
+                            onChange={(e) => {
+                              const f = e.target.files?.[0];
+                              if (!f) return;
+                              const parsed = uploadFileSchema.safeParse(f);
+                              if (!parsed.success) {
+                                setError(
+                                  parsed.error.issues[0]?.message ??
+                                    "Arquivo inválido",
+                                );
+                                setShowErrors(true);
+                                return;
+                              }
+                              setModules((prev) =>
+                                prev.map((m) =>
+                                  m.id === mod.id
+                                    ? {
+                                        ...m,
+                                        lessons: m.lessons.map((l) =>
+                                          l.id === lesson.id
+                                            ? { ...l, file: f.name }
+                                            : l,
+                                        ),
+                                      }
+                                    : m,
+                                ),
+                              );
+                            }}
+                          />
+                          <svg
+                            className="size-[16px]"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                          >
+                            <path
+                              d="M15.232 5.232l3.536 3.536M9 11l6.586-6.586a2 2 0 012.828 0l.172.172a2 2 0 010 2.828L12 14H9v-3z"
+                              stroke="#021b59"
+                              strokeWidth="1.8"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M5 19h14"
+                              stroke="#021b59"
+                              strokeWidth="1.8"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                        </label>
+                        {/* Remove button */}
+                        <button
+                          type="button"
+                          aria-label={`Remover ${lesson.name}`}
+                          onClick={() => removeLesson(mod.id, lesson.id)}
+                          className="shrink-0 size-[26px] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded"
+                        >
+                          <svg
+                            className="size-full"
+                            fill="none"
+                            viewBox="0 0 28 28"
+                            aria-hidden="true"
+                          >
+                            <path
+                              clipRule="evenodd"
+                              d={closeLgPath}
+                              fill="#801436"
+                              fillRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Add lesson button — inside the module card */}
+                <div className="p-[16px]">
+                  <button
+                    type="button"
+                    onClick={() => setActiveModuleId(mod.id)}
+                    className="h-[48px] w-full border-2 border-[#021b59] rounded-[26px] flex items-center justify-center gap-[8px] cursor-pointer hover:bg-[#021b59]/5 transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
                   >
-                    <path d={docPath} fill="#021B59" />
-                  </svg>
-                  <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[18px]">
-                    Adicionar aula
-                  </span>
-                </button>
+                    <svg
+                      className="size-[24px] shrink-0"
+                      fill="none"
+                      viewBox="0 0 32 32.6667"
+                      aria-hidden="true"
+                    >
+                      <path d={docPath} fill="#021B59" />
+                    </svg>
+                    <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[18px]">
+                      Adicionar aula
+                    </span>
+                  </button>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
 
         {/* Add module */}
         <button

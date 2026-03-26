@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "dev": "vite"
+    "dev": "vite",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@ava-poc/types": "workspace:*",
@@ -71,6 +74,7 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.1.12",
+    "@testing-library/jest-dom": "^6.9.1",
     "@types/dompurify": "^3.2.0",
     "@types/react": "^19.2.14",
     "@vitejs/plugin-react": "4.7.0",

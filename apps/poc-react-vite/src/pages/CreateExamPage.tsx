@@ -270,6 +270,16 @@ function PerguntasTab({
   return (
     <div className="flex flex-col gap-[20px]">
       {/* Added questions */}
+      {questions.length === 0 && (
+        <div className="flex flex-col items-center gap-[12px] py-[40px] text-center bg-[#f5f8ff] rounded-[12px]">
+          <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[16px]">
+            Crie sua primeira prova
+          </p>
+          <p className="font-['Figtree:Regular',sans-serif] font-normal text-[#595959] text-[14px]">
+            Adicione perguntas abaixo para compor a avaliação.
+          </p>
+        </div>
+      )}
       {questions.map((q, idx) => (
         <div
           key={q.id}

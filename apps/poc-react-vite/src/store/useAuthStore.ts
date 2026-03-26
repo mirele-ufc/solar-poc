@@ -48,6 +48,8 @@ interface AuthStore {
   sendMessage: (msg: Omit<SentMessage, "id" | "sentAt">) => void;
 }
 
+type AuthStoreSnapshot = Pick<AuthStore, "currentUser" | "isLoggedIn">;
+
 /**
  * Hardcoded credentials for prototype demonstration
  * Maps username to password and user profile
@@ -192,3 +194,11 @@ export const useAuthStore = create<AuthStore>((set) => ({
     }));
   },
 }));
+
+export function selectCanManageCourses(state: AuthStoreSnapshot): boolean {
+  return state.currentUser.role === "professor";
+}
+
+export function selectCurrentUser(state: AuthStoreSnapshot): UserProfile {
+  return state.currentUser;
+}

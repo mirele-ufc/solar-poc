@@ -12,6 +12,7 @@ export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showErrors, setShowErrors] = useState(false);
   const [generalError, setGeneralError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuthStore();
 
@@ -31,6 +32,7 @@ export function LoginPage() {
   const form = watch();
 
   const onSubmitValid = (values: LoginFormValues) => {
+    setIsLoading(true);
     const ok = login(values.username.trim(), values.password);
     if (ok) {
       setGeneralError("");
@@ -39,6 +41,7 @@ export function LoginPage() {
     } else {
       setGeneralError("Usuário ou senha incorretos");
       setShowErrors(true);
+      setIsLoading(false);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
@@ -259,10 +262,12 @@ export function LoginPage() {
           <div className="flex flex-col gap-[16px] w-full mt-[8px]">
             <button
               type="submit"
-              className="bg-[#ffeac4] cursor-pointer w-full h-[50px] rounded-[26px] hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-white focus-visible:outline-offset-[3px]"
+              disabled={isLoading}
+              aria-busy={isLoading}
+              className="bg-[#ffeac4] cursor-pointer w-full h-[50px] rounded-[26px] hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-white focus-visible:outline-offset-[3px] disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
-                Acessar
+                {isLoading ? "Acessando..." : "Acessar"}
               </span>
             </button>
             <button

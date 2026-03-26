@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { useAuthStore } from "@/store/useAuthStore";
+import { selectCanManageCourses, useAuthStore } from "@/store/useAuthStore";
 import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
 
 // ── Course thumbnail map ──────────────────────────────────────────────────────
@@ -167,15 +167,14 @@ type ProfessorCourseMenuProps = {
 // ── Page ──────────────────────────────────────────────────────────────────────
 export function CoursesPage() {
   const navigate = useNavigate();
-  const { currentUser } = useAuthStore();
-  const isProfessor = currentUser.role === "professor";
+  const canManageCourses = useAuthStore(selectCanManageCourses);
 
   const goToCourse = (id: string) => {
     if (id === "power-bi") navigate("/courses/power-bi");
     else if (id === "python") navigate("/courses/python");
   };
 
-  if (isProfessor) {
+  if (canManageCourses) {
     return (
       <div className="bg-white flex flex-col gap-[30px] items-start pt-[30px] px-[20px] md:px-[40px] pb-[60px]">
         <div className="flex flex-col gap-[12px] w-full">
