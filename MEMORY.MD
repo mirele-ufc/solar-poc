@@ -16,13 +16,13 @@
 
 ## SECTION: GLOBAL PROGRESS
 
-| Campo      | Valor                                                        |
-| ---------- | ------------------------------------------------------------ |
-| **Fase**   | 1 — Contratos Canônicos e Tipagem                            |
-| **Módulo** | 1.1 — Auditar e consolidar tipos em @ava-poc/types          |
-| **Story**  | 1.1 — Consolidação de tipos completa                         |
-| **Status** | DONE                                                         |
-| **Branch** | feature/refactor-types-consolidation                         |
+| Campo      | Valor                                              |
+| ---------- | -------------------------------------------------- |
+| **Fase**   | 1 — Contratos Canônicos e Tipagem                  |
+| **Módulo** | 1.1 — Auditar e consolidar tipos em @ava-poc/types |
+| **Story**  | 1.1 — Consolidação de tipos completa               |
+| **Status** | DONE                                               |
+| **Branch** | feature/refactor-types-consolidation               |
 
 **Status:** Fase 1 iniciada, Story 1.1 ✅ DONE, 8/43 total (19%), next: 1.2
 
@@ -85,15 +85,15 @@
 
 ## SECTION: SESSION CONTEXT
 
-| #   | Story | Status  | Commits | Testes | Evidencia de teste criado                                                                             | Evidencia RED inicial                    | Notas                                                                                                |
-| --- | ----- | ------- | ------- | ------ | ----------------------------------------------------------------------------------------------------- | ---------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| 1   | 0.1.1 | ✅ DONE | 1/1     | 2/2    | src/**tests**/unit/routes/ProtectedRoute.test.tsx                                                     | RED inicial registrado no ciclo da story | Guard global aplicado no roteamento + commit realizado                                               |
-| 2   | 0.2.1 | ✅ DONE | 1/1     | 3/3    | src/**tests**/unit/routes/ProtectedRoute.test.tsx                                                     | RED registrado na suite de rotas         | routes.ts segmentado por role (professor/student e professor only) + commit realizado                |
-| 3   | 0.3.1 | ✅ DONE | 1/1     | 3/3    | src/**tests**/unit/pages/roleCleanup.test.tsx                                                         | Suite de regressão criada no ciclo       | Role cleanup concluído em pages; mensageria protegida por rota; commits 41a3b29 + 1d0cccb publicados |
-| 4   | 0.4.1 | ✅ DONE | 2/2     | 3/3    | src/**tests**/unit/store/authLogout.test.ts, src/**tests**/unit/components/AuthLayout.logout.test.tsx | RED validado (1 falha funcional)         | Logout local aplicado no AuthLayout sem endpoint backend                                             |
-| 5   | 0.5.1 | ✅ DONE | 2/2     | 3/3    | src/**tests**/unit/pages/UnauthorizedPage.test.tsx                                                    | RED validado (import da página ausente)  | UnauthorizedPage criada com botão de retorno e redirecionamento automático para /courses             |
-| 6   | 0.6.1 | ✅ DONE | 1/1     | 4/4    | src/**tests**/unit/routes/publicRoutes.test.tsx                                                       | RED estrutural (testes antes de rodar)   | Suite valida que /, /register, /forgot-password e /unauthorized são acessíveis sem autenticação      |
-| 7   | 1.1.1 | ✅ DONE | 2/2     | 27/27  | Type-check OK; Vitest: 27/27 testes passando                                                         | Draft: tipos consolidados em @ava-poc/types | Consolidação de tipos em v1.0 + resolução de role (professor/student/admin) + imports bem-definidos |
+| #   | Story | Status  | Commits | Testes | Evidencia de teste criado                                                                             | Evidencia RED inicial                       | Notas                                                                                                |
+| --- | ----- | ------- | ------- | ------ | ----------------------------------------------------------------------------------------------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| 1   | 0.1.1 | ✅ DONE | 1/1     | 2/2    | src/**tests**/unit/routes/ProtectedRoute.test.tsx                                                     | RED inicial registrado no ciclo da story    | Guard global aplicado no roteamento + commit realizado                                               |
+| 2   | 0.2.1 | ✅ DONE | 1/1     | 3/3    | src/**tests**/unit/routes/ProtectedRoute.test.tsx                                                     | RED registrado na suite de rotas            | routes.ts segmentado por role (professor/student e professor only) + commit realizado                |
+| 3   | 0.3.1 | ✅ DONE | 1/1     | 3/3    | src/**tests**/unit/pages/roleCleanup.test.tsx                                                         | Suite de regressão criada no ciclo          | Role cleanup concluído em pages; mensageria protegida por rota; commits 41a3b29 + 1d0cccb publicados |
+| 4   | 0.4.1 | ✅ DONE | 2/2     | 3/3    | src/**tests**/unit/store/authLogout.test.ts, src/**tests**/unit/components/AuthLayout.logout.test.tsx | RED validado (1 falha funcional)            | Logout local aplicado no AuthLayout sem endpoint backend                                             |
+| 5   | 0.5.1 | ✅ DONE | 2/2     | 3/3    | src/**tests**/unit/pages/UnauthorizedPage.test.tsx                                                    | RED validado (import da página ausente)     | UnauthorizedPage criada com botão de retorno e redirecionamento automático para /courses             |
+| 6   | 0.6.1 | ✅ DONE | 1/1     | 4/4    | src/**tests**/unit/routes/publicRoutes.test.tsx                                                       | RED estrutural (testes antes de rodar)      | Suite valida que /, /register, /forgot-password e /unauthorized são acessíveis sem autenticação      |
+| 7   | 1.1.1 | ✅ DONE | 2/2     | 27/27  | Type-check OK; Vitest: 27/27 testes passando                                                          | Draft: tipos consolidados em @ava-poc/types | Consolidação de tipos em v1.0 + resolução de role (professor/student/admin) + imports bem-definidos  |
 
 **Resumo:** 7/7 stories Fase 0 + 1/1 story Fase 1.1, Total 8/8 commits, 27/27 testes focados passando
 
