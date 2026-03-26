@@ -8,23 +8,23 @@
 
 ## MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
 
-**Última atualização:** 2026-03-26T15:36:00Z (1.3 concluída com commits e suíte de erro validada)  
+**Última atualização:** 2026-03-26T15:53:00Z (1.4 concluída localmente com centralização de tipos duplicados)  
 **Sprint ativo:** Fase 1 — Contratos Canônicos e Tipagem  
-**Status geral:** 23% (10/43 subtarefas)
+**Status geral:** 26% (11/43 subtarefas)
 
 ---
 
 ## SECTION: GLOBAL PROGRESS
 
-| Campo      | Valor                                           |
-| ---------- | ----------------------------------------------- |
-| **Fase**   | 1 — Contratos Canônicos e Tipagem               |
-| **Módulo** | 1.3 — Centralizar e alinhar schemas Zod         |
-| **Story**  | 1.3 — Schemas alinhados ao contrato e validados |
-| **Status** | DONE                                            |
-| **Branch** | feature/refactor-contratos-tipagem              |
+| Campo      | Valor                                          |
+| ---------- | ---------------------------------------------- |
+| **Fase**   | 1 — Contratos Canônicos e Tipagem              |
+| **Módulo** | 1.4 — Remover tipos locais duplicados de pages |
+| **Story**  | 1.4 — Tipos de pages centralizados             |
+| **Status** | DONE                                           |
+| **Branch** | feature/refactor-contratos-tipagem             |
 
-**Status:** Fase 1 em andamento, Story 1.3 ✅ DONE (local), 10/43 total (23%), next: 1.4
+**Status:** Fase 1 em andamento, Story 1.4 ✅ DONE (local), 11/43 total (26%), next: 1.5
 
 ### ✅ Completes
 
@@ -40,42 +40,42 @@
 | 1.1 | Auditar e consolidar tipos em @ava-poc/types    | ✅     | 26/03/2026 | 9bb4021 + 910841e                               | —   |
 | 1.2 | Migrar useAuthStore para tipos globais          | ✅     | 26/03/2026 | 6dfa8ae + 146efd2 + 99f8ba3 + 6a664e6 + d285b57 | —   |
 | 1.3 | Centralizar e alinhar schemas Zod               | ✅     | 26/03/2026 | 088d981 + 3b25f55 + 39c4cbe                     | —   |
+| 1.4 | Remover tipos locais duplicados de pages        | ✅     | 26/03/2026 | f0e773e                                         | —   |
 
 ### 📊 By-Phase Metrics
 
 | Phase     | Complete | Total  | %       | Status             | Start Date | Est. End |
 | --------- | -------- | ------ | ------- | ------------------ | ---------- | -------- |
 | 0         | 7        | 7      | 100%    | ✅ COMPLETA        | 25/03      | 26/03    |
-| 1         | 3        | 6      | 50%     | 🔄 IN_PROGRESS     | 26/03      | —        |
+| 1         | 4        | 6      | 67%     | 🔄 IN_PROGRESS     | 26/03      | —        |
 | 2         | 0        | 7      | 0%      | ⏳ FUTURE          | —          | —        |
 | 3         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
 | 4         | 0        | 7      | 0%      | ⏳ FUTURE          | —          | —        |
 | 5         | 0        | 4      | 0%      | ⏳ FUTURE          | —          | —        |
 | 6         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
-| **TOTAL** | **10**   | **43** | **23%** | **🟢 IN PROGRESS** | 25/03      | —        |
+| **TOTAL** | **11**   | **43** | **26%** | **🟢 IN PROGRESS** | 25/03      | —        |
 
 ### ⏳ Next Ready (First 3)
 
-1. **1.4 — Remover tipos locais duplicados de pages**
-   - Duração: 1 dia
-   - Dependências: 1.3 ✅
-   - Status: ⏳ READY NOW
-   - Detalhes: Remover duplicação de tipos locais em pages/components
-
-2. **1.5 — Validar zero `any` em TypeScript**
+1. **1.5 — Validar zero `any` em TypeScript**
    - Duração: 0.5 dia
+   - Dependências: 1.4 ✅
+   - Status: ⏳ READY NOW
+
+2. **1.6 — Refatorar componentes com Slots Pattern**
+   - Duração: 1.5 dias
    - Status: ⏳ NEXT
 
-3. **1.6 — Refatorar componentes com Slots Pattern**
-   - Duração: 1.5 dias
+3. **2.1 — Criar authService.ts com endpoints de autenticação**
+   - Duração: 2 dias
    - Status: ⏳ FUTURE
 
 ### ⛔ Blockers
 
-❌ **Nenhum blocker detectado.**
+✅ **Nenhum blocker detectado.**
 
-- ✅ Backend: Status desconhecido (validar em `/start-implementation`)
-- ✅ Tests: Vitest pronto para usar
+- ✅ Type-check: passou localmente
+- ✅ Tests: 61/61 passando
 - ✅ Git: Branch `feature/refactor-contratos-tipagem` ativa
 - ✅ Documentação: Todas docs em `/docs/` presentes
 
@@ -94,22 +94,19 @@
 7. `1.1.1` — Tipos consolidados em `@ava-poc/types`, com role canonical resolvido.
 8. `1.2.1` — `useAuthStore` migrado para tipos globais, com ajustes de null-safety e compatibilidade.
 9. `1.3.1` — Schemas Zod alinhados ao contrato e suíte de erro expandida para `auth`, `course`, `enrollment`, `exam`, `file` e `message`.
+10. `1.4.1` — Tipos duplicados de módulos e mensagens centralizados em `@ava-poc/types` e consumidores migrados.
 
-**Resumo:** Fase 0 concluída (7/7). Fase 1 com 3/6 subtarefas concluídas. Últimas entregas: 1.2 (store tipada) e 1.3 (schemas Zod + testes de erro).
+**Resumo:** Fase 0 concluída (7/7). Fase 1 com 4/6 subtarefas concluídas. Últimas entregas: 1.3 (schemas Zod + testes de erro) e 1.4 (centralização de tipos duplicados).
 
 ### Last Action
 
-- **Date:** 26/03/2026 15:36 UTC
+- **Date:** 26/03/2026 15:53 UTC
 - **Machine:** local
-- **What:** Subtarefa 1.3 concluída — schemas Zod alinhados e cobertura de erros expandida
-- **Testes executados:**
-  - Vitest focal: `src/__tests__/unit/validations/schemas.contract.test.ts` ✅ 22/22
-- **Commits realizados (mais recentes):**
-  - `39c4cbe` refactor: Alinhar schemas Zod com tipos de contrato (auth, courses, exams)
-  - `3b25f55` test: Adicionar testes de contratos para schemas Zod
-  - `088d981` test: Adicionar testes de contratos para schemas Zod
-- **Status:** Story 1.3 concluída; validações de erro cobrindo auth, course, enrollment, exam, file e message
-- **Próxima:** 1.4 (Remover tipos locais duplicados de pages) — READY NOW
+- **What:** Subtarefa 1.4 concluída — tipos duplicados de pages centralizados
+- **Testes executados:** Type-check ✅ PASSED; Vitest app ✅ 61/61
+- **Commits realizados (mais recentes):** `6b413f6`, `41395d1`, `39c4cbe`
+- **Status:** Story 1.4 concluída localmente; tipos compartilhados aplicados em modules/messages pages; aguardando autorização se houver intenção de commit
+- **Próxima:** 1.5 (Validar zero `any` em TypeScript) — READY NOW
 
 ### Observações Contratuais da 0.2
 
@@ -123,33 +120,29 @@ Quando você voltar para continuar:
 # 1. Antes de tudo, validar contexto
 /status-refactoring
 
-# 2. Começar Fase 1.4
-Implemente 1.4 (Remover tipos locais duplicados de pages)
+# 2. Começar Fase 1.5
+Implemente 1.5 (Validar zero `any` em TypeScript)
 ```
 
 ## 📝 Arquivos em Edição
 
-- [x] `apps/poc-react-vite/src/__tests__/unit/validations/schemas.contract.test.ts`
-- [x] `apps/poc-react-vite/src/validations/authSchema.ts`
-- [x] `apps/poc-react-vite/src/validations/courseSchema.ts`
-- [x] `apps/poc-react-vite/src/validations/enrollmentSchema.ts`
-- [x] `apps/poc-react-vite/src/validations/examSchema.ts`
-- [x] `apps/poc-react-vite/src/validations/fileSchema.ts`
-- [x] `apps/poc-react-vite/src/validations/messageSchema.ts`
+- [x] `packages/types/src/index.ts`
+- [x] `apps/poc-react-vite/src/pages/ModulesPage.tsx`
+- [x] `apps/poc-react-vite/src/pages/PythonModulesPage.tsx`
+- [x] `apps/poc-react-vite/src/pages/MessagesPage.tsx`
+- [x] `apps/poc-react-vite/src/pages/StudentMessagesPage.tsx`
 - [x] `MEMORY.md`
 
 ## 🚦 Bloqueadores
 
-| Bloqueador                                                                      | Impacto                                              | Solução sugerida                                                                  |
-| ------------------------------------------------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `pnpm --filter @figma/my-make-file run type-check` falhando no terminal `turbo` | Impede fechar Fase 1 com critério completo de aceite | Triar erros atuais do type-check antes de iniciar 1.5 ou consolidar novos commits |
+Nenhum blocker ativo no momento.
 
 ## 💡 Notas Rápidas
 
-- Story 1.3 concluída com cobertura de erro expandida para os schemas atuais em `src/validations/`.
-- Suite focal de schemas: 22/22 testes passando.
-- Próxima subtarefa operacional: 1.4 — remover tipos locais duplicados de pages.
-- Após 1.4, o próximo passo natural é 1.5 com foco direto em zerar `any` e estabilizar o type-check.
+- Story 1.4 concluída localmente com centralização de tipos de módulos e mensagens em `@ava-poc/types`.
+- `type-check` passou após a refatoração.
+- Suite de testes da aplicação: 61/61 passando.
+- Próxima subtarefa operacional: 1.5 — validar zero `any` em TypeScript.
 
 ## 🔗 Links de Referência
 
@@ -175,9 +168,3 @@ Implemente 1.4 (Remover tipos locais duplicados de pages)
 2. Ler seção "Próxima Ação"
 3. Rodar `git status` para verificar estado da branch
 4. Continuar do ponto exato onde parou
-
----
-
-**Última atualização:** [vazio — preencher ao usar]  
-**Status:** [vazio — preencher ao usar]  
-**Sessão ativa:** SIM / NÃO
