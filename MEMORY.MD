@@ -16,28 +16,28 @@
 
 ## SECTION: GLOBAL PROGRESS
 
-| Campo      | Valor                                              |
-| ---------- | -------------------------------------------------- |
-| **Fase**   | 1 — Contratos Canônicos e Tipagem                 |
-| **Módulo** | 1.2 — Migrar useAuthStore para tipos globais      |
+| Campo      | Valor                                               |
+| ---------- | --------------------------------------------------- |
+| **Fase**   | 1 — Contratos Canônicos e Tipagem                   |
+| **Módulo** | 1.2 — Migrar useAuthStore para tipos globais        |
 | **Story**  | 1.2 — Migração do store para IUserSession concluída |
-| **Status** | DONE                                               |
-| **Branch** | feature/refactor-contratos-tipagem                 |
+| **Status** | DONE                                                |
+| **Branch** | feature/refactor-contratos-tipagem                  |
 
 **Status:** Fase 1 em andamento, Story 1.2 ✅ DONE, 9/43 total (21%), next: 1.3
 
 ### ✅ Completes
 
-| Sub | Title                                           | Status | Date       | Commit                                | PR  |
-| --- | ----------------------------------------------- | ------ | ---------- | ------------------------------------- | --- |
-| 0.1 | Criar ProtectedRoute com validação de role      | ✅     | 25/03      | ce2df32                               | —   |
-| 0.2 | Integrar ProtectedRoute em routes.ts            | ✅     | 25/03/2026 | 028ba89                               | —   |
-| 0.3 | Remover hardcodes de role em páginas            | ✅     | 25/03/2026 | 41a3b29                               | —   |
-| 0.4 | Implementar logout seguro local                 | ✅     | 26/03/2026 | 7689a26 + cd395ac                     | —   |
-| 0.5 | Implementar Unauthorized page                   | ✅     | 26/03/2026 | 8fa0cd3 + 00d9fe6                     | —   |
-| 0.6 | Validar rotas públicas sem guard incorreto      | ✅     | 26/03/2026 | 189c57f                               | —   |
-| 0.7 | HTTP error interceptor + loading + empty states | ✅     | 26/03/2026 | 1aac552 + 3edb2fc + 41cb179 + 4390f75 | —   |
-| 1.1 | Auditar e consolidar tipos em @ava-poc/types    | ✅     | 26/03/2026 | 9bb4021 + 910841e                     | —   |
+| Sub | Title                                           | Status | Date       | Commit                                          | PR  |
+| --- | ----------------------------------------------- | ------ | ---------- | ----------------------------------------------- | --- |
+| 0.1 | Criar ProtectedRoute com validação de role      | ✅     | 25/03      | ce2df32                                         | —   |
+| 0.2 | Integrar ProtectedRoute em routes.ts            | ✅     | 25/03/2026 | 028ba89                                         | —   |
+| 0.3 | Remover hardcodes de role em páginas            | ✅     | 25/03/2026 | 41a3b29                                         | —   |
+| 0.4 | Implementar logout seguro local                 | ✅     | 26/03/2026 | 7689a26 + cd395ac                               | —   |
+| 0.5 | Implementar Unauthorized page                   | ✅     | 26/03/2026 | 8fa0cd3 + 00d9fe6                               | —   |
+| 0.6 | Validar rotas públicas sem guard incorreto      | ✅     | 26/03/2026 | 189c57f                                         | —   |
+| 0.7 | HTTP error interceptor + loading + empty states | ✅     | 26/03/2026 | 1aac552 + 3edb2fc + 41cb179 + 4390f75           | —   |
+| 1.1 | Auditar e consolidar tipos em @ava-poc/types    | ✅     | 26/03/2026 | 9bb4021 + 910841e                               | —   |
 | 1.2 | Migrar useAuthStore para tipos globais          | ✅     | 26/03/2026 | 6dfa8ae + 146efd2 + 99f8ba3 + 6a664e6 + d285b57 | —   |
 
 ### 📊 By-Phase Metrics
