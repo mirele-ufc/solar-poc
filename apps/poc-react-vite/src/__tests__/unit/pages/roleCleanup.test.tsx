@@ -12,7 +12,7 @@ function buildUser(role: IUserSession["role"]): IUserSession {
   if (role === "professor") {
     return {
       id: "prof-001",
-      nome: "Prof. Eduardo Silva",
+      name: "Prof. Eduardo Silva",
       cpf: "98765432100",
       email: "professor@ufc.br",
       role,
@@ -22,7 +22,7 @@ function buildUser(role: IUserSession["role"]): IUserSession {
 
   return {
     id: "student-001",
-    nome: "Eduardo Marinho",
+    name: "Eduardo Marinho",
     cpf: "12345678901",
     email: "eduardo.marinho@ufc.br",
     role: "student",

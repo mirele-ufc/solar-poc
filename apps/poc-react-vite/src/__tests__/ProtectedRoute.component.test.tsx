@@ -14,7 +14,7 @@ const mockedUseAuthStore = vi.mocked(useAuthStore);
 function buildUser(role: IUserSession["role"]): IUserSession {
   return {
     id: `user-${role}`,
-    nome: "Test User",
+    name: "Test User",
     cpf: "12345678900",
     email: "test@ufc.br",
     role,

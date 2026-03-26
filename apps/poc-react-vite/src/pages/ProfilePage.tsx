@@ -131,6 +131,11 @@ export function ProfilePage() {
   const navigate = useNavigate();
   const { currentUser, updateCurrentUser } = useAuthStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const user = currentUser;
+
+  if (!user) {
+    return null;
+  }
 
   // password form state
   const [currentPw, setCurrentPw] = useState("");
@@ -147,7 +152,7 @@ export function ProfilePage() {
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result === "string") {
-        updateCurrentUser({ fotoUrl: reader.result });
+        updateCurrentUser({ photoUrl: reader.result });
       }
     };
     reader.readAsDataURL(file);
@@ -157,8 +162,6 @@ export function ProfilePage() {
   const handlePasswordSave = () => {
     const errors: Record<string, string> = {};
     if (!currentPw) errors.current = "Informe a senha atual.";
-    else if (currentPw !== currentUser.password)
-      errors.current = "Senha atual incorreta.";
     if (!newPw) errors.new = "Informe a nova senha.";
     else if (newPw.length < 6)
       errors.new = "A nova senha deve ter ao menos 6 caracteres.";
@@ -169,7 +172,6 @@ export function ProfilePage() {
     setPwErrors(errors);
     if (Object.keys(errors).length > 0) return;
 
-    updateCurrentUser({ password: newPw });
     setCurrentPw("");
     setNewPw("");
     setConfirmPw("");
@@ -234,18 +236,18 @@ export function ProfilePage() {
           <div className="flex flex-col items-center gap-[12px]">
             <div className="relative group">
               <div className="size-[110px] rounded-full overflow-hidden bg-[#042e99] border-4 border-[#ffeac4] flex items-center justify-center">
-                {currentUser.photoUrl && currentUser.photoUrl.length > 0 ? (
+                {user.photoUrl && user.photoUrl.length > 0 ? (
                   <img
-                    src={currentUser.photoUrl}
+                    src={user.photoUrl}
                     alt="Foto de perfil"
                     className="size-full object-cover"
                   />
                 ) : (
                   <span
-                    aria-label={`Iniciais de ${currentUser.name}`}
+                    aria-label={`Iniciais de ${user.name}`}
                     className="font-['Figtree:Bold',sans-serif] font-bold text-[#ffeac4] text-[36px] select-none"
                   >
-                    {initials(currentUser.name)}
+                    {initials(user.name)}
                   </span>
                 )}
               </div>
@@ -281,7 +283,7 @@ export function ProfilePage() {
 
             <div className="text-center">
               <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#ffeac4] text-[22px]">
-                {currentUser.name}
+                {user.name}
               </p>
               <p className="font-['Figtree:Regular',sans-serif] font-normal text-[#ffeac4]/80 text-[14px] mt-[2px]">
                 Estudante
@@ -305,8 +307,8 @@ export function ProfilePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
-            <ReadonlyField label="CPF" value={maskCPF(currentUser.cpf)} />
-            <ReadonlyField label="E-mail" value={currentUser.email} />
+            <ReadonlyField label="CPF" value={maskCPF(user.cpf)} />
+            <ReadonlyField label="E-mail" value={user.email} />
           </div>
           <p className="mt-[10px] font-['Figtree:Regular',sans-serif] font-normal text-[#595959] text-[13px] leading-[20px]">
             CPF e e-mail são dados de identificação e não podem ser alterados
@@ -329,9 +331,9 @@ export function ProfilePage() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-[20px]">
             {/* Preview */}
             <div className="size-[80px] rounded-full overflow-hidden bg-[#042e99] border-2 border-[#021b59] shrink-0 flex items-center justify-center">
-              {currentUser.photoUrl ? (
+              {user.photoUrl ? (
                 <img
-                  src={currentUser.photoUrl}
+                  src={user.photoUrl}
                   alt="Prévia da foto de perfil"
                   className="size-full object-cover"
                 />
@@ -340,7 +342,7 @@ export function ProfilePage() {
                   aria-hidden="true"
                   className="font-['Figtree:Bold',sans-serif] font-bold text-[#ffeac4] text-[28px] select-none"
                 >
-                  {initials(currentUser.name)}
+                  {initials(user.name)}
                 </span>
               )}
             </div>
@@ -355,12 +357,12 @@ export function ProfilePage() {
                   onClick={() => fileInputRef.current?.click()}
                   className="bg-[#ffeac4] h-[44px] px-[24px] rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[15px]"
                 >
-                  {currentUser.photoUrl ? "Trocar foto" : "Adicionar foto"}
+                  {user.photoUrl ? "Trocar foto" : "Adicionar foto"}
                 </button>
-                {currentUser.photoUrl && (
+                {user.photoUrl && (
                   <button
                     type="button"
-                    onClick={() => updateCurrentUser({ photoUrl: null })}
+                    onClick={() => updateCurrentUser({ photoUrl: undefined })}
                     className="h-[44px] px-[24px] rounded-[26px] border-2 border-[#c0392b] cursor-pointer hover:bg-[#fdecea] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#c0392b] font-['Figtree:Medium',sans-serif] font-medium text-[#c0392b] text-[15px]"
                   >
                     Remover foto

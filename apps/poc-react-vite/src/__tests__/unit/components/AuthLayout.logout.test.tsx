@@ -8,7 +8,7 @@ import type { IUserSession } from "@ava-poc/types";
 function buildUser(role: IUserSession["role"]): IUserSession {
   return {
     id: `user-${role}`,
-    nome: role === "professor" ? "Prof. Teste" : "Aluno Teste",
+    name: role === "professor" ? "Prof. Teste" : "Aluno Teste",
     cpf: "12345678901",
     email: role === "professor" ? "prof@ufc.br" : "aluno@ufc.br",
     role,

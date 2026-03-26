@@ -140,7 +140,7 @@ export function MessagesPage() {
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const initials = (currentUser?.nome ?? "")
+  const initials = (currentUser?.name ?? "")
     .split(" ")
     .map((namePart) => namePart[0])
     .join("")

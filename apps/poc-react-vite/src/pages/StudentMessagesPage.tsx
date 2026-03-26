@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { ChevronLeft, ChevronDown, ChevronUp, Inbox } from "lucide-react";
 import { useAuthStore, type SentMessage } from "@/store/useAuthStore";
+import { useCourseStore } from "@/store/useCourseStore";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -187,6 +188,8 @@ export function StudentMessagesPage() {
   const navigate = useNavigate();
   const { currentUser, sentMessages } = useAuthStore();
   const { enrolledCourses } = useCourseStore();
+  const userName = currentUser?.name ?? "Estudante";
+  const userPhotoUrl = currentUser?.photoUrl;
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [readIds, setReadIds] = useState<Set<string>>(new Set());
@@ -208,7 +211,7 @@ export function StudentMessagesPage() {
   const unreadCount = receivedMessages.filter((m) => !readIds.has(m.id)).length;
 
   const initials = (() => {
-    const parts = user.name.trim().split(/\s+/);
+    const parts = userName.trim().split(/\s+/);
     if (parts.length >= 2)
       return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     return parts[0].slice(0, 2).toUpperCase();
@@ -265,9 +268,9 @@ export function StudentMessagesPage() {
           <div className="flex flex-col items-center gap-[2px]">
             <div className="relative mb-[12px]">
               <div className="size-[110px] rounded-full bg-[#042e99] border-4 border-[#ffeac4] flex items-center justify-center overflow-hidden">
-                {user.photoUrl ? (
+                {userPhotoUrl ? (
                   <img
-                    src={user.photoUrl}
+                    src={userPhotoUrl}
                     alt=""
                     className="size-full object-cover"
                   />
@@ -292,7 +295,7 @@ export function StudentMessagesPage() {
               )}
             </div>
             <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#ffeac4] text-[22px]">
-              {user.name}
+              {userName}
             </p>
             <p className="font-['Figtree:Regular',sans-serif] text-[rgba(255,234,196,0.8)] text-[14px]">
               Estudante

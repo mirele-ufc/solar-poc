@@ -84,7 +84,7 @@ export function MessagePage() {
     setShowErrors(true);
   };
 
-  const initials = (currentUser?.nome ?? "")
+  const initials = (currentUser?.name ?? "")
     .split(" ")
     .map((n: string) => n[0])
     .join("")
@@ -143,9 +143,9 @@ export function MessagePage() {
             {/* Avatar */}
             <div className="relative mb-[12px]">
               <div className="size-[110px] rounded-full bg-[#042e99] border-4 border-[#ffeac4] flex items-center justify-center overflow-hidden">
-                {currentUser?.fotoUrl ? (
+                {currentUser?.photoUrl ? (
                   <img
-                    src={currentUser.fotoUrl}
+                    src={currentUser.photoUrl}
                     alt=""
                     className="size-full object-cover"
                   />
@@ -162,7 +162,7 @@ export function MessagePage() {
 
             {/* Name and role */}
             <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#ffeac4] text-[22px]">
-              {currentUser?.nome}
+              {currentUser?.name}
             </p>
             <p className="font-['Figtree:Regular',sans-serif] text-[rgba(255,234,196,0.8)] text-[14px]">
               Professor

@@ -724,6 +724,7 @@ function RequisitosAlert({
 export function PythonModulesPage() {
   const navigate = useNavigate();
   const { currentUser } = useAuthStore();
+  const studentName = currentUser?.name ?? "Estudante";
   useEnrollmentGuard("python");
 
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set(["1"]));
@@ -1012,7 +1013,7 @@ export function PythonModulesPage() {
       {showMatriculaModal && (
         <DeclaracaoMatriculaModal
           onClose={() => setShowMatriculaModal(false)}
-          studentName={currentUser.name}
+          studentName={studentName}
           validationCode={matriculaCode}
           emissionDate={emissionDate}
         />
@@ -1020,7 +1021,7 @@ export function PythonModulesPage() {
       {showConclusaoModal && (
         <DeclaracaoConclusaoModal
           onClose={() => setShowConclusaoModal(false)}
-          studentName={currentUser.name}
+          studentName={studentName}
           validationCode={conclusaoCode}
           emissionDate={emissionDate}
           conclusionDate={emissionDate}

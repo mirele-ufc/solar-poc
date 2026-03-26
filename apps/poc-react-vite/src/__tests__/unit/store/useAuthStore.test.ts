@@ -27,7 +27,7 @@ describe("useAuthStore", () => {
       // This test validates that the type is importable and the store accepts it
       const mockUser: IUserSession = {
         id: "1",
-        nome: "Test User",
+        name: "Test User",
         cpf: "12345678901",
         email: "test@ufc.br",
         role: "student",
@@ -111,7 +111,7 @@ describe("useAuthStore", () => {
     it("store deve aceitar IUserSession sem erros de tipo", () => {
       const user: IUserSession = {
         id: "aluno-456",
-        nome: "Eduardo Marinho",
+        name: "Eduardo Marinho",
         cpf: "12345678901",
         email: "eduardo@ufc.br",
         role: "student",
@@ -133,7 +133,7 @@ describe("useAuthStore", () => {
 
       const user: IUserSession = {
         id: "prof-999",
-        nome: "Professor Nullable",
+        name: "Professor Nullable",
         cpf: "99999999999",
         email: "prof.nullable@ufc.br",
         role: "professor",
@@ -150,11 +150,11 @@ describe("useAuthStore", () => {
       useAuthStore.getState().login("professor", "professor");
 
       useAuthStore.getState().updateCurrentUser({
-        nome: "Prof. Updated",
+        name: "Prof. Updated",
       });
 
       const state = useAuthStore.getState();
-      expect(state.currentUser?.nome).toBe("Prof. Updated");
+      expect(state.currentUser?.name).toBe("Prof. Updated");
     });
   });
 });

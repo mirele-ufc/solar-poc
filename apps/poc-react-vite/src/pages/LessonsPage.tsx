@@ -136,14 +136,18 @@ function loadVisited(): Set<string> {
   try {
     const raw = localStorage.getItem(VISITED_KEY);
     if (raw) return new Set(JSON.parse(raw) as string[]);
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
   return new Set();
 }
 
 function saveVisited(visited: Set<string>) {
   try {
     localStorage.setItem(VISITED_KEY, JSON.stringify([...visited]));
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 }
 
 // ─── LessonsPage ─────────────────────────────────────────────────────────────
@@ -165,7 +169,7 @@ export function LessonsPage() {
       : 0;
 
   const [aulaIndex, setAulaIndex] = useState<number>(
-    Math.min(initialIndex, aulas.length - 1)
+    Math.min(initialIndex, aulas.length - 1),
   );
 
   const [visited, setVisited] = useState<Set<string>>(() => loadVisited());
@@ -197,14 +201,10 @@ export function LessonsPage() {
   };
 
   return (
-    <main
-      id="main-content"
-      className="bg-white flex flex-col min-h-screen"
-    >
+    <main id="main-content" className="bg-white flex flex-col min-h-screen">
       {/* Scrollable content area with bottom padding for fixed button */}
       <div className="flex-1 overflow-y-auto pb-[96px]">
         <div className="max-w-[600px] mx-auto flex flex-col gap-[20px] px-[16px] md:px-[24px] pt-[20px] w-full">
-
           {/* Breadcrumb + back */}
           <PageHeader
             title={currentAula.title}
@@ -219,9 +219,7 @@ export function LessonsPage() {
           />
 
           {/* Course title */}
-          <h2
-            className="font-['Figtree:Bold',sans-serif] font-bold text-[24px] leading-[36px] text-black"
-          >
+          <h2 className="font-['Figtree:Bold',sans-serif] font-bold text-[24px] leading-[36px] text-black">
             Power BI - Fundamentos
           </h2>
 
@@ -238,9 +236,7 @@ export function LessonsPage() {
 
             {/* Lesson title row */}
             <div className="flex items-center justify-between w-full">
-              <h3
-                className="font-['Figtree:Bold',sans-serif] font-bold text-[24px] leading-[36px] text-black"
-              >
+              <h3 className="font-['Figtree:Bold',sans-serif] font-bold text-[24px] leading-[36px] text-black">
                 {currentAula.title}: {currentAula.subtitle}
               </h3>
               {/* Arrow icon decorative — indicates the card is part of the accordion list */}
@@ -291,7 +287,11 @@ export function LessonsPage() {
           type="button"
           onClick={handleNext}
           className="bg-[#ffeac4] flex h-[50px] items-center justify-center rounded-[26px] w-full max-w-[360px] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px] hover:bg-[#ffd98a] transition-colors active:scale-[0.98]"
-          aria-label={isLastAula ? "Ir para a prova do módulo" : `Ir para a próxima aula (${aulaIndex + 2} de ${aulas.length})`}
+          aria-label={
+            isLastAula
+              ? "Ir para a prova do módulo"
+              : `Ir para a próxima aula (${aulaIndex + 2} de ${aulas.length})`
+          }
         >
           <span className="font-['Figtree:Medium',sans-serif] font-medium text-[20px] leading-[30px] text-[#333] text-center whitespace-nowrap">
             {isLastAula ? "Ir para a prova" : "Ir para próxima aula"}
