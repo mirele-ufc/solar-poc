@@ -1,8 +1,8 @@
 import { create } from "zustand";
-import type { UserProfile, SentMessage } from "@ava-poc/types";
+import type { IUserSession, SentMessage } from "@ava-poc/types";
 
 // Re-export types for external imports (tests, components)
-export type { UserProfile, SentMessage };
+export type { IUserSession, SentMessage };
 
 /**
  * Authentication store state and actions
@@ -15,18 +15,24 @@ export type { UserProfile, SentMessage };
  */
 interface AuthStore {
   // State
-  currentUser: UserProfile;
+  currentUser: IUserSession | null;
   sentMessages: SentMessage[];
   isLoggedIn: boolean;
 
   // Actions
   login: (username: string, password: string) => boolean;
   logout: () => void;
-  updateCurrentUser: (partial: Partial<UserProfile>) => void;
+  updateCurrentUser: (partial: Partial<IUserSession>) => void;
   sendMessage: (msg: Omit<SentMessage, "id" | "sentAt">) => void;
 }
 
-type AuthStoreSnapshot = Pick<AuthStore, "currentUser" | "isLoggedIn">;
+/**
+ * Type alias for store snapshot (used in selectors)
+ */
+type AuthStoreSnapshot = {
+  currentUser: IUserSession | null;
+  isLoggedIn: boolean;
+};
 
 /**
  * Hardcoded credentials for prototype demonstration
@@ -35,38 +41,47 @@ type AuthStoreSnapshot = Pick<AuthStore, "currentUser" | "isLoggedIn">;
  * ⚠️ PROTOTYPE ONLY:
  * In production, authentication must be backend-driven with secure token management.
  */
-const CREDENTIALS: Record<string, { password: string; profile: UserProfile }> =
+const CREDENTIALS: Record<string, { password: string; profile: IUserSession }> =
   {
     professor: {
       password: "professor",
       profile: {
-        name: "Prof. Eduardo Silva",
+        id: "prof-001",
+        nome: "Prof. Eduardo Silva",
         cpf: "98765432100",
         email: "professor@ufc.br",
-        photoUrl: null,
+        fotoUrl: undefined,
         role: "professor",
+        status: "ATIVO",
       },
     },
     estudante: {
       password: "estudante",
       profile: {
-        name: "Eduardo Marinho",
+        id: "student-001",
+        nome: "Eduardo Marinho",
         cpf: "12345678901",
         email: "eduardo.marinho@ufc.br",
-        photoUrl: null,
+        fotoUrl: undefined,
         role: "student",
+        status: "ATIVO",
       },
     },
   };
 
 /**
- * Default user profile when not logged in
- * Uses student credentials as default
+ * Initial state when user is not logged in
+ * currentUser is null until user successfully authenticates
  */
-const DEFAULT_USER: UserProfile = CREDENTIALS.estudante.profile;
+const INITIAL_STATE = {
+  currentUser: null as IUserSession | null,
+  sentMessages: [] as SentMessage[],
+  isLoggedIn: false,
+};
 
 /**
  * Mock messages for prototype demonstration
+ * Used for testing and demo purposes
  *
  * ⚠️ PROTOTYPE: In production, messages are fetched from backend API
  */
@@ -104,10 +119,15 @@ const MOCK_MESSAGES: SentMessage[] = [
  * Usage:
  * const { currentUser, login, logout } = useAuthStore();
  */
+/**
+ * Zustand authentication store
+ * Manages user profile, authentication state, and messages
+ *
+ * Usage:
+ * const { currentUser, login, logout } = useAuthStore();
+ */
 export const useAuthStore = create<AuthStore>((set) => ({
-  currentUser: DEFAULT_USER,
-  sentMessages: MOCK_MESSAGES,
-  isLoggedIn: false,
+  ...INITIAL_STATE,
 
   /**
    * Authenticate user with username and password
@@ -133,13 +153,14 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
   /**
    * Logout current user
-   * Resets to default user state
+   * Clears authentication state completely
+   * - Sets currentUser to null
+   * - Sets isLoggedIn to false
+   * - Clears sentMessages array
    */
   logout: () => {
     set({
-      currentUser: DEFAULT_USER,
-      isLoggedIn: false,
-      sentMessages: MOCK_MESSAGES,
+      ...INITIAL_STATE,
     });
   },
 
@@ -148,9 +169,11 @@ export const useAuthStore = create<AuthStore>((set) => ({
    *
    * @param partial - Partial user profile to merge with current user
    */
-  updateCurrentUser: (partial: Partial<UserProfile>) => {
+  updateCurrentUser: (partial: Partial<IUserSession>) => {
     set((state) => ({
-      currentUser: { ...state.currentUser, ...partial },
+      currentUser: state.currentUser
+        ? { ...state.currentUser, ...partial }
+        : null,
     }));
   },
 
@@ -174,9 +197,11 @@ export const useAuthStore = create<AuthStore>((set) => ({
 }));
 
 export function selectCanManageCourses(state: AuthStoreSnapshot): boolean {
-  return state.currentUser.role === "professor";
+  return state.currentUser?.role === "professor" || false;
 }
 
-export function selectCurrentUser(state: AuthStoreSnapshot): UserProfile {
+export function selectCurrentUser(
+  state: AuthStoreSnapshot,
+): IUserSession | null {
   return state.currentUser;
 }

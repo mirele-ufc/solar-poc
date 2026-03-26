@@ -1,24 +1,27 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useAuthStore, type UserProfile } from "@/store/useAuthStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import type { IUserSession } from "@ava-poc/types";
 import { apiClient } from "@/services/api";
 
-function buildUser(role: UserProfile["role"]): UserProfile {
+function buildUser(role: IUserSession["role"]): IUserSession {
   if (role === "professor") {
     return {
-      name: "Prof. Logout Test",
+      id: "prof-logout-test",
+      nome: "Prof. Logout Test",
       cpf: "11111111111",
       email: "prof.logout@ufc.br",
-      photoUrl: null,
       role,
+      status: "ATIVO",
     };
   }
 
   return {
-    name: "Aluno Logout Test",
+    id: "aluno-logout-test",
+    nome: "Aluno Logout Test",
     cpf: "22222222222",
     email: "aluno.logout@ufc.br",
-    photoUrl: null,
-    role,
+    role: "student",
+    status: "ATIVO",
   };
 }
 
@@ -36,7 +39,7 @@ describe("useAuthStore logout", () => {
 
     const state = useAuthStore.getState();
     expect(state.isLoggedIn).toBe(false);
-    expect(state.currentUser.email).toBe("eduardo.marinho@ufc.br");
+    expect(state.currentUser).toBeNull();
   });
 
   it("nao dispara chamada de API de logout", () => {
