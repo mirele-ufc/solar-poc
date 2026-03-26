@@ -1,4 +1,4 @@
-# MEMORY.md — Rastreamento de Progresso Contínuo
+# Rastreamento de Progresso Contínuo
 
 > **Fonte de verdade única** para progresso do refactoring UFC LMS React.  
 > Atualizado automaticamente pelo agente **IMPLEMENT-AND-COMMIT** após cada subtarefa.  
@@ -6,7 +6,7 @@
 
 ---
 
-# MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
+## MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
 
 **Última atualização:** 2026-03-26T15:36:00Z (1.3 concluída com commits e suíte de erro validada)  
 **Sprint ativo:** Fase 1 — Contratos Canônicos e Tipagem  
@@ -83,17 +83,19 @@
 
 ## SECTION: SESSION CONTEXT
 
-| #   | Story | Status  | Commits | Testes | Evidencia de teste criado                                                                             | Evidencia RED inicial                       | Notas                                                                                                |
-| --- | ----- | ------- | ------- | ------ | ----------------------------------------------------------------------------------------------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| 1   | 0.1.1 | ✅ DONE | 1/1     | 2/2    | src/**tests**/unit/routes/ProtectedRoute.test.tsx                                                     | RED inicial registrado no ciclo da story    | Guard global aplicado no roteamento + commit realizado                                               |
-| 2   | 0.2.1 | ✅ DONE | 1/1     | 3/3    | src/**tests**/unit/routes/ProtectedRoute.test.tsx                                                     | RED registrado na suite de rotas            | routes.ts segmentado por role (professor/student e professor only) + commit realizado                |
-| 3   | 0.3.1 | ✅ DONE | 1/1     | 3/3    | src/**tests**/unit/pages/roleCleanup.test.tsx                                                         | Suite de regressão criada no ciclo          | Role cleanup concluído em pages; mensageria protegida por rota; commits 41a3b29 + 1d0cccb publicados |
-| 4   | 0.4.1 | ✅ DONE | 2/2     | 3/3    | src/**tests**/unit/store/authLogout.test.ts, src/**tests**/unit/components/AuthLayout.logout.test.tsx | RED validado (1 falha funcional)            | Logout local aplicado no AuthLayout sem endpoint backend                                             |
-| 5   | 0.5.1 | ✅ DONE | 2/2     | 3/3    | src/**tests**/unit/pages/UnauthorizedPage.test.tsx                                                    | RED validado (import da página ausente)     | UnauthorizedPage criada com botão de retorno e redirecionamento automático para /courses             |
-| 6   | 0.6.1 | ✅ DONE | 1/1     | 4/4    | src/**tests**/unit/routes/publicRoutes.test.tsx                                                       | RED estrutural (testes antes de rodar)      | Suite valida que /, /register, /forgot-password e /unauthorized são acessíveis sem autenticação      |
-| 7   | 1.1.1 | ✅ DONE | 2/2     | 27/27  | Type-check OK; Vitest: 27/27 testes passando                                                          | Draft: tipos consolidados em @ava-poc/types | Consolidação de tipos em v1.0 + resolução de role (professor/student/admin) + imports bem-definidos  |
+### Stories concluídas nesta trilha
 
-**Resumo:** 7/7 stories Fase 0 + 1/1 story Fase 1.1, Total 8/8 commits, 27/27 testes focados passando
+1. `0.1.1` — ProtectedRoute criado e testado, com guard global aplicado no roteamento.
+2. `0.2.1` — Integração de rotas por role concluída e validada em suíte de rotas.
+3. `0.3.1` — Hardcodes de role removidos das páginas principais, com regressão coberta.
+4. `0.4.1` — Logout local implementado sem endpoint backend, com testes dedicados.
+5. `0.5.1` — UnauthorizedPage criada com retorno e redirecionamento automático.
+6. `0.6.1` — Rotas públicas validadas sem bloqueio indevido.
+7. `1.1.1` — Tipos consolidados em `@ava-poc/types`, com role canonical resolvido.
+8. `1.2.1` — `useAuthStore` migrado para tipos globais, com ajustes de null-safety e compatibilidade.
+9. `1.3.1` — Schemas Zod alinhados ao contrato e suíte de erro expandida para `auth`, `course`, `enrollment`, `exam`, `file` e `message`.
+
+**Resumo:** Fase 0 concluída (7/7). Fase 1 com 3/6 subtarefas concluídas. Últimas entregas: 1.2 (store tipada) e 1.3 (schemas Zod + testes de erro).
 
 ### Last Action
 
@@ -125,187 +127,38 @@ Quando você voltar para continuar:
 Implemente 1.4 (Remover tipos locais duplicados de pages)
 ```
 
-### Important Notes
-
-- 📖 **Primeira vez?** Leia: `docs/COMO_COMECAR.md` (setup + TDD walkthrough)
-- 🚀 **Pronto para codificar?** Siga: `docs/REFACTORING_QUICK_REFERENCE.md` (10 min overview)
-- 📋 **Detalhes de cada subtarefa?** Consulte: `docs/REFACTORING_PLAN_GRANULAR_V2.md`
-- 🎯 **Entendeu o workflow?** Comande: `Implemente 0.7 (Tratamento HTTP padronizado + loading states)`
-
-### Velocity & Timeline
-
-- **Velocidade esperada:** 1-2 subtarefas/dia (durante ramp-up da Fase 0)
-- **Timeline total:** 11-17 semanas (43 subtarefas)
-- **Estimativa final:** Meados de maio de 2026
-
-_Será atualizada conforme velocidade real for estabelecida._
-
----
-
-## SECTION: MAINTENANCE
-
-**Story:** 0.1.2  
-**Título:** Política central de role  
-**Etapa:** RED (escrever teste antes da implementação)  
-**Arquivo:** src/routes/types.ts + src/routes + src/**tests**/unit/routes  
-**Estimativa:** 60-90 min
-
-### How to Update This File
-
-**Quando o agente IMPLEMENT-AND-COMMIT completa uma subtarefa:**
-
-1. Adicione nova linha em tabela `✅ Completes`:
-
-   ```
-   | 0.1 | Criar ProtectedRoute com validação de role | ✅ | 24/03 | abc1234 | #125 |
-   ```
-
-2. Atualize `Fase 0` em tabela `By-Phase Metrics`:
-
-   ```
-   | 0 | 1 | 7 | 14% | 🟢 IN PROGRESS | 24/03 | — |
-   ```
-
-3. Atualize linha de status inicial:
-
-   ```
-   Status: Fase 0 — Segurança, 1/7 complete, 1/43 total (2%), next: 0.2
-   ```
-
-4. Mova próximas ready (remova blocker, adicione nova):
-
-   ```
-   ⏳ Next Ready
-   1. 0.2 — Integrar ProtectedRoute (1.5 dias) ✅ READY NOW
-   2. 0.3 — Cleanup rotas (0.5 dias) ⏳ BLOCKED on 0.2
-   3. 0.4 — Logout Seguro (1 dia) ⏳ BLOCKED on 0.2, 0.3
-   ```
-
-5. Atualize SESSION CONTEXT:
-   ```
-   Last Action:
-   - Date: 24/03/2026 14:30
-   - Machine: [seu-pc]
-   - What: Merged PR#125 (0.1 ProtectedRoute)
-   - Status: Tudo commitado
-   ```
-
-**Automatização:** O agente IMPLEMENT-AND-COMMIT faz isso automaticamente. Você não precisa editar manual (mas pode se precisar corrigir).
-
-### File Locations
-
-- **Este arquivo:** Raiz do projeto → `./MEMORY.md`
-- **Lido por:** `/status-refactoring` agente
-- **Atualizado por:** `/implement-and-commit` agente
-- **Backup:** Commit history em git (cada atualização é um commit)
-
-### Git Strategy
-
-- Cada atualização de MEMORY.md vem com commit `docs: Atualizar MEMORY.md com subtarefa X.Y completa`
-- History é preservado em git → Sempre possível rolar back se necessário
-- MEMORY.md é versionado no git (não local-only)
-
----
-
-## QUICK REFERENCE
-
-| Ação                            | Comando                                      |
-| ------------------------------- | -------------------------------------------- |
-| Ver status atual                | `/status-refactoring`                        |
-| Começar implementação           | `Implemente 0.4 (Implementar logout seguro)` |
-| Ver contexto                    | Ler este arquivo: **MEMORY.md**              |
-| Consultar detalhes da subtarefa | `docs/REFACTORING_PLAN_GRANULAR_V2.md`       |
-| Validar contexto todo           | `/start-implementation`                      |
-| Ler guia completo               | `docs/COMO_COMECAR.md`                       |
-
----
-
-**Criado:** 24/03/2026  
-**Status:** ✅ Pronto para primeira subtarefa  
-**Próxima ação:** Rodar `/start-implementation` para validar tudo
-
-```
-1. [Ação A]
-2. [Ação B]
-3. [Ação C]
-```
-
----
-
 ## 📝 Arquivos em Edição
 
-- [ ] `src/.../.../file1.tsx`
-- [ ] `src/__tests__/.../file1.test.tsx`
-- [ ] `src/.../.../file2.tsx`
-
-**Status de cada um:**
-
-- file1.tsx: [descrição do estado — 80% escrito, faltam testes]
-- file1.test.tsx: [estado — RED, 2 testes falhando]
-- file2.tsx: [estado — TODO]
-
----
+- [x] `apps/poc-react-vite/src/__tests__/unit/validations/schemas.contract.test.ts`
+- [x] `apps/poc-react-vite/src/validations/authSchema.ts`
+- [x] `apps/poc-react-vite/src/validations/courseSchema.ts`
+- [x] `apps/poc-react-vite/src/validations/enrollmentSchema.ts`
+- [x] `apps/poc-react-vite/src/validations/examSchema.ts`
+- [x] `apps/poc-react-vite/src/validations/fileSchema.ts`
+- [x] `apps/poc-react-vite/src/validations/messageSchema.ts`
+- [x] `MEMORY.md`
 
 ## 🚦 Bloqueadores
 
-**Nenhum registrado**
-
-Ou:
-
-| Bloqueador  | Impacto               | Solução           |
-| ----------- | --------------------- | ----------------- |
-| [descrição] | [qual story bloqueia] | [ação necessária] |
-
----
+| Bloqueador                                                                      | Impacto                                              | Solução sugerida                                                                  |
+| ------------------------------------------------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `pnpm --filter @figma/my-make-file run type-check` falhando no terminal `turbo` | Impede fechar Fase 1 com critério completo de aceite | Triar erros atuais do type-check antes de iniciar 1.5 ou consolidar novos commits |
 
 ## 💡 Notas Rápidas
 
-- **Config Zustand:** Middleware persist resolvido em Story 0.2.1
-- **MSW mock:** API mocking funciona corretamente, não precisa ajuste
-- **TypeScript:** strict mode — validar interface de store
-- **Padrão TDD:** Aprovado, seguir AAA (Arrange, Act, Assert)
-- **Commits:** Graph de commits em bom estado, merge pronto para development
-
----
-
-## 📋 Checklist de Pronto (DoD)
-
-Quando finalizar story, verificar:
-
-- [ ] Testes unitários: 100% passando
-- [ ] Testes de integração: passando
-- [ ] `npm run type-check`: sem erros
-- [ ] `npm run lint`: sem warnings
-- [ ] `npm run build`: sucesso
-- [ ] Commit automático feito com convenção correta
-- [ ] Branch está atualizada com development (se necessário)
-- [ ] Não quebrou outras stories/páginas
-
----
+- Story 1.3 concluída com cobertura de erro expandida para os schemas atuais em `src/validations/`.
+- Suite focal de schemas: 22/22 testes passando.
+- Próxima subtarefa operacional: 1.4 — remover tipos locais duplicados de pages.
+- Após 1.4, o próximo passo natural é 1.5 com foco direto em zerar `any` e estabilizar o type-check.
 
 ## 🔗 Links de Referência
 
-| Link                                            | Propósito                                                      |
-| ----------------------------------------------- | -------------------------------------------------------------- |
-| `/memories/REFACTORING_PLAN_FINAL.md`           | Plano técnico completo (fases, stories, endpoints)             |
-| `/memories/refactoring-quick-ref.md`            | Quick reference (decisões, stack, próximas ações)              |
-| `/memories/sprint-tracking.md`                  | Rastreamento de progresso global                               |
-| `CLAUDE.md`                                     | Diretrizes de código, SOLID, Clean Code                        |
-| `.claude/commands/doc/requisitos-funcionais.md` | RFs — orienta quais endpoints/funcionalidades implementar      |
-| `.claude/commands/doc/user-stories.md`          | USs — contexto de negócio por perfil (ADMIN, PROFESSOR, ALUNO) |
-
----
-
-## 🔄 Histórico de Updates Nesta Sessão
-
-```
-[HH:MM] Iniciada sessão, chat #X
-[HH:MM] Story X.Y.1 — DONE (testes + implementação + commit)
-[HH:MM] Story X.Y.2 — Em testes, 2/2 passando
-[HH:MM] MEMORY.md atualizado — próximo: implementar arquivo2.tsx
-```
-
----
+| Link                                   | Propósito                                  |
+| -------------------------------------- | ------------------------------------------ |
+| `docs/REFACTORING_PLAN_GRANULAR_V2.md` | Plano mestre de execução das 43 subtarefas |
+| `docs/REFACTORING_QUICK_REFERENCE.md`  | Resumo operacional do fluxo de refatoração |
+| `docs/COMO_COMECAR.md`                 | Setup e workflow de trabalho               |
+| `CLAUDE.md`                            | Diretrizes de código, contrato e escopo    |
 
 ## 🛑 Pausar / Retomar
 
