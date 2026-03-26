@@ -8,7 +8,7 @@
 
 ## MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
 
-**Última atualização:** 2026-03-26T15:53:00Z (1.4 concluída localmente com centralização de tipos duplicados)  
+**Última atualização:** 2026-03-26T16:05:00Z (1.4 concluída e commitada)  
 **Sprint ativo:** Fase 1 — Contratos Canônicos e Tipagem  
 **Status geral:** 26% (11/43 subtarefas)
 
@@ -24,7 +24,7 @@
 | **Status** | DONE                                           |
 | **Branch** | feature/refactor-contratos-tipagem             |
 
-**Status:** Fase 1 em andamento, Story 1.4 ✅ DONE (local), 11/43 total (26%), next: 1.5
+**Status:** Fase 1 em andamento, Story 1.4 ✅ DONE, 11/43 total (26%), next: 1.5
 
 ### ✅ Completes
 
@@ -74,7 +74,7 @@
 
 ✅ **Nenhum blocker detectado.**
 
-- ✅ Type-check: passou localmente
+- ✅ Type-check: passou
 - ✅ Tests: 61/61 passando
 - ✅ Git: Branch `feature/refactor-contratos-tipagem` ativa
 - ✅ Documentação: Todas docs em `/docs/` presentes
@@ -100,12 +100,12 @@
 
 ### Last Action
 
-- **Date:** 26/03/2026 15:53 UTC
+- **Date:** 26/03/2026 16:05 UTC
 - **Machine:** local
 - **What:** Subtarefa 1.4 concluída — tipos duplicados de pages centralizados
 - **Testes executados:** Type-check ✅ PASSED; Vitest app ✅ 61/61
-- **Commits realizados (mais recentes):** `6b413f6`, `41395d1`, `39c4cbe`
-- **Status:** Story 1.4 concluída localmente; tipos compartilhados aplicados em modules/messages pages; aguardando autorização se houver intenção de commit
+- **Commits realizados (mais recentes):** `ec2f739`, `f0e773e`, `6b413f6`
+- **Status:** Story 1.4 concluída e registrada em git; tipos compartilhados aplicados em modules/messages pages
 - **Próxima:** 1.5 (Validar zero `any` em TypeScript) — READY NOW
 
 ### Observações Contratuais da 0.2
@@ -126,12 +126,7 @@ Implemente 1.5 (Validar zero `any` em TypeScript)
 
 ## 📝 Arquivos em Edição
 
-- [x] `packages/types/src/index.ts`
-- [x] `apps/poc-react-vite/src/pages/ModulesPage.tsx`
-- [x] `apps/poc-react-vite/src/pages/PythonModulesPage.tsx`
-- [x] `apps/poc-react-vite/src/pages/MessagesPage.tsx`
-- [x] `apps/poc-react-vite/src/pages/StudentMessagesPage.tsx`
-- [x] `MEMORY.md`
+Nenhum arquivo pendente no working tree no momento.
 
 ## 🚦 Bloqueadores
 
@@ -139,7 +134,7 @@ Nenhum blocker ativo no momento.
 
 ## 💡 Notas Rápidas
 
-- Story 1.4 concluída localmente com centralização de tipos de módulos e mensagens em `@ava-poc/types`.
+- Story 1.4 concluída e commitada com centralização de tipos de módulos e mensagens em `@ava-poc/types`.
 - `type-check` passou após a refatoração.
 - Suite de testes da aplicação: 61/61 passando.
 - Próxima subtarefa operacional: 1.5 — validar zero `any` em TypeScript.
