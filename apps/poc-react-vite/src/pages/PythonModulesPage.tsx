@@ -3,6 +3,14 @@ import { useNavigate } from "react-router";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { useEnrollmentGuard } from "@/hooks/useEnrollmentGuard";
 import { useAuthStore } from "@/store/useAuthStore";
+import type {
+  ICompletionDeclarationModal,
+  IEnrollmentDeclarationModal,
+  IModuleData,
+  IProgressBarProps,
+  IRequirementsAlert,
+  ModuleItemType,
+} from "@/types";
 
 const ARROW_PATH = "M6 7L12 13L18 7L20 9L12 17L4 9L6 7Z";
 const CHECK_PATH = "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z";
@@ -10,36 +18,26 @@ const CHECK_PATH = "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z";
 const PYTHON_HERO =
   "https://images.unsplash.com/photo-1624953587687-daf255b6b80a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800";
 
-type ItemType = "aula" | "prova";
-
-interface LessonItem {
-  id: string;
-  label: string;
-  type: ItemType;
-}
-
-interface ModuloData {
-  id: string;
-  title: string;
-  items: LessonItem[];
-}
-
-const MODULOS: ModuloData[] = [
+const MODULOS: IModuleData[] = [
   {
     id: "1",
     title: "Módulo 01 — Introdução ao Python",
     items: [
-      { id: "py-m1-aula-01", label: "Aula 01 — O que é Python", type: "aula" },
-      { id: "py-m1-prova-01", label: "Prova do Módulo", type: "prova" },
+      {
+        id: "py-m1-aula-01",
+        label: "Aula 01 — O que é Python",
+        type: "lesson",
+      },
+      { id: "py-m1-prova-01", label: "Prova do Módulo", type: "exam" },
     ],
   },
 ];
 
 const ALL_AULA_IDS = MODULOS.flatMap((m) =>
-  m.items.filter((i) => i.type === "aula").map((i) => i.id),
+  m.items.filter((i) => i.type === "lesson").map((i) => i.id),
 );
 const ALL_PROVA_IDS = MODULOS.flatMap((m) =>
-  m.items.filter((i) => i.type === "prova").map((i) => i.id),
+  m.items.filter((i) => i.type === "exam").map((i) => i.id),
 );
 const ALL_LESSON_IDS = MODULOS.flatMap((m) => m.items.map((i) => i.id));
 
@@ -114,7 +112,7 @@ function CheckIcon() {
   );
 }
 
-function ProgressBar({ visited, total }: { visited: number; total: number }) {
+function ProgressBar({ visited, total }: IProgressBarProps) {
   const pct = total > 0 ? Math.round((visited / total) * 100) : 0;
   return (
     <div className="w-full mt-[4px]">
@@ -156,12 +154,7 @@ function DeclaracaoMatriculaModal({
   studentName,
   validationCode,
   emissionDate,
-}: {
-  onClose: () => void;
-  studentName: string;
-  validationCode: string;
-  emissionDate: Date;
-}) {
+}: IEnrollmentDeclarationModal) {
   useEffect(() => {
     function handleEsc(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -359,13 +352,7 @@ function DeclaracaoConclusaoModal({
   validationCode,
   emissionDate,
   conclusionDate,
-}: {
-  onClose: () => void;
-  studentName: string;
-  validationCode: string;
-  emissionDate: Date;
-  conclusionDate: Date;
-}) {
+}: ICompletionDeclarationModal) {
   useEffect(() => {
     function handleEsc(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -573,18 +560,12 @@ function DeclaracaoConclusaoModal({
 // ── Alerta de requisitos não cumpridos ────────────────────────────────────────
 
 function RequisitosAlert({
-  totalAulas,
-  visitedAulas,
-  totalProvas,
-  visitedProvas,
+  totalLessons,
+  visitedLessons,
+  totalExams,
+  visitedExams,
   onClose,
-}: {
-  totalAulas: number;
-  visitedAulas: number;
-  totalProvas: number;
-  visitedProvas: number;
-  onClose: () => void;
-}) {
+}: IRequirementsAlert) {
   useEffect(() => {
     function handleEsc(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -645,13 +626,13 @@ function RequisitosAlert({
             {[
               {
                 label: "Aulas concluídas",
-                done: visitedAulas >= totalAulas,
-                detail: `${visitedAulas} de ${totalAulas} aulas`,
+                done: visitedLessons >= totalLessons,
+                detail: `${visitedLessons} de ${totalLessons} aulas`,
               },
               {
                 label: "Provas realizadas",
-                done: visitedProvas >= totalProvas,
-                detail: `${visitedProvas} de ${totalProvas} provas`,
+                done: visitedExams >= totalExams,
+                detail: `${visitedExams} de ${totalExams} provas`,
               },
             ].map(({ label, done, detail }) => (
               <div
@@ -745,11 +726,11 @@ export function PythonModulesPage() {
   }, [visited]);
 
   // Completion
-  const visitedAulas = ALL_AULA_IDS.filter((id) => visited.has(id)).length;
-  const visitedProvas = ALL_PROVA_IDS.filter((id) => visited.has(id)).length;
+  const visitedLessons = ALL_AULA_IDS.filter((id) => visited.has(id)).length;
+  const visitedExams = ALL_PROVA_IDS.filter((id) => visited.has(id)).length;
   const isConcluded =
-    visitedAulas >= ALL_AULA_IDS.length &&
-    visitedProvas >= ALL_PROVA_IDS.length;
+    visitedLessons >= ALL_AULA_IDS.length &&
+    visitedExams >= ALL_PROVA_IDS.length;
 
   const totalProgress = ALL_LESSON_IDS.filter((id) => visited.has(id)).length;
   const overallPct = Math.round((totalProgress / ALL_LESSON_IDS.length) * 100);
@@ -763,14 +744,14 @@ export function PythonModulesPage() {
     });
   };
 
-  const handleVisitLesson = (lessonId: string, type: ItemType) => {
+  const handleVisitLesson = (lessonId: string, type: ModuleItemType) => {
     setVisited((prev) => {
       const next = new Set(prev);
       next.add(lessonId);
       return next;
     });
 
-    if (type === "prova") {
+    if (type === "exam") {
       navigate("/courses/python/exam/instructions");
     } else {
       navigate("/courses/python/modules/1", { state: { aulaIndex: 0 } });
@@ -866,7 +847,7 @@ export function PythonModulesPage() {
         >
           {MODULOS.map((mod) => {
             const isOpen = expandedIds.has(mod.id);
-            const aulaItems = mod.items.filter((i) => i.type === "aula");
+            const aulaItems = mod.items.filter((i) => i.type === "lesson");
             const visitedCount = aulaItems.filter((i) =>
               visited.has(i.id),
             ).length;
@@ -1029,10 +1010,10 @@ export function PythonModulesPage() {
       )}
       {showRequisitosAlert && (
         <RequisitosAlert
-          totalAulas={ALL_AULA_IDS.length}
-          visitedAulas={visitedAulas}
-          totalProvas={ALL_PROVA_IDS.length}
-          visitedProvas={visitedProvas}
+          totalLessons={ALL_AULA_IDS.length}
+          visitedLessons={visitedLessons}
+          totalExams={ALL_PROVA_IDS.length}
+          visitedExams={visitedExams}
           onClose={() => setShowRequisitosAlert(false)}
         />
       )}

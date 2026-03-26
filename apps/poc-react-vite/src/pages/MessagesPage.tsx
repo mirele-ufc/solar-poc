@@ -8,7 +8,8 @@ import {
   Send,
   Inbox,
 } from "lucide-react";
-import { useAuthStore, type SentMessage } from "@/store/useAuthStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import type { IMessageCardProps } from "@/types";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -42,13 +43,7 @@ function formatDateShort(isoString: string): string {
 
 // ─── MessageCard ──────────────────────────────────────────────────────────────
 
-interface MessageCardProps {
-  message: SentMessage;
-  isExpanded: boolean;
-  onToggle: () => void;
-}
-
-function MessageCard({ message, isExpanded, onToggle }: MessageCardProps) {
+function MessageCard({ message, isExpanded, onToggle }: IMessageCardProps) {
   const preview =
     message.body.length > 120 ? message.body.slice(0, 120) + "…" : message.body;
 

@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { ChevronLeft, ChevronDown, ChevronUp, Inbox } from "lucide-react";
-import { useAuthStore, type SentMessage } from "@/store/useAuthStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import { useCourseStore } from "@/store/useCourseStore";
+import type { IMessageCardProps } from "@/types";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -39,19 +40,12 @@ const PROFESSOR_NAME = "Prof. Eduardo Silva";
 
 // ─── MessageCard ──────────────────────────────────────────────────────────────
 
-interface MessageCardProps {
-  message: SentMessage;
-  isExpanded: boolean;
-  onToggle: () => void;
-  isUnread: boolean;
-}
-
 function MessageCard({
   message,
   isExpanded,
   onToggle,
   isUnread,
-}: MessageCardProps) {
+}: IMessageCardProps) {
   const preview =
     message.body.length > 130 ? message.body.slice(0, 130) + "…" : message.body;
 
