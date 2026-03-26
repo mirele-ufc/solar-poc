@@ -8,9 +8,9 @@
 
 # MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
 
-**Última atualização:** 26/03/2026 (0.7 implementada — interceptor HTTP + loading states + empty states)  
-**Sprint ativo:** Fase 0 — Segurança  
-**Status geral:** 16% (7/43 subtarefas)
+**Última atualização:** 26/03/2026 (1.1 implementada — consolidação de tipos em v1.0)  
+**Sprint ativo:** Fase 1 — Contratos Canônicos e Tipagem  
+**Status geral:** 19% (8/43 subtarefas)
 
 ---
 
@@ -18,13 +18,13 @@
 
 | Campo      | Valor                                                        |
 | ---------- | ------------------------------------------------------------ |
-| **Fase**   | 0 — Segurança de navegação e sessão                          |
-| **Módulo** | 0.7 — HTTP error interceptor + loading states + empty states |
-| **Story**  | 0.7 — Todas as histórias completas                           |
+| **Fase**   | 1 — Contratos Canônicos e Tipagem                            |
+| **Módulo** | 1.1 — Auditar e consolidar tipos em @ava-poc/types          |
+| **Story**  | 1.1 — Consolidação de tipos completa                         |
 | **Status** | DONE                                                         |
-| **Branch** | feature/refactor-auth-guard-global                           |
+| **Branch** | feature/refactor-types-consolidation                         |
 
-**Status:** Fase 0 — Segurança, 7/7 complete ✅, 7/43 total (16%), next: 1.1
+**Status:** Fase 1 iniciada, Story 1.1 ✅ DONE, 8/43 total (19%), next: 1.2
 
 ### ✅ Completes
 
@@ -37,33 +37,40 @@
 | 0.5 | Implementar Unauthorized page                   | ✅     | 26/03/2026 | 8fa0cd3 + 00d9fe6                     | —   |
 | 0.6 | Validar rotas públicas sem guard incorreto      | ✅     | 26/03/2026 | 189c57f                               | —   |
 | 0.7 | HTTP error interceptor + loading + empty states | ✅     | 26/03/2026 | 1aac552 + 3edb2fc + 41cb179 + 4390f75 | —   |
+| 1.1 | Auditar e consolidar tipos em @ava-poc/types    | ✅     | 26/03/2026 | 9bb4021 + 910841e                     | —   |
 
 ### 📊 By-Phase Metrics
 
 | Phase     | Complete | Total  | %       | Status             | Start Date | Est. End |
 | --------- | -------- | ------ | ------- | ------------------ | ---------- | -------- |
 | 0         | 7        | 7      | 100%    | ✅ COMPLETA        | 25/03      | 26/03    |
-| 1         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
+| 1         | 1        | 6      | 16%     | 🔄 IN_PROGRESS     | 26/03      | —        |
 | 2         | 0        | 7      | 0%      | ⏳ FUTURE          | —          | —        |
 | 3         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
 | 4         | 0        | 7      | 0%      | ⏳ FUTURE          | —          | —        |
 | 5         | 0        | 4      | 0%      | ⏳ FUTURE          | —          | —        |
 | 6         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
+| **TOTAL** | **8**    | **43** | **19%** | **🟢 IN PROGRESS** | 25/03      | —        |
+| 6         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
 | **TOTAL** | **7**    | **43** | **16%** | **🟢 IN PROGRESS** | 25/03      | —        |
 
 ### ⏳ Next Ready (First 3)
 
-1. **1.1 — Auditar e consolidar tipos em @ava-poc/types**
-   - Duração: 2 dias
-   - Dependências: Fase 0 concluída ✅
-   - Status: ✅ **READY NOW**
-   - Detalhes: `docs/REFACTORING_PLAN_GRANULAR_V2.md` § 1.1
-
-2. **1.2 — Migrar useAuthStore para tipos globais**
+1. **1.2 — Migrar useAuthStore para tipos globais**
    - Duração: 1 dia
-   - Dependências: 1.1
-   - Status: ⏳ FUTURE
+   - Dependências: 1.1 ✅ completa
+   - Status: ✅ **READY NOW**
    - Detalhes: `docs/REFACTORING_PLAN_GRANULAR_V2.md` § 1.2
+
+2. **1.3 — [Próxima subtarefa não especificada no plano — confirmar]**
+   - Duração: —
+   - Dependências: 1.2?
+   - Status: ⏳ FUTURE
+   - Detalhes: Verificar com REFACTORING_PLAN_GRANULAR_V2.md
+
+3. **1.4 — [Próxima]**
+   - Duração: —
+   - Status: ⏳ FUTURE
 
 ### ⛔ Blockers
 
@@ -86,21 +93,23 @@
 | 4   | 0.4.1 | ✅ DONE | 2/2     | 3/3    | src/**tests**/unit/store/authLogout.test.ts, src/**tests**/unit/components/AuthLayout.logout.test.tsx | RED validado (1 falha funcional)         | Logout local aplicado no AuthLayout sem endpoint backend                                             |
 | 5   | 0.5.1 | ✅ DONE | 2/2     | 3/3    | src/**tests**/unit/pages/UnauthorizedPage.test.tsx                                                    | RED validado (import da página ausente)  | UnauthorizedPage criada com botão de retorno e redirecionamento automático para /courses             |
 | 6   | 0.6.1 | ✅ DONE | 1/1     | 4/4    | src/**tests**/unit/routes/publicRoutes.test.tsx                                                       | RED estrutural (testes antes de rodar)   | Suite valida que /, /register, /forgot-password e /unauthorized são acessíveis sem autenticação      |
+| 7   | 1.1.1 | ✅ DONE | 2/2     | 27/27  | Type-check OK; Vitest: 27/27 testes passando                                                         | Draft: tipos consolidados em @ava-poc/types | Consolidação de tipos em v1.0 + resolução de role (professor/student/admin) + imports bem-definidos |
 
-**Resumo:** 6/7 stories, 6/7 commits, 16/16 testes focados de auth/rota/página passando
+**Resumo:** 7/7 stories Fase 0 + 1/1 story Fase 1.1, Total 8/8 commits, 27/27 testes focados passando
 
 ### Last Action
 
-- **Date:** 26/03/2026
+- **Date:** 26/03/2026 16:00 UTC
 - **Machine:** local
-- **What:** Subtarefa 0.6 implementada via TDD (RED→GREEN→REFACTOR), validando rotas públicas acessíveis sem autenticação
+- **What:** Subtarefa 1.1 implementada — consolidação de tipos em @ava-poc/types v1.0
 - **Testes executados:**
-  - `src/__tests__/unit/routes/publicRoutes.test.tsx` (4/4)
-- **Commits planejados para 0.6:**
-  - `test: Validar rotas públicas não são bloqueadas por ProtectedRoute`
-  - `docs: Atualizar MEMORY.MD com subtarefa 0.6 completa`
-- **Commits executados:** `189c57f` (test)
-- **Status:** Implementação e testes da 0.6 concluídos; commit de docs pendente; sem push/PR
+  - Type-check TypeScript: ✅ PASSED (consolidação validada)
+  - Vitest: 27/27 ✅ PASSED
+- **Commits realizados:**
+  - `9bb4021` refactor: Consolidar tipos domain + API em @ava-poc/types v1.0
+  - `910841e` refactor: Resolver inconsistência role e atualizar imports
+- **Status:** Consolidação de tipos concluída; todos os consumidores migrados para @ava-poc/types; imports centralizados; role resolvido (professor/student/admin)
+- **Próxima:** 1.2 (Migrar useAuthStore para tipos globais) — READY NOW
 
 ### Observações Contratuais da 0.2
 
@@ -112,13 +121,10 @@ Quando você voltar para continuar:
 
 ```bash
 # 1. Antes de tudo, validar contexto
-/start-implementation
-
-# 2. Ver status atual
 /status-refactoring
 
-# 3. Começar Fase 0.7
-Implemente 0.7 (Tratamento HTTP padronizado + loading states)
+# 2. Começar Fase 1.2
+Implemente 1.2 (Migrar useAuthStore para tipos globais)
 ```
 
 ### Important Notes
