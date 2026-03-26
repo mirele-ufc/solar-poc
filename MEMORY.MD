@@ -101,11 +101,11 @@
 - **Machine:** local
 - **What:** Subtarefa 1.3 concluída — schemas Zod alinhados e cobertura de erros expandida
 - **Testes executados:**
-   - Vitest focal: `src/__tests__/unit/validations/schemas.contract.test.ts` ✅ 22/22
+  - Vitest focal: `src/__tests__/unit/validations/schemas.contract.test.ts` ✅ 22/22
 - **Commits realizados (mais recentes):**
-   - `39c4cbe` refactor: Alinhar schemas Zod com tipos de contrato (auth, courses, exams)
-   - `3b25f55` test: Adicionar testes de contratos para schemas Zod
-   - `088d981` test: Adicionar testes de contratos para schemas Zod
+  - `39c4cbe` refactor: Alinhar schemas Zod com tipos de contrato (auth, courses, exams)
+  - `3b25f55` test: Adicionar testes de contratos para schemas Zod
+  - `088d981` test: Adicionar testes de contratos para schemas Zod
 - **Status:** Story 1.3 concluída; validações de erro cobrindo auth, course, enrollment, exam, file e message
 - **Próxima:** 1.4 (Remover tipos locais duplicados de pages) — READY NOW
 
