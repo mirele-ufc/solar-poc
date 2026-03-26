@@ -8,9 +8,9 @@
 
 # MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
 
-**Última atualização:** 26/03/2026 (1.1 implementada — consolidação de tipos em v1.0)  
+**Última atualização:** 26/03/2026 (1.2 implementada — migração useAuthStore para IUserSession)  
 **Sprint ativo:** Fase 1 — Contratos Canônicos e Tipagem  
-**Status geral:** 19% (8/43 subtarefas)
+**Status geral:** 21% (9/43 subtarefas)
 
 ---
 
@@ -18,13 +18,13 @@
 
 | Campo      | Valor                                              |
 | ---------- | -------------------------------------------------- |
-| **Fase**   | 1 — Contratos Canônicos e Tipagem                  |
-| **Módulo** | 1.1 — Auditar e consolidar tipos em @ava-poc/types |
-| **Story**  | 1.1 — Consolidação de tipos completa               |
+| **Fase**   | 1 — Contratos Canônicos e Tipagem                 |
+| **Módulo** | 1.2 — Migrar useAuthStore para tipos globais      |
+| **Story**  | 1.2 — Migração do store para IUserSession concluída |
 | **Status** | DONE                                               |
-| **Branch** | feature/refactor-types-consolidation               |
+| **Branch** | feature/refactor-contratos-tipagem                 |
 
-**Status:** Fase 1 iniciada, Story 1.1 ✅ DONE, 8/43 total (19%), next: 1.2
+**Status:** Fase 1 em andamento, Story 1.2 ✅ DONE, 9/43 total (21%), next: 1.3
 
 ### ✅ Completes
 
@@ -38,38 +38,34 @@
 | 0.6 | Validar rotas públicas sem guard incorreto      | ✅     | 26/03/2026 | 189c57f                               | —   |
 | 0.7 | HTTP error interceptor + loading + empty states | ✅     | 26/03/2026 | 1aac552 + 3edb2fc + 41cb179 + 4390f75 | —   |
 | 1.1 | Auditar e consolidar tipos em @ava-poc/types    | ✅     | 26/03/2026 | 9bb4021 + 910841e                     | —   |
+| 1.2 | Migrar useAuthStore para tipos globais          | ✅     | 26/03/2026 | 6dfa8ae + 146efd2 + 99f8ba3 + 6a664e6 + d285b57 | —   |
 
 ### 📊 By-Phase Metrics
 
 | Phase     | Complete | Total  | %       | Status             | Start Date | Est. End |
 | --------- | -------- | ------ | ------- | ------------------ | ---------- | -------- |
 | 0         | 7        | 7      | 100%    | ✅ COMPLETA        | 25/03      | 26/03    |
-| 1         | 1        | 6      | 16%     | 🔄 IN_PROGRESS     | 26/03      | —        |
+| 1         | 2        | 6      | 33%     | 🔄 IN_PROGRESS     | 26/03      | —        |
 | 2         | 0        | 7      | 0%      | ⏳ FUTURE          | —          | —        |
 | 3         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
 | 4         | 0        | 7      | 0%      | ⏳ FUTURE          | —          | —        |
 | 5         | 0        | 4      | 0%      | ⏳ FUTURE          | —          | —        |
 | 6         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
-| **TOTAL** | **8**    | **43** | **19%** | **🟢 IN PROGRESS** | 25/03      | —        |
-| 6         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
-| **TOTAL** | **7**    | **43** | **16%** | **🟢 IN PROGRESS** | 25/03      | —        |
+| **TOTAL** | **9**    | **43** | **21%** | **🟢 IN PROGRESS** | 25/03      | —        |
 
 ### ⏳ Next Ready (First 3)
 
-1. **1.2 — Migrar useAuthStore para tipos globais**
-   - Duração: 1 dia
-   - Dependências: 1.1 ✅ completa
-   - Status: ✅ **READY NOW**
-   - Detalhes: `docs/REFACTORING_PLAN_GRANULAR_V2.md` § 1.2
-
-2. **1.3 — [Próxima subtarefa não especificada no plano — confirmar]**
+1. **1.3 — [Próxima subtarefa — verificar docs/REFACTORING_PLAN_GRANULAR_V2.md]**
    - Duração: —
-   - Dependências: 1.2?
+   - Dependências: 1.2 ✅ (em fase de commits)
+   - Status: ⏳ READY APÓS MERGE DE 1.2
+   - Detalhes: Confirmar com documentação
+
+2. **1.4 — [Próxima]**
+   - Duração: —
    - Status: ⏳ FUTURE
-   - Detalhes: Verificar com REFACTORING_PLAN_GRANULAR_V2.md
 
-3. **1.4 — [Próxima]**
-   - Duração: —
+3. **[Próxima fase 2+]**
    - Status: ⏳ FUTURE
 
 ### ⛔ Blockers
