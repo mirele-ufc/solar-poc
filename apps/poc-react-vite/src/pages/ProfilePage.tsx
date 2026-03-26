@@ -147,7 +147,7 @@ export function ProfilePage() {
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result === "string") {
-        updateCurrentUser({ photoUrl: reader.result });
+        updateCurrentUser({ fotoUrl: reader.result });
       }
     };
     reader.readAsDataURL(file);
@@ -340,7 +340,7 @@ export function ProfilePage() {
                   aria-hidden="true"
                   className="font-['Figtree:Bold',sans-serif] font-bold text-[#ffeac4] text-[28px] select-none"
                 >
-                    {initials(currentUser.name)}
+                  {initials(currentUser.name)}
                 </span>
               )}
             </div>

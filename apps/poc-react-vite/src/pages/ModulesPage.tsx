@@ -1149,7 +1149,7 @@ export function ModulesPage() {
       {showMatriculaModal && (
         <DeclaracaoMatriculaModal
           onClose={() => setShowMatriculaModal(false)}
-          studentName={currentUser.name}
+          studentName={currentUser?.nome || ""}
           validationCode={matriculaCode}
           emissionDate={emissionDate}
         />
@@ -1158,7 +1158,7 @@ export function ModulesPage() {
       {showConclusaoModal && (
         <DeclaracaoConclusaoModal
           onClose={() => setShowConclusaoModal(false)}
-          studentName={currentUser.name}
+          studentName={currentUser?.nome || ""}
           validationCode={conclusaoCode}
           emissionDate={emissionDate}
           conclusionDate={emissionDate}
