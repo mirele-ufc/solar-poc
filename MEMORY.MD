@@ -8,23 +8,23 @@
 
 # MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
 
-**Última atualização:** 26/03/2026 (1.2 implementada — migração useAuthStore para IUserSession)  
+**Última atualização:** 2026-03-26T15:36:00Z (1.3 concluída com commits e suíte de erro validada)  
 **Sprint ativo:** Fase 1 — Contratos Canônicos e Tipagem  
-**Status geral:** 21% (9/43 subtarefas)
+**Status geral:** 23% (10/43 subtarefas)
 
 ---
 
 ## SECTION: GLOBAL PROGRESS
 
-| Campo      | Valor                                               |
-| ---------- | --------------------------------------------------- |
-| **Fase**   | 1 — Contratos Canônicos e Tipagem                   |
-| **Módulo** | 1.2 — Migrar useAuthStore para tipos globais        |
-| **Story**  | 1.2 — Migração do store para IUserSession concluída |
-| **Status** | DONE                                                |
-| **Branch** | feature/refactor-contratos-tipagem                  |
+| Campo      | Valor                                           |
+| ---------- | ----------------------------------------------- |
+| **Fase**   | 1 — Contratos Canônicos e Tipagem               |
+| **Módulo** | 1.3 — Centralizar e alinhar schemas Zod         |
+| **Story**  | 1.3 — Schemas alinhados ao contrato e validados |
+| **Status** | DONE                                            |
+| **Branch** | feature/refactor-contratos-tipagem              |
 
-**Status:** Fase 1 em andamento, Story 1.2 ✅ DONE, 9/43 total (21%), next: 1.3
+**Status:** Fase 1 em andamento, Story 1.3 ✅ DONE (local), 10/43 total (23%), next: 1.4
 
 ### ✅ Completes
 
@@ -39,33 +39,35 @@
 | 0.7 | HTTP error interceptor + loading + empty states | ✅     | 26/03/2026 | 1aac552 + 3edb2fc + 41cb179 + 4390f75           | —   |
 | 1.1 | Auditar e consolidar tipos em @ava-poc/types    | ✅     | 26/03/2026 | 9bb4021 + 910841e                               | —   |
 | 1.2 | Migrar useAuthStore para tipos globais          | ✅     | 26/03/2026 | 6dfa8ae + 146efd2 + 99f8ba3 + 6a664e6 + d285b57 | —   |
+| 1.3 | Centralizar e alinhar schemas Zod               | ✅     | 26/03/2026 | 088d981 + 3b25f55 + 39c4cbe                     | —   |
 
 ### 📊 By-Phase Metrics
 
 | Phase     | Complete | Total  | %       | Status             | Start Date | Est. End |
 | --------- | -------- | ------ | ------- | ------------------ | ---------- | -------- |
 | 0         | 7        | 7      | 100%    | ✅ COMPLETA        | 25/03      | 26/03    |
-| 1         | 2        | 6      | 33%     | 🔄 IN_PROGRESS     | 26/03      | —        |
+| 1         | 3        | 6      | 50%     | 🔄 IN_PROGRESS     | 26/03      | —        |
 | 2         | 0        | 7      | 0%      | ⏳ FUTURE          | —          | —        |
 | 3         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
 | 4         | 0        | 7      | 0%      | ⏳ FUTURE          | —          | —        |
 | 5         | 0        | 4      | 0%      | ⏳ FUTURE          | —          | —        |
 | 6         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
-| **TOTAL** | **9**    | **43** | **21%** | **🟢 IN PROGRESS** | 25/03      | —        |
+| **TOTAL** | **10**   | **43** | **23%** | **🟢 IN PROGRESS** | 25/03      | —        |
 
 ### ⏳ Next Ready (First 3)
 
-1. **1.3 — [Próxima subtarefa — verificar docs/REFACTORING_PLAN_GRANULAR_V2.md]**
-   - Duração: —
-   - Dependências: 1.2 ✅ (em fase de commits)
-   - Status: ⏳ READY APÓS MERGE DE 1.2
-   - Detalhes: Confirmar com documentação
+1. **1.4 — Remover tipos locais duplicados de pages**
+   - Duração: 1 dia
+   - Dependências: 1.3 ✅
+   - Status: ⏳ READY NOW
+   - Detalhes: Remover duplicação de tipos locais em pages/components
 
-2. **1.4 — [Próxima]**
-   - Duração: —
-   - Status: ⏳ FUTURE
+2. **1.5 — Validar zero `any` em TypeScript**
+   - Duração: 0.5 dia
+   - Status: ⏳ NEXT
 
-3. **[Próxima fase 2+]**
+3. **1.6 — Refatorar componentes com Slots Pattern**
+   - Duração: 1.5 dias
    - Status: ⏳ FUTURE
 
 ### ⛔ Blockers
@@ -74,7 +76,7 @@
 
 - ✅ Backend: Status desconhecido (validar em `/start-implementation`)
 - ✅ Tests: Vitest pronto para usar
-- ✅ Git: Branch `feature/refactor-auth-guard-global` sincronizada com origin
+- ✅ Git: Branch `feature/refactor-contratos-tipagem` ativa
 - ✅ Documentação: Todas docs em `/docs/` presentes
 
 ---
@@ -95,17 +97,17 @@
 
 ### Last Action
 
-- **Date:** 26/03/2026 16:00 UTC
+- **Date:** 26/03/2026 15:36 UTC
 - **Machine:** local
-- **What:** Subtarefa 1.1 implementada — consolidação de tipos em @ava-poc/types v1.0
+- **What:** Subtarefa 1.3 concluída — schemas Zod alinhados e cobertura de erros expandida
 - **Testes executados:**
-  - Type-check TypeScript: ✅ PASSED (consolidação validada)
-  - Vitest: 27/27 ✅ PASSED
-- **Commits realizados:**
-  - `9bb4021` refactor: Consolidar tipos domain + API em @ava-poc/types v1.0
-  - `910841e` refactor: Resolver inconsistência role e atualizar imports
-- **Status:** Consolidação de tipos concluída; todos os consumidores migrados para @ava-poc/types; imports centralizados; role resolvido (professor/student/admin)
-- **Próxima:** 1.2 (Migrar useAuthStore para tipos globais) — READY NOW
+   - Vitest focal: `src/__tests__/unit/validations/schemas.contract.test.ts` ✅ 22/22
+- **Commits realizados (mais recentes):**
+   - `39c4cbe` refactor: Alinhar schemas Zod com tipos de contrato (auth, courses, exams)
+   - `3b25f55` test: Adicionar testes de contratos para schemas Zod
+   - `088d981` test: Adicionar testes de contratos para schemas Zod
+- **Status:** Story 1.3 concluída; validações de erro cobrindo auth, course, enrollment, exam, file e message
+- **Próxima:** 1.4 (Remover tipos locais duplicados de pages) — READY NOW
 
 ### Observações Contratuais da 0.2
 
@@ -119,8 +121,8 @@ Quando você voltar para continuar:
 # 1. Antes de tudo, validar contexto
 /status-refactoring
 
-# 2. Começar Fase 1.2
-Implemente 1.2 (Migrar useAuthStore para tipos globais)
+# 2. Começar Fase 1.4
+Implemente 1.4 (Remover tipos locais duplicados de pages)
 ```
 
 ### Important Notes
