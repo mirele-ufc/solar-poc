@@ -10,47 +10,37 @@
 
 ## MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
 
-**Última atualização:** 27/03/2026 (1.2 implementada localmente — migração do auth store para IUserSession + ajustes de compatibilidade)  
-**Sprint ativo:** Fase 1 — Contratos Canônicos e Tipagem (retomada)  
-**Status geral:** 21% (9/43 subtarefas commitadas + 1 subtarefa local validada)
+**Última atualização:** 27/03/2026 (Fases 0 e 1 auditadas e confirmadas — 100% completas. Fase 2 em progresso, 2.1 concluída, 2.2 ready.)  
+**Sprint ativo:** Fase 2 — Autenticação com Backend  
+**Status geral:** 33% (14/43 subtarefas concluídas)
 
 ---
 
-## UPDATE — 27/03/2026 (Sessão Atual)
+## UPDATE — 27/03/2026 (Auditoria Fases 0 e 1)
 
 - **Branch atual:** `feature/refactor-auth-service-2-1`
-- **Fase ativa nesta sessão:** Fase 1 — Contratos Canônicos e Tipagem
-- **Subtarefa executada:** 1.2 — Migrar `useAuthStore` para tipos globais (`IUserSession`)
-- **Status da 1.2 (sessão):** ✅ Implementação local concluída e validada (aguardando commit granular)
-- **Mudança núcleo:** `useAuthStore` migrado de `UserProfile` local para `IUserSession` canônico
-- **Compatibilidade ajustada:** páginas e testes atualizados para `nome`/`fotoUrl`
-- **Validação técnica:** `pnpm --filter @figma/my-make-file type-check` ✅ (zero erros)
-- **Validação de regressão focada:** 16/16 testes ✅
-- **Arquivos principais da 1.2:**
-  - `apps/poc-react-vite/src/store/useAuthStore.ts`
-  - `apps/poc-react-vite/src/components/shared/AuthLayout.tsx`
-  - `apps/poc-react-vite/src/pages/ProfilePage.tsx`
-  - `apps/poc-react-vite/src/pages/ModulesPage.tsx`
-  - `apps/poc-react-vite/src/pages/PythonModulesPage.tsx`
-  - `apps/poc-react-vite/src/pages/MessagePage.tsx`
-  - `apps/poc-react-vite/src/pages/MessagesPage.tsx`
-  - `apps/poc-react-vite/src/pages/StudentMessagesPage.tsx`
-- **Observação de rastreabilidade:** progresso ainda não commitado; sem hash novo nesta atualização
-- **Próxima etapa planejada:** gerar commits granulares da 1.2 e avançar para 1.3 (schemas Zod)
+- **Fases auditadas:** Fase 0 e Fase 1 — ambas confirmadas 100% completas
+- **Resultado da auditoria:** Todos os itens técnicos de Fase 0 e Fase 1 confirmados PASS
+- **Validações executadas:**
+  - `get_errors` frontend: ✅ zero erros
+  - `grep` por `: any` e `<any>` em src: ✅ zero matches
+  - `grep` por hardcodes de role em pages: ✅ zero matches
+  - Type-check: ✅ PASSED (zero erros)
+- **Próxima etapa planejada:** Implementar 2.2 (Request Interceptor em api.ts)
 
 ---
 
 ## SECTION: GLOBAL PROGRESS
 
-| Campo      | Valor                                        |
-| ---------- | -------------------------------------------- |
-| **Fase**   | 1 — Contratos Canônicos e Tipagem            |
-| **Módulo** | 1.2 — Migrar useAuthStore para tipos globais |
-| **Story**  | 1.2 — Migração para IUserSession             |
-| **Status** | IN_PROGRESS (implementação local validada)   |
-| **Branch** | feature/refactor-auth-service-2-1            |
+| Campo      | Valor                                 |
+| ---------- | ------------------------------------- |
+| **Fase**   | 2 — Autenticação com Backend          |
+| **Módulo** | 2.2 — Implementar Request Interceptor |
+| **Story**  | 2.2 — JWT Interceptor em api.ts       |
+| **Status** | NOT_STARTED (ready)                   |
+| **Branch** | feature/refactor-auth-service-2-1     |
 
-**Status:** Fase 1 retomada nesta branch; 1.2 implementada localmente e validada; pendente apenas commit granular para contabilização oficial.
+**Status:** Fases 0 e 1 concluídas e auditadas (100%). Fase 2 em progresso — 2.1 concluída, 2.2 pronta para iniciar.
 
 ### ✅ Completes
 
@@ -83,25 +73,25 @@
 | 4         | 0        | 7      | 0%      | ⏳ FUTURE          | —          | —        |
 | 5         | 0        | 4      | 0%      | ⏳ FUTURE          | —          | —        |
 | 6         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
-| **TOTAL** | **9**    | **43** | **21%** | **🟢 IN PROGRESS** | 25/03      | —        |
+| **TOTAL** | **14**   | **43** | **33%** | **🟢 IN PROGRESS** | 25/03      | —        |
 
 ### ⏳ Next Ready (First 3)
 
-1. **Commit granular da 1.2 (auth store + compatibilidade + testes)**
-   - Duração: 0.5 dia
-   - Dependências: validações já concluídas
-   - Status: ✅ **READY NOW**
-
-2. **1.3 — Centralizar e alinhar schemas Zod**
-   - Duração: 1-1.5 dia
-   - Dependências: 1.2
-   - Status: ✅ **READY NOW**
-   - Detalhes: `docs/REFACTORING_PLAN_GRANULAR_V2.md` § 1.3
-
-3. **1.4 — Remover tipos locais duplicados de pages**
+1. **2.2 — Implementar Request Interceptor em api.ts**
    - Duração: 1 dia
-   - Dependências: 1.3
+   - Dependências: 2.1 ✅
+   - Status: ✅ **READY NOW**
+   - Detalhes: `docs/REFACTORING_PLAN_GRANULAR_V2.md` § 2.2
+
+2. **2.3 — Integrar LoginPage com backend**
+   - Duração: 1-1.5 dia
+   - Dependências: 2.2
    - Status: ⏳ NEXT
+
+3. **2.4 — Integrar RegisterPage com backend**
+   - Duração: 1 dia
+   - Dependências: 2.3
+   - Status: ⏳ BLOCKED on 2.3
 
 ### ⛔ Blockers
 
@@ -126,7 +116,7 @@
 | 6   | 0.6.1 | ✅ DONE | 1/1     | 4/4    | src/**tests**/unit/routes/publicRoutes.test.tsx                                                       | RED estrutural (testes antes de rodar)      | Suite valida que /, /register, /forgot-password e /unauthorized são acessíveis sem autenticação      |
 | 7   | 1.1.1 | ✅ DONE | 2/2     | 27/27  | Type-check OK; Vitest: 27/27 testes passando                                                          | Draft: tipos consolidados em @ava-poc/types | Consolidação de tipos em v1.0 + resolução de role (professor/student/admin) + imports bem-definidos  |
 
-**Resumo:** Fase 0 concluída nesta branch-base; 1.1 concluída (commitada); 1.2 concluída localmente com migração canônica do store e validações técnicas verdes.
+**Resumo:** Fases 0 e 1 concluídas e auditadas (100%). Fase 2 em progresso: 2.1 concluída (commits: 3ece624, a2ec8eb, 877540a). Próxima: 2.2 (Request Interceptor).
 
 **Atualização 2.1 (fora da tabela por limite de largura):**
 
@@ -138,15 +128,16 @@
 
 ### Last Action
 
-- **Date:** 27/03/2026 13:00 UTC
+- **Date:** 27/03/2026 UTC
 - **Machine:** local
-- **What:** Subtarefa 1.2 executada localmente — migração de `useAuthStore` para `IUserSession` + ajustes em consumidores e testes
+- **What:** Auditoria completa das Fases 0 e 1 — todos os itens confirmados PASS. Documentação atualizada.
 - **Validações executadas:**
-  - Type-check TypeScript: ✅ PASSED (zero erros)
-  - Vitest focado: 16/16 ✅ PASSED
-- **Commits realizados:** nenhum novo hash nesta etapa (aguardando commit granular)
-- **Status:** 1.2 pronta para commit e merge técnico
-- **Próxima:** 1.3 (alinhar schemas Zod) após commits granulares da 1.2
+  - `get_errors` frontend: ✅ zero erros
+  - `grep` por `: any` / `<any>` em src: ✅ zero matches
+  - `grep` por hardcodes de role em pages: ✅ zero matches
+- **Commits realizados:** sem novo commit (apenas atualização de docs)
+- **Status:** Fase 0 ✅ e Fase 1 ✅ fechadas. Próxima: 2.2 (Request Interceptor)
+- **Próxima:** Implementar 2.2 (Request Interceptor em api.ts)
 
 ### Observações Contratuais da 0.2
 

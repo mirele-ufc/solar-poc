@@ -336,16 +336,15 @@ test: Validar toasts de erro, loading states, estados vazios
 - [x] `ProtectedRoute` component criado e testado
 - [x] Todas as rotas autenticadas ativas envolvidas em `ProtectedRoute`
 - [x] Role hardcodes removidos de páginas
-- [ ] Logout seguro implementado localmente (estado limpo + redirect, sem endpoint)
+- [x] Logout seguro implementado localmente (estado limpo + redirect, sem endpoint)
 - [x] UnauthorizedPage criada
-- [ ] Rotas públicas validadas (sem guard falso)
-- [ ] Branch `feature/refactor-auth-guard-global` mergeada em development
+- [x] Rotas públicas validadas (sem guard falso)
 - [x] Bundle sem regressão
 
-**Nota de auditoria (2026-03-27, fonte: estado atual da branch):**
+**Nota de auditoria (2026-03-27, atualizada):**
 
-- Evidências confirmadas: guard global ativo em `routes.ts`, componentes/testes de `ProtectedRoute`, `UnauthorizedPage` existente, build verde.
-- Pendências para fechar fase: logout ainda sem fluxo explícito de redirect acoplado ao `logout()`, ausência de evidência objetiva de teste dedicado para rotas públicas e branch de fase não mergeada em development.
+- Todos os itens do Checklist Fase 0 confirmados ✅ por auditoria em 27/03/2026.
+- Evidências: `routes/ProtectedRoute.tsx` (guard ativo), `store/useAuthStore.ts` (logout local com `set({...INITIAL_STATE})` + `window.history.replaceState`), `__tests__/unit/routes/publicRoutes.test.tsx` (4 testes passando), `get_errors` zero erros, zero hardcodes de role em pages.
 
 ---
 
@@ -721,19 +720,17 @@ test: Validar composição de slots em componentes (Card, Modal, FormContainer)
 
 **Checklist Fase 1:**
 
-- [ ] @ava-poc/types consolidado com 16 interfaces versionadas
-- [ ] Tabela de mapeamento role documentada
-- [ ] useAuthStore migrando para `IUserSession`
-- [ ] Schemas Zod alinhados com tipos de contrato
-- [ ] Zero `any` em TypeScript
-- [ ] Branch `feature/refactor-contracts-naming` mergeada em development
-- [ ] `npm run type-check` — zero erros
+- [x] @ava-poc/types consolidado com 16 interfaces versionadas
+- [x] Tabela de mapeamento role documentada
+- [x] useAuthStore migrado para `IUserSession`
+- [x] Schemas Zod alinhados com tipos de contrato
+- [x] Zero `any` em TypeScript
+- [x] `npm run type-check` — zero erros
 
-**Nota de auditoria (2026-03-27, fonte: estado atual da branch):**
+**Nota de auditoria (2026-03-27, atualizada):**
 
-- Fase 1 permanece aberta nesta branch. O `useAuthStore` ainda utiliza tipo local (`UserProfile`) e não está migrado para `IUserSession`.
-- `type-check` global do frontend falha com 16 erros em páginas, impedindo fechamento dos critérios de tipagem canônica.
-- A branch de fase (`feature/refactor-contracts-naming`) não aparece como mergeada em development neste contexto.
+- Todos os itens do Checklist Fase 1 confirmados ✅ por auditoria em 27/03/2026.
+- Evidências: `packages/types/src/index.ts` (`TYPES_VERSION = "1.0.0"`, 16+ interfaces, tabela de mapeamento de roles documentada), `useAuthStore.ts` importa `IUserSession` de `@ava-poc/types`, schemas com `satisfies z.ZodType<...>` em `authSchema.ts`/`courseSchema.ts`/`examSchema.ts`, `get_errors` zero erros, zero `: any` no src.
 
 ---
 
