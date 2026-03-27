@@ -6,25 +6,49 @@
 
 ---
 
-# MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
+## MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
 
-**Última atualização:** 26/03/2026 (1.1 implementada — consolidação de tipos em v1.0)  
-**Sprint ativo:** Fase 1 — Contratos Canônicos e Tipagem  
-**Status geral:** 19% (8/43 subtarefas)
+**Última atualização:** 27/03/2026 (1.2 implementada localmente — migração do auth store para IUserSession + ajustes de compatibilidade)  
+**Sprint ativo:** Fase 1 — Contratos Canônicos e Tipagem (retomada)  
+**Status geral:** 21% (9/43 subtarefas commitadas + 1 subtarefa local validada)
+
+---
+
+## UPDATE — 27/03/2026 (Sessão Atual)
+
+- **Branch atual:** `feature/refactor-auth-service-2-1`
+- **Fase ativa nesta sessão:** Fase 1 — Contratos Canônicos e Tipagem
+- **Subtarefa executada:** 1.2 — Migrar `useAuthStore` para tipos globais (`IUserSession`)
+- **Status da 1.2 (sessão):** ✅ Implementação local concluída e validada (aguardando commit granular)
+- **Mudança núcleo:** `useAuthStore` migrado de `UserProfile` local para `IUserSession` canônico
+- **Compatibilidade ajustada:** páginas e testes atualizados para `nome`/`fotoUrl`
+- **Validação técnica:** `pnpm --filter @figma/my-make-file type-check` ✅ (zero erros)
+- **Validação de regressão focada:** 16/16 testes ✅
+- **Arquivos principais da 1.2:**
+  - `apps/poc-react-vite/src/store/useAuthStore.ts`
+  - `apps/poc-react-vite/src/components/shared/AuthLayout.tsx`
+  - `apps/poc-react-vite/src/pages/ProfilePage.tsx`
+  - `apps/poc-react-vite/src/pages/ModulesPage.tsx`
+  - `apps/poc-react-vite/src/pages/PythonModulesPage.tsx`
+  - `apps/poc-react-vite/src/pages/MessagePage.tsx`
+  - `apps/poc-react-vite/src/pages/MessagesPage.tsx`
+  - `apps/poc-react-vite/src/pages/StudentMessagesPage.tsx`
+- **Observação de rastreabilidade:** progresso ainda não commitado; sem hash novo nesta atualização
+- **Próxima etapa planejada:** gerar commits granulares da 1.2 e avançar para 1.3 (schemas Zod)
 
 ---
 
 ## SECTION: GLOBAL PROGRESS
 
-| Campo      | Valor                                              |
-| ---------- | -------------------------------------------------- |
-| **Fase**   | 1 — Contratos Canônicos e Tipagem                  |
-| **Módulo** | 1.1 — Auditar e consolidar tipos em @ava-poc/types |
-| **Story**  | 1.1 — Consolidação de tipos completa               |
-| **Status** | DONE                                               |
-| **Branch** | feature/refactor-types-consolidation               |
+| Campo      | Valor                                        |
+| ---------- | -------------------------------------------- |
+| **Fase**   | 1 — Contratos Canônicos e Tipagem            |
+| **Módulo** | 1.2 — Migrar useAuthStore para tipos globais |
+| **Story**  | 1.2 — Migração para IUserSession             |
+| **Status** | IN_PROGRESS (implementação local validada)   |
+| **Branch** | feature/refactor-auth-service-2-1            |
 
-**Status:** Fase 1 iniciada, Story 1.1 ✅ DONE, 8/43 total (19%), next: 1.2
+**Status:** Fase 1 retomada nesta branch; 1.2 implementada localmente e validada; pendente apenas commit granular para contabilização oficial.
 
 ### ✅ Completes
 
@@ -39,46 +63,46 @@
 | 0.7 | HTTP error interceptor + loading + empty states | ✅     | 26/03/2026 | 1aac552 + 3edb2fc + 41cb179 + 4390f75 | —   |
 | 1.1 | Auditar e consolidar tipos em @ava-poc/types    | ✅     | 26/03/2026 | 9bb4021 + 910841e                     | —   |
 
+- **Completa recente:** 2.1 — authService endpoints (Auth/Perfil) ✅ (commits: `3ece624`, `a2ec8eb`, `877540a`)
+
 ### 📊 By-Phase Metrics
 
 | Phase     | Complete | Total  | %       | Status             | Start Date | Est. End |
 | --------- | -------- | ------ | ------- | ------------------ | ---------- | -------- |
 | 0         | 7        | 7      | 100%    | ✅ COMPLETA        | 25/03      | 26/03    |
 | 1         | 1        | 6      | 16%     | 🔄 IN_PROGRESS     | 26/03      | —        |
-| 2         | 0        | 7      | 0%      | ⏳ FUTURE          | —          | —        |
+| 2         | 1        | 7      | 14%     | 🔄 IN_PROGRESS     | 27/03      | —        |
 | 3         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
 | 4         | 0        | 7      | 0%      | ⏳ FUTURE          | —          | —        |
 | 5         | 0        | 4      | 0%      | ⏳ FUTURE          | —          | —        |
 | 6         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
-| **TOTAL** | **8**    | **43** | **19%** | **🟢 IN PROGRESS** | 25/03      | —        |
-| 6         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
-| **TOTAL** | **7**    | **43** | **16%** | **🟢 IN PROGRESS** | 25/03      | —        |
+| **TOTAL** | **9**    | **43** | **21%** | **🟢 IN PROGRESS** | 25/03      | —        |
 
 ### ⏳ Next Ready (First 3)
 
-1. **1.2 — Migrar useAuthStore para tipos globais**
-   - Duração: 1 dia
-   - Dependências: 1.1 ✅ completa
+1. **Commit granular da 1.2 (auth store + compatibilidade + testes)**
+   - Duração: 0.5 dia
+   - Dependências: validações já concluídas
    - Status: ✅ **READY NOW**
-   - Detalhes: `docs/REFACTORING_PLAN_GRANULAR_V2.md` § 1.2
 
-2. **1.3 — [Próxima subtarefa não especificada no plano — confirmar]**
-   - Duração: —
-   - Dependências: 1.2?
-   - Status: ⏳ FUTURE
-   - Detalhes: Verificar com REFACTORING_PLAN_GRANULAR_V2.md
+2. **1.3 — Centralizar e alinhar schemas Zod**
+   - Duração: 1-1.5 dia
+   - Dependências: 1.2
+   - Status: ✅ **READY NOW**
+   - Detalhes: `docs/REFACTORING_PLAN_GRANULAR_V2.md` § 1.3
 
-3. **1.4 — [Próxima]**
-   - Duração: —
-   - Status: ⏳ FUTURE
+3. **1.4 — Remover tipos locais duplicados de pages**
+   - Duração: 1 dia
+   - Dependências: 1.3
+   - Status: ⏳ NEXT
 
 ### ⛔ Blockers
 
 ❌ **Nenhum blocker detectado.**
 
-- ✅ Backend: Status desconhecido (validar em `/start-implementation`)
+- ✅ Backend: aguardando ambiente local completo (Docker em instalação)
 - ✅ Tests: Vitest pronto para usar
-- ✅ Git: Branch `feature/refactor-auth-guard-global` sincronizada com origin
+- ✅ Git: Branch `feature/refactor-auth-service-2-1` ativa
 - ✅ Documentação: Todas docs em `/docs/` presentes
 
 ---
@@ -95,21 +119,27 @@
 | 6   | 0.6.1 | ✅ DONE | 1/1     | 4/4    | src/**tests**/unit/routes/publicRoutes.test.tsx                                                       | RED estrutural (testes antes de rodar)      | Suite valida que /, /register, /forgot-password e /unauthorized são acessíveis sem autenticação      |
 | 7   | 1.1.1 | ✅ DONE | 2/2     | 27/27  | Type-check OK; Vitest: 27/27 testes passando                                                          | Draft: tipos consolidados em @ava-poc/types | Consolidação de tipos em v1.0 + resolução de role (professor/student/admin) + imports bem-definidos  |
 
-**Resumo:** 7/7 stories Fase 0 + 1/1 story Fase 1.1, Total 8/8 commits, 27/27 testes focados passando
+**Resumo:** Fase 0 concluída nesta branch-base; 1.1 concluída (commitada); 1.2 concluída localmente com migração canônica do store e validações técnicas verdes.
+
+**Atualização 2.1 (fora da tabela por limite de largura):**
+
+- Story: 2.1.1
+- Status: ✅ DONE
+- Commits: 3/3 (`3ece624`, `a2ec8eb`, `877540a`)
+- Testes: 19/19
+- Evidência: `src/__tests__/unit/services/authService.test.ts` e `src/__tests__/unit/services/api.interceptor.test.ts`
 
 ### Last Action
 
-- **Date:** 26/03/2026 16:00 UTC
+- **Date:** 27/03/2026 13:00 UTC
 - **Machine:** local
-- **What:** Subtarefa 1.1 implementada — consolidação de tipos em @ava-poc/types v1.0
-- **Testes executados:**
-  - Type-check TypeScript: ✅ PASSED (consolidação validada)
-  - Vitest: 27/27 ✅ PASSED
-- **Commits realizados:**
-  - `9bb4021` refactor: Consolidar tipos domain + API em @ava-poc/types v1.0
-  - `910841e` refactor: Resolver inconsistência role e atualizar imports
-- **Status:** Consolidação de tipos concluída; todos os consumidores migrados para @ava-poc/types; imports centralizados; role resolvido (professor/student/admin)
-- **Próxima:** 1.2 (Migrar useAuthStore para tipos globais) — READY NOW
+- **What:** Subtarefa 1.2 executada localmente — migração de `useAuthStore` para `IUserSession` + ajustes em consumidores e testes
+- **Validações executadas:**
+  - Type-check TypeScript: ✅ PASSED (zero erros)
+  - Vitest focado: 16/16 ✅ PASSED
+- **Commits realizados:** nenhum novo hash nesta etapa (aguardando commit granular)
+- **Status:** 1.2 pronta para commit e merge técnico
+- **Próxima:** 1.3 (alinhar schemas Zod) após commits granulares da 1.2
 
 ### Observações Contratuais da 0.2
 
@@ -123,8 +153,8 @@ Quando você voltar para continuar:
 # 1. Antes de tudo, validar contexto
 /status-refactoring
 
-# 2. Começar Fase 1.2
-Implemente 1.2 (Migrar useAuthStore para tipos globais)
+# 2. Começar Fase 2.2
+Implemente 2.2 (Implementar Request Interceptor em api.ts)
 ```
 
 ### Important Notes
@@ -211,14 +241,14 @@ _Será atualizada conforme velocidade real for estabelecida._
 
 ## QUICK REFERENCE
 
-| Ação                            | Comando                                      |
-| ------------------------------- | -------------------------------------------- |
-| Ver status atual                | `/status-refactoring`                        |
-| Começar implementação           | `Implemente 0.4 (Implementar logout seguro)` |
-| Ver contexto                    | Ler este arquivo: **MEMORY.md**              |
-| Consultar detalhes da subtarefa | `docs/REFACTORING_PLAN_GRANULAR_V2.md`       |
-| Validar contexto todo           | `/start-implementation`                      |
-| Ler guia completo               | `docs/COMO_COMECAR.md`                       |
+| Ação                            | Comando                                |
+| ------------------------------- | -------------------------------------- |
+| Ver status atual                | `/status-refactoring`                  |
+| Começar implementação           | `Implemente 2.2`                       |
+| Ver contexto                    | Ler este arquivo: **MEMORY.md**        |
+| Consultar detalhes da subtarefa | `docs/REFACTORING_PLAN_GRANULAR_V2.md` |
+| Validar contexto todo           | `/start-implementation`                |
+| Ler guia completo               | `docs/COMO_COMECAR.md`                 |
 
 ---
 
@@ -236,27 +266,17 @@ _Será atualizada conforme velocidade real for estabelecida._
 
 ## 📝 Arquivos em Edição
 
-- [ ] `src/.../.../file1.tsx`
-- [ ] `src/__tests__/.../file1.test.tsx`
-- [ ] `src/.../.../file2.tsx`
-
-**Status de cada um:**
-
-- file1.tsx: [descrição do estado — 80% escrito, faltam testes]
-- file1.test.tsx: [estado — RED, 2 testes falhando]
-- file2.tsx: [estado — TODO]
+- [x] `apps/poc-react-vite/src/__tests__/unit/services/authService.test.ts` (committed)
+- [x] `apps/poc-react-vite/src/services/authService.ts` (committed)
+- [x] `apps/poc-react-vite/src/services/types/authService.types.ts` (committed)
+- [ ] `MEMORY.MD` (atualização desta sessão, não commitada)
+- [ ] `backend/` (untracked, fora do escopo)
 
 ---
 
 ## 🚦 Bloqueadores
 
-**Nenhum registrado**
-
-Ou:
-
-| Bloqueador  | Impacto               | Solução           |
-| ----------- | --------------------- | ----------------- |
-| [descrição] | [qual story bloqueia] | [ação necessária] |
+Nenhum blocker técnico para continuar 2.2 no frontend.
 
 ---
 
@@ -266,7 +286,8 @@ Ou:
 - **MSW mock:** API mocking funciona corretamente, não precisa ajuste
 - **TypeScript:** strict mode — validar interface de store
 - **Padrão TDD:** Aprovado, seguir AAA (Arrange, Act, Assert)
-- **Commits:** Graph de commits em bom estado, merge pronto para development
+- **Commits:** 2.1 concluída com sequência granular test → feat → refactor
+- **Próximo foco:** 2.2 response/request interceptor com refresh token automático
 
 ---
 
@@ -327,6 +348,6 @@ Quando finalizar story, verificar:
 
 ---
 
-**Última atualização:** [vazio — preencher ao usar]  
-**Status:** [vazio — preencher ao usar]  
-**Sessão ativa:** SIM / NÃO
+**Última atualização:** 27/03/2026  
+**Status:** Fase 2.1 concluída, 2.2 ready  
+**Sessão ativa:** SIM
