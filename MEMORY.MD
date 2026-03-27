@@ -10,9 +10,9 @@
 
 ## MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
 
-**Última atualização:** 27/03/2026 (Fases 0 e 1 auditadas e confirmadas — 100% completas. Fase 2 em progresso, 2.1 concluída, 2.2 ready.)  
+**Última atualização:** 27/03/2026 19:32 (2.2 ✅ completa, 15/43 = 35%, Fase 2 em progresso)  
 **Sprint ativo:** Fase 2 — Autenticação com Backend  
-**Status geral:** 33% (14/43 subtarefas concluídas)
+**Status geral:** 35% (15/43 subtarefas concluídas)
 
 ---
 
@@ -59,8 +59,8 @@
 | 1.4 | Remover tipos locais duplicados de pages        | ✅     | 26/03/2026 | f0e773e                                                   | —   |
 | 1.5 | Validar zero `any` em TypeScript                | ✅     | 26/03/2026 | 324708d + 7822e32                                         | —   |
 | 1.6 | Refatorar componentes com Slots Pattern         | ✅     | 27/03/2026 | `0080137` + `9090c6a` + `4ecc3d7` + `b24fbb4` + `32558a8` | —   |
-
-- **Completa recente:** 2.1 — authService endpoints (Auth/Perfil) ✅ (commits: `3ece624`, `a2ec8eb`, `877540a`)
+| 2.1 | authService endpoints (Auth/Perfil)            | ✅     | 27/03/2026 | `3ece624` + `a2ec8eb` + `877540a`                        | —   |
+| 2.2 | Implementar Request Interceptor em api.ts       | ✅     | 27/03/2026 | `0ae5cf1` + `cb93963` + `2279807`                        | —   |
 
 ### 📊 By-Phase Metrics
 
@@ -68,30 +68,30 @@
 | --------- | -------- | ------ | ------- | ------------------ | ---------- | -------- |
 | 0         | 7        | 7      | 100%    | ✅ COMPLETA        | 25/03      | 26/03    |
 | 1         | 6        | 6      | 100%    | ✅ COMPLETA        | 26/03      | 27/03    |
-| 2         | 1        | 7      | 14%     | 🔄 IN_PROGRESS     | 27/03      | —        |
+| 2         | 2        | 7      | 29%     | 🔄 IN_PROGRESS     | 27/03      | —        |
 | 3         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
 | 4         | 0        | 7      | 0%      | ⏳ FUTURE          | —          | —        |
 | 5         | 0        | 4      | 0%      | ⏳ FUTURE          | —          | —        |
 | 6         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
-| **TOTAL** | **14**   | **43** | **33%** | **🟢 IN PROGRESS** | 25/03      | —        |
+| **TOTAL** | **15**   | **43** | **35%** | **🟢 IN PROGRESS** | 25/03      | —        |
 
 ### ⏳ Next Ready (First 3)
 
-1. **2.2 — Implementar Request Interceptor em api.ts**
-   - Duração: 1 dia
-   - Dependências: 2.1 ✅
-   - Status: ✅ **READY NOW**
-   - Detalhes: `docs/REFACTORING_PLAN_GRANULAR_V2.md` § 2.2
-
-2. **2.3 — Integrar LoginPage com backend**
+1. **2.3 — Integrar LoginPage com backend**
    - Duração: 1-1.5 dia
-   - Dependências: 2.2
-   - Status: ⏳ NEXT
+   - Dependências: 2.2 ✅
+   - Status: ✅ **READY NOW**
+   - Detalhes: `docs/REFACTORING_PLAN_GRANULAR_V2.md` § 2.3
 
-3. **2.4 — Integrar RegisterPage com backend**
+2. **2.4 — Integrar RegisterPage com backend**
    - Duração: 1 dia
    - Dependências: 2.3
-   - Status: ⏳ BLOCKED on 2.3
+   - Status: ⏳ NEXT
+
+3. **2.5 — Implementar refresh token flow**
+   - Duração: 1 dia
+   - Dependências: 2.3, 2.4
+   - Status: ⏳ BLOCKED on 2.4
 
 ### ⛔ Blockers
 
@@ -128,16 +128,21 @@
 
 ### Last Action
 
-- **Date:** 27/03/2026 UTC
+- **Date:** 27/03/2026 UTC 19:32
 - **Machine:** local
-- **What:** Auditoria completa das Fases 0 e 1 — todos os itens confirmados PASS. Documentação atualizada.
-- **Validações executadas:**
-  - `get_errors` frontend: ✅ zero erros
-  - `grep` por `: any` / `<any>` em src: ✅ zero matches
-  - `grep` por hardcodes de role em pages: ✅ zero matches
-- **Commits realizados:** sem novo commit (apenas atualização de docs)
-- **Status:** Fase 0 ✅ e Fase 1 ✅ fechadas. Próxima: 2.2 (Request Interceptor)
-- **Próxima:** Implementar 2.2 (Request Interceptor em api.ts)
+- **What:** Implementar 2.2 (Request Interceptor em api.ts) — concluída com êxito
+  - Adicionado campos `token` e `refreshToken` em useAuthStore
+  - Implementado request interceptor que injeta `Authorization: Bearer <token>` em requisições
+  - 3 commits granulares: test, refactor (impl), refactor (types)
+  - 4/4 testes passando ✅
+  - Type-check: zero erros ✅
+  - Build: sucesso ✅
+- **Commits realizados:**
+  - `0ae5cf1` — test: Adicionar testes para request interceptor JWT
+  - `cb93963` — refactor: Implementar request interceptor para injetar JWT em headers
+  - `2279807` — refactor: Corrigir tipos TypeScript em testes de request interceptor
+- **Status:** 2.2 ✅ COMPLETA. Fase 2 agora em 2/7 (29%). Total: 15/43 (35%)
+- **Próxima:** 2.3 (Integrar LoginPage com backend) — READY NOW
 
 ### Observações Contratuais da 0.2
 
