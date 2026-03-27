@@ -111,7 +111,7 @@ export function ForgotPasswordPage() {
               </label>
               <div
                 className={`bg-white h-[60px] w-full rounded-[12px] relative ${
-                  showErrors && !email.trim()
+                  showErrors && !form.email.trim()
                     ? "border-2 border-[#c0392b]"
                     : "border border-[#5f5f5f]"
                 }`}

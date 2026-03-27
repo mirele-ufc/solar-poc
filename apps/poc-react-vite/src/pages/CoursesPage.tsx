@@ -21,17 +21,6 @@ const COURSE_IMAGES: Record<string, string> = {
 const FALLBACK =
   "https://images.unsplash.com/photo-1762330910399-95caa55acf04?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400";
 
-// ── SVG paths ─────────────────────────────────────────────────────────────────
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const editPath =
-  "M3 17.25V21H6.75L17.81 9.94L14.06 6.19L3 17.25ZM20.71 7.04C21.1 6.65 21.1 6.02 20.71 5.63L18.37 3.29C17.98 2.9 17.35 2.9 16.96 3.29L15.13 5.12L18.88 8.87L20.71 7.04Z";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const chartPath =
-  "M9 17H7V10H9V17ZM13 17H11V7H13V17ZM17 17H15V13H17V17ZM19 19H5V5H19V19ZM19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3Z";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const closeSm =
-  "M10.657 12.071L5 6.414L6.414 5L12.071 10.657L17.728 5L19.142 6.414L13.485 12.071L19.142 17.728L17.728 19.142L12.071 13.485L6.414 19.142L5 17.728L10.657 12.071Z";
-
 // ── Card ──────────────────────────────────────────────────────────────────────
 type CourseCardProps = {
   id: string;
@@ -152,17 +141,6 @@ function CourseGrid({
     </div>
   );
 }
-
-// ── Professor course menu (future feature) ─────────────────────────────────
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-type ProfessorCourseMenuProps = {
-  onEdit: () => void;
-  onViewResponses: () => void;
-  onClose: () => void;
-};
-
-// FUTURE FEATURE: Professor course context menu
-// TODO: Implement when professor course editing features are ready
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export function CoursesPage() {

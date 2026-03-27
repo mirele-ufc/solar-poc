@@ -19,23 +19,6 @@ const bullets = [
   "Publicação e compartilhamento de relatórios no Power BI Service",
 ];
 
-// TODO: Use these constants when rendering course details UI
-// @future: implement course details section with target audience and prerequisites info
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const courseDetailsData = {
-  publicTarget: [
-    "Profissionais de diversas áreas que trabalham com análise de dados",
-    "Estudantes e recém-formados interessados em Business Intelligence",
-    "Gestores que desejam tomar decisões baseadas em dados",
-    "Analistas que buscam aprimorar suas habilidades em visualização de dados",
-  ],
-  prerequisites: [
-    "Conhecimentos básicos de informática e navegação na web",
-    "Familiaridade com planilhas eletrônicas (Excel ou similar)",
-    "Não é necessário conhecimento prévio em programação",
-  ],
-};
-
 export function CourseDetailPage() {
   const navigate = useNavigate();
   const { isEnrolledInCourse, unenrollFromCourse } = useCourseStore();
