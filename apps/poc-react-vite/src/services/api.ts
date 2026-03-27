@@ -65,16 +65,18 @@ apiClient.interceptors.response.use(
 );
 
 /**
- * Request interceptor for future enhancements
- * Can be used to add authorization headers, request tracking, etc.
+ * Request interceptor for JWT authentication
+ * Injects Authorization header with JWT token on every authenticated request
+ * - Retrieves current token from Zustand store at request time
+ * - If token exists: adds `Authorization: Bearer <token>` header
+ * - If token is null/undefined: skips (allows public requests)
  */
 apiClient.interceptors.request.use(
   (config) => {
-    // Example: Add custom headers if needed
-    // const token = getAuthToken(); // This should come from a secure context
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    const token = useAuthStore.getState().token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {

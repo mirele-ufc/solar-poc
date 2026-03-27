@@ -19,11 +19,14 @@ interface AuthStore {
   currentUser: IUserSession | null;
   sentMessages: SentMessage[];
   isLoggedIn: boolean;
+  token: string | null;
+  refreshToken: string | null;
 
   // Actions
   login: (username: string, password: string) => boolean;
   logout: () => void;
   updateCurrentUser: (partial: Partial<IUserSession>) => void;
+  setTokens: (token: string | null, refreshToken?: string | null) => void;
   sendMessage: (msg: Omit<SentMessage, "id" | "sentAt">) => void;
 }
 
@@ -72,11 +75,13 @@ const CREDENTIALS: Record<string, { password: string; profile: IUserSession }> =
 
 const INITIAL_STATE: Pick<
   AuthStore,
-  "currentUser" | "isLoggedIn" | "sentMessages"
+  "currentUser" | "isLoggedIn" | "sentMessages" | "token" | "refreshToken"
 > = {
   currentUser: null,
   isLoggedIn: false,
   sentMessages: [],
+  token: null,
+  refreshToken: null,
 };
 
 /**
@@ -146,6 +151,20 @@ export const useAuthStore = create<AuthStore>((set) => ({
         ? { ...state.currentUser, ...partial }
         : null,
     }));
+  },
+
+  /**
+   * Set JWT tokens for authenticated requests
+   * Stores access token and optional refresh token in state
+   *
+   * @param token - JWT access token from backend
+   * @param refreshToken - Optional refresh token for token renewal
+   */
+  setTokens: (token: string | null, refreshToken?: string | null) => {
+    set({
+      token,
+      refreshToken: refreshToken ?? null,
+    });
   },
 
   /**
