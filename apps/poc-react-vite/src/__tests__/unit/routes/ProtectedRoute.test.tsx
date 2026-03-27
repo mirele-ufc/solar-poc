@@ -8,20 +8,24 @@ import { useAuthStore } from "@/store/useAuthStore";
 function buildUser(role: UserProfile["role"]): UserProfile {
   if (role === "professor") {
     return {
-      name: "Prof. Eduardo Silva",
+      id: "test-prof-001",
+      nome: "Prof. Eduardo Silva",
       cpf: "98765432100",
       email: "professor@ufc.br",
-      photoUrl: null,
+      fotoUrl: undefined,
       role,
+      status: "ATIVO",
     };
   }
 
   return {
-    name: "Eduardo Marinho",
+    id: "test-student-001",
+    nome: "Eduardo Marinho",
     cpf: "12345678901",
     email: "eduardo.marinho@ufc.br",
-    photoUrl: null,
+    fotoUrl: undefined,
     role,
+    status: "ATIVO",
   };
 }
 

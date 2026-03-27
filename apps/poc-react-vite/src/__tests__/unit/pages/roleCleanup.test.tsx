@@ -14,20 +14,24 @@ import {
 function buildUser(role: UserProfile["role"]): UserProfile {
   if (role === "professor") {
     return {
-      name: "Prof. Eduardo Silva",
+      id: "test-prof-001",
+      nome: "Prof. Eduardo Silva",
       cpf: "98765432100",
       email: "professor@ufc.br",
-      photoUrl: null,
+      fotoUrl: undefined,
       role,
+      status: "ATIVO",
     };
   }
 
   return {
-    name: "Eduardo Marinho",
+    id: "test-student-001",
+    nome: "Eduardo Marinho",
     cpf: "12345678901",
     email: "eduardo.marinho@ufc.br",
-    photoUrl: null,
+    fotoUrl: undefined,
     role,
+    status: "ATIVO",
   };
 }
 
@@ -61,9 +65,7 @@ describe("role cleanup in protected pages", () => {
   it("renders MessagePage without local authorization alert", () => {
     renderWithRouter(<MessagePage />);
 
-    expect(
-      screen.queryByText("Acesso restrito a professores."),
-    ).toBeNull();
+    expect(screen.queryByText("Acesso restrito a professores.")).toBeNull();
     expect(
       screen.getByRole("button", { name: "Enviar mensagem" }),
     ).toBeDefined();
@@ -72,9 +74,7 @@ describe("role cleanup in protected pages", () => {
   it("renders MessagesPage without local authorization alert", () => {
     renderWithRouter(<MessagesPage />);
 
-    expect(
-      screen.queryByText("Acesso restrito a professores."),
-    ).toBeNull();
+    expect(screen.queryByText("Acesso restrito a professores.")).toBeNull();
     expect(
       screen.getByRole("button", { name: "Criar nova mensagem" }),
     ).toBeDefined();
@@ -85,9 +85,7 @@ describe("role cleanup in protected pages", () => {
     renderWithRouter(<MyCoursesPage />);
 
     expect(screen.getByText("Cursos que leciono")).toBeDefined();
-    expect(
-      screen.getByText("Cursos em que estou matriculado"),
-    ).toBeDefined();
+    expect(screen.getByText("Cursos em que estou matriculado")).toBeDefined();
     expect(
       screen.queryByText("Você ainda não está matriculado em nenhum curso"),
     ).toBeNull();

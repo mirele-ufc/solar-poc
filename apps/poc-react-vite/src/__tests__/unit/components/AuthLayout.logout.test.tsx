@@ -6,11 +6,13 @@ import { useAuthStore, type UserProfile } from "@/store/useAuthStore";
 
 function buildUser(role: UserProfile["role"]): UserProfile {
   return {
-    name: role === "professor" ? "Prof. Teste" : "Aluno Teste",
+    id: role === "professor" ? "test-prof-001" : "test-student-001",
+    nome: role === "professor" ? "Prof. Teste" : "Aluno Teste",
     cpf: "12345678901",
     email: "teste.logout@ufc.br",
-    photoUrl: null,
+    fotoUrl: undefined,
     role,
+    status: "ATIVO",
   };
 }
 

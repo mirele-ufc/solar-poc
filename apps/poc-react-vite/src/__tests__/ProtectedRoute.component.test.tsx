@@ -12,11 +12,13 @@ const mockedUseAuthStore = vi.mocked(useAuthStore);
 
 function buildUser(role: UserProfile["role"]): UserProfile {
   return {
-    name: "Test User",
+    id: "test-user-001",
+    nome: "Test User",
     cpf: "12345678900",
     email: "test@ufc.br",
-    photoUrl: null,
+    fotoUrl: undefined,
     role,
+    status: "ATIVO",
   };
 }
 

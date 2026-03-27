@@ -5,20 +5,24 @@ import { apiClient } from "@/services/api";
 function buildUser(role: UserProfile["role"]): UserProfile {
   if (role === "professor") {
     return {
-      name: "Prof. Logout Test",
+      id: "test-prof-001",
+      nome: "Prof. Logout Test",
       cpf: "11111111111",
       email: "prof.logout@ufc.br",
-      photoUrl: null,
+      fotoUrl: undefined,
       role,
+      status: "ATIVO",
     };
   }
 
   return {
-    name: "Aluno Logout Test",
+    id: "test-student-001",
+    nome: "Aluno Logout Test",
     cpf: "22222222222",
     email: "aluno.logout@ufc.br",
-    photoUrl: null,
+    fotoUrl: undefined,
     role,
+    status: "ATIVO",
   };
 }
 

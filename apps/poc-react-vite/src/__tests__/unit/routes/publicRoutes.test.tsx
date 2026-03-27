@@ -49,11 +49,13 @@ function buildUnauthenticatedState() {
   return {
     isLoggedIn: false,
     currentUser: {
-      name: "",
+      id: "",
+      nome: "",
       cpf: "",
       email: "",
-      photoUrl: null,
+      fotoUrl: undefined,
       role: "student" as UserProfile["role"],
+      status: "INATIVO" as const,
     },
   };
 }
