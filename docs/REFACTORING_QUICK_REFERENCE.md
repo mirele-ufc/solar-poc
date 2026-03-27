@@ -6,9 +6,12 @@
 
 ---
 
-## 1. Estrutura em 7 Fases Numeradas (0-6) e 43 Subtarefas (com 5 gaps integrados)
+## 1. Estrutura em Fase A (pré-requisito) + 7 Fases Numeradas (0-6)
 
 ```
+Fase A: Configuração de Ambiente (pré-requisito, sem subtarefa numerada)
+  └─ Node/pnpm, pnpm install, build/test verde, .env.local a partir de .env.example, VITE_API_BASE_URL e registro no MEMORY.md
+
 Fase 0: Segurança (7 tarefas, 1-2 sem) — +0.7 (error handling)
   └─ ProtectedRoute, routes.ts, role cleanup, logout local seguro sem endpoint, unauthorized page, rotas públicas, error handling HTTP
 
@@ -31,7 +34,7 @@ Fase 6: Hardening (6 tarefas, 1-2 sem) — +6.7 (Governança PR)
   └─ Breadcrumbs, idioma, A11y, docs slices, CLAUDE.md atualizado, governança de review
 ```
 
-**TOTAL: 43 Subtarefas | Cronograma: 11-17 semanas**
+**TOTAL: 43 Subtarefas (Fases 0-6) + Fase A de pré-requisito | Cronograma: 11-17 semanas**
 
 ---
 
@@ -265,6 +268,8 @@ Cobertura consolidada em "## 3. Mapeamento RN" (RN01-RN12).
 ## 6. Dependências Críticas Entre Fases
 
 ```
+   FASE A (Ambiente / Pré-requisito)
+     ↓ [bloqueia qualquer execução]
    FASE 0 (Segurança)
         ↓ [bloqueia tudo]
    FASE 1 (Contratos)
@@ -282,7 +287,7 @@ Cobertura consolidada em "## 3. Mapeamento RN" (RN01-RN12).
 
 ### Modelo Híbrido de Execução (Frontend-Only)
 
-- Gates sequenciais obrigatórios: Fase 0 -> Fase 1 -> Auth/Perfil estável.
+- Gates sequenciais obrigatórios: Fase A -> Fase 0 -> Fase 1 -> Auth/Perfil estável.
 - Paralelismo permitido após os gates:
   - Cursos/Módulos/Aulas em paralelo com Provas/Admin.
 - Restrição de escopo:

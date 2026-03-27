@@ -132,6 +132,13 @@ Sequência oficial para qualquer máquina/usuário:
 ## 🔍 Estrutura de Fases
 
 ```
+Fase A (pré-requisito): Configuração de Ambiente
+  ├─ Node/pnpm validados
+  ├─ pnpm install + build/test verde
+  ├─ .env.local criado a partir de .env.example
+  ├─ VITE_API_BASE_URL configurado
+  └─ Ambiente registrado no MEMORY.md
+
 Fase 0 (1-2 sem): Segurança
   ├─ ProtectedRoute + role-based access
   ├─ Guard em todas as rotas autenticadas ativas
