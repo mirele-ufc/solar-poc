@@ -49,7 +49,7 @@
 | 1.2 | Migrar useAuthStore para tipos globais          | ✅     | 26/03/2026 | 6dfa8ae + 146efd2 + 99f8ba3 + 6a664e6 + d285b57 | —   |
 | 1.3 | Centralizar e alinhar schemas Zod               | ✅     | 26/03/2026 | 088d981 + 3b25f55 + 39c4cbe                     | —   |
 | 1.4 | Remover tipos locais duplicados de pages        | ✅     | 26/03/2026 | f0e773e                                         | —   |
-| 1.5 | Validar zero `any` em TypeScript                | ✅     | 26/03/2026 | local (sem commit)                              | —   |
+| 1.5 | Validar zero `any` em TypeScript                | ✅     | 26/03/2026 | 324708d + 7822e32                               | —   |
 
 ### 📊 By-Phase Metrics
 
@@ -114,7 +114,7 @@
 - **Machine:** local
 - **What:** Subtarefa 1.5 validada — `src/` sem ocorrências de `any`
 - **Testes executados:** Busca por `any` em `apps/poc-react-vite/src/**` sem ocorrências; Type-check ✅ PASSED
-- **Commits realizados (mais recentes):** `ec2f739`, `f0e773e`, `6b413f6`
+- **Commits realizados (mais recentes):** `324708d`, `7822e32`, `ec2f739`, `f0e773e`, `6b413f6`
 - **Status:** Story 1.5 concluída localmente; critério do plano atendido sem necessidade de alteração de código além da rastreabilidade
 - **Próxima:** 1.6 (Refatorar componentes com Slots Pattern) — READY NOW
 
