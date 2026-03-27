@@ -261,6 +261,23 @@ export interface IPageHeaderProps {
 }
 
 /**
+ * Lesson item used in course management and exam builder pages
+ */
+export interface ICourseManageLesson {
+  id: string;
+  name: string;
+}
+
+/**
+ * Module item used in course management and exam builder pages
+ */
+export interface ICourseManageModule {
+  id: string;
+  name: string;
+  lessons: ICourseManageLesson[];
+}
+
+/**
  * Type selector for ModulesPage and PythonModulesPage items
  * Used to differentiate lesson and module rendering
  */

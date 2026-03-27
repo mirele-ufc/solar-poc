@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { CourseInfoData } from "./CreateCoursePage";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { Modal } from "@/components/ui/modal";
 import {
   createModulesSchema,
   type CreateModulesFormValues,
@@ -80,16 +81,14 @@ function AddLessonPopup({
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
+    <Modal
+      isOpen
+      onClose={onClose}
       aria-label="Adicionar aula"
-      className="fixed inset-0 z-50 flex items-center justify-center px-[20px] bg-black/40 backdrop-blur-sm"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
+      className="w-full max-w-[420px] rounded-[16px] p-0 shadow-2xl"
+      overlayClassName="px-[20px]"
     >
-      <div className="bg-white rounded-[16px] shadow-2xl w-full max-w-[420px] p-[24px] flex flex-col gap-[20px]">
+      <div className="p-[24px] flex flex-col gap-[20px]">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-[10px]">
@@ -329,7 +328,7 @@ function AddLessonPopup({
           </>
         )}
       </div>
-    </div>
+    </Modal>
   );
 }
 

@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router";
 import type { CourseInfoData } from "./CreateCoursePage";
+import type { ICourseManageModule } from "@ava-poc/types";
+import { Modal } from "@/components/ui/modal";
 import { createQuestionSchema } from "@/validations/examSchema";
 import { imageFileSchema, uploadFileSchema } from "@/validations/fileSchema";
 
@@ -20,8 +22,6 @@ const EDIT_ICON =
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Tab = "Perguntas" | "Respostas" | "Configurações";
-type Lesson = { id: string; name: string };
-type ModuleData = { id: string; name: string; lessons: Lesson[] };
 type Option = { id: string; text: string };
 type Question = {
   id: string;
@@ -674,7 +674,7 @@ export function CreateExamPage() {
         { id: "l4", name: "Aula 02" },
       ],
     },
-  ]) as ModuleData[];
+  ]) as ICourseManageModule[];
 
   // View state: modules list OR exam editor
   const [editorOpen, setEditorOpen] = useState(false);
@@ -702,7 +702,9 @@ export function CreateExamPage() {
   );
 
   // State for modules (to allow removing lessons)
-  const [modulesList, setModulesList] = useState<ModuleData[]>(modules);
+  const [modulesList, setModulesList] = useState<ICourseManageModule[]>(
+    modules,
+  );
 
   // Inline lesson editing state
   const [editingLesson, setEditingLesson] = useState<{
@@ -1049,91 +1051,85 @@ export function CreateExamPage() {
       </div>
 
       {/* ── Edit lesson modal ── */}
-      {editingLesson && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
-            onClick={() => setEditingLesson(null)}
-            aria-hidden="true"
-          />
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="edit-lesson-title"
-            className="fixed inset-0 z-50 flex items-center justify-center px-[20px]"
-          >
-            <div className="bg-white w-full max-w-[400px] rounded-[12px] shadow-xl p-[24px] flex flex-col gap-[20px]">
-              <h2
-                id="edit-lesson-title"
-                className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[20px] leading-[30px]"
+      <Modal
+        isOpen={Boolean(editingLesson)}
+        onClose={() => setEditingLesson(null)}
+        aria-labelledby="edit-lesson-title"
+        className="w-full max-w-[400px] rounded-[12px] p-[24px] shadow-xl"
+        overlayClassName="px-[20px]"
+      >
+        {editingLesson && (
+          <Modal.Body className="flex flex-col gap-[20px]">
+            <h2
+              id="edit-lesson-title"
+              className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[20px] leading-[30px]"
+            >
+              Editar aula
+            </h2>
+            <div className="flex flex-col gap-[6px]">
+              <label
+                htmlFor="edit-lesson-name"
+                className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[16px]"
               >
-                Editar aula
-              </h2>
-              <div className="flex flex-col gap-[6px]">
-                <label
-                  htmlFor="edit-lesson-name"
-                  className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[16px]"
-                >
-                  Nome da aula
-                </label>
-                <input
-                  id="edit-lesson-name"
-                  type="text"
-                  value={editingLesson.name}
-                  onChange={(e) =>
-                    setEditingLesson((prev) =>
-                      prev ? { ...prev, name: e.target.value } : null,
-                    )
-                  }
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") saveEditLesson();
-                    if (e.key === "Escape") setEditingLesson(null);
-                  }}
-                  autoFocus
-                  className="w-full border border-[#8e8e8e] h-[50px] rounded-[12px] px-[16px] font-['Figtree:Regular',sans-serif] text-[16px] text-[#333] bg-white focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
-                />
-              </div>
-
-              {/* File upload section */}
-              <div className="flex flex-col gap-[10px]">
-                <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[16px]">
-                  Arquivo da aula
-                </p>
-                <p className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[14px] leading-[22px]">
-                  Deseja substituir o arquivo atual por um novo?
-                </p>
-                <EditLessonFileUpload
-                  value={editingLesson.replaceFile ?? false}
-                  fileName={editingLesson.fileName}
-                  onChange={(replaceFile, fileName) =>
-                    setEditingLesson((prev) =>
-                      prev ? { ...prev, replaceFile, fileName } : null,
-                    )
-                  }
-                />
-              </div>
-
-              <div className="flex gap-[12px]">
-                <button
-                  type="button"
-                  onClick={() => setEditingLesson(null)}
-                  className="flex-1 h-[46px] border-2 border-[#021b59] rounded-[26px] font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[16px] hover:bg-[#021b59]/5 transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={saveEditLesson}
-                  disabled={!editingLesson.name.trim()}
-                  className="flex-1 h-[46px] bg-[#021b59] rounded-[26px] font-['Figtree:Medium',sans-serif] font-medium text-[#ffeac4] text-[16px] hover:bg-[#042e99] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  Salvar
-                </button>
-              </div>
+                Nome da aula
+              </label>
+              <input
+                id="edit-lesson-name"
+                type="text"
+                value={editingLesson.name}
+                onChange={(e) =>
+                  setEditingLesson((prev) =>
+                    prev ? { ...prev, name: e.target.value } : null,
+                  )
+                }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") saveEditLesson();
+                  if (e.key === "Escape") setEditingLesson(null);
+                }}
+                autoFocus
+                className="w-full border border-[#8e8e8e] h-[50px] rounded-[12px] px-[16px] font-['Figtree:Regular',sans-serif] text-[16px] text-[#333] bg-white focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+              />
             </div>
-          </div>
-        </>
-      )}
+
+            {/* File upload section */}
+            <div className="flex flex-col gap-[10px]">
+              <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[16px]">
+                Arquivo da aula
+              </p>
+              <p className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[14px] leading-[22px]">
+                Deseja substituir o arquivo atual por um novo?
+              </p>
+              <EditLessonFileUpload
+                value={editingLesson.replaceFile ?? false}
+                fileName={editingLesson.fileName}
+                onChange={(replaceFile, fileName) =>
+                  setEditingLesson((prev) =>
+                    prev ? { ...prev, replaceFile, fileName } : null,
+                  )
+                }
+              />
+            </div>
+
+            <div className="flex gap-[12px]">
+              <button
+                type="button"
+                onClick={() => setEditingLesson(null)}
+                className="flex-1 h-[46px] border-2 border-[#021b59] rounded-[26px] font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[16px] hover:bg-[#021b59]/5 transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={saveEditLesson}
+                disabled={!editingLesson.name.trim()}
+                className="flex-1 h-[46px] bg-[#021b59] rounded-[26px] font-['Figtree:Medium',sans-serif] font-medium text-[#ffeac4] text-[16px] hover:bg-[#042e99] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Salvar
+              </button>
+            </div>
+          </Modal.Body>
+        )}
+      </Modal>
     </div>
   );
 }

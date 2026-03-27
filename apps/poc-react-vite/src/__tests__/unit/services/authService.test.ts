@@ -204,9 +204,10 @@ describe("authService", () => {
     const putArgs = mockedPut.mock.calls[0];
     const sentFormData = putArgs?.[1] as FormData;
 
-    expect(mockedPut).toHaveBeenCalledWith(
-      "/perfil/foto",
-      expect.any(FormData),
+    expect(mockedPut).toHaveBeenCalledTimes(1);
+    expect(putArgs?.[0]).toBe("/perfil/foto");
+    expect(sentFormData).toBeInstanceOf(FormData);
+    expect(putArgs?.[2]).toEqual(
       expect.objectContaining({
         headers: expect.objectContaining({
           "Content-Type": "multipart/form-data",

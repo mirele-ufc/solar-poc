@@ -48,6 +48,17 @@ function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
+function CardImage({ className, alt, ...props }: React.ComponentProps<"img">) {
+  return (
+    <img
+      data-slot="card-image"
+      alt={alt}
+      className={cn("w-full rounded-t-xl object-cover", className)}
+      {...props}
+    />
+  );
+}
+
 function CardAction({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -88,5 +99,6 @@ export {
   CardTitle,
   CardAction,
   CardDescription,
+  CardImage,
   CardContent,
 };

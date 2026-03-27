@@ -30,6 +30,8 @@ export type {
   IMessageCardProps,
   IBreadcrumb,
   IPageHeaderProps,
+  ICourseManageLesson,
+  ICourseManageModule,
   ModuleItemType,
   ILessonItem,
   IModuleData,
