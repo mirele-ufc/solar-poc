@@ -1,7 +1,9 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router";
+import type { ICourseManageModule } from "@ava-poc/types";
 import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
+import { Modal } from "@/components/ui/modal";
 import { toast } from "sonner";
 
 // ── SVG paths ─────────────────────────────────────────────────────────────────
@@ -15,12 +17,9 @@ const PEOPLE_PATH =
   "M16 11C17.66 11 18.99 9.66 18.99 8C18.99 6.34 17.66 5 16 5C14.34 5 13 6.34 13 8C13 9.66 14.34 11 16 11ZM8 11C9.66 11 10.99 9.66 10.99 8C10.99 6.34 9.66 5 8 5C6.34 5 5 6.34 5 8C5 9.66 6.34 11 8 11ZM8 13C5.67 13 1 14.17 1 16.5V19H15V16.5C15 14.17 10.33 13 8 13ZM16 13C15.71 13 15.38 13.02 15.03 13.05C16.19 13.89 17 15.02 17 16.5V19H23V16.5C23 14.17 18.33 13 16 13Z";
 const ARROW_BACK =
   "M20 11H7.83L13.42 5.41L12 4L4 12L12 20L13.41 18.59L7.83 13H20V11Z";
-const DOWNLOAD_PATH =
-  "M5 20H19V18H5V20ZM19 9H15V3H9V9H5L12 16L19 9Z";
+const DOWNLOAD_PATH = "M5 20H19V18H5V20ZM19 9H15V3H9V9H5L12 16L19 9Z";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-type Lesson = { id: string; name: string };
-type Module = { id: string; name: string; lessons: Lesson[] };
 type StudentStatus = "concluiu" | "em_andamento" | "parou" | "nao_acessou";
 type Student = {
   id: string;
@@ -34,22 +33,101 @@ type Student = {
 
 // ── Mock participants ─────────────────────────────────────────────────────────
 const MOCK_STUDENTS: Student[] = [
-  { id: "p1",  name: "Ana Beatriz Lima",      email: "ana.lima@email.com",       progress: 100, status: "concluiu",     lastAccess: "12/03/2026" },
-  { id: "p2",  name: "Carlos Eduardo Silva",  email: "carlos.silva@email.com",   progress: 55,  status: "em_andamento", lastAccess: "14/03/2026" },
-  { id: "p3",  name: "Mariana Costa",         email: "mariana.costa@email.com",  progress: 100, status: "concluiu",     lastAccess: "10/03/2026" },
-  { id: "p4",  name: "Lucas Pereira",         email: "lucas.pereira@email.com",  progress: 20,  status: "parou",        lastAccess: "28/02/2026", stoppedAt: "Módulo 01 — Aula 02" },
-  { id: "p5",  name: "Fernanda Rocha",        email: "fernanda.rocha@email.com", progress: 70,  status: "em_andamento", lastAccess: "15/03/2026" },
-  { id: "p6",  name: "Pedro Alves",           email: "pedro.alves@email.com",    progress: 0,   status: "nao_acessou",  lastAccess: "—" },
-  { id: "p7",  name: "Juliana Mendes",        email: "juliana.mendes@email.com", progress: 100, status: "concluiu",     lastAccess: "09/03/2026" },
-  { id: "p8",  name: "Rafael Torres",         email: "rafael.torres@email.com",  progress: 35,  status: "parou",        lastAccess: "05/03/2026", stoppedAt: "Módulo 02 — Aula 01" },
-  { id: "p9",  name: "Camila Souza",          email: "camila.souza@email.com",   progress: 0,   status: "nao_acessou",  lastAccess: "—" },
-  { id: "p10", name: "Bruno Lopes",           email: "bruno.lopes@email.com",    progress: 85,  status: "em_andamento", lastAccess: "16/03/2026" },
+  {
+    id: "p1",
+    name: "Ana Beatriz Lima",
+    email: "ana.lima@email.com",
+    progress: 100,
+    status: "concluiu",
+    lastAccess: "12/03/2026",
+  },
+  {
+    id: "p2",
+    name: "Carlos Eduardo Silva",
+    email: "carlos.silva@email.com",
+    progress: 55,
+    status: "em_andamento",
+    lastAccess: "14/03/2026",
+  },
+  {
+    id: "p3",
+    name: "Mariana Costa",
+    email: "mariana.costa@email.com",
+    progress: 100,
+    status: "concluiu",
+    lastAccess: "10/03/2026",
+  },
+  {
+    id: "p4",
+    name: "Lucas Pereira",
+    email: "lucas.pereira@email.com",
+    progress: 20,
+    status: "parou",
+    lastAccess: "28/02/2026",
+    stoppedAt: "Módulo 01 — Aula 02",
+  },
+  {
+    id: "p5",
+    name: "Fernanda Rocha",
+    email: "fernanda.rocha@email.com",
+    progress: 70,
+    status: "em_andamento",
+    lastAccess: "15/03/2026",
+  },
+  {
+    id: "p6",
+    name: "Pedro Alves",
+    email: "pedro.alves@email.com",
+    progress: 0,
+    status: "nao_acessou",
+    lastAccess: "—",
+  },
+  {
+    id: "p7",
+    name: "Juliana Mendes",
+    email: "juliana.mendes@email.com",
+    progress: 100,
+    status: "concluiu",
+    lastAccess: "09/03/2026",
+  },
+  {
+    id: "p8",
+    name: "Rafael Torres",
+    email: "rafael.torres@email.com",
+    progress: 35,
+    status: "parou",
+    lastAccess: "05/03/2026",
+    stoppedAt: "Módulo 02 — Aula 01",
+  },
+  {
+    id: "p9",
+    name: "Camila Souza",
+    email: "camila.souza@email.com",
+    progress: 0,
+    status: "nao_acessou",
+    lastAccess: "—",
+  },
+  {
+    id: "p10",
+    name: "Bruno Lopes",
+    email: "bruno.lopes@email.com",
+    progress: 85,
+    status: "em_andamento",
+    lastAccess: "16/03/2026",
+  },
 ];
 
 // ── Mock course data ───────────────────────────────────────────────────────────
 const COURSE_DATA: Record<
   string,
-  { title: string; hours: string; students: number; image: string; modules: Module[]; avgScore: number }
+  {
+    title: string;
+    hours: string;
+    students: number;
+    image: string;
+    modules: ICourseManageModule[];
+    avgScore: number;
+  }
 > = {
   "power-bi": {
     title: "Power BI - Fundamentos",
@@ -161,7 +239,12 @@ const MOCK_PROVA_RESPONSES: Record<
         text: "Qual é a principal função do Power Query?",
         options: [
           { label: "A", text: "Criar dashboards", pct: 15, correct: false },
-          { label: "B", text: "Tratamento e transformação de dados", pct: 62, correct: true },
+          {
+            label: "B",
+            text: "Tratamento e transformação de dados",
+            pct: 62,
+            correct: true,
+          },
           { label: "C", text: "Publicar relatórios", pct: 13, correct: false },
           { label: "D", text: "Criar animações", pct: 10, correct: false },
         ],
@@ -187,11 +270,34 @@ const MOCK_PROVA_RESPONSES: Record<
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-const STATUS_META: Record<StudentStatus, { label: string; color: string; bg: string; dotColor: string }> = {
-  concluiu:     { label: "Concluiu",      color: "#155724", bg: "#e6f9ee", dotColor: "#28a745" },
-  em_andamento: { label: "Em andamento",  color: "#021b59", bg: "#c5d6ff", dotColor: "#0643de" },
-  parou:        { label: "Parou",         color: "#801436", bg: "#fde8ef", dotColor: "#de2e66" },
-  nao_acessou:  { label: "Não acessou",   color: "#606060", bg: "#f0f0f0", dotColor: "#8e8e8e" },
+const STATUS_META: Record<
+  StudentStatus,
+  { label: string; color: string; bg: string; dotColor: string }
+> = {
+  concluiu: {
+    label: "Concluiu",
+    color: "#155724",
+    bg: "#e6f9ee",
+    dotColor: "#28a745",
+  },
+  em_andamento: {
+    label: "Em andamento",
+    color: "#021b59",
+    bg: "#c5d6ff",
+    dotColor: "#0643de",
+  },
+  parou: {
+    label: "Parou",
+    color: "#801436",
+    bg: "#fde8ef",
+    dotColor: "#de2e66",
+  },
+  nao_acessou: {
+    label: "Não acessou",
+    color: "#606060",
+    bg: "#f0f0f0",
+    dotColor: "#8e8e8e",
+  },
 };
 
 // ── Stat Card ─────────────────────────────────────────────────────────────────
@@ -209,12 +315,24 @@ function StatCard({
   bg: string;
 }) {
   return (
-    <div className="flex flex-col gap-[6px] rounded-[12px] px-[16px] py-[14px]" style={{ background: bg }}>
-      <p className="font-['Figtree:Bold',sans-serif] font-bold text-[28px] leading-[36px]" style={{ color }}>
+    <div
+      className="flex flex-col gap-[6px] rounded-[12px] px-[16px] py-[14px]"
+      style={{ background: bg }}
+    >
+      <p
+        className="font-['Figtree:Bold',sans-serif] font-bold text-[28px] leading-[36px]"
+        style={{ color }}
+      >
         {value}
       </p>
-      <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[14px] leading-[20px]">{label}</p>
-      {sub && <p className="font-['Figtree:Regular',sans-serif] text-[#8e8e8e] text-[12px]">{sub}</p>}
+      <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[14px] leading-[20px]">
+        {label}
+      </p>
+      {sub && (
+        <p className="font-['Figtree:Regular',sans-serif] text-[#8e8e8e] text-[12px]">
+          {sub}
+        </p>
+      )}
     </div>
   );
 }
@@ -240,15 +358,14 @@ function EditLessonModal({
   };
 
   return (
-    <>
-      <div className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="edit-lesson-dlg-title"
-        className="fixed inset-0 z-50 flex items-center justify-center px-[20px]"
-      >
-        <div className="bg-white w-full max-w-[400px] rounded-[12px] shadow-xl p-[24px] flex flex-col gap-[20px]">
+    <Modal
+      isOpen
+      onClose={onClose}
+      aria-labelledby="edit-lesson-dlg-title"
+      className="bg-white w-full max-w-[400px] rounded-[12px] shadow-xl p-[24px]"
+      overlayClassName="px-[20px] bg-black/40"
+    >
+      <Modal.Body className="flex flex-col gap-[20px]">
           <h2
             id="edit-lesson-dlg-title"
             className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[20px] leading-[30px]"
@@ -309,7 +426,9 @@ function EditLessonModal({
             {fileName && (
               <p className="font-['Figtree:Regular',sans-serif] text-[#333] text-[13px]">
                 Selecionado:{" "}
-                <span className="font-['Figtree:Medium',sans-serif] font-medium">{fileName}</span>
+                <span className="font-['Figtree:Medium',sans-serif] font-medium">
+                  {fileName}
+                </span>
               </p>
             )}
           </div>
@@ -331,27 +450,28 @@ function EditLessonModal({
               Salvar
             </button>
           </div>
-        </div>
-      </div>
-    </>
+      </Modal.Body>
+    </Modal>
   );
 }
 
 // ── Participants Panel ────────────────────────────────────────────────────────
 function ParticipantsPanel({ onClose }: { onClose: () => void }) {
   const [filter, setFilter] = useState<StudentStatus | "todos">("todos");
-  const filtered = filter === "todos" ? MOCK_STUDENTS : MOCK_STUDENTS.filter((s) => s.status === filter);
+  const filtered =
+    filter === "todos"
+      ? MOCK_STUDENTS
+      : MOCK_STUDENTS.filter((s) => s.status === filter);
 
   return (
-    <>
-      <div className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="participants-title"
-        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:px-[20px]"
-      >
-        <div className="bg-white w-full sm:max-w-[520px] rounded-t-[16px] sm:rounded-[12px] shadow-xl flex flex-col max-h-[85vh]">
+    <Modal
+      isOpen
+      onClose={onClose}
+      aria-labelledby="participants-title"
+      className="bg-white w-full sm:max-w-[520px] rounded-t-[16px] sm:rounded-[12px] shadow-xl flex flex-col max-h-[85vh] p-0"
+      overlayClassName="items-end sm:items-center justify-center sm:px-[20px] p-0 bg-black/40"
+    >
+      <Modal.Body className="p-0">
           <div className="flex items-center justify-between px-[20px] py-[16px] border-b border-[#e0e0e0] shrink-0">
             <h2
               id="participants-title"
@@ -365,15 +485,33 @@ function ParticipantsPanel({ onClose }: { onClose: () => void }) {
               aria-label="Fechar"
               className="size-[44px] flex items-center justify-center rounded focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] hover:opacity-70"
             >
-              <svg className="size-[20px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                <path clipRule="evenodd" d={CLOSE_SM} fill="#333" fillRule="evenodd" />
+              <svg
+                className="size-[20px]"
+                fill="none"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  clipRule="evenodd"
+                  d={CLOSE_SM}
+                  fill="#333"
+                  fillRule="evenodd"
+                />
               </svg>
             </button>
           </div>
 
           {/* Filters */}
           <div className="flex gap-[8px] px-[20px] pt-[12px] pb-[8px] overflow-x-auto no-scrollbar shrink-0">
-            {(["todos", "concluiu", "em_andamento", "parou", "nao_acessou"] as const).map((f) => (
+            {(
+              [
+                "todos",
+                "concluiu",
+                "em_andamento",
+                "parou",
+                "nao_acessou",
+              ] as const
+            ).map((f) => (
               <button
                 key={f}
                 type="button"
@@ -423,7 +561,10 @@ function ParticipantsPanel({ onClose }: { onClose: () => void }) {
                       <div className="w-[50px] h-[4px] bg-[#e0e0e0] rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full"
-                          style={{ width: `${p.progress}%`, background: meta.dotColor }}
+                          style={{
+                            width: `${p.progress}%`,
+                            background: meta.dotColor,
+                          }}
                           aria-hidden="true"
                         />
                       </div>
@@ -436,9 +577,8 @@ function ParticipantsPanel({ onClose }: { onClose: () => void }) {
               );
             })}
           </ul>
-        </div>
-      </div>
-    </>
+      </Modal.Body>
+    </Modal>
   );
 }
 
@@ -455,15 +595,14 @@ function ProvaResponsesPanel({
   const data = MOCK_PROVA_RESPONSES[modId];
 
   return (
-    <>
-      <div className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="prova-resp-title"
-        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:px-[20px]"
-      >
-        <div className="bg-white w-full sm:max-w-[520px] rounded-t-[16px] sm:rounded-[12px] shadow-xl flex flex-col max-h-[85vh]">
+    <Modal
+      isOpen
+      onClose={onClose}
+      aria-labelledby="prova-resp-title"
+      className="bg-white w-full sm:max-w-[520px] rounded-t-[16px] sm:rounded-[12px] shadow-xl flex flex-col max-h-[85vh] p-0"
+      overlayClassName="items-end sm:items-center justify-center sm:px-[20px] p-0 bg-black/40"
+    >
+      <Modal.Body className="p-0">
           <div className="flex items-center justify-between px-[20px] py-[16px] border-b border-[#e0e0e0] shrink-0">
             <div className="flex flex-col gap-[2px]">
               <h2
@@ -472,7 +611,9 @@ function ProvaResponsesPanel({
               >
                 Respostas da prova
               </h2>
-              <p className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[13px]">{modName}</p>
+              <p className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[13px]">
+                {modName}
+              </p>
             </div>
             <button
               type="button"
@@ -480,8 +621,18 @@ function ProvaResponsesPanel({
               aria-label="Fechar"
               className="size-[32px] flex items-center justify-center rounded focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] hover:opacity-70"
             >
-              <svg className="size-[20px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                <path clipRule="evenodd" d={CLOSE_SM} fill="#333" fillRule="evenodd" />
+              <svg
+                className="size-[20px]"
+                fill="none"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  clipRule="evenodd"
+                  d={CLOSE_SM}
+                  fill="#333"
+                  fillRule="evenodd"
+                />
               </svg>
             </button>
           </div>
@@ -530,7 +681,9 @@ function ProvaResponsesPanel({
                             <div className="flex items-center gap-[6px] flex-1 min-w-0">
                               <span
                                 className={`shrink-0 font-['Figtree:Medium',sans-serif] font-medium text-[14px] ${
-                                  opt.correct ? "text-[#155724]" : "text-[#021b59]"
+                                  opt.correct
+                                    ? "text-[#155724]"
+                                    : "text-[#021b59]"
                                 }`}
                               >
                                 {opt.label})
@@ -546,7 +699,9 @@ function ProvaResponsesPanel({
                             </div>
                             <span
                               className={`shrink-0 font-['Figtree:Medium',sans-serif] font-medium text-[13px] ${
-                                opt.correct ? "text-[#c0396b]" : "text-[#595959]"
+                                opt.correct
+                                  ? "text-[#c0396b]"
+                                  : "text-[#595959]"
                               }`}
                             >
                               {opt.pct}%
@@ -574,9 +729,8 @@ function ProvaResponsesPanel({
               </>
             )}
           </div>
-        </div>
-      </div>
-    </>
+      </Modal.Body>
+    </Modal>
   );
 }
 
@@ -588,17 +742,21 @@ function CourseDashboard({
   course: { title: string; hours: string; avgScore: number };
   totalStudents: number;
 }) {
-  const concluiu    = MOCK_STUDENTS.filter((s) => s.status === "concluiu").length;
-  const emAndamento = MOCK_STUDENTS.filter((s) => s.status === "em_andamento").length;
-  const parou       = MOCK_STUDENTS.filter((s) => s.status === "parou").length;
-  const naoAcessou  = MOCK_STUDENTS.filter((s) => s.status === "nao_acessou").length;
-  const acessaram   = totalStudents - naoAcessou;
+  const concluiu = MOCK_STUDENTS.filter((s) => s.status === "concluiu").length;
+  const emAndamento = MOCK_STUDENTS.filter(
+    (s) => s.status === "em_andamento",
+  ).length;
+  const parou = MOCK_STUDENTS.filter((s) => s.status === "parou").length;
+  const naoAcessou = MOCK_STUDENTS.filter(
+    (s) => s.status === "nao_acessou",
+  ).length;
+  const acessaram = totalStudents - naoAcessou;
 
   const pieData = [
-    { name: "Concluíram",     value: concluiu,    color: "#28a745" },
-    { name: "Em andamento",   value: emAndamento, color: "#0643de" },
-    { name: "Pararam",        value: parou,       color: "#de2e66" },
-    { name: "Não acessaram",  value: naoAcessou,  color: "#8e8e8e" },
+    { name: "Concluíram", value: concluiu, color: "#28a745" },
+    { name: "Em andamento", value: emAndamento, color: "#0643de" },
+    { name: "Pararam", value: parou, color: "#de2e66" },
+    { name: "Não acessaram", value: naoAcessou, color: "#8e8e8e" },
   ];
 
   const stoppedStudents = MOCK_STUDENTS.filter((s) => s.status === "parou");
@@ -607,12 +765,47 @@ function CourseDashboard({
     <div className="flex flex-col gap-[20px]">
       {/* Stat cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-[12px]">
-        <StatCard value={totalStudents} label="Total inscritos"         color="#021b59" bg="#c5d6ff" />
-        <StatCard value={acessaram}     label="Acessaram"               sub={`${Math.round((acessaram / totalStudents) * 100)}% do total`} color="#0643de" bg="#e8eeff" />
-        <StatCard value={naoAcessou}    label="Nunca acessaram"         sub={`${Math.round((naoAcessou / totalStudents) * 100)}% do total`} color="#606060" bg="#f0f0f0" />
-        <StatCard value={concluiu}      label="Concluíram"              sub={`${Math.round((concluiu / totalStudents) * 100)}% do total`}   color="#155724" bg="#e6f9ee" />
-        <StatCard value={emAndamento}   label="Em andamento"            sub={`${Math.round((emAndamento / totalStudents) * 100)}% do total`} color="#021b59" bg="#fffed0" />
-        <StatCard value={parou}         label="Pararam"                 sub={`${Math.round((parou / totalStudents) * 100)}% do total`}      color="#801436" bg="#fde8ef" />
+        <StatCard
+          value={totalStudents}
+          label="Total inscritos"
+          color="#021b59"
+          bg="#c5d6ff"
+        />
+        <StatCard
+          value={acessaram}
+          label="Acessaram"
+          sub={`${Math.round((acessaram / totalStudents) * 100)}% do total`}
+          color="#0643de"
+          bg="#e8eeff"
+        />
+        <StatCard
+          value={naoAcessou}
+          label="Nunca acessaram"
+          sub={`${Math.round((naoAcessou / totalStudents) * 100)}% do total`}
+          color="#606060"
+          bg="#f0f0f0"
+        />
+        <StatCard
+          value={concluiu}
+          label="Concluíram"
+          sub={`${Math.round((concluiu / totalStudents) * 100)}% do total`}
+          color="#155724"
+          bg="#e6f9ee"
+        />
+        <StatCard
+          value={emAndamento}
+          label="Em andamento"
+          sub={`${Math.round((emAndamento / totalStudents) * 100)}% do total`}
+          color="#021b59"
+          bg="#fffed0"
+        />
+        <StatCard
+          value={parou}
+          label="Pararam"
+          sub={`${Math.round((parou / totalStudents) * 100)}% do total`}
+          color="#801436"
+          bg="#fde8ef"
+        />
       </div>
 
       {/* Progress bar */}
@@ -620,11 +813,18 @@ function CourseDashboard({
         <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[14px]">
           Distribuição de progresso
         </p>
-        <div className="w-full h-[14px] rounded-full overflow-hidden flex" role="img" aria-label="Gráfico de distribuição de progresso dos alunos">
+        <div
+          className="w-full h-[14px] rounded-full overflow-hidden flex"
+          role="img"
+          aria-label="Gráfico de distribuição de progresso dos alunos"
+        >
           {pieData.map((d) => (
             <div
               key={d.name}
-              style={{ width: `${(d.value / totalStudents) * 100}%`, background: d.color }}
+              style={{
+                width: `${(d.value / totalStudents) * 100}%`,
+                background: d.color,
+              }}
               title={`${d.name}: ${d.value}`}
             />
           ))}
@@ -632,7 +832,11 @@ function CourseDashboard({
         <div className="flex flex-wrap gap-x-[16px] gap-y-[6px]">
           {pieData.map((d) => (
             <div key={d.name} className="flex items-center gap-[6px]">
-              <div className="size-[10px] rounded-full shrink-0" style={{ background: d.color }} aria-hidden="true" />
+              <div
+                className="size-[10px] rounded-full shrink-0"
+                style={{ background: d.color }}
+                aria-hidden="true"
+              />
               <span className="font-['Figtree:Regular',sans-serif] text-[#333] text-[13px]">
                 {d.name} ({d.value})
               </span>
@@ -663,7 +867,11 @@ function CourseDashboard({
                 `${value} aluno${value !== 1 ? "s" : ""} (${Math.round((value / totalStudents) * 100)}%)`,
                 name,
               ]}
-              contentStyle={{ borderRadius: "8px", border: "1px solid #e0e0e0", fontSize: "13px" }}
+              contentStyle={{
+                borderRadius: "8px",
+                border: "1px solid #e0e0e0",
+                fontSize: "13px",
+              }}
             />
           </PieChart>
         </ResponsiveContainer>
@@ -679,7 +887,12 @@ function CourseDashboard({
             Média de acertos nas provas
           </p>
         </div>
-        <svg className="size-[36px] shrink-0 opacity-40" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+        <svg
+          className="size-[36px] shrink-0 opacity-40"
+          fill="none"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
           <path d={CHART_PATH} fill="#021b59" />
         </svg>
       </div>
@@ -729,17 +942,26 @@ export function ManageCoursePage() {
   const { id = "power-bi" } = useParams<{ id: string }>();
   const course = COURSE_DATA[id] ?? COURSE_DATA["power-bi"];
 
-  const [modules, setModules] = useState<Module[]>(course.modules);
-  const [editingLesson, setEditingLesson] = useState<{ modId: string; lessonId: string } | null>(null);
+  const [modules, setModules] = useState<ICourseManageModule[]>(course.modules);
+  const [editingLesson, setEditingLesson] = useState<{
+    modId: string;
+    lessonId: string;
+  } | null>(null);
   const [showParticipants, setShowParticipants] = useState(false);
   const [provaModId, setProvaModId] = useState<string | null>(null);
   const [generatingPDF, setGeneratingPDF] = useState(false);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "modulos">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "modulos">(
+    "dashboard",
+  );
 
   // ── Handlers ──────────────────────────────────────────────────────────────
   const removeLesson = (modId: string, lessonId: string) => {
     setModules((prev) =>
-      prev.map((m) => (m.id === modId ? { ...m, lessons: m.lessons.filter((l) => l.id !== lessonId) } : m))
+      prev.map((m) =>
+        m.id === modId
+          ? { ...m, lessons: m.lessons.filter((l) => l.id !== lessonId) }
+          : m,
+      ),
     );
   };
 
@@ -759,11 +981,11 @@ export function ManageCoursePage() {
           ? {
               ...m,
               lessons: m.lessons.map((l) =>
-                l.id === editingLesson.lessonId ? { ...l, name } : l
+                l.id === editingLesson.lessonId ? { ...l, name } : l,
               ),
             }
-          : m
-      )
+          : m,
+      ),
     );
     setEditingLesson(null);
   };
@@ -774,7 +996,9 @@ export function ManageCoursePage() {
     return mod?.lessons.find((l) => l.id === editingLesson.lessonId) ?? null;
   };
 
-  const provaModName = provaModId ? modules.find((m) => m.id === provaModId)?.name ?? "" : "";
+  const provaModName = provaModId
+    ? (modules.find((m) => m.id === provaModId)?.name ?? "")
+    : "";
 
   const handleGeneratePDF = async () => {
     setGeneratingPDF(true);
@@ -798,14 +1022,22 @@ export function ManageCoursePage() {
           src={course.image}
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" aria-hidden="true" />
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"
+          aria-hidden="true"
+        />
         <button
           type="button"
           onClick={() => navigate("/courses")}
           aria-label="Voltar para cursos"
           className="absolute top-[16px] left-[16px] size-[36px] rounded-full bg-white/80 flex items-center justify-center hover:bg-white transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
         >
-          <svg className="size-[20px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+          <svg
+            className="size-[20px]"
+            fill="none"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
             <path d={ARROW_BACK} fill="#021b59" />
           </svg>
         </button>
@@ -820,7 +1052,6 @@ export function ManageCoursePage() {
       </div>
 
       <div className="max-w-[900px] mx-auto w-full px-[20px] md:px-[40px] pt-[20px] flex flex-col gap-[20px]">
-
         {/* Quick actions row */}
         <div className="flex flex-col sm:flex-row gap-[10px]">
           <button
@@ -828,7 +1059,12 @@ export function ManageCoursePage() {
             onClick={() => setShowParticipants(true)}
             className="flex-1 flex items-center justify-center gap-[8px] h-[46px] bg-[#ffeac4] rounded-[26px] hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59]"
           >
-            <svg className="size-[18px] shrink-0" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+            <svg
+              className="size-[18px] shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
               <path d={PEOPLE_PATH} fill="#333" />
             </svg>
             <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[16px]">
@@ -851,8 +1087,19 @@ export function ManageCoursePage() {
                   viewBox="0 0 24 24"
                   aria-hidden="true"
                 >
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="#ffeac4" strokeWidth="4" />
-                  <path className="opacity-75" fill="#ffeac4" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="#ffeac4"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="#ffeac4"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  />
                 </svg>
                 <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#ffeac4] text-[16px]">
                   Gerando…
@@ -860,7 +1107,12 @@ export function ManageCoursePage() {
               </>
             ) : (
               <>
-                <svg className="size-[18px] shrink-0" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                <svg
+                  className="size-[18px] shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
                   <path d={DOWNLOAD_PATH} fill="#ffeac4" />
                 </svg>
                 <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#ffeac4] text-[16px]">
@@ -890,7 +1142,7 @@ export function ManageCoursePage() {
           {(
             [
               { key: "dashboard", label: "Dashboard" },
-              { key: "modulos",   label: "Módulos e aulas" },
+              { key: "modulos", label: "Módulos e aulas" },
             ] as const
           ).map((tab) => (
             <button
@@ -918,7 +1170,10 @@ export function ManageCoursePage() {
         )}
 
         {activeTab === "modulos" && (
-          <section aria-label="Módulos e aulas" className="flex flex-col gap-[16px]">
+          <section
+            aria-label="Módulos e aulas"
+            className="flex flex-col gap-[16px]"
+          >
             {modules.length === 0 && (
               <p className="font-['Figtree:Regular',sans-serif] text-[#8e8e8e] text-[15px] text-center py-[24px]">
                 Nenhum módulo disponível.
@@ -926,7 +1181,10 @@ export function ManageCoursePage() {
             )}
 
             {modules.map((mod) => (
-              <div key={mod.id} className="border border-[#e0e0e0] rounded-[8px] overflow-hidden">
+              <div
+                key={mod.id}
+                className="border border-[#e0e0e0] rounded-[8px] overflow-hidden"
+              >
                 {/* Module header */}
                 <div className="flex items-center justify-between gap-[8px] bg-[#021b59] px-[16px] py-[12px]">
                   <p className="font-['Figtree:Bold',sans-serif] font-bold text-white text-[16px] flex-1 min-w-0 truncate">
@@ -939,7 +1197,12 @@ export function ManageCoursePage() {
                       onClick={() => setProvaModId(mod.id)}
                       className="flex items-center gap-[6px] bg-white/20 hover:bg-white/30 transition-colors rounded-[20px] px-[10px] py-[4px] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-white"
                     >
-                      <svg className="size-[15px] shrink-0" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                      <svg
+                        className="size-[15px] shrink-0"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
                         <path d={CHART_PATH} fill="white" />
                       </svg>
                       <span className="font-['Figtree:Medium',sans-serif] font-medium text-white text-[13px] hidden sm:inline">
@@ -952,8 +1215,18 @@ export function ManageCoursePage() {
                       onClick={() => removeModule(mod.id)}
                       className="size-[26px] flex items-center justify-center rounded hover:opacity-70 transition-opacity focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-white"
                     >
-                      <svg className="size-full" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                        <path clipRule="evenodd" d={CLOSE_SM} fill="white" fillRule="evenodd" />
+                      <svg
+                        className="size-full"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <path
+                          clipRule="evenodd"
+                          d={CLOSE_SM}
+                          fill="white"
+                          fillRule="evenodd"
+                        />
                       </svg>
                     </button>
                   </div>
@@ -981,7 +1254,12 @@ export function ManageCoursePage() {
                           onClick={() => openEditLesson(mod.id, l.id)}
                           className="size-[22px] hover:opacity-70 transition-opacity focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded"
                         >
-                          <svg className="size-full" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                          <svg
+                            className="size-full"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                          >
                             <path d={EDIT_PATH} fill="#021b59" />
                           </svg>
                         </button>
@@ -991,8 +1269,18 @@ export function ManageCoursePage() {
                           onClick={() => removeLesson(mod.id, l.id)}
                           className="size-[22px] hover:opacity-70 transition-opacity focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded"
                         >
-                          <svg className="size-full" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                            <path clipRule="evenodd" d={CLOSE_SM} fill="#801436" fillRule="evenodd" />
+                          <svg
+                            className="size-full"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                          >
+                            <path
+                              clipRule="evenodd"
+                              d={CLOSE_SM}
+                              fill="#801436"
+                              fillRule="evenodd"
+                            />
                           </svg>
                         </button>
                       </div>
@@ -1014,7 +1302,9 @@ export function ManageCoursePage() {
         />
       )}
 
-      {showParticipants && <ParticipantsPanel onClose={() => setShowParticipants(false)} />}
+      {showParticipants && (
+        <ParticipantsPanel onClose={() => setShowParticipants(false)} />
+      )}
 
       {provaModId && (
         <ProvaResponsesPanel

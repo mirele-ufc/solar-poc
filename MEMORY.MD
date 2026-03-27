@@ -1,4 +1,4 @@
-# MEMORY.md — Rastreamento de Progresso Contínuo
+# Rastreamento de Progresso Contínuo
 
 > **Fonte de verdade única** para progresso do refactoring UFC LMS React.  
 > Atualizado automaticamente pelo agente **IMPLEMENT-AND-COMMIT** após cada subtarefa.  
@@ -6,79 +6,100 @@
 
 ---
 
-# MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
+## MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
 
-**Última atualização:** 26/03/2026 (1.1 implementada — consolidação de tipos em v1.0)  
-**Sprint ativo:** Fase 1 — Contratos Canônicos e Tipagem  
-**Status geral:** 19% (8/43 subtarefas)
+## MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
+
+**Última atualização:** 27/03/2026 (Fases 0 e 1 auditadas e confirmadas — 100% completas. Fase 2 em progresso, 2.1 concluída, 2.2 ready.)  
+**Sprint ativo:** Fase 2 — Autenticação com Backend  
+**Status geral:** 33% (14/43 subtarefas concluídas)
+
+---
+
+## UPDATE — 27/03/2026 (Auditoria Fases 0 e 1)
+
+- **Branch atual:** `feature/refactor-auth-service-2-1`
+- **Fases auditadas:** Fase 0 e Fase 1 — ambas confirmadas 100% completas
+- **Resultado da auditoria:** Todos os itens técnicos de Fase 0 e Fase 1 confirmados PASS
+- **Validações executadas:**
+  - `get_errors` frontend: ✅ zero erros
+  - `grep` por `: any` e `<any>` em src: ✅ zero matches
+  - `grep` por hardcodes de role em pages: ✅ zero matches
+  - Type-check: ✅ PASSED (zero erros)
+- **Próxima etapa planejada:** Implementar 2.2 (Request Interceptor em api.ts)
 
 ---
 
 ## SECTION: GLOBAL PROGRESS
 
-| Campo      | Valor                                              |
-| ---------- | -------------------------------------------------- |
-| **Fase**   | 1 — Contratos Canônicos e Tipagem                  |
-| **Módulo** | 1.1 — Auditar e consolidar tipos em @ava-poc/types |
-| **Story**  | 1.1 — Consolidação de tipos completa               |
-| **Status** | DONE                                               |
-| **Branch** | feature/refactor-types-consolidation               |
+| Campo      | Valor                                 |
+| ---------- | ------------------------------------- |
+| **Fase**   | 2 — Autenticação com Backend          |
+| **Módulo** | 2.2 — Implementar Request Interceptor |
+| **Story**  | 2.2 — JWT Interceptor em api.ts       |
+| **Status** | NOT_STARTED (ready)                   |
+| **Branch** | feature/refactor-auth-service-2-1     |
 
-**Status:** Fase 1 iniciada, Story 1.1 ✅ DONE, 8/43 total (19%), next: 1.2
+**Status:** Fases 0 e 1 concluídas e auditadas (100%). Fase 2 em progresso — 2.1 concluída, 2.2 pronta para iniciar.
 
 ### ✅ Completes
 
-| Sub | Title                                           | Status | Date       | Commit                                | PR  |
-| --- | ----------------------------------------------- | ------ | ---------- | ------------------------------------- | --- |
-| 0.1 | Criar ProtectedRoute com validação de role      | ✅     | 25/03      | ce2df32                               | —   |
-| 0.2 | Integrar ProtectedRoute em routes.ts            | ✅     | 25/03/2026 | 028ba89                               | —   |
-| 0.3 | Remover hardcodes de role em páginas            | ✅     | 25/03/2026 | 41a3b29                               | —   |
-| 0.4 | Implementar logout seguro local                 | ✅     | 26/03/2026 | 7689a26 + cd395ac                     | —   |
-| 0.5 | Implementar Unauthorized page                   | ✅     | 26/03/2026 | 8fa0cd3 + 00d9fe6                     | —   |
-| 0.6 | Validar rotas públicas sem guard incorreto      | ✅     | 26/03/2026 | 189c57f                               | —   |
-| 0.7 | HTTP error interceptor + loading + empty states | ✅     | 26/03/2026 | 1aac552 + 3edb2fc + 41cb179 + 4390f75 | —   |
-| 1.1 | Auditar e consolidar tipos em @ava-poc/types    | ✅     | 26/03/2026 | 9bb4021 + 910841e                     | —   |
+| Sub | Title                                           | Status | Date       | Commit                                                    | PR  |
+| --- | ----------------------------------------------- | ------ | ---------- | --------------------------------------------------------- | --- |
+| 0.1 | Criar ProtectedRoute com validação de role      | ✅     | 25/03      | ce2df32                                                   | —   |
+| 0.2 | Integrar ProtectedRoute em routes.ts            | ✅     | 25/03/2026 | 028ba89                                                   | —   |
+| 0.3 | Remover hardcodes de role em páginas            | ✅     | 25/03/2026 | 41a3b29                                                   | —   |
+| 0.4 | Implementar logout seguro local                 | ✅     | 26/03/2026 | 7689a26 + cd395ac                                         | —   |
+| 0.5 | Implementar Unauthorized page                   | ✅     | 26/03/2026 | 8fa0cd3 + 00d9fe6                                         | —   |
+| 0.6 | Validar rotas públicas sem guard incorreto      | ✅     | 26/03/2026 | 189c57f                                                   | —   |
+| 0.7 | HTTP error interceptor + loading + empty states | ✅     | 26/03/2026 | 1aac552 + 3edb2fc + 41cb179 + 4390f75                     | —   |
+| 1.1 | Auditar e consolidar tipos em @ava-poc/types    | ✅     | 26/03/2026 | 9bb4021 + 910841e                                         | —   |
+| 1.2 | Migrar useAuthStore para tipos globais          | ✅     | 26/03/2026 | 6dfa8ae + 146efd2 + 99f8ba3 + 6a664e6 + d285b57           | —   |
+| 1.3 | Centralizar e alinhar schemas Zod               | ✅     | 26/03/2026 | 088d981 + 3b25f55 + 39c4cbe                               | —   |
+| 1.4 | Remover tipos locais duplicados de pages        | ✅     | 26/03/2026 | f0e773e                                                   | —   |
+| 1.5 | Validar zero `any` em TypeScript                | ✅     | 26/03/2026 | 324708d + 7822e32                                         | —   |
+| 1.6 | Refatorar componentes com Slots Pattern         | ✅     | 27/03/2026 | `0080137` + `9090c6a` + `4ecc3d7` + `b24fbb4` + `32558a8` | —   |
+
+- **Completa recente:** 2.1 — authService endpoints (Auth/Perfil) ✅ (commits: `3ece624`, `a2ec8eb`, `877540a`)
 
 ### 📊 By-Phase Metrics
 
 | Phase     | Complete | Total  | %       | Status             | Start Date | Est. End |
 | --------- | -------- | ------ | ------- | ------------------ | ---------- | -------- |
 | 0         | 7        | 7      | 100%    | ✅ COMPLETA        | 25/03      | 26/03    |
-| 1         | 1        | 6      | 16%     | 🔄 IN_PROGRESS     | 26/03      | —        |
-| 2         | 0        | 7      | 0%      | ⏳ FUTURE          | —          | —        |
+| 1         | 6        | 6      | 100%    | ✅ COMPLETA        | 26/03      | 27/03    |
+| 2         | 1        | 7      | 14%     | 🔄 IN_PROGRESS     | 27/03      | —        |
 | 3         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
 | 4         | 0        | 7      | 0%      | ⏳ FUTURE          | —          | —        |
 | 5         | 0        | 4      | 0%      | ⏳ FUTURE          | —          | —        |
 | 6         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
-| **TOTAL** | **8**    | **43** | **19%** | **🟢 IN PROGRESS** | 25/03      | —        |
-| 6         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
-| **TOTAL** | **7**    | **43** | **16%** | **🟢 IN PROGRESS** | 25/03      | —        |
+| **TOTAL** | **14**   | **43** | **33%** | **🟢 IN PROGRESS** | 25/03      | —        |
 
 ### ⏳ Next Ready (First 3)
 
-1. **1.2 — Migrar useAuthStore para tipos globais**
+1. **2.2 — Implementar Request Interceptor em api.ts**
    - Duração: 1 dia
-   - Dependências: 1.1 ✅ completa
+   - Dependências: 2.1 ✅
    - Status: ✅ **READY NOW**
-   - Detalhes: `docs/REFACTORING_PLAN_GRANULAR_V2.md` § 1.2
+   - Detalhes: `docs/REFACTORING_PLAN_GRANULAR_V2.md` § 2.2
 
-2. **1.3 — [Próxima subtarefa não especificada no plano — confirmar]**
-   - Duração: —
-   - Dependências: 1.2?
-   - Status: ⏳ FUTURE
-   - Detalhes: Verificar com REFACTORING_PLAN_GRANULAR_V2.md
+2. **2.3 — Integrar LoginPage com backend**
+   - Duração: 1-1.5 dia
+   - Dependências: 2.2
+   - Status: ⏳ NEXT
 
-3. **1.4 — [Próxima]**
-   - Duração: —
-   - Status: ⏳ FUTURE
+3. **2.4 — Integrar RegisterPage com backend**
+   - Duração: 1 dia
+   - Dependências: 2.3
+   - Status: ⏳ BLOCKED on 2.3
 
 ### ⛔ Blockers
 
-❌ **Nenhum blocker detectado.**
+✅ **Nenhum blocker detectado.**
 
-- ✅ Backend: Status desconhecido (validar em `/start-implementation`)
+- ✅ Backend: aguardando ambiente local completo (Docker em instalação)
 - ✅ Tests: Vitest pronto para usar
-- ✅ Git: Branch `feature/refactor-auth-guard-global` sincronizada com origin
+- ✅ Git: Branch `feature/refactor-auth-service-2-1` ativa
 - ✅ Documentação: Todas docs em `/docs/` presentes
 
 ---
@@ -95,21 +116,28 @@
 | 6   | 0.6.1 | ✅ DONE | 1/1     | 4/4    | src/**tests**/unit/routes/publicRoutes.test.tsx                                                       | RED estrutural (testes antes de rodar)      | Suite valida que /, /register, /forgot-password e /unauthorized são acessíveis sem autenticação      |
 | 7   | 1.1.1 | ✅ DONE | 2/2     | 27/27  | Type-check OK; Vitest: 27/27 testes passando                                                          | Draft: tipos consolidados em @ava-poc/types | Consolidação de tipos em v1.0 + resolução de role (professor/student/admin) + imports bem-definidos  |
 
-**Resumo:** 7/7 stories Fase 0 + 1/1 story Fase 1.1, Total 8/8 commits, 27/27 testes focados passando
+**Resumo:** Fases 0 e 1 concluídas e auditadas (100%). Fase 2 em progresso: 2.1 concluída (commits: 3ece624, a2ec8eb, 877540a). Próxima: 2.2 (Request Interceptor).
+
+**Atualização 2.1 (fora da tabela por limite de largura):**
+
+- Story: 2.1.1
+- Status: ✅ DONE
+- Commits: 3/3 (`3ece624`, `a2ec8eb`, `877540a`)
+- Testes: 19/19
+- Evidência: `src/__tests__/unit/services/authService.test.ts` e `src/__tests__/unit/services/api.interceptor.test.ts`
 
 ### Last Action
 
-- **Date:** 26/03/2026 16:00 UTC
+- **Date:** 27/03/2026 UTC
 - **Machine:** local
-- **What:** Subtarefa 1.1 implementada — consolidação de tipos em @ava-poc/types v1.0
-- **Testes executados:**
-  - Type-check TypeScript: ✅ PASSED (consolidação validada)
-  - Vitest: 27/27 ✅ PASSED
-- **Commits realizados:**
-  - `9bb4021` refactor: Consolidar tipos domain + API em @ava-poc/types v1.0
-  - `910841e` refactor: Resolver inconsistência role e atualizar imports
-- **Status:** Consolidação de tipos concluída; todos os consumidores migrados para @ava-poc/types; imports centralizados; role resolvido (professor/student/admin)
-- **Próxima:** 1.2 (Migrar useAuthStore para tipos globais) — READY NOW
+- **What:** Auditoria completa das Fases 0 e 1 — todos os itens confirmados PASS. Documentação atualizada.
+- **Validações executadas:**
+  - `get_errors` frontend: ✅ zero erros
+  - `grep` por `: any` / `<any>` em src: ✅ zero matches
+  - `grep` por hardcodes de role em pages: ✅ zero matches
+- **Commits realizados:** sem novo commit (apenas atualização de docs)
+- **Status:** Fase 0 ✅ e Fase 1 ✅ fechadas. Próxima: 2.2 (Request Interceptor)
+- **Próxima:** Implementar 2.2 (Request Interceptor em api.ts)
 
 ### Observações Contratuais da 0.2
 
@@ -123,8 +151,8 @@ Quando você voltar para continuar:
 # 1. Antes de tudo, validar contexto
 /status-refactoring
 
-# 2. Começar Fase 1.2
-Implemente 1.2 (Migrar useAuthStore para tipos globais)
+# 2. Começar Fase 2.2
+Implemente 2.2 (Implementar Request Interceptor em api.ts)
 ```
 
 ### Important Notes
@@ -211,14 +239,14 @@ _Será atualizada conforme velocidade real for estabelecida._
 
 ## QUICK REFERENCE
 
-| Ação                            | Comando                                      |
-| ------------------------------- | -------------------------------------------- |
-| Ver status atual                | `/status-refactoring`                        |
-| Começar implementação           | `Implemente 0.4 (Implementar logout seguro)` |
-| Ver contexto                    | Ler este arquivo: **MEMORY.md**              |
-| Consultar detalhes da subtarefa | `docs/REFACTORING_PLAN_GRANULAR_V2.md`       |
-| Validar contexto todo           | `/start-implementation`                      |
-| Ler guia completo               | `docs/COMO_COMECAR.md`                       |
+| Ação                            | Comando                                |
+| ------------------------------- | -------------------------------------- |
+| Ver status atual                | `/status-refactoring`                  |
+| Começar implementação           | `Implemente 2.2`                       |
+| Ver contexto                    | Ler este arquivo: **MEMORY.md**        |
+| Consultar detalhes da subtarefa | `docs/REFACTORING_PLAN_GRANULAR_V2.md` |
+| Validar contexto todo           | `/start-implementation`                |
+| Ler guia completo               | `docs/COMO_COMECAR.md`                 |
 
 ---
 
@@ -236,27 +264,17 @@ _Será atualizada conforme velocidade real for estabelecida._
 
 ## 📝 Arquivos em Edição
 
-- [ ] `src/.../.../file1.tsx`
-- [ ] `src/__tests__/.../file1.test.tsx`
-- [ ] `src/.../.../file2.tsx`
-
-**Status de cada um:**
-
-- file1.tsx: [descrição do estado — 80% escrito, faltam testes]
-- file1.test.tsx: [estado — RED, 2 testes falhando]
-- file2.tsx: [estado — TODO]
+- [x] `apps/poc-react-vite/src/__tests__/unit/services/authService.test.ts` (committed)
+- [x] `apps/poc-react-vite/src/services/authService.ts` (committed)
+- [x] `apps/poc-react-vite/src/services/types/authService.types.ts` (committed)
+- [ ] `MEMORY.MD` (atualização desta sessão, não commitada)
+- [ ] `backend/` (untracked, fora do escopo)
 
 ---
 
 ## 🚦 Bloqueadores
 
-**Nenhum registrado**
-
-Ou:
-
-| Bloqueador  | Impacto               | Solução           |
-| ----------- | --------------------- | ----------------- |
-| [descrição] | [qual story bloqueia] | [ação necessária] |
+Nenhum blocker técnico para continuar 2.2 no frontend.
 
 ---
 
@@ -266,7 +284,8 @@ Ou:
 - **MSW mock:** API mocking funciona corretamente, não precisa ajuste
 - **TypeScript:** strict mode — validar interface de store
 - **Padrão TDD:** Aprovado, seguir AAA (Arrange, Act, Assert)
-- **Commits:** Graph de commits em bom estado, merge pronto para development
+- **Commits:** 2.1 concluída com sequência granular test → feat → refactor
+- **Próximo foco:** 2.2 response/request interceptor com refresh token automático
 
 ---
 
@@ -287,27 +306,12 @@ Quando finalizar story, verificar:
 
 ## 🔗 Links de Referência
 
-| Link                                            | Propósito                                                      |
-| ----------------------------------------------- | -------------------------------------------------------------- |
-| `/memories/REFACTORING_PLAN_FINAL.md`           | Plano técnico completo (fases, stories, endpoints)             |
-| `/memories/refactoring-quick-ref.md`            | Quick reference (decisões, stack, próximas ações)              |
-| `/memories/sprint-tracking.md`                  | Rastreamento de progresso global                               |
-| `CLAUDE.md`                                     | Diretrizes de código, SOLID, Clean Code                        |
-| `.claude/commands/doc/requisitos-funcionais.md` | RFs — orienta quais endpoints/funcionalidades implementar      |
-| `.claude/commands/doc/user-stories.md`          | USs — contexto de negócio por perfil (ADMIN, PROFESSOR, ALUNO) |
-
----
-
-## 🔄 Histórico de Updates Nesta Sessão
-
-```
-[HH:MM] Iniciada sessão, chat #X
-[HH:MM] Story X.Y.1 — DONE (testes + implementação + commit)
-[HH:MM] Story X.Y.2 — Em testes, 2/2 passando
-[HH:MM] MEMORY.md atualizado — próximo: implementar arquivo2.tsx
-```
-
----
+| Link                                   | Propósito                                  |
+| -------------------------------------- | ------------------------------------------ |
+| `docs/REFACTORING_PLAN_GRANULAR_V2.md` | Plano mestre de execução das 43 subtarefas |
+| `docs/REFACTORING_QUICK_REFERENCE.md`  | Resumo operacional do fluxo de refatoração |
+| `docs/COMO_COMECAR.md`                 | Setup e workflow de trabalho               |
+| `CLAUDE.md`                            | Diretrizes de código, contrato e escopo    |
 
 ## 🛑 Pausar / Retomar
 
@@ -327,6 +331,6 @@ Quando finalizar story, verificar:
 
 ---
 
-**Última atualização:** [vazio — preencher ao usar]  
-**Status:** [vazio — preencher ao usar]  
-**Sessão ativa:** SIM / NÃO
+**Última atualização:** 27/03/2026  
+**Status:** Fase 2.1 concluída, 2.2 ready  
+**Sessão ativa:** SIM

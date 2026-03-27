@@ -22,6 +22,10 @@ export function MessagePage() {
   const navigate = useNavigate();
   const { currentUser, sendMessage } = useAuthStore();
 
+  if (!currentUser) {
+    return null;
+  }
+
   const {
     watch,
     setValue,
@@ -84,7 +88,7 @@ export function MessagePage() {
     setShowErrors(true);
   };
 
-  const initials = currentUser.name
+  const initials = currentUser.nome
     .split(" ")
     .map((n: string) => n[0])
     .join("")
@@ -143,9 +147,9 @@ export function MessagePage() {
             {/* Avatar */}
             <div className="relative mb-[12px]">
               <div className="size-[110px] rounded-full bg-[#042e99] border-4 border-[#ffeac4] flex items-center justify-center overflow-hidden">
-                {currentUser.photoUrl ? (
+                {currentUser.fotoUrl ? (
                   <img
-                    src={currentUser.photoUrl}
+                    src={currentUser.fotoUrl}
                     alt=""
                     className="size-full object-cover"
                   />
@@ -162,7 +166,7 @@ export function MessagePage() {
 
             {/* Name and role */}
             <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#ffeac4] text-[22px]">
-              {currentUser.name}
+              {currentUser.nome}
             </p>
             <p className="font-['Figtree:Regular',sans-serif] text-[rgba(255,234,196,0.8)] text-[14px]">
               Professor

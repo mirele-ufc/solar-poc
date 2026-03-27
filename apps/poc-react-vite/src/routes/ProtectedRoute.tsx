@@ -10,7 +10,7 @@ export function ProtectedRoute({
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const currentUser = useAuthStore((state) => state.currentUser);
 
-  if (!isLoggedIn) {
+  if (!isLoggedIn || !currentUser) {
     return <Navigate to={redirectTo} replace />;
   }
 

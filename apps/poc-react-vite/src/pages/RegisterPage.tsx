@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { FormContainer } from "@/components/shared/FormContainer";
 import imgUfcLogo1 from "@/assets/9098abf5bf97a1aac4c76f171ec108cee92cfddb.png";
 import imgAtivo224X1 from "@/assets/a17a08a750e97ba9bb12c3ad582c426a8debf0fa.png";
 import {
@@ -281,11 +282,13 @@ export function RegisterPage() {
         )}
 
         {/* Form */}
-        <form
-          className="flex flex-col gap-[12px] items-start w-full"
+        <FormContainer
+          className="w-full"
           onSubmit={handleSubmit(onSubmitValid, onSubmitInvalid)}
           noValidate
+          aria-label="Formulário de cadastro"
         >
+          <FormContainer.Body className="flex flex-col gap-[12px] items-start w-full">
           <InputField
             label="CPF"
             placeholder="Formato: 000.000.000-00"
@@ -410,7 +413,8 @@ export function RegisterPage() {
               </span>
             </button>
           </div>
-        </form>
+          </FormContainer.Body>
+        </FormContainer>
 
         {/* Footer */}
         <nav

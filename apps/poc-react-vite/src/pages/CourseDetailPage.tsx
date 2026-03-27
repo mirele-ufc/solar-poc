@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { useCourseStore } from "@/store/useCourseStore";
 import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { Modal } from "@/components/ui/modal";
 import { toast } from "sonner";
 
 const HERO_IMAGE =
@@ -18,23 +19,6 @@ const bullets = [
   "Construção de dashboards interativos e relatórios visuais",
   "Publicação e compartilhamento de relatórios no Power BI Service",
 ];
-
-// TODO: Use these constants when rendering course details UI
-// @future: implement course details section with target audience and prerequisites info
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const courseDetailsData = {
-  publicTarget: [
-    "Profissionais de diversas áreas que trabalham com análise de dados",
-    "Estudantes e recém-formados interessados em Business Intelligence",
-    "Gestores que desejam tomar decisões baseadas em dados",
-    "Analistas que buscam aprimorar suas habilidades em visualização de dados",
-  ],
-  prerequisites: [
-    "Conhecimentos básicos de informática e navegação na web",
-    "Familiaridade com planilhas eletrônicas (Excel ou similar)",
-    "Não é necessário conhecimento prévio em programação",
-  ],
-};
 
 export function CourseDetailPage() {
   const navigate = useNavigate();
@@ -182,79 +166,58 @@ export function CourseDetailPage() {
       </div>
 
       {/* ── Cancel enrollment confirmation modal ── */}
-      {showCancelModal && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
-            onClick={() => setShowCancelModal(false)}
-            aria-hidden="true"
-          />
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="cancel-modal-title"
-            aria-describedby="cancel-modal-desc"
-            className="fixed inset-0 z-50 flex items-center justify-center px-[20px]"
-          >
-            <div className="bg-white w-full max-w-[420px] rounded-[12px] shadow-2xl p-[28px] flex flex-col gap-[20px]">
-              {/* Icon + title */}
-              <div className="flex flex-col items-center gap-[12px] text-center">
-                <div
-                  className="size-[52px] rounded-full bg-[#fde8ef] flex items-center justify-center shrink-0"
-                  aria-hidden="true"
-                >
-                  <svg
-                    className="size-[28px]"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path d={WARN_PATH} fill="#de2e66" />
-                  </svg>
-                </div>
-                <h2
-                  id="cancel-modal-title"
-                  className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[20px] leading-[30px]"
-                >
-                  Cancelar matrícula?
-                </h2>
-              </div>
-
-              {/* Message */}
-              <p
-                id="cancel-modal-desc"
-                className="font-['Figtree:Regular',sans-serif] text-[#333] text-[15px] leading-[24px] text-center"
+      <Modal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        className="w-full max-w-[420px] rounded-[12px] shadow-2xl p-[28px] gap-[20px]"
+      >
+        <Modal.Header>
+          <div className="flex flex-col items-center gap-[12px] text-center">
+            <div
+              className="size-[52px] rounded-full bg-[#fde8ef] flex items-center justify-center shrink-0"
+              aria-hidden="true"
+            >
+              <svg
+                className="size-[28px]"
+                fill="none"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
               >
-                Tem certeza que deseja cancelar sua matrícula neste curso?{" "}
-                <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#801436]">
-                  Após o cancelamento, você perderá o acesso ao conteúdo da
-                  disciplina
-                </span>
-                , incluindo aulas, materiais, atividades, provas e fóruns.
-              </p>
-
-              {/* Actions */}
-              <div className="flex flex-col gap-[10px]">
-                <button
-                  type="button"
-                  onClick={handleConfirmCancel}
-                  className="w-full h-[50px] bg-[#de2e66] rounded-[26px] hover:bg-[#ba348a] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#de2e66] focus-visible:outline-offset-[2px] font-['Figtree:Medium',sans-serif] font-medium text-white text-[17px]"
-                >
-                  Confirmar cancelamento
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowCancelModal(false)}
-                  className="w-full h-[50px] border-2 border-[#021b59] rounded-[26px] hover:bg-[#021b59]/5 transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px] font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[17px]"
-                  autoFocus
-                >
-                  Voltar — manter matrícula
-                </button>
-              </div>
+                <path d={WARN_PATH} fill="#de2e66" />
+              </svg>
             </div>
+            <span className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[20px] leading-[30px]">
+              Cancelar matrícula?
+            </span>
           </div>
-        </>
-      )}
+        </Modal.Header>
+
+        <Modal.Body className="font-['Figtree:Regular',sans-serif] text-[#333] text-[15px] leading-[24px] text-center">
+          Tem certeza que deseja cancelar sua matrícula neste curso?{" "}
+          <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#801436]">
+            Após o cancelamento, você perderá o acesso ao conteúdo da disciplina
+          </span>
+          , incluindo aulas, materiais, atividades, provas e fóruns.
+        </Modal.Body>
+
+        <Modal.Footer className="flex flex-col gap-[10px] sm:flex-col sm:justify-start">
+          <button
+            type="button"
+            onClick={handleConfirmCancel}
+            className="w-full h-[50px] bg-[#de2e66] rounded-[26px] hover:bg-[#ba348a] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#de2e66] focus-visible:outline-offset-[2px] font-['Figtree:Medium',sans-serif] font-medium text-white text-[17px]"
+          >
+            Confirmar cancelamento
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowCancelModal(false)}
+            className="w-full h-[50px] border-2 border-[#021b59] rounded-[26px] hover:bg-[#021b59]/5 transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px] font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[17px]"
+            autoFocus
+          >
+            Voltar — manter matrícula
+          </button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

@@ -48,6 +48,17 @@ function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
+function CardImage({ className, alt, ...props }: React.ComponentProps<"img">) {
+  return (
+    <img
+      data-slot="card-image"
+      alt={alt}
+      className={cn("w-full rounded-t-xl object-cover", className)}
+      {...props}
+    />
+  );
+}
+
 function CardAction({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -81,12 +92,25 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
+// Compound component — slots pattern (dot-notation)
+const CardCompound = Object.assign(Card, {
+  Header: CardHeader,
+  Content: CardContent,
+  Body: CardContent,
+  Footer: CardFooter,
+  Title: CardTitle,
+  Description: CardDescription,
+  Action: CardAction,
+  Image: CardImage,
+});
+
 export {
-  Card,
+  CardCompound as Card,
   CardHeader,
   CardFooter,
   CardTitle,
   CardAction,
   CardDescription,
+  CardImage,
   CardContent,
 };

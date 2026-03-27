@@ -68,9 +68,13 @@ export function AuthLayout() {
     }
   }, [menuOpen]);
 
+  if (!currentUser) {
+    return <Outlet />;
+  }
+
   // compute initials for avatar fallback
   const initials = (() => {
-    const parts = currentUser.name.trim().split(/\s+/);
+    const parts = currentUser.nome.trim().split(/\s+/);
     if (parts.length >= 2)
       return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     return parts[0].slice(0, 2).toUpperCase();
@@ -162,9 +166,9 @@ export function AuthLayout() {
               }}
               className={`flex items-center justify-center size-[44px] rounded-full border-2 border-[#ffeac4] overflow-hidden focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#ffeac4] transition-colors bg-[#042e99]`}
             >
-              {currentUser.photoUrl ? (
+              {currentUser.fotoUrl ? (
                 <img
-                  src={currentUser.photoUrl}
+                  src={currentUser.fotoUrl}
                   alt="Foto de perfil"
                   className="size-full object-cover"
                 />
@@ -195,9 +199,9 @@ export function AuthLayout() {
                   {/* User info */}
                   <div className="px-[20px] py-[8px] pb-[14px] flex items-center gap-[12px] border-b border-[#ffeac4]/20 mb-[6px]">
                     <div className="size-[38px] rounded-full overflow-hidden bg-[#042e99] border border-[#ffeac4] shrink-0 flex items-center justify-center">
-                      {currentUser.photoUrl ? (
+                      {currentUser.fotoUrl ? (
                         <img
-                          src={currentUser.photoUrl}
+                          src={currentUser.fotoUrl}
                           alt=""
                           className="size-full object-cover"
                           aria-hidden="true"
@@ -213,10 +217,10 @@ export function AuthLayout() {
                     </div>
                     <div>
                       <p className="font-['Figtree:Medium',sans-serif] font-medium leading-[22px] text-[#ffeac4] text-[16px]">
-                        {currentUser.name}
+                        {currentUser.nome}
                       </p>
                       <p className="font-['Figtree:Regular',sans-serif] font-normal text-[#ffeac4]/70 text-[12px]">
-                        {currentUser.email}
+                        {currentUser?.email}
                       </p>
                     </div>
                   </div>
@@ -245,7 +249,7 @@ export function AuthLayout() {
                   </button>
 
                   {/* Mensagem — somente para professores */}
-                  {currentUser.role === "professor" && (
+                  {currentUser?.role === "professor" && (
                     <button
                       role="menuitem"
                       type="button"
@@ -273,7 +277,7 @@ export function AuthLayout() {
                   )}
 
                   {/* My Courses — for professors and students */}
-                  {currentUser.role === "professor" && (
+                  {currentUser?.role === "professor" && (
                     <button
                       role="menuitem"
                       type="button"
@@ -301,7 +305,7 @@ export function AuthLayout() {
                   )}
 
                   {/* My Courses — students only */}
-                  {currentUser.role === "student" && (
+                  {currentUser?.role === "student" && (
                     <button
                       role="menuitem"
                       type="button"
@@ -329,7 +333,7 @@ export function AuthLayout() {
                   )}
 
                   {/* Mensagens recebidas — somente para estudantes */}
-                  {currentUser.role === "student" && (
+                  {currentUser?.role === "student" && (
                     <button
                       role="menuitem"
                       type="button"

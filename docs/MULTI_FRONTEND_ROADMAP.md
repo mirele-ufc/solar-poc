@@ -9,9 +9,16 @@
 
 ## 🎯 Visão Geral
 
+### Escopo do Ciclo Atual (Obrigatório)
+
+- O ciclo atual permanece em `apps/poc-react-vite`.
+- A estratégia ativa é híbrida e frontend-only.
+- Itens de Vue/Next são roadmap futuro e não entram no escopo de implementação corrente.
+
 A arquitetura de refatoração foi **projetada para ser agnóstica a framework**, permitindo:
 
 ✅ **Reutilização:**
+
 - Mesmo plano de refatoração (43 subtarefas)
 - Mesmo baseline contratual estrito de endpoints em arquitetura.md
 - Mesmos requisitos (RF/RN/RNF)
@@ -19,6 +26,7 @@ A arquitetura de refatoração foi **projetada para ser agnóstica a framework**
 - Mesmos tipos compartilhados
 
 ⚠️ **O que muda:**
+
 - Stack específica por framework
 - Padrões de componentes
 - Convenções de código (CLAUDE-TECH.md)
@@ -223,67 +231,79 @@ export const loginSchema = z.object({
 
 ### **3. Padrões de Estado (DIFEREM)**
 
-| React | Vue 3 | Next.js |
-|-------|-------|---------|
-| **Zustand** | **Pinia** | **Zustand + Server State** |
-| `useAuthStore()` | `useAuthStore()` (Pinia) | `useAuthStore()` + server actions |
+| React                             | Vue 3                                      | Next.js                              |
+| --------------------------------- | ------------------------------------------ | ------------------------------------ |
+| **Zustand**                       | **Pinia**                                  | **Zustand + Server State**           |
+| `useAuthStore()`                  | `useAuthStore()` (Pinia)                   | `useAuthStore()` + server actions    |
 | `const { user } = useAuthStore()` | `const store = useAuthStore(); store.user` | Client: Zustand / Server: middleware |
-| Global state only | Global + reactive | Global (split: client/server) |
+| Global state only                 | Global + reactive                          | Global (split: client/server)        |
 
 ### **4. Componentes (DIFEREM SINTAXE, MESMA LÓGICA)**
 
-| React | Vue 3 | Next.js |
-|-------|-------|---------|
-| **Functional Components** | **SFC (.vue)** | **RSC/Client Comps** |
-| `function Card({ children })` | `<script setup> defineSlots() </script>` | `export default function Card()` (RSC) |
-| Props via destructure | `defineProps()` in `<script setup>` | Props via function args |
-| Slots pattern: `<Card.Header>` | Slots: `<template #header>` | Slots: `{children}` prop |
-| Hooks: `useState`, `useEffect` | Composables: `ref()`, `computed()` | Client: Hooks / Server: async |
+| React                          | Vue 3                                    | Next.js                                |
+| ------------------------------ | ---------------------------------------- | -------------------------------------- |
+| **Functional Components**      | **SFC (.vue)**                           | **RSC/Client Comps**                   |
+| `function Card({ children })`  | `<script setup> defineSlots() </script>` | `export default function Card()` (RSC) |
+| Props via destructure          | `defineProps()` in `<script setup>`      | Props via function args                |
+| Slots pattern: `<Card.Header>` | Slots: `<template #header>`              | Slots: `{children}` prop               |
+| Hooks: `useState`, `useEffect` | Composables: `ref()`, `computed()`       | Client: Hooks / Server: async          |
 
 ### **5. Diretrizes (CLAUDE-TECH.md)**
 
 #### **CLAUDE-REACT.md**
+
 ```markdown
 ## Stack
+
 React 18+, Vite, Zustand, React Query, React Router, Shadcn UI
 
 ## Padrões
+
 - Functional components with custom hooks
 - Zustand for global state
 - React Query for remote data
 - Slots pattern via children composition
 
 ## Testes
+
 Vitest + @testing-library/react
 ```
 
 #### **CLAUDE-VUE.md**
+
 ```markdown
 ## Stack
+
 Vue 3, Vite, Pinia, VueQuery, Vue Router, Headless UI
 
 ## Padrões
+
 - Single File Components (SFC) with Composition API
 - Pinia for global state (reactive)
 - VueQuery for remote data
 - Slots pattern via <template #slotName>
 
 ## Testes
+
 Vitest + @vue/test-utils
 ```
 
 #### **CLAUDE-NEXT.md**
+
 ```markdown
 ## Stack
+
 Next.js 14+, Server Components, Pinia, TanStack Query, Tailwind
 
 ## Padrões
+
 - RSC (React Server Components) for data fetching
 - Client Components for interactivity
 - Server Actions for mutations
 - Slots pattern via {children}
 
 ## Testes
+
 Vitest + @testing-library/react (only client components)
 ```
 
@@ -345,18 +365,21 @@ Vitest + @testing-library/react (only client components)
 ## 🎓 Benefícios da Abordagem Multi-Frontend
 
 ### **Para a UFC:**
+
 - ✅ **Comparar frameworks** na prática (React vs Vue vs Next)
 - ✅ **Reutilizar tipos** e lógica de negócio
 - ✅ **Provar que backend é agnóstico** a frontend
 - ✅ **Validar portabilidade** de designs
 
 ### **Para Developers:**
+
 - ✅ **Aprender 3 frameworks** com mesmo projeto
 - ✅ **Padrões análogos** (Zustand ↔ Pinia ↔ TanStack Query)
 - ✅ **Mesmos testes** (Zod, services, tipos)
 - ✅ **Portfolio impressionante** (UFC LMS em 3 stacks)
 
 ### **Para o Projeto:**
+
 - ✅ **Escalabilidade** (fácil adicionar Svelte, Angular, etc.)
 - ✅ **Manutenção** (tipos compartilhados = DRY)
 - ✅ **CI/CD** (Turbo paraleliza testes dos 3 apps)
@@ -370,9 +393,10 @@ Vitest + @testing-library/react (only client components)
 ✅ Não bloqueia outros frameworks  
 ✅ Documentação já suporta escalabilidade  
 ✅ Agente de validação é agnóstico  
-✅ Tipos estão preparados para reutilização  
+✅ Tipos estão preparados para reutilização
 
 **Quando React terminar (Semana 18):**
+
 1. Criar monorepo Turbo
 2. Adaptar tipos para `@ava-poc/types`
 3. Começar Vue (reutiliza 80% de código)
@@ -380,4 +404,3 @@ Vitest + @testing-library/react (only client components)
 ---
 
 **Salvo em:** `/docs/MULTI_FRONTEND_ROADMAP.md` — versionado e consultável quando escalar
-

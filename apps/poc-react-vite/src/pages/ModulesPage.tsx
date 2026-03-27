@@ -4,28 +4,21 @@ import imgRectangle30 from "@/assets/22ebf3a06cf8215c6bd0946f42302bc2204ed790.pn
 import { PageHeader } from "@/components/shared/PageHeader";
 import { useEnrollmentGuard } from "@/hooks/useEnrollmentGuard";
 import { useAuthStore } from "@/store/useAuthStore";
+import type {
+  ICompletionDeclarationModal,
+  IEnrollmentDeclarationModal,
+  IModuleData,
+  IProgressBarProps,
+  IRequirementsAlert,
+  ModuleItemType,
+} from "@/types";
 
 // ─── Arrow / Check SVG paths ─────────────────────────────────────────────────
 const ARROW_PATH = "M6 7L12 13L18 7L20 9L12 17L4 9L6 7Z";
 const CHECK_PATH = "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
-type ItemType = "aula" | "prova";
-
-interface LessonItem {
-  id: string;
-  label: string;
-  type: ItemType;
-  modId: string;
-}
-
-interface ModuloData {
-  id: string;
-  title: string;
-  items: LessonItem[];
-}
-
-const MODULOS: ModuloData[] = [
+const MODULOS: IModuleData[] = [
   {
     id: "1",
     title: "Módulo 01",
@@ -33,25 +26,25 @@ const MODULOS: ModuloData[] = [
       {
         id: "m1-aula-01",
         label: "Aula 01 - Introdução",
-        type: "aula",
+        type: "lesson",
         modId: "1",
       },
       {
         id: "m1-aula-02",
         label: "Aula 02 - Conceitos Básicos",
-        type: "aula",
+        type: "lesson",
         modId: "1",
       },
       {
         id: "m1-aula-03",
         label: "Aula 03 - Prática",
-        type: "aula",
+        type: "lesson",
         modId: "1",
       },
       {
         id: "m1-prova-01",
         label: "Prova do Módulo",
-        type: "prova",
+        type: "exam",
         modId: "1",
       },
     ],
@@ -63,25 +56,25 @@ const MODULOS: ModuloData[] = [
       {
         id: "m2-aula-01",
         label: "Aula 01 - Power Query",
-        type: "aula",
+        type: "lesson",
         modId: "2",
       },
       {
         id: "m2-aula-02",
         label: "Aula 02 - Transformação de Dados",
-        type: "aula",
+        type: "lesson",
         modId: "2",
       },
       {
         id: "m2-aula-03",
         label: "Aula 03 - Relacionamentos",
-        type: "aula",
+        type: "lesson",
         modId: "2",
       },
       {
         id: "m2-prova-01",
         label: "Prova do Módulo",
-        type: "prova",
+        type: "exam",
         modId: "2",
       },
     ],
@@ -93,25 +86,25 @@ const MODULOS: ModuloData[] = [
       {
         id: "m3-aula-01",
         label: "Aula 01 - DAX Básico",
-        type: "aula",
+        type: "lesson",
         modId: "3",
       },
       {
         id: "m3-aula-02",
         label: "Aula 02 - Visualizações Avançadas",
-        type: "aula",
+        type: "lesson",
         modId: "3",
       },
       {
         id: "m3-aula-03",
         label: "Aula 03 - Publicação e Compartilhamento",
-        type: "aula",
+        type: "lesson",
         modId: "3",
       },
       {
         id: "m3-prova-01",
         label: "Prova do Módulo",
-        type: "prova",
+        type: "exam",
         modId: "3",
       },
     ],
@@ -121,10 +114,10 @@ const MODULOS: ModuloData[] = [
 // Todos os IDs de lições para validar conclusão
 const ALL_LESSON_IDS = MODULOS.flatMap((m) => m.items.map((i) => i.id));
 const ALL_AULA_IDS = MODULOS.flatMap((m) =>
-  m.items.filter((i) => i.type === "aula").map((i) => i.id),
+  m.items.filter((i) => i.type === "lesson").map((i) => i.id),
 );
 const ALL_PROVA_IDS = MODULOS.flatMap((m) =>
-  m.items.filter((i) => i.type === "prova").map((i) => i.id),
+  m.items.filter((i) => i.type === "exam").map((i) => i.id),
 );
 
 const VISITED_KEY = "solar_visited_lessons";
@@ -200,12 +193,7 @@ function CheckIcon() {
   );
 }
 
-interface ProgressBarProps {
-  visited: number;
-  total: number;
-}
-
-function ProgressBar({ visited, total }: ProgressBarProps) {
+function ProgressBar({ visited, total }: IProgressBarProps) {
   const pct = total > 0 ? Math.round((visited / total) * 100) : 0;
   return (
     <div className="w-full mt-[4px]">
@@ -241,11 +229,15 @@ function ProgressBar({ visited, total }: ProgressBarProps) {
 }
 
 interface ModuleCardProps {
-  modulo: ModuloData;
+  modulo: IModuleData;
   isOpen: boolean;
   onToggle: () => void;
   visited: Set<string>;
-  onVisitLesson: (lessonId: string, modId: string, type: ItemType) => void;
+  onVisitLesson: (
+    lessonId: string,
+    modId: string,
+    type: ModuleItemType,
+  ) => void;
 }
 
 function ModuleCard({
@@ -255,7 +247,7 @@ function ModuleCard({
   visited,
   onVisitLesson,
 }: ModuleCardProps) {
-  const aulaItems = modulo.items.filter((i) => i.type === "aula");
+  const aulaItems = modulo.items.filter((i) => i.type === "lesson");
   const visitedCount = aulaItems.filter((i) => visited.has(i.id)).length;
 
   return (
@@ -295,7 +287,7 @@ function ModuleCard({
                   <button
                     type="button"
                     onClick={() =>
-                      onVisitLesson(item.id, item.modId, item.type)
+                      onVisitLesson(item.id, item.modId ?? modulo.id, item.type)
                     }
                     className="flex items-center justify-between w-full py-[10px] text-left focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:rounded-[4px] focus-visible:outline-offset-[2px] group"
                   >
@@ -322,19 +314,12 @@ function ModuleCard({
 
 // ─── Declaration Modals ───────────────────────────────────────────────────────
 
-interface DeclaracaoMatriculaModalProps {
-  onClose: () => void;
-  studentName: string;
-  validationCode: string;
-  emissionDate: Date;
-}
-
 function DeclaracaoMatriculaModal({
   onClose,
   studentName,
   validationCode,
   emissionDate,
-}: DeclaracaoMatriculaModalProps) {
+}: IEnrollmentDeclarationModal) {
   // ESC fecha
   useEffect(() => {
     function handleEsc(e: KeyboardEvent) {
@@ -532,21 +517,13 @@ function DeclaracaoMatriculaModal({
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface DeclaracaoConclusaoModalProps {
-  onClose: () => void;
-  studentName: string;
-  validationCode: string;
-  emissionDate: Date;
-  conclusionDate: Date;
-}
-
 function DeclaracaoConclusaoModal({
   onClose,
   studentName,
   validationCode,
   emissionDate,
   conclusionDate,
-}: DeclaracaoConclusaoModalProps) {
+}: ICompletionDeclarationModal) {
   useEffect(() => {
     function handleEsc(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -757,21 +734,13 @@ function DeclaracaoConclusaoModal({
 
 // ─── Alerta de requisitos não cumpridos ───────────────────────────────────────
 
-interface RequisitosAlertProps {
-  totalAulas: number;
-  visitedAulas: number;
-  totalProvas: number;
-  visitedProvas: number;
-  onClose: () => void;
-}
-
 function RequisitosAlert({
-  totalAulas,
-  visitedAulas,
-  totalProvas,
-  visitedProvas,
+  totalLessons,
+  visitedLessons,
+  totalExams,
+  visitedExams,
   onClose,
-}: RequisitosAlertProps) {
+}: IRequirementsAlert) {
   useEffect(() => {
     function handleEsc(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -834,13 +803,13 @@ function RequisitosAlert({
             {[
               {
                 label: "Aulas concluídas",
-                done: visitedAulas >= totalAulas,
-                detail: `${visitedAulas} de ${totalAulas} aulas`,
+                done: visitedLessons >= totalLessons,
+                detail: `${visitedLessons} de ${totalLessons} aulas`,
               },
               {
                 label: "Provas realizadas",
-                done: visitedProvas >= totalProvas,
-                detail: `${visitedProvas} de ${totalProvas} provas`,
+                done: visitedExams >= totalExams,
+                detail: `${visitedExams} de ${totalExams} provas`,
               },
             ].map(({ label, done, detail }) => (
               <div
@@ -934,11 +903,11 @@ export function ModulesPage() {
   }, [visited]);
 
   // Compute completion
-  const visitedAulas = ALL_AULA_IDS.filter((id) => visited.has(id)).length;
-  const visitedProvas = ALL_PROVA_IDS.filter((id) => visited.has(id)).length;
+  const visitedLessons = ALL_AULA_IDS.filter((id) => visited.has(id)).length;
+  const visitedExams = ALL_PROVA_IDS.filter((id) => visited.has(id)).length;
   const isConcluded =
-    visitedAulas >= ALL_AULA_IDS.length &&
-    visitedProvas >= ALL_PROVA_IDS.length;
+    visitedLessons >= ALL_AULA_IDS.length &&
+    visitedExams >= ALL_PROVA_IDS.length;
 
   const totalProgress = ALL_LESSON_IDS.filter((id) => visited.has(id)).length;
   const overallPct = Math.round((totalProgress / ALL_LESSON_IDS.length) * 100);
@@ -955,7 +924,7 @@ export function ModulesPage() {
   const handleVisitLesson = (
     lessonId: string,
     modId: string,
-    type: ItemType,
+    type: ModuleItemType,
   ) => {
     setVisited((prev) => {
       const next = new Set(prev);
@@ -963,11 +932,11 @@ export function ModulesPage() {
       return next;
     });
 
-    if (type === "prova") {
+    if (type === "exam") {
       navigate("/courses/power-bi/exam/instructions");
     } else {
       const mod = MODULOS.find((m) => m.id === modId);
-      const aulaItems = mod?.items.filter((i) => i.type === "aula") ?? [];
+      const aulaItems = mod?.items.filter((i) => i.type === "lesson") ?? [];
       const aulaIndex = aulaItems.findIndex((i) => i.id === lessonId);
       navigate(`/courses/power-bi/modules/${modId}`, {
         state: { aulaIndex: aulaIndex >= 0 ? aulaIndex : 0 },
@@ -1149,7 +1118,7 @@ export function ModulesPage() {
       {showMatriculaModal && (
         <DeclaracaoMatriculaModal
           onClose={() => setShowMatriculaModal(false)}
-          studentName={currentUser.name}
+          studentName={currentUser?.nome ?? "Estudante"}
           validationCode={matriculaCode}
           emissionDate={emissionDate}
         />
@@ -1158,7 +1127,7 @@ export function ModulesPage() {
       {showConclusaoModal && (
         <DeclaracaoConclusaoModal
           onClose={() => setShowConclusaoModal(false)}
-          studentName={currentUser.name}
+          studentName={currentUser?.nome ?? "Estudante"}
           validationCode={conclusaoCode}
           emissionDate={emissionDate}
           conclusionDate={emissionDate}
@@ -1168,10 +1137,10 @@ export function ModulesPage() {
       {showRequisitosAlert && (
         <RequisitosAlert
           onClose={() => setShowRequisitosAlert(false)}
-          totalAulas={ALL_AULA_IDS.length}
-          visitedAulas={visitedAulas}
-          totalProvas={ALL_PROVA_IDS.length}
-          visitedProvas={visitedProvas}
+          totalLessons={ALL_AULA_IDS.length}
+          visitedLessons={visitedLessons}
+          totalExams={ALL_PROVA_IDS.length}
+          visitedExams={visitedExams}
         />
       )}
     </main>

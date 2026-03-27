@@ -20,6 +20,8 @@ export function useEnrollmentGuard(courseId: string) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!currentUser) return; // Guard null check
+
     if (currentUser.role === "professor") {
       // Se o professor tem papel de aluno neste curso, aplica a regra de matrícula
       if (hasCourseStudentRole(courseId)) {
@@ -39,7 +41,7 @@ export function useEnrollmentGuard(courseId: string) {
     courseId,
     isEnrolledInCourse,
     navigate,
-    currentUser.role,
+    currentUser,
     hasCourseStudentRole,
   ]);
 }

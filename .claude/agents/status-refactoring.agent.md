@@ -8,6 +8,7 @@ description: "Agente de status e dashboard de progresso. Lê MEMORY.MD (GLOBAL P
 ## Propósito
 
 Agente que transforma a leitura de `MEMORY.MD` em um **dashboard visual e compreensível** com:
+
 1. ✅ Status atual (fase, progresso %)
 2. 📋 Próximas subtarefas ready (3 opções)
 3. ⛔ Blockers detectados (se houver)
@@ -23,6 +24,12 @@ Agente que transforma a leitura de `MEMORY.MD` em um **dashboard visual e compre
 - Se não houver autorização explícita, encerre no relatório e nas recomendações.
 - Não autorize commits, push, PR ou avanço de fase em nome do usuário.
 
+## Guardrails de Portabilidade (Cross-Machine)
+
+- Validar se o `MEMORY.md` foi atualizado recentemente antes de recomendar próxima ação.
+- Destacar possível divergência entre branch atual e branch registrada no `MEMORY.md`.
+- Se houver troca de máquina/sessão sem sincronização aparente, recomendar `/start-implementation` antes do executor.
+
 ---
 
 ## Workflow (3 Fases)
@@ -30,26 +37,27 @@ Agente que transforma a leitura de `MEMORY.MD` em um **dashboard visual e compre
 ### Fase 1: LER MEMORY.MD (1 minuto)
 
 **Ações:**
+
 ```
 1. Abrir arquivo: MEMORY.MD (raiz do projeto)
 2. Localizar seção: ## SECTION: GLOBAL PROGRESS
 3. Extrair dados:
    Status: <linha inicial com fase e percentual>
-   
+
    ✅ Completes table:
    - Linha 1: Sub | Title | Status | Date | Commit
    - Línhas seguintes: cada subtarefa completa
    - Contar total de linhas ✅
-   
+
    ⏳ Next Ready section:
    - Extrair próximas N subtarefas (geralmente 3 recomendadas)
    - Verificar dependências
-   
+
    ⛔ Potenciais blockers:
    - Subtarefa com ❌ status?
    - Subtarefa com ⏳ por mais de N dias?
    - Backend status "DOWN"?
-   
+
 4. Extrair SESSION CONTEXT (último snapshot):
    - Last Action data/hora/máquina
    - Next Action recomendada
@@ -57,45 +65,52 @@ Agente que transforma a leitura de `MEMORY.MD` em um **dashboard visual e compre
 ```
 
 **Exemplo de MEMORY.MD:**
+
 ```markdown
 ## SECTION: GLOBAL PROGRESS
 
 Status: Fase 0, 4/7 complete, 4/43 total (9%), next: 0.5
 
 ### ✅ Completes
-| Sub | Title | Status | Date | Commit |
-|-----|-------|--------|------|--------|
-| 0.1 | ProtectedRoute | ✅ | 22/03 | abc1234 |
-| 0.2 | Integrar ProtectedRoute | ✅ | 22/03 | def5678 |
-| 0.3 | Cleanup rotas | ✅ | 23/03 | ghi9012 |
-| 0.4 | Logout Seguro | ✅ | 24/03 | jkl3456 |
+
+| Sub | Title                   | Status | Date  | Commit  |
+| --- | ----------------------- | ------ | ----- | ------- |
+| 0.1 | ProtectedRoute          | ✅     | 22/03 | abc1234 |
+| 0.2 | Integrar ProtectedRoute | ✅     | 22/03 | def5678 |
+| 0.3 | Cleanup rotas           | ✅     | 23/03 | ghi9012 |
+| 0.4 | Logout Seguro           | ✅     | 24/03 | jkl3456 |
 
 ### ⏳ Next Ready
+
 1. 0.5 — Unauthorized page (0.5 day, deps: 0.1-0.4 ✅)
 2. 0.6 — Token refresh (1 day, deps: 0.1-0.4 ✅)
 3. 0.7 — Error handling (0.5 day, deps: 0.1-0.4 ✅)
 
 ### 📊 By-Phase Metrics
-| Phase | Complete | Total | % | Status |
-|-------|----------|-------|---|--------|
-| 0 | 4 | 7 | 57% | 🟢 ON TRACK |
-| 1 | 0 | 6 | 0% | ⏳ PENDING |
-| 2-6 | 0 | 32 | 0% | ⏳ PENDING |
+
+| Phase | Complete | Total | %   | Status      |
+| ----- | -------- | ----- | --- | ----------- |
+| 0     | 4        | 7     | 57% | 🟢 ON TRACK |
+| 1     | 0        | 6     | 0%  | ⏳ PENDING  |
+| 2-6   | 0        | 32    | 0%  | ⏳ PENDING  |
 
 ## SECTION: SESSION CONTEXT
 
 Last Action:
+
 - Date: 24/03/2026 17:45 UTC
 - Machine: Escritório (Windows)
 - What: Merged PR#129 (0.4 complete) into development
 - Status: Tudo commitado
 
 For Next Session:
+
 - git pull origin development
 - /status-refactoring (validate status)
 - "Implemente 0.5 (Unauthorized page)"
 
 Notes:
+
 - Backend responding normally
 - No conflicts in last merge
 ```
@@ -103,27 +118,28 @@ Notes:
 ### Fase 2: ANALISAR & CALCULAR MÉTRICAS (2 minutos)
 
 **Ações:**
+
 ```
 1. Validar integridade:
    - Todas subtarefas completadas têm commit hash? ✅
    - Datas estão em ordem cronológica? ✅
    - Nenhuma subtarefa aparece 2x? ✅
-   
+
 2. Calcular velocidade:
    - Total dias desde primeira subtarefa
    - Subtarefas por dia
    - Exemplo: 4 subtarefas em 3 dias = 1.33/dia
-   
+
 3. Projetar timeline:
    - Subtarefas remaining: 43 - 4 = 41
    - Velocidade: 1.33/dia
    - Projeção: 41 / 1.33 = ~31 dias (~6-7 semanas)
-   
+
 4. Identificar padrões:
    - Fase 0 vai rápido (4/7 em 3 dias = 1.33/dia) 🟢
    - Fases futuras podem ser mais lentas (mais complexidade)
    - Estimativa conservadora: +20% tempo adicional
-   
+
 5. Detectar blockers:
    - Subtarefa ⏳ por > 3 dias? → Possível blocker
    - Backend status DOWN? → Blocker crítico
@@ -132,6 +148,7 @@ Notes:
 ```
 
 **Cálculos Exemplo:**
+
 ```
 Subtarefas Completas: 4
 Dias Decorridos: 3
@@ -265,16 +282,19 @@ Dev digita qualquer um destes:
 ```
 
 Ou:
+
 ```
 Qual é o status?
 ```
 
 Ou:
+
 ```
 Onde estamos no plano?
 ```
 
 Ou:
+
 ```
 /status
 ```
@@ -282,6 +302,7 @@ Ou:
 ### Saída Esperada
 
 Nunca menos que:
+
 1. ✅ Últimas subtarefas completadas (último 5)
 2. 🏃 Próximas 3 ready (com dependências claras)
 3. 📊 Progresso por fase (% visual)
@@ -341,11 +362,13 @@ Fluxo Completo:
 ## Exemplo de Execução Completa
 
 **Input:**
+
 ```
 /status-refactoring
 ```
 
 **MEMORY.MD State:**
+
 ```
 Status: Fase 0, 4/7 complete, 4/43 total (9%), next: 0.5
 
@@ -359,6 +382,7 @@ Status: Fase 0, 4/7 complete, 4/43 total (9%), next: 0.5
 ```
 
 **Agente Output:**
+
 ```
 ╔═══════════════════════════════════════════════════════════════╗
 ║        📊 STATUS — REFACTORING UFC LMS REACT FRONTEND         ║
@@ -382,9 +406,9 @@ Estimativa Final: 5-15 de maio de 2026
 ──────────────────
 1. 0.5 — Unauthorized page (0.5 dia) ✅
    → "Implemente 0.5 (Unauthorized page)"
-   
+
 2. 0.6 — Token refresh (1 dia) ✅
-   
+
 3. 0.7 — Error handling (0.5 dia) ✅
 
 📊 POR FASE
@@ -454,6 +478,7 @@ Recomendação:
 ## Suporte
 
 Se precisar de ajuda:
+
 1. 📖 Consulte: `docs/COMO_COMECAR.md` (setup + FAQ)
 2. 📋 Veja: `docs/REFACTORING_QUICK_REFERENCE.md` (visão geral)
 3. 🔍 Leia: `docs/REFACTORING_PLAN_GRANULAR_V2.md` (detalhes)

@@ -2,15 +2,18 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { beforeEach, describe, expect, it } from "vitest";
 import { AuthLayout } from "@/components/shared/AuthLayout";
-import { useAuthStore, type UserProfile } from "@/store/useAuthStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import type { IUserSession } from "@ava-poc/types";
 
-function buildUser(role: UserProfile["role"]): UserProfile {
+function buildUser(role: IUserSession["role"]): IUserSession {
   return {
-    name: role === "professor" ? "Prof. Teste" : "Aluno Teste",
+    id: role === "professor" ? "test-prof-001" : "test-student-001",
+    nome: role === "professor" ? "Prof. Teste" : "Aluno Teste",
     cpf: "12345678901",
     email: "teste.logout@ufc.br",
-    photoUrl: null,
+    fotoUrl: undefined,
     role,
+    status: "ATIVO",
   };
 }
 
