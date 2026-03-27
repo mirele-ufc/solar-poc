@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router";
 import { selectCanManageCourses, useAuthStore } from "@/store/useAuthStore";
 import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
+import { Card } from "@/components/ui/card";
 
 // ── Course thumbnail map ──────────────────────────────────────────────────────
 const COURSE_IMAGES: Record<string, string> = {
@@ -21,7 +22,6 @@ const COURSE_IMAGES: Record<string, string> = {
 const FALLBACK =
   "https://images.unsplash.com/photo-1762330910399-95caa55acf04?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400";
 
-
 // ── Card ──────────────────────────────────────────────────────────────────────
 type CourseCardProps = {
   id: string;
@@ -38,28 +38,35 @@ function CourseCard({ id, title, hours, onClick, isActive }: CourseCardProps) {
       onClick={onClick}
       className="flex flex-col gap-[10px] items-start cursor-pointer group text-left w-full focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px] rounded-[4px]"
     >
-      <div className="w-full aspect-[16/10] overflow-hidden rounded-[8px] bg-[#e0e0e0] relative">
-        <ImageWithFallback
-          alt={title}
-          src={COURSE_IMAGES[id] ?? FALLBACK}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-        />
-        {isActive && (
-          <span className="absolute top-[8px] right-[8px] bg-[#e6f9ee] text-[#155724] text-[11px] font-['Figtree:Medium',sans-serif] font-medium px-[8px] py-[2px] rounded-full">
-            Ativo
-          </span>
-        )}
-      </div>
-      <div className="flex flex-col gap-[2px]">
-        <p className="font-['Figtree:Medium',sans-serif] font-medium leading-[26px] text-[18px] text-black">
-          {title}
-        </p>
-        {hours && (
-          <p className="font-['Figtree:Regular',sans-serif] font-normal leading-[20px] text-[14px] text-[#595959]">
-            {hours}
-          </p>
-        )}
-      </div>
+      <Card className="w-full gap-[10px] border-0 shadow-none rounded-[8px] bg-transparent">
+        <Card.Header className="w-full p-0">
+          <Card.Content className="w-full p-0">
+            <div className="w-full aspect-[16/10] overflow-hidden rounded-[8px] bg-[#e0e0e0] relative">
+              <ImageWithFallback
+                alt={title}
+                src={COURSE_IMAGES[id] ?? FALLBACK}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+              />
+              {isActive && (
+                <span className="absolute top-[8px] right-[8px] bg-[#e6f9ee] text-[#155724] text-[11px] font-['Figtree:Medium',sans-serif] font-medium px-[8px] py-[2px] rounded-full">
+                  Ativo
+                </span>
+              )}
+            </div>
+          </Card.Content>
+        </Card.Header>
+
+        <Card.Body className="p-0">
+          <Card.Title className="font-['Figtree:Medium',sans-serif] font-medium leading-[26px] text-[18px] text-black">
+            {title}
+          </Card.Title>
+          {hours && (
+            <Card.Description className="font-['Figtree:Regular',sans-serif] font-normal leading-[20px] text-[14px] text-[#595959] mt-[2px]">
+              {hours}
+            </Card.Description>
+          )}
+        </Card.Body>
+      </Card>
     </button>
   );
 }

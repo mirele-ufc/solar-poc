@@ -2,6 +2,7 @@ import { useNavigate } from "react-router";
 import { useCourseStore } from "@/store/useCourseStore";
 import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { Card } from "@/components/ui/card";
 
 const ALL_COURSES: Record<
   string,
@@ -66,27 +67,34 @@ function CourseCard({
       onClick={onClick}
       className="flex flex-col gap-[10px] items-start cursor-pointer group text-left w-full focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px] rounded-[4px]"
     >
-      <div className="w-full aspect-[16/10] overflow-hidden rounded-[8px] bg-[#e0e0e0] relative">
-        <ImageWithFallback
-          alt={title}
-          src={image}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-        />
-        <span
-          className="absolute top-[8px] right-[8px] text-[11px] font-['Figtree:Medium',sans-serif] font-medium px-[8px] py-[2px] rounded-full"
-          style={{ backgroundColor: badge.bg, color: badge.text }}
-        >
-          {badge.label}
-        </span>
-      </div>
-      <div className="flex flex-col gap-[2px]">
-        <p className="font-['Figtree:Medium',sans-serif] font-medium leading-[26px] text-[18px] text-black">
-          {title}
-        </p>
-        <p className="font-['Figtree:Regular',sans-serif] font-normal leading-[20px] text-[14px] text-[#595959]">
-          {category} · {hours}
-        </p>
-      </div>
+      <Card className="w-full gap-[10px] border-0 shadow-none rounded-[8px] bg-transparent">
+        <Card.Header className="w-full p-0">
+          <Card.Content className="w-full p-0">
+            <div className="w-full aspect-[16/10] overflow-hidden rounded-[8px] bg-[#e0e0e0] relative">
+              <ImageWithFallback
+                alt={title}
+                src={image}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+              />
+              <span
+                className="absolute top-[8px] right-[8px] text-[11px] font-['Figtree:Medium',sans-serif] font-medium px-[8px] py-[2px] rounded-full"
+                style={{ backgroundColor: badge.bg, color: badge.text }}
+              >
+                {badge.label}
+              </span>
+            </div>
+          </Card.Content>
+        </Card.Header>
+
+        <Card.Body className="p-0">
+          <Card.Title className="font-['Figtree:Medium',sans-serif] font-medium leading-[26px] text-[18px] text-black">
+            {title}
+          </Card.Title>
+          <Card.Description className="font-['Figtree:Regular',sans-serif] font-normal leading-[20px] text-[14px] text-[#595959] mt-[2px]">
+            {category} · {hours}
+          </Card.Description>
+        </Card.Body>
+      </Card>
     </button>
   );
 }
