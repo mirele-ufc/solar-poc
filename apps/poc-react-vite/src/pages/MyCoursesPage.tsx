@@ -1,8 +1,7 @@
 import { useNavigate } from "react-router";
 import { useCourseStore } from "@/store/useCourseStore";
-import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
+import { CourseCard } from "@/components/shared/CourseCard";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { Card } from "@/components/ui/card";
 
 const ALL_COURSES: Record<
   string,
@@ -40,64 +39,6 @@ const BOOK_ICON =
 
 const TEACHER_ICON =
   "M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z";
-
-interface CourseCardProps {
-  id: string;
-  title: string;
-  category: string;
-  hours: string;
-  image: string;
-  badge: { label: string; bg: string; text: string };
-  onClick: () => void;
-}
-
-function CourseCard({
-  id,
-  title,
-  category,
-  hours,
-  image,
-  badge,
-  onClick,
-}: CourseCardProps) {
-  return (
-    <button
-      key={id}
-      type="button"
-      onClick={onClick}
-      className="flex flex-col gap-[10px] items-start cursor-pointer group text-left w-full focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px] rounded-[4px]"
-    >
-      <Card className="w-full gap-[10px] border-0 shadow-none rounded-[8px] bg-transparent">
-        <Card.Header className="w-full p-0">
-          <Card.Content className="w-full p-0">
-            <div className="w-full aspect-[16/10] overflow-hidden rounded-[8px] bg-[#e0e0e0] relative">
-              <ImageWithFallback
-                alt={title}
-                src={image}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-              />
-              <span
-                className="absolute top-[8px] right-[8px] text-[11px] font-['Figtree:Medium',sans-serif] font-medium px-[8px] py-[2px] rounded-full"
-                style={{ backgroundColor: badge.bg, color: badge.text }}
-              >
-                {badge.label}
-              </span>
-            </div>
-          </Card.Content>
-        </Card.Header>
-
-        <Card.Body className="p-0">
-          <Card.Title className="font-['Figtree:Medium',sans-serif] font-medium leading-[26px] text-[18px] text-black">
-            {title}
-          </Card.Title>
-          <Card.Description className="font-['Figtree:Regular',sans-serif] font-normal leading-[20px] text-[14px] text-[#595959] mt-[2px]">
-            {category} · {hours}
-          </Card.Description>
-        </Card.Body>
-      </Card>
-    </button>
-  );
-}
 
 function EmptyState({ message, sub }: { message: string; sub: string }) {
   return (
@@ -209,7 +150,10 @@ export function MyCoursesPage() {
             {taughtCourses.map((course) => (
               <CourseCard
                 key={course.id}
-                {...course}
+                title={course.title}
+                imageSrc={course.image}
+                imageAlt={course.title}
+                description={`${course.category} · ${course.hours}`}
                 badge={{ label: "Professor", bg: "#c5d6ff", text: "#021b59" }}
                 onClick={() => navigate(getCourseTarget(course.id))}
               />
@@ -276,7 +220,10 @@ export function MyCoursesPage() {
             {studentCourses.map((course) => (
               <CourseCard
                 key={course.id}
-                {...course}
+                title={course.title}
+                imageSrc={course.image}
+                imageAlt={course.title}
+                description={`${course.category} · ${course.hours}`}
                 badge={{ label: "Matriculado", bg: "#e6f9ee", text: "#155724" }}
                 onClick={() => navigate(`/courses/${course.id}`)}
               />

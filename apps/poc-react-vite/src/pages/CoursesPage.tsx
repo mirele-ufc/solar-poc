@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router";
 import { selectCanManageCourses, useAuthStore } from "@/store/useAuthStore";
-import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
-import { Card } from "@/components/ui/card";
+import { CourseCard } from "@/components/shared/CourseCard";
 
 // ── Course thumbnail map ──────────────────────────────────────────────────────
 const COURSE_IMAGES: Record<string, string> = {
@@ -21,55 +20,6 @@ const COURSE_IMAGES: Record<string, string> = {
 
 const FALLBACK =
   "https://images.unsplash.com/photo-1762330910399-95caa55acf04?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400";
-
-// ── Card ──────────────────────────────────────────────────────────────────────
-type CourseCardProps = {
-  id: string;
-  title: string;
-  hours?: string;
-  onClick: () => void;
-  isActive?: boolean;
-};
-
-function CourseCard({ id, title, hours, onClick, isActive }: CourseCardProps) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex flex-col gap-[10px] items-start cursor-pointer group text-left w-full focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px] rounded-[4px]"
-    >
-      <Card className="w-full gap-[10px] border-0 shadow-none rounded-[8px] bg-transparent">
-        <Card.Header className="w-full p-0">
-          <Card.Content className="w-full p-0">
-            <div className="w-full aspect-[16/10] overflow-hidden rounded-[8px] bg-[#e0e0e0] relative">
-              <ImageWithFallback
-                alt={title}
-                src={COURSE_IMAGES[id] ?? FALLBACK}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-              />
-              {isActive && (
-                <span className="absolute top-[8px] right-[8px] bg-[#e6f9ee] text-[#155724] text-[11px] font-['Figtree:Medium',sans-serif] font-medium px-[8px] py-[2px] rounded-full">
-                  Ativo
-                </span>
-              )}
-            </div>
-          </Card.Content>
-        </Card.Header>
-
-        <Card.Body className="p-0">
-          <Card.Title className="font-['Figtree:Medium',sans-serif] font-medium leading-[26px] text-[18px] text-black">
-            {title}
-          </Card.Title>
-          {hours && (
-            <Card.Description className="font-['Figtree:Regular',sans-serif] font-normal leading-[20px] text-[14px] text-[#595959] mt-[2px]">
-              {hours}
-            </Card.Description>
-          )}
-        </Card.Body>
-      </Card>
-    </button>
-  );
-}
 
 // ── Course data ───────────────────────────────────────────────────────────────
 const computacaoCourses = [
@@ -126,9 +76,10 @@ function CourseGrid({
         {courses.map((c) => (
           <div key={c.id} className="shrink-0 w-[200px]">
             <CourseCard
-              id={c.id}
               title={c.title}
-              hours={showHours ? c.hours : undefined}
+              imageSrc={COURSE_IMAGES[c.id] ?? FALLBACK}
+              imageAlt={c.title}
+              description={showHours ? c.hours : undefined}
               onClick={() => onClickCourse(c.id)}
             />
           </div>
@@ -139,9 +90,10 @@ function CourseGrid({
         {courses.map((c) => (
           <CourseCard
             key={c.id}
-            id={c.id}
             title={c.title}
-            hours={showHours ? c.hours : undefined}
+            imageSrc={COURSE_IMAGES[c.id] ?? FALLBACK}
+            imageAlt={c.title}
+            description={showHours ? c.hours : undefined}
             onClick={() => onClickCourse(c.id)}
           />
         ))}
@@ -194,14 +146,16 @@ export function CoursesPage() {
                 <div key={c.id} className="shrink-0 w-[200px]">
                   {/* Python → visão de aluno; demais → gerenciar */}
                   <CourseCard
-                    id={c.id}
+                    key={c.id}
                     title={c.title}
+                    imageSrc={COURSE_IMAGES[c.id] ?? FALLBACK}
+                    imageAlt={c.title}
+                    badge={{ label: "Ativo", bg: "#e6f9ee", text: "#155724" }}
                     onClick={() =>
                       c.id === "python"
                         ? navigate("/courses/python")
                         : navigate(`/courses/${c.id}/manage`)
                     }
-                    isActive
                   />
                 </div>
               ))}
@@ -210,14 +164,15 @@ export function CoursesPage() {
               {activeCourses.map((c) => (
                 <CourseCard
                   key={c.id}
-                  id={c.id}
                   title={c.title}
+                  imageSrc={COURSE_IMAGES[c.id] ?? FALLBACK}
+                  imageAlt={c.title}
+                  badge={{ label: "Ativo", bg: "#e6f9ee", text: "#155724" }}
                   onClick={() =>
                     c.id === "python"
                       ? navigate("/courses/python")
                       : navigate(`/courses/${c.id}/manage`)
                   }
-                  isActive
                 />
               ))}
             </div>
