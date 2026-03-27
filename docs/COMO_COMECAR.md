@@ -14,6 +14,8 @@
 - [ ] Rodar `pnpm build` para validar que projeto compila
 - [ ] Rodar `pnpm test` para validar que testes rodam
 - [ ] Confirmar backend Spring Boot disponível (ex: http://localhost:8080)
+- [ ] Criar `apps/poc-react-vite/.env.local` a partir de `apps/poc-react-vite/.env.example`
+- [ ] Configurar `VITE_API_BASE_URL` para o backend da máquina atual
 
 ---
 
@@ -22,17 +24,19 @@
 Na ordem abaixo (tudo em `/docs/`):
 
 1. **REFACTORING_QUICK_REFERENCE.md** (5 min)
-  - Visão de 7 fases numeradas (0-6) em 1 página
-   - Endpoints por domínio
-   - Padrões de implementação
-   - Dúvidas frequentes
+
+- Visão de 7 fases numeradas (0-6) em 1 página
+- Endpoints por domínio
+- Padrões de implementação
+- Dúvidas frequentes
 
 2. **REFACTORING_PLAN_GRANULAR_V2.md** (15-20 min)
-  - Detalhes de 43 subtarefas (39 originais + 4 novas subtarefas + 1 refactor inline entre os 5 gaps)
-   - Cada subtarefa tem: duração, testes, commits esperados
-  - Tabela de endpoints (39 oficiais, somente arquitetura.md)
-   - Decisões arquiteturais
-  - Seção "Resumo de 43 Subtarefas" mostra breakdown por fase + gaps
+
+- Detalhes de 43 subtarefas (39 originais + 4 novas subtarefas + 1 refactor inline entre os 5 gaps)
+- Cada subtarefa tem: duração, testes, commits esperados
+- Tabela de endpoints (39 oficiais, somente arquitetura.md)
+- Decisões arquiteturais
+- Seção "Resumo de 43 Subtarefas" mostra breakdown por fase + gaps
 
 **Esses 2 documentos são sua "biblioteca" — consulte sempre que tiver dúvida específica.**
 
@@ -50,7 +54,8 @@ Na ordem abaixo (tudo em `/docs/`):
 - [ ] Baseline contratual da arquitetura (39 endpoints oficiais) está mapeado?
 - [ ] Rotas e serviços planejados refletem somente endpoints de `.claude/commands/doc/arquitetura.md`?
 
-**Gap integrado em Fase 4:** 
+**Gap integrado em Fase 4:**
+
 - `POST /modulos/{moduloId}/prova/gerar-quiz-ia` — Spring AI endpoint para geração automática de quiz (RF35-RF38)
 
 **Se algum endpoint faltar:** remover o fluxo/rota do escopo ativo até formalização no `arquitetura.md`.
@@ -58,6 +63,7 @@ Na ordem abaixo (tudo em `/docs/`):
 **Nota de escopo histórico:** quando houver menções legadas a fluxos de mensageria ou endpoints não contratuais em documentos auxiliares, trate-as apenas como registro histórico. Esses fluxos permanecem fora do escopo ativo até formalização em `.claude/commands/doc/arquitetura.md`.
 
 **Fonte da verdade obrigatória:**
+
 - `CLAUDE.md` + `.claude/commands/doc/arquitetura.md`
 - Em conflito entre os dois: parar a execução, confirmar com o usuário e registrar a decisão na documentação.
 
@@ -93,6 +99,7 @@ git push origin feature/refactor-auth-guard-global
 ```
 
 **Tipos de Branch (ver [GITFLOW_STRATEGY.md](GITFLOW_STRATEGY.md) para detalhes):**
+
 - `feature/refactor-<dominio>`: Features/refatorações (Fase 0-6)
 - `bugfix/fix-<tipo>`: Correções de bugs
 - `hotfix/fix-<severidade>`: Urgentes em produção
@@ -114,7 +121,7 @@ git pull origin development
 git checkout -b feature/refactor-auth-guard-global
 
 # 2. Criar MEMORY.md da sessão (copiar template)
-cp /memories/session/MEMORY_TEMPLATE.md /memories/session/MEMORY.md
+cp /memories/MEMORY_TEMPLATE.md ./MEMORY.md
 
 # 3. Preencher MEMORY.md com status inicial
 # - Fase: 0
@@ -122,6 +129,23 @@ cp /memories/session/MEMORY_TEMPLATE.md /memories/session/MEMORY.md
 # - Status: ⏳ TODO
 # - Branch: feature/refactor-auth-guard-global
 ```
+
+## 6. Checklist Cross-Machine (Portável)
+
+Ao iniciar em outra máquina:
+
+- [ ] Confirmar `node -v`, `pnpm -v`, `git --version`
+- [ ] Executar `pnpm install`
+- [ ] Atualizar `apps/poc-react-vite/.env.local`
+- [ ] Validar branch com `git branch --show-current`
+- [ ] Ler `MEMORY.md` completo na raiz do projeto
+- [ ] Rodar `/start-implementation` antes de escolher a subtarefa
+
+Ao pausar e trocar de máquina:
+
+- [ ] Atualizar `MEMORY.md` com status e próxima ação
+- [ ] Commitar mudanças da sessão
+- [ ] Fazer push da branch ativa
 
 ### Subtarefa 0.1: Criar ProtectedRoute
 
@@ -251,7 +275,7 @@ export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
 ```bash
 # STEP 4: Preparar Commits (Aguardando Autorização)
 npm run type-check    # ✅ sem erros
-npm run lint         # ✅ sem warnings  
+npm run lint         # ✅ sem warnings
 npm run test -- --coverage  # ✅ cobertura ✅
 npm run build        # ✅ build sucesso
 
@@ -278,15 +302,16 @@ git commit -m "feat: Criar ProtectedRoute com validação de autenticação"
 
 Após 0.1 concluída, continuar com:
 
-| Subtarefa | Duração | Resumo | MEMORY.md Atualizar |
-|---|---|---|---|
-| 0.2 | 1.5d | Integrar routes.ts (24 rotas protegidas) | Status → IN_PROGRESS |
-| 0.3 | 2d | Remover hardcodes role de pages | Commits: 2/3 |
-| 0.4 | 1d | Logout seguro local (limpa estado e redireciona, sem endpoint) | Testes: 7/17 passando |
-| 0.5 | 0.5d | UnauthorizedPage com redirect 5s | Bloqueadores: nenhum |
-| 0.6 | 0.5d | Validar rotas públicas não guardadas | Próxima: 0.2 |
+| Subtarefa | Duração | Resumo                                                         | MEMORY.md Atualizar   |
+| --------- | ------- | -------------------------------------------------------------- | --------------------- |
+| 0.2       | 1.5d    | Integrar routes.ts (24 rotas protegidas)                       | Status → IN_PROGRESS  |
+| 0.3       | 2d      | Remover hardcodes role de pages                                | Commits: 2/3          |
+| 0.4       | 1d      | Logout seguro local (limpa estado e redireciona, sem endpoint) | Testes: 7/17 passando |
+| 0.5       | 0.5d    | UnauthorizedPage com redirect 5s                               | Bloqueadores: nenhum  |
+| 0.6       | 0.5d    | Validar rotas públicas não guardadas                           | Próxima: 0.2          |
 
 **Padrão para cada subtarefa:**
+
 1. RED: escrever testes
 2. GREEN: implementar
 3. REFACTOR: limpar código
@@ -362,14 +387,14 @@ R: `/docs/REFACTORING_QUICK_REFERENCE.md` seção "Endpoints Backend: Resumo por
 
 ## 8. Documentos de Referência (Sempre Consultáveis)
 
-| Documento | Localização | Propósito | Quando consultar |
-|---|---|---|---|
-| REFACTORING_QUICK_REFERENCE.md | `/docs/` | Resumo 7 fases numeradas (0-6), endpoints, padrões | Início de cada sessão |
-| REFACTORING_PLAN_GRANULAR_V2.md | `/docs/` | Detalhes de 43 subtarefas | Ao iniciar subtarefa nova |
-| MEMORY.MD | `/memories/session/` | Progresso de sessão ativa | Antes de pausar ou retomar |
-| COMO_COMECAR.md | `/docs/` | Este arquivo — onboarding | 1ª vez ou nova pessoa |
-| CLAUDE.md | `root/` | Diretrizes obrigatórias (SOLID, Clean Code) | Quando em dúvida sobre qualidade |
-| diagnostico-refatoracao.md | `.claude/commands/frontend/` | Matriz de riscos consolidada | Decisões arquiteturais |
+| Documento                       | Localização                  | Propósito                                          | Quando consultar                 |
+| ------------------------------- | ---------------------------- | -------------------------------------------------- | -------------------------------- |
+| REFACTORING_QUICK_REFERENCE.md  | `/docs/`                     | Resumo 7 fases numeradas (0-6), endpoints, padrões | Início de cada sessão            |
+| REFACTORING_PLAN_GRANULAR_V2.md | `/docs/`                     | Detalhes de 43 subtarefas                          | Ao iniciar subtarefa nova        |
+| MEMORY.MD                       | `/memories/session/`         | Progresso de sessão ativa                          | Antes de pausar ou retomar       |
+| COMO_COMECAR.md                 | `/docs/`                     | Este arquivo — onboarding                          | 1ª vez ou nova pessoa            |
+| CLAUDE.md                       | `root/`                      | Diretrizes obrigatórias (SOLID, Clean Code)        | Quando em dúvida sobre qualidade |
+| diagnostico-refatoracao.md      | `.claude/commands/frontend/` | Matriz de riscos consolidada                       | Decisões arquiteturais           |
 
 ---
 

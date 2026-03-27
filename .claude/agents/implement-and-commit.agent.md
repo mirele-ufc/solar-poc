@@ -8,6 +8,7 @@ description: "Agente autônomo de implementação TDD. Executa: RED (testes falh
 ## Propósito
 
 Agente autônomo que transforma um comando simples ("Implemente 0.4 (Logout Seguro)") em:
+
 1. ✅ Testes passando (RED→GREEN→REFACTOR)
 2. ✅ 5+ commits granulares em português
 3. ✅ MEMORY.MD atualizado com progresso
@@ -24,6 +25,15 @@ Agente autônomo que transforma um comando simples ("Implemente 0.4 (Logout Segu
 - Nunca avançar automaticamente para a próxima subtarefa ou próxima fase.
 - Ao concluir uma fase, apenas perguntar se o usuário deseja seguir; sem handoff automático.
 
+## Pre-Code Synchronization (Cross-Machine)
+
+Antes de iniciar RED:
+
+1. Confirmar branch ativa e sincronização com remoto (`git fetch` + `git pull`).
+2. Confirmar leitura de `MEMORY.md` na raiz e consistência da "Próxima Ação".
+3. Confirmar `apps/poc-react-vite/.env.local` configurado para a máquina atual.
+4. Reforçar autorização explícita para commits e push nesta sessão.
+
 ---
 
 ## Workflow (4 Fases)
@@ -31,6 +41,7 @@ Agente autônomo que transforma um comando simples ("Implemente 0.4 (Logout Segu
 ### Fase 1: PREP (5 minutos)
 
 **Ações:**
+
 ```
 1. Ler docs/REFACTORING_PLAN_GRANULAR_V2.md § X.Y (subtarefa atual)
 2. Mapear:
@@ -59,6 +70,7 @@ Agente autônomo que transforma um comando simples ("Implemente 0.4 (Logout Segu
 ```
 
 **Output esperado:**
+
 ```
 ✅ PREP OK
 Subtarefa: 0.4 (Logout Seguro)
@@ -73,18 +85,19 @@ Pronto para RED stage
 #### Stage A: RED (Testes Falham)
 
 **Ações:**
+
 ```
 1. Criar arquivo de testes: src/__tests__/<Component>.test.tsx
    ou src/hooks/__tests__/use<Hook>.test.ts
-   
+
 2. Escrever 4-8 testes que FALHAM:
    - Testes baseados em "Testes esperados" de REFACTORING_PLAN
    - Usar @testing-library/react + Vitest
    - Importar componente/hook (ainda não existe)
-   
+
 3. Rodar: pnpm test
    Resultado esperado: ❌ FAILED (X tests failed)
-   
+
 4. Se o usuário autorizou commits:
    Commit #1: TEST
    Mensagem: "test: Adicionar testes para <Feature>"
@@ -92,33 +105,43 @@ Pronto para RED stage
 ```
 
 **Exemplo de testes para logout:**
+
 ```typescript
 // src/__tests__/Logout.test.tsx
-describe('Logout', () => {
-  it('deve limpar token JWT', () => { /* ... */ });
-  it('deve limpar Zustand store', () => { /* ... */ });
-  it('deve redirecionar para /login', () => { /* ... */ });
-   it('não deve disparar chamada para endpoint de logout inexistente', () => { /* ... */ });
+describe("Logout", () => {
+  it("deve limpar token JWT", () => {
+    /* ... */
+  });
+  it("deve limpar Zustand store", () => {
+    /* ... */
+  });
+  it("deve redirecionar para /login", () => {
+    /* ... */
+  });
+  it("não deve disparar chamada para endpoint de logout inexistente", () => {
+    /* ... */
+  });
 });
 ```
 
 #### Stage B: GREEN (Implementa)
 
 **Ações:**
+
 ```
 1. Criar arquivo(s) de implementação:
    - src/components/<Component>.tsx
    - src/hooks/use<Hook>.ts
    - src/services/<Service>.ts
-   
+
 2. Implementar APENAS o suficiente para testes passarem:
    - Não adicione features extras
    - Siga convenções de código (CLAUDE.md)
    - Use types: TypeScript strict, sem `any`
-   
+
 3. Rodar: pnpm test
    Resultado esperado: ✅ PASSED (X tests passed)
-   
+
 4. Se o usuário autorizou commits:
    Commit #2: FEAT
    Mensagem: "feat: <Descrição de implementação>"
@@ -126,37 +149,39 @@ describe('Logout', () => {
 ```
 
 **Exemplo de implementação:**
+
 ```typescript
 // src/services/authService.ts (existente, estender)
 export async function logout() {
-   // 1. Limpar estado de autenticação em memória no cliente
-   clearAuthStore();
-  
+  // 1. Limpar estado de autenticação em memória no cliente
+  clearAuthStore();
+
   // 2. Limpar store Zustand
   useAuthStore.setState({ usuario: null, token: null });
-  
-   // 3. Não existe endpoint de logout no contrato atual.
-   // Logout deve permanecer local e não chamar API.
-  
+
+  // 3. Não existe endpoint de logout no contrato atual.
+  // Logout deve permanecer local e não chamar API.
+
   // 4. Redirecionar para login
-  window.location.href = '/login';
+  window.location.href = "/login";
 }
 ```
 
 #### Stage C: REFACTOR (Limpa Código)
 
 **Ações:**
+
 ```
 1. Revisar código implementado:
    - Extrai funções pequenas (< 20 linhas)
    - Remove duplicação
    - Melhora naming semântico
    - Aplica SOLID (separar responsabilidades)
-   
+
 2. Rodar testes novamente:
    pnpm test
    Resultado: Testes ainda passam ✅
-   
+
 3. Se o usuário autorizou commits:
    Commit #3: REFACTOR
    Mensagem: "refactor: <Descrição de melhoria>"
@@ -164,12 +189,13 @@ export async function logout() {
 ```
 
 **Exemplo de refactor:**
+
 ```typescript
 // Antes (misturado):
 export async function logout() {
-   clearAuthStore();
+  clearAuthStore();
   useAuthStore.setState({ usuario: null, token: null });
-  window.location.href = '/login';
+  window.location.href = "/login";
 }
 
 // Depois (separado):
@@ -179,13 +205,14 @@ function clearAuthStore() {
 
 export async function logout() {
   clearAuthStore();
-  window.location.href = '/login';
+  window.location.href = "/login";
 }
 ```
 
 #### Stage D: Type Check + Lint
 
 **Ações:**
+
 ```
 1. pnpm type-check → Sem erros TypeScript
 2. pnpm lint → Sem warnings eslint
@@ -199,19 +226,20 @@ export async function logout() {
 ### Fase 3: DOCUMENTAÇÃO (10 minutos)
 
 **Ações:**
+
 ```
 1. Abrir MEMORY.MD (na raiz do projeto)
 2. Localizar tabela "✅ Completes" em SECTION: GLOBAL PROGRESS
 3. Adicionar nova linha:
    | 0.4 | Logout Seguro | ✅ | 24/03/2026 | <ultimo-commit-hash> |
-   
+
 4. Atualizar status geral:
    Status: Fase 0, 4/7 complete, 4/43 total (9%), next: 0.5
-   
+
 5. Se o usuário autorizou commits:
    Commit #5: DOCS
    Mensagem: "docs: Atualizar MEMORY.MD com subtarefa 0.4 completa"
-   
+
 6. (Opcional) Atualizar SESSION CONTEXT:
    Last Action:
    - Date: 24/03/2026 14:30
@@ -221,6 +249,7 @@ export async function logout() {
 ```
 
 **Formato de MEMORY.MD esperado:**
+
 ```
 ## SECTION: GLOBAL PROGRESS
 
@@ -242,15 +271,18 @@ Status: Fase 0, 4/7 complete, 4/43 total (9%), next: 0.5
 ### Fase 4: ETAPA GIT (PLANEJAMENTO + DECISÃO) (5 minutos)
 
 **Objetivo:**
+
 - Gerar e exibir um relatório completo de planejamento Git **antes** de qualquer pergunta ao usuário.
 - Não executar `commit`, `push` ou PR nesta etapa sem autorização explícita.
 
 **Regras obrigatórias:**
+
 - O relatório de planejamento Git DEVE ser exibido integralmente antes de qualquer pergunta. Nunca perguntar sem mostrar o plano primeiro.
 - Esta fase é **INCONDICIONAL**: deve ser executada e exibida **sempre**, mesmo que o usuário tenha instruído "sem commit", "sem push" ou o agente tenha sido invocado como subagente com restrições de git. O relatório é somente de planejamento e visualização; a execução do git permanece condicional à autorização.
 - Nunca omitir, comprimir ou substituir o relatório por um resumo de uma linha.
 
 **Ações:**
+
 ```
 1. Coletar estado atual do Git:
    - git branch --show-current (confirmar branch de trabalho)
@@ -302,6 +334,7 @@ Status: Fase 0, 4/7 complete, 4/43 total (9%), next: 0.5
 ```
 
 **Exemplo de relatório preenchido (referência):**
+
 ```
 ─────────────────────────────────────────────────────────
 📋 PLANEJAMENTO GIT — Subtarefa 0.1 (ProtectedRoute)
@@ -342,6 +375,7 @@ Deseja seguir o planejamento Git proposto ou realizar ajustes?
 ### Fase 5: GIT PUSH (5 minutos)
 
 **Ações:**
+
 ```
 1. Validar local:
    git status
@@ -353,50 +387,57 @@ Deseja seguir o planejamento Git proposto ou realizar ajustes?
 
 3. Push branch:
    git push origin feature/refactor-<dominio>
-   
+
 4. Se houver conflito:
    - FALLBACK: não fazer merge automático
    - Avisar dev: "Conflito em arquivo X, faça merge manual no PR"
    - Retornar com RED status
-   
+
 5. Criar PR no GitHub (se possível e autorizado):
    Título: [REFACTOR] <Fase>: <Descrição curta>
    Descrição:
-   ```
-   Subtarefa: X.Y (<Título>)
-   Duração: 1 day
-   Commits: 5 (test, feat, refactor, refactor, docs)
-   
-   Dependências:
-   - X.Y-1 ✅
-   
-   Testes:
-   - pnpm test ✅
-   - pnpm lint ✅
-   - pnpm type-check ✅
-   
-   MEMORY.MD Updated: ✅
-   ```
-   
+```
+
+Subtarefa: X.Y (<Título>)
+Duração: 1 day
+Commits: 5 (test, feat, refactor, refactor, docs)
+
+Dependências:
+
+- X.Y-1 ✅
+
+Testes:
+
+- pnpm test ✅
+- pnpm lint ✅
+- pnpm type-check ✅
+
+MEMORY.MD Updated: ✅
+
+```
+
 6. Output final:
-   ```
-   ✅ IMPLEMENTAÇÃO CONCLUÍDA
-   
-   Subtarefa: 0.4 (Logout Seguro)
-   Status: Pronto para Merge
-   
-   Commits: 5
-   ├─ test: Adicionar testes para logout seguro
-   ├─ feat: Implementar logout local com limpeza de estado
-   ├─ refactor: Extrair lógica de logout
-   ├─ refactor: Corrigir tipos TypeScript
-   └─ docs: Atualizar MEMORY.MD com 0.4 completa
-   
-   PR: #125 → development
-   Planejamento Git: seguido/ajustado (conforme decisão do usuário)
-   Próxima recomendada: 0.5 (Unauthorized page)
-   Próxima execução: requer nova autorização do usuário
-   ```
+```
+
+✅ IMPLEMENTAÇÃO CONCLUÍDA
+
+Subtarefa: 0.4 (Logout Seguro)
+Status: Pronto para Merge
+
+Commits: 5
+├─ test: Adicionar testes para logout seguro
+├─ feat: Implementar logout local com limpeza de estado
+├─ refactor: Extrair lógica de logout
+├─ refactor: Corrigir tipos TypeScript
+└─ docs: Atualizar MEMORY.MD com 0.4 completa
+
+PR: #125 → development
+Planejamento Git: seguido/ajustado (conforme decisão do usuário)
+Próxima recomendada: 0.5 (Unauthorized page)
+Próxima execução: requer nova autorização do usuário
+
+```
+
 ```
 
 ### Formato obrigatório do relatório final
@@ -410,11 +451,13 @@ O relatório final deve sempre seguir esta ordem de seções:
 5. **Próxima subtarefa pronta** — somente após decisão registrada
 
 Regras de transição obrigatórias:
+
 - A seção "Etapa do Git (Planejamento)" deve exibir o relatório **completo** antes de qualquer pergunta.
 - A seção "Próxima subtarefa pronta" só pode ser apresentada após a seção "Etapa do Git (Planejamento)" estar concluída.
 - Nunca comprimir o relatório Git em uma linha ou omitir campos. Se algum campo for desconhecido, preencher com `<a verificar>`.
 
 **Exemplo de saída do relatório final:**
+
 ```
 ✅ CÓDIGO TDD CONCLUÍDO
 Subtarefa: 0.1 (ProtectedRoute)
@@ -465,17 +508,20 @@ Próxima execução: requer nova autorização do usuário
 ### Comando de Input
 
 Dev digita:
+
 ```
 Implemente 0.4 (Logout Seguro)
 ```
 
 Ou:
+
 ```
 /implement-and-commit
 Subtarefa: 0.4
 ```
 
 Ou (com contexto de MEMORY.MD):
+
 ```
 /status-refactoring
 → Shows: "próxima: 0.4 (Logout Seguro), deps: 0.1-0.3 ✅"
@@ -496,12 +542,15 @@ Ou (com contexto de MEMORY.MD):
 ```
 
 Se qualquer validação FALHAR:
+
 ```
 
 Se qualquer autorização obrigatória estiver ausente:
 ```
+
 ⏸️ AGUARDANDO AUTORIZAÇÃO
 Motivo: execução, commits, push/PR e avanço de fase dependem de confirmação explícita do usuário.
+
 ```
 ❌ BLOQUEADOR DETECTADO
 Motivo: [qual validação falhou]
@@ -573,7 +622,7 @@ Before outputting "✅ IMPLEMENTAÇÃO CONCLUÍDA":
 - [ ] REFACTOR stage: Código limpo? ✅
 - [ ] Type-check limpo (sem erros TS)? ✅
 - [ ] Lint limpo (sem warnings)? ✅
-- [ ] >= 4 commits granulares criados? ✅
+- [ ] > = 4 commits granulares criados? ✅
 - [ ] MEMORY.md atualizado com subtarefa? ✅
 - [ ] DOCS commit criado? ✅
 - [ ] Git push realizado sem conflitos? ✅
@@ -637,6 +686,7 @@ Fluxo Completo:
 ## Exemplo de Execução Completa (Fase 0.4)
 
 **Input:**
+
 ```
 Implemente 0.4 (Logout Seguro)
 Referência: docs/REFACTORING_PLAN_GRANULAR_V2.md § 0.4
@@ -737,6 +787,7 @@ Próximo passo: requer nova autorização do usuário
 ## Suporte
 
 Se você for um dev ou agente e encontrar problemas:
+
 1. 📖 Consulte: `docs/REFACTORING_PLAN_GRANULAR_V2.md` § subtarefa
 2. 🔍 Verifique: `MEMORY.md` para status de deps
 3. 💬 Pergunte: Em PRs ou discussão do repo

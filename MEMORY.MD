@@ -8,9 +8,17 @@
 
 ## MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
 
-**Última atualização:** 2026-03-26T16:14:00Z (1.5 validada com zero `any` em `src/`)  
+**Última atualização:** 2026-03-27T18:40:00Z (plano híbrido portável aplicado na documentação e agentes)  
 **Sprint ativo:** Fase 1 — Contratos Canônicos e Tipagem  
 **Status geral:** 28% (12/43 subtarefas)
+
+## Machine & Environment Info
+
+- **Hostname:** preencher na sessão atual (ex.: comando `hostname`)
+- **Node:** preencher na sessão atual (ex.: comando `node -v`)
+- **pnpm:** preencher na sessão atual (ex.: comando `pnpm -v`)
+- **Backend URL (frontend):** valor de `apps/poc-react-vite/.env.local`
+- **Observação:** atualizar estes campos ao trocar de máquina
 
 ---
 
