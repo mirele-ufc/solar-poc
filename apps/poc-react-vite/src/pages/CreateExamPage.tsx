@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router";
 import type { CourseInfoData } from "./CreateCoursePage";
+import { Modal } from "@/components/ui/modal";
 import { createQuestionSchema } from "@/validations/examSchema";
 import { imageFileSchema, uploadFileSchema } from "@/validations/fileSchema";
 
@@ -1049,26 +1050,19 @@ export function CreateExamPage() {
       </div>
 
       {/* ── Edit lesson modal ── */}
-      {editingLesson && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
-            onClick={() => setEditingLesson(null)}
-            aria-hidden="true"
-          />
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="edit-lesson-title"
-            className="fixed inset-0 z-50 flex items-center justify-center px-[20px]"
-          >
-            <div className="bg-white w-full max-w-[400px] rounded-[12px] shadow-xl p-[24px] flex flex-col gap-[20px]">
-              <h2
-                id="edit-lesson-title"
-                className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[20px] leading-[30px]"
-              >
+      <Modal
+        isOpen={Boolean(editingLesson)}
+        onClose={() => setEditingLesson(null)}
+        className="w-full max-w-[400px] rounded-[12px] p-[24px]"
+      >
+        {editingLesson && (
+          <>
+            <Modal.Header>
+              <span className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[20px] leading-[30px]">
                 Editar aula
-              </h2>
+              </span>
+            </Modal.Header>
+            <Modal.Body className="flex flex-col gap-[20px] py-0">
               <div className="flex flex-col gap-[6px]">
                 <label
                   htmlFor="edit-lesson-name"
@@ -1094,7 +1088,6 @@ export function CreateExamPage() {
                 />
               </div>
 
-              {/* File upload section */}
               <div className="flex flex-col gap-[10px]">
                 <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[16px]">
                   Arquivo da aula
@@ -1112,28 +1105,27 @@ export function CreateExamPage() {
                   }
                 />
               </div>
-
-              <div className="flex gap-[12px]">
-                <button
-                  type="button"
-                  onClick={() => setEditingLesson(null)}
-                  className="flex-1 h-[46px] border-2 border-[#021b59] rounded-[26px] font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[16px] hover:bg-[#021b59]/5 transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={saveEditLesson}
-                  disabled={!editingLesson.name.trim()}
-                  className="flex-1 h-[46px] bg-[#021b59] rounded-[26px] font-['Figtree:Medium',sans-serif] font-medium text-[#ffeac4] text-[16px] hover:bg-[#042e99] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  Salvar
-                </button>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
+            </Modal.Body>
+            <Modal.Footer className="flex gap-[12px] sm:justify-start">
+              <button
+                type="button"
+                onClick={() => setEditingLesson(null)}
+                className="flex-1 h-[46px] border-2 border-[#021b59] rounded-[26px] font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[16px] hover:bg-[#021b59]/5 transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={saveEditLesson}
+                disabled={!editingLesson.name.trim()}
+                className="flex-1 h-[46px] bg-[#021b59] rounded-[26px] font-['Figtree:Medium',sans-serif] font-medium text-[#ffeac4] text-[16px] hover:bg-[#042e99] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Salvar
+              </button>
+            </Modal.Footer>
+          </>
+        )}
+      </Modal>
     </div>
   );
 }
