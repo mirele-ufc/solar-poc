@@ -1,4 +1,16 @@
 import { z } from "zod";
+import type { IQuestionAnswer, ISubmitQuizPayload } from "@ava-poc/types";
+
+export const questionAnswerSchema = z.object({
+  questionId: z.string().trim().min(1, "ID da pergunta é obrigatório"),
+  selectedAnswerIndex: z.number().int().min(0),
+}) satisfies z.ZodType<IQuestionAnswer>;
+
+export const quizSubmitSchema = z.object({
+  studentId: z.string().trim().min(1, "Aluno é obrigatório"),
+  courseId: z.string().trim().min(1, "Curso é obrigatório"),
+  answers: z.array(questionAnswerSchema).min(1, "Responda ao menos 1 questão"),
+}) satisfies z.ZodType<ISubmitQuizPayload>;
 
 const questionOptionSchema = z.object({
   id: z.string(),
