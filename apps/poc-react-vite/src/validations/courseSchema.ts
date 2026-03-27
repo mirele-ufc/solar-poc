@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { imageFileSchema } from "./fileSchema";
-import type { ICreateCoursePayload } from "@ava-poc/types";
+import type {
+  ICreateCoursePayload,
+  IUpdateCoursePayload,
+} from "@ava-poc/types";
 
 export const createCourseRequestSchema = z.object({
   titulo: z.string().trim().min(1, "O título é obrigatório"),

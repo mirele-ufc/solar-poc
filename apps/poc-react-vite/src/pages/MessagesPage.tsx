@@ -133,6 +133,10 @@ export function MessagesPage() {
   const navigate = useNavigate();
   const { currentUser, sentMessages } = useAuthStore();
 
+  if (!currentUser) {
+    return null;
+  }
+
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const initials = currentUser.nome
@@ -196,7 +200,6 @@ export function MessagesPage() {
           {/* Avatar + name */}
           <div className="flex flex-col items-center gap-[2px]">
             <div className="relative mb-[12px]">
-              <div className="size-[110px] rounded-full bg-[#042e99] border-4 border-[#ffeac4] flex items-center justify-center overflow-hidden">
               <div className="size-[110px] rounded-full bg-[#042e99] border-4 border-[#ffeac4] flex items-center justify-center overflow-hidden">
                 {sentMessages.length > 0 ? (
                   <span

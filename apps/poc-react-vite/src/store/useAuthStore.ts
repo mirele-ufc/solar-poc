@@ -16,7 +16,7 @@ export type { SentMessage };
  */
 interface AuthStore {
   // State
-  currentUser: IUserSession;
+  currentUser: IUserSession | null;
   sentMessages: SentMessage[];
   isLoggedIn: boolean;
 
@@ -70,43 +70,14 @@ const CREDENTIALS: Record<string, { password: string; profile: IUserSession }> =
     },
   };
 
-/**
- * Initial state when user is not logged in
- * currentUser is null until user successfully authenticates
- */
-const DEFAULT_USER: IUserSession = CREDENTIALS.estudante.profile;
-
-/**
- * Mock messages for prototype demonstration
- *
- * ⚠️ PROTOTYPE: In production, messages are fetched from backend API
- */
-const MOCK_MESSAGES: SentMessage[] = [
-  {
-    id: "msg-001",
-    recipientId: "power-bi",
-    recipientLabel: "Alunos de Power BI - Fundamentos",
-    subject: "Bem-vindos ao curso de Power BI!",
-    body: "Olá a todos! Seja muito bem-vindos ao curso de Power BI - Fundamentos. Nas próximas semanas exploraremos juntos as principais funcionalidades dessa poderosa ferramenta de Business Intelligence. Qualquer dúvida, estou à disposição.",
-    sentAt: "2026-03-10T09:00:00.000Z",
-  },
-  {
-    id: "msg-002",
-    recipientId: "all",
-    recipientLabel: "Alunos de todos os cursos",
-    subject: "Aviso: Manutenção do sistema SOLAR",
-    body: "Informamos que o sistema SOLAR passará por manutenção programada neste sábado, das 08h às 12h. Durante esse período o acesso estará temporariamente indisponível. Pedimos desculpas pelo inconveniente.",
-    sentAt: "2026-03-08T14:30:00.000Z",
-  },
-  {
-    id: "msg-003",
-    recipientId: "power-bi",
-    recipientLabel: "Alunos de Power BI - Fundamentos",
-    subject: "Material complementar — Módulo 02",
-    body: "Disponibilizei na plataforma um material complementar sobre Power Query que irá ajudá-los na prática do Módulo 02. Aproveitem para revisar os conceitos antes da prova. Bons estudos!",
-    sentAt: "2026-03-05T11:15:00.000Z",
-  },
-];
+const INITIAL_STATE: Pick<
+  AuthStore,
+  "currentUser" | "isLoggedIn" | "sentMessages"
+> = {
+  currentUser: null,
+  isLoggedIn: false,
+  sentMessages: [],
+};
 
 /**
  * Zustand authentication store
@@ -158,6 +129,10 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({
       ...INITIAL_STATE,
     });
+
+    if (typeof window !== "undefined") {
+      window.history.replaceState({}, "", "/");
+    }
   },
 
   /**
@@ -196,6 +171,8 @@ export function selectCanManageCourses(state: AuthStoreSnapshot): boolean {
   return state.currentUser?.role === "professor" || false;
 }
 
-export function selectCurrentUser(state: AuthStoreSnapshot): IUserSession {
+export function selectCurrentUser(
+  state: AuthStoreSnapshot,
+): IUserSession | null {
   return state.currentUser;
 }

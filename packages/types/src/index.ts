@@ -18,10 +18,10 @@ export const TYPES_VERSION = "1.0.0";
  */
 export interface IUserSession {
   id: string;
-  name: string;
+  nome: string;
   cpf: string;
   email: string;
-  photoUrl?: string;
+  fotoUrl?: string;
   role: "professor" | "student" | "admin";
   status: "ATIVO" | "INATIVO";
 }

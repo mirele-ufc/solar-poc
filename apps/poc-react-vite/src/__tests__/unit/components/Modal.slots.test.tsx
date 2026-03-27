@@ -31,7 +31,7 @@ describe("Modal — Slots Pattern", () => {
     expect(screen.queryByText("Conteúdo oculto")).toBeNull();
   });
 
-  it("chama onClose ao clicar no botão de fechar (X)", () => {
+  it("chama onClose ao clicar no overlay", () => {
     const onClose = vi.fn();
     render(
       <Modal isOpen={true} onClose={onClose}>
@@ -40,8 +40,9 @@ describe("Modal — Slots Pattern", () => {
       </Modal>,
     );
 
-    const closeButton = screen.getByRole("button", { name: /close/i });
-    fireEvent.click(closeButton);
+    const overlay = document.querySelector('[data-slot="modal-overlay"]');
+    if (!overlay) throw new Error("Overlay não encontrado");
+    fireEvent.click(overlay);
 
     expect(onClose).toHaveBeenCalledOnce();
   });

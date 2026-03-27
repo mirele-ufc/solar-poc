@@ -92,19 +92,6 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function CardImage({
-  className,
-  ...props
-}: React.ComponentProps<"img">) {
-  return (
-    <img
-      data-slot="card-image"
-      className={cn("w-full object-cover", className)}
-      {...props}
-    />
-  );
-}
-
 // Compound component — slots pattern (dot-notation)
 const CardCompound = Object.assign(Card, {
   Header: CardHeader,
@@ -126,5 +113,4 @@ export {
   CardDescription,
   CardImage,
   CardContent,
-  CardImage,
 };

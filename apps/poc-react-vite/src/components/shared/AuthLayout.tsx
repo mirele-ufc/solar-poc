@@ -68,6 +68,10 @@ export function AuthLayout() {
     }
   }, [menuOpen]);
 
+  if (!currentUser) {
+    return <Outlet />;
+  }
+
   // compute initials for avatar fallback
   const initials = (() => {
     const parts = currentUser.nome.trim().split(/\s+/);

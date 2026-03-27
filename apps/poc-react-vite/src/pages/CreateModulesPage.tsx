@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { CourseInfoData } from "./CreateCoursePage";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Modal } from "@/components/ui/modal";
-import { Modal } from "@/components/ui/modal";
 import {
   createModulesSchema,
   type CreateModulesFormValues,

@@ -20,7 +20,6 @@ function buildUser(role: IUserSession["role"]): IUserSession {
     fotoUrl: undefined,
     role,
     status: "ATIVO",
-    status: "ATIVO",
   };
 }
 

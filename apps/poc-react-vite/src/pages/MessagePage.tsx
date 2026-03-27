@@ -22,6 +22,10 @@ export function MessagePage() {
   const navigate = useNavigate();
   const { currentUser, sendMessage } = useAuthStore();
 
+  if (!currentUser) {
+    return null;
+  }
+
   const {
     watch,
     setValue,

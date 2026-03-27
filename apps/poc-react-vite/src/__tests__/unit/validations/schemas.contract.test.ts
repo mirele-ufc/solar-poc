@@ -27,7 +27,7 @@ const createFile = (sizeInBytes: number, type: string, name = "file.bin") =>
 describe("schemas contract alignment", () => {
   it("should fail on invalid login email", () => {
     const result = loginRequestSchema.safeParse({
-      email: "invalid-email",
+      email: "x",
       senha: "123456",
     });
 

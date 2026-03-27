@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { ChevronLeft, ChevronDown, ChevronUp, Inbox } from "lucide-react";
-import { useAuthStore, type SentMessage } from "@/store/useAuthStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import { useCourseStore } from "@/store/useCourseStore";
+import type { IMessageCardProps } from "@/types";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -181,8 +182,10 @@ export function StudentMessagesPage() {
   const navigate = useNavigate();
   const { currentUser, sentMessages } = useAuthStore();
   const { enrolledCourses } = useCourseStore();
-  const userName = currentUser?.name ?? "Estudante";
-  const userPhotoUrl = currentUser?.photoUrl;
+
+  if (!currentUser) {
+    return null;
+  }
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [readIds, setReadIds] = useState<Set<string>>(new Set());

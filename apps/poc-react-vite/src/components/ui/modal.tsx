@@ -5,7 +5,7 @@ import { cn } from "./utils";
 type ModalProps = {
   isOpen: boolean;
   onClose?: () => void;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
   overlayClassName?: string;
 } & Omit<React.ComponentProps<"div">, "children" | "className">;

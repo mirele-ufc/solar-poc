@@ -56,16 +56,5 @@ export const createQuestionSchema = z
 
 export const questionSchema = createQuestionSchema;
 
-export const questionAnswerSchema = z.object({
-  questionId: z.string().trim().min(1, "questionId é obrigatório"),
-  selectedAnswerIndex: z.number().int().min(0, "Índice inválido"),
-}) satisfies z.ZodType<IQuestionAnswer>;
-
-export const quizSubmitSchema = z.object({
-  studentId: z.string().trim().min(1, "studentId é obrigatório"),
-  courseId: z.string().trim().min(1, "courseId é obrigatório"),
-  answers: z.array(questionAnswerSchema).min(1, "Envie ao menos uma resposta"),
-}) satisfies z.ZodType<ISubmitQuizPayload>;
-
 export type CreateQuestionFormValues = z.infer<typeof createQuestionSchema>;
 export type QuizSubmitFormValues = z.infer<typeof quizSubmitSchema>;
