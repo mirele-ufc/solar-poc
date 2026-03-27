@@ -216,7 +216,7 @@ export function AuthLayout() {
                         {currentUser.nome}
                       </p>
                       <p className="font-['Figtree:Regular',sans-serif] font-normal text-[#ffeac4]/70 text-[12px]">
-                        {currentUser.email}
+                        {currentUser?.email}
                       </p>
                     </div>
                   </div>
@@ -245,7 +245,7 @@ export function AuthLayout() {
                   </button>
 
                   {/* Mensagem — somente para professores */}
-                  {currentUser.role === "professor" && (
+                  {currentUser?.role === "professor" && (
                     <button
                       role="menuitem"
                       type="button"
@@ -273,7 +273,7 @@ export function AuthLayout() {
                   )}
 
                   {/* My Courses — for professors and students */}
-                  {currentUser.role === "professor" && (
+                  {currentUser?.role === "professor" && (
                     <button
                       role="menuitem"
                       type="button"
@@ -301,7 +301,7 @@ export function AuthLayout() {
                   )}
 
                   {/* My Courses — students only */}
-                  {currentUser.role === "student" && (
+                  {currentUser?.role === "student" && (
                     <button
                       role="menuitem"
                       type="button"
@@ -329,7 +329,7 @@ export function AuthLayout() {
                   )}
 
                   {/* Mensagens recebidas — somente para estudantes */}
-                  {currentUser.role === "student" && (
+                  {currentUser?.role === "student" && (
                     <button
                       role="menuitem"
                       type="button"

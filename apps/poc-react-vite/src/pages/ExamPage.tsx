@@ -1,7 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
-import { fetchExamQuestions, fetchOptionLabels, type Question } from "@/services/mocks/examMock";
+import {
+  fetchExamQuestions,
+  fetchOptionLabels,
+  type Question,
+} from "@/services/mocks/examMock";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { Modal } from "@/components/ui/modal";
 import { useEnrollmentGuard } from "@/hooks/useEnrollmentGuard";
 import { Modal } from "@/components/ui/modal";
 
@@ -9,8 +14,12 @@ const clockPath =
   "M12 22C6.477 22 2 17.523 2 12C2 6.477 6.477 2 12 2C17.523 2 22 6.477 22 12C22 17.523 17.523 22 12 22ZM20 12C20 9.87827 19.1571 7.84344 17.6569 6.34315C16.1566 4.84285 14.1217 4 12 4C9.87827 4 7.84344 4.84285 6.34315 6.34315C4.84285 7.84344 4 9.87827 4 12C4 14.1217 4.84285 16.1566 6.34315 17.6569C7.84344 19.1571 9.87827 20 12 20C14.1217 20 16.1566 19.1571 17.6569 17.6569C19.1571 16.1566 20 14.1217 20 12ZM16 11C16.2652 11 16.5196 11.1054 16.7071 11.2929C16.8946 11.4804 17 11.7348 17 12C17 12.2652 16.8946 12.5196 16.7071 12.7071C16.5196 12.8946 16.2652 13 16 13H13C11.9 13 11 12.1 11 11V7C11 6.73478 11.1054 6.48043 11.2929 6.29289C11.4804 6.10536 11.7348 6 12 6C12.2652 6 12.5196 6.10536 12.7071 6.29289C12.8946 6.48043 13 6.73478 13 7V11H16Z";
 
 function formatTime(s: number) {
-  const h = Math.floor(s / 3600).toString().padStart(2, "0");
-  const m = Math.floor((s % 3600) / 60).toString().padStart(2, "0");
+  const h = Math.floor(s / 3600)
+    .toString()
+    .padStart(2, "0");
+  const m = Math.floor((s % 3600) / 60)
+    .toString()
+    .padStart(2, "0");
   const sec = (s % 60).toString().padStart(2, "0");
   return `${h}:${m}:${sec}`;
 }
@@ -57,9 +66,11 @@ export function ExamPage() {
           if (next === ms && !announcedRef.current.has(ms)) {
             announcedRef.current.add(ms);
             const label =
-              ms === 300 ? "5 minutos restantes" :
-              ms === 60  ? "1 minuto restante" :
-                           "30 segundos restantes";
+              ms === 300
+                ? "5 minutos restantes"
+                : ms === 60
+                  ? "1 minuto restante"
+                  : "30 segundos restantes";
             setTimeAnnouncement(label);
           }
         }
@@ -71,7 +82,7 @@ export function ExamPage() {
       });
     }, 1000);
     return () => clearInterval(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -112,7 +123,12 @@ export function ExamPage() {
 
   return (
     <div className="bg-white min-h-screen pb-[60px]">
-      <div role="status" aria-live="assertive" aria-atomic="true" className="sr-only">
+      <div
+        role="status"
+        aria-live="assertive"
+        aria-atomic="true"
+        className="sr-only"
+      >
         {timeAnnouncement}
       </div>
 
@@ -130,12 +146,17 @@ export function ExamPage() {
         />
 
         {isLoading ? (
-          <p className="text-center text-[#606060] py-[40px]">Carregando prova...</p>
+          <p className="text-center text-[#606060] py-[40px]">
+            Carregando prova...
+          </p>
         ) : (
           <>
             <p
               className="font-['Anek_Devanagari:ExtraBold',sans-serif] font-extrabold leading-tight text-black"
-              style={{ fontSize: "clamp(22px, 5vw, 34px)", fontVariationSettings: "'wdth' 100" }}
+              style={{
+                fontSize: "clamp(22px, 5vw, 34px)",
+                fontVariationSettings: "'wdth' 100",
+              }}
             >
               Power BI - Fundamentos
             </p>
@@ -149,8 +170,18 @@ export function ExamPage() {
                 aria-live="off"
                 aria-label={`Tempo restante: ${formatTime(timeLeft)}`}
               >
-                <svg className="size-[20px] shrink-0" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                  <path clipRule="evenodd" d={clockPath} fill="#595959" fillRule="evenodd" />
+                <svg
+                  className="size-[20px] shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    clipRule="evenodd"
+                    d={clockPath}
+                    fill="#595959"
+                    fillRule="evenodd"
+                  />
                 </svg>
                 <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#595959] text-[17px] tabular-nums">
                   {formatTime(timeLeft)}
@@ -162,7 +193,10 @@ export function ExamPage() {
               const chosen = answers[q.id];
               const fieldsetId = `question-${q.id}-legend`;
               return (
-                <fieldset key={q.id} className="flex flex-col gap-[14px] border-0 p-0 m-0">
+                <fieldset
+                  key={q.id}
+                  className="flex flex-col gap-[14px] border-0 p-0 m-0"
+                >
                   <legend className="float-left w-full">
                     <div className="flex items-start justify-between gap-[12px]">
                       <div className="flex-1 min-w-0">
@@ -212,13 +246,24 @@ export function ExamPage() {
                           <div
                             className={[
                               "shrink-0 size-[22px] border-2 rounded-[4px] flex items-center justify-center transition-colors",
-                              isSelected ? "bg-[#ffeac4] border-[#021b59]" : "bg-white border-[#aaa]",
+                              isSelected
+                                ? "bg-[#ffeac4] border-[#021b59]"
+                                : "bg-white border-[#aaa]",
                             ].join(" ")}
                             aria-hidden="true"
                           >
                             {isSelected && (
-                              <svg className="size-[13px]" fill="none" viewBox="0 0 22 22">
-                                <path clipRule="evenodd" d="M5 9L3 11L9 17L19 7L17 5L9 13L5 9Z" fill="#021B59" fillRule="evenodd" />
+                              <svg
+                                className="size-[13px]"
+                                fill="none"
+                                viewBox="0 0 22 22"
+                              >
+                                <path
+                                  clipRule="evenodd"
+                                  d="M5 9L3 11L9 17L19 7L17 5L9 13L5 9Z"
+                                  fill="#021B59"
+                                  fillRule="evenodd"
+                                />
                               </svg>
                             )}
                           </div>

@@ -2,7 +2,8 @@ import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { useAuthStore, type UserProfile } from "@/store/useAuthStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import type { IUserSession } from "@ava-poc/types";
 
 vi.mock("@/store/useAuthStore", () => ({
   useAuthStore: vi.fn(),
@@ -10,7 +11,7 @@ vi.mock("@/store/useAuthStore", () => ({
 
 const mockedUseAuthStore = vi.mocked(useAuthStore);
 
-function buildUser(role: UserProfile["role"]): UserProfile {
+function buildUser(role: IUserSession["role"]): IUserSession {
   return {
     id: "test-user-001",
     nome: "Test User",
@@ -18,6 +19,7 @@ function buildUser(role: UserProfile["role"]): UserProfile {
     email: "test@ufc.br",
     fotoUrl: undefined,
     role,
+    status: "ATIVO",
     status: "ATIVO",
   };
 }

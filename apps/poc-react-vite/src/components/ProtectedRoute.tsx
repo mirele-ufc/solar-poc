@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
 import { Navigate, Outlet } from "react-router";
-import { useAuthStore, type UserProfile } from "@/store/useAuthStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import type { IUserSession } from "@ava-poc/types";
 
 export interface ProtectedRouteProps {
-  allowedRoles: ReadonlyArray<UserProfile["role"]>;
+  allowedRoles: ReadonlyArray<IUserSession["role"]>;
   children?: ReactNode;
   loginPath?: string;
 }
@@ -12,8 +13,8 @@ const DEFAULT_LOGIN_PATH = "/";
 const UNAUTHORIZED_PATH = "/unauthorized";
 
 function isRoleAllowed(
-  role: UserProfile["role"],
-  allowedRoles: ReadonlyArray<UserProfile["role"]>,
+  role: IUserSession["role"],
+  allowedRoles: ReadonlyArray<IUserSession["role"]>,
 ): boolean {
   return allowedRoles.includes(role);
 }
@@ -25,7 +26,7 @@ export function ProtectedRoute({
 }: ProtectedRouteProps) {
   const { isLoggedIn, currentUser } = useAuthStore();
 
-  if (!isLoggedIn) {
+  if (!isLoggedIn || !currentUser) {
     return <Navigate to={loginPath} replace />;
   }
 

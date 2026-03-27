@@ -20,6 +20,27 @@
 - ✅ Duração estimada
 - ✅ Critério de aceitação observável
 
+### Estratégia de Execução Híbrida Portável (Frontend-Only)
+
+- Este ciclo altera apenas frontend.
+- Execução por gates:
+  - Gate 1: base estrutural e tipagem canônica.
+  - Gate 2: auth/perfil estáveis no frontend.
+  - Gate 3: integração por domínio em paralelo (cursos e provas/admin).
+- Operação portável:
+  - Sem caminhos absolutos de máquina na documentação.
+  - Sessão sempre retomada por `MEMORY.md` na raiz.
+  - Setup local padronizado por `.env.example` + `.env.local`.
+
+### Governança de Atualização de Documentação
+
+- Após cada story concluída:
+  - atualizar `MEMORY.md` (status, commits, próxima ação).
+- Ao concluir fase:
+  - revisar `REFACTORING_QUICK_REFERENCE.md` (progressão e próximas ready).
+- Ao alterar fluxo operacional:
+  - revisar `docs/README.md` (orquestração dos 3 agentes).
+
 ---
 
 ## FASE 0: Segurança de Navegação (1-2 semanas)
@@ -39,6 +60,7 @@
 
 - Verifica `useAuthStore().isLoggedIn`
 - Verifica `useAuthStore().currentUser.role` contra lista de roles permitidos
+- Se falhar: autenticação → redirect `/` com toast "Sessão expirada"
 - Se falhar: autenticação → redirect `/` com toast "Sessão expirada"
 - Se falhar: autorização → redirect `/unauthorized` (404-like) com toast "Acesso negado"
 - Se OK → renderiza `<Outlet />`
@@ -92,6 +114,8 @@ test: Adicionar testes para ProtectedRoute (sem token, role inválido, com suces
 - /create-course/exam (professor only)
 - /courses/power-bi/\* (8 rotas)
 - /courses/python/\* (8 rotas)
+- /courses/power-bi/\* (8 rotas)
+- /courses/python/\* (8 rotas)
 - /admin/usuarios (admin only)
 
 **Fora do escopo ativo:** rotas legadas de mensageria (`/message`, `/messages`, `/received-messages`) devem ser removidas/ocultadas na 4.5 por nao possuirem endpoint contratual.
@@ -124,6 +148,9 @@ test: Validar proteção de navegação em rotas críticas (professor, student, 
   **Duração:** 2 dias (refactoring, testes unitários de comportamento)
   **Commit esperado:**
 
+  **Duração:** 2 dias (refactoring, testes unitários de comportamento)
+  **Commit esperado:**
+
 ```
 refactor: Remover hardcodes de role de pages — confiar em ProtectedRoute
 ```
@@ -142,14 +169,19 @@ refactor: Remover hardcodes de role de pages — confiar em ProtectedRoute
 - estado em memória do frontend (sem persistir JWT em storage inseguro)
 - Após logout → redirect automático para `/`
   **Regra contratual estrita:**
+  **Regra contratual estrita:**
 - Não existe endpoint de logout em `arquitetura.md`.
 - Fluxo de logout deve ser exclusivamente local no frontend: limpar estado de autenticação e redirecionar.
 - É proibido adicionar `POST /logout`, `POST /auth/logout` ou qualquer rota equivalente fora do contrato.
+  **Testes:**
   **Testes:**
 - Chamar `logout()` → `isLoggedIn === false`
 - Chamar `logout()` → estado de autenticação limpo em memória
 - Chamar `logout()` → redirect para `/`
 - Chamar `logout()` → nenhuma chamada de API de logout é disparada
+  **Duração:** 1 dia
+  **Commits esperados:**
+
   **Duração:** 1 dia
   **Commits esperados:**
 
@@ -164,12 +196,18 @@ test: Validar logout limpa estado global e redireciona
 
 **Arquivo:**
 
+**Arquivo:**
+
 - `src/pages/UnauthorizedPage.tsx` (novo)
 - `src/routes.ts` (adicionar rota /unauthorized)
+  **Lógica:**
   **Lógica:**
 - Página minimalista: "Você não tem permissão para acessar este recurso"
 - Botão "Voltar" ou "Ir para dashboard"
 - Redirection automática após 5s para `/courses`
+  **Duração:** 0.5 dias
+  **Commit esperado:**
+
   **Duração:** 0.5 dias
   **Commit esperado:**
 
@@ -186,6 +224,10 @@ feat: Criar UnauthorizedPage com redirecionamento automático
 - `/` (login)
 - `/register`
 - `/forgot-password`
+  **Teste:** Acessar cada uma sem autenticação → deve funcionar
+  **Duração:** 0.5 dias
+  **Commit esperado:**
+
   **Teste:** Acessar cada uma sem autenticação → deve funcionar
   **Duração:** 0.5 dias
   **Commit esperado:**
@@ -228,6 +270,28 @@ apiClient.interceptors.response.use(
     }
     return Promise.reject(error);
   },
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Sessão expirada → toast + redirect login
+      toast.error("Sessão expirada. Faça login novamente.");
+      useAuthStore.getState().logout();
+      window.location.href = "/";
+    } else if (error.response?.status === 403) {
+      // Sem permissão
+      toast.error("Você não tem permissão para realizar esta ação.");
+    } else if (error.response?.status === 409) {
+      // Conflito (ex: curso já existe)
+      toast.error(error.response.data.message || "Recurso em conflito");
+    } else if (error.response?.status === 422) {
+      // Validação falhou
+      toast.error("Dados inválidos. Verifique os campos.");
+    } else if (error.response?.status >= 500) {
+      // Erro no servidor
+      toast.error("Erro no servidor. Tente novamente.");
+    }
+    return Promise.reject(error);
+  },
 );
 ```
 
@@ -244,11 +308,15 @@ apiClient.interceptors.response.use(
 - Mensagens vazio: "Nenhuma mensagem"
 - Exames vazio: "Crie sua primeira prova"
   **Testes:**
+  **Testes:**
 - API erro 401 → toast exibido + redirect login
 - API erro 409 → toast com mensagem de conflito
 - API erro 500 → toast genérico
 - Loading state: botão desabilitado durante requisição
 - Estado vazio: mensagem exibida (cursos, módulos, etc.)
+  **Duração:** 1.5 dias
+  **Commits esperados:**
+
   **Duração:** 1.5 dias
   **Commits esperados:**
 
@@ -258,6 +326,8 @@ feat: Adicionar loading states em componentes de ação
 feat: Implementar estados vazios em listas com mensagens orientadoras
 test: Validar toasts de erro, loading states, estados vazios
 ```
+
+## **Impacto:** Reutilizado em Fases 2, 3, 4, 5 (todas as integrações backend)
 
 ## **Impacto:** Reutilizado em Fases 2, 3, 4, 5 (todas as integrações backend)
 
@@ -299,6 +369,8 @@ test: Validar toasts de erro, loading states, estados vazios
 - Nenhuma página usa `IUserSession` corretamente
   **Ação:**
 
+  **Ação:**
+
 1. Definir **tabela de mapeamento canonical:**
 
 ```
@@ -319,7 +391,23 @@ export interface IUserSession {
   role: "professor" | "student" | "admin";
   status: "ATIVO" | "INATIVO";
   fotoUrl?: string;
+  id: string;
+  nome: string;
+  cpf: string;
+  email: string;
+  role: "professor" | "student" | "admin";
+  status: "ATIVO" | "INATIVO";
+  fotoUrl?: string;
 }
+export interface ICourse {
+  id: string;
+  titulo: string;
+  categoria: string;
+  descricao: string;
+  cargaHoraria: string;
+  status: "RASCUNHO" | "PUBLICADO" | "ARQUIVADO";
+  professorId: string;
+  // ... demais campos
 export interface ICourse {
   id: string;
   titulo: string;
@@ -331,10 +419,17 @@ export interface ICourse {
   // ... demais campos
 }
 // API Contracts
+// API Contracts
 export interface ILoginRequest {
   email: string;
   senha: string;
+  email: string;
+  senha: string;
 }
+export interface ILoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  usuario: IUserSession;
 export interface ILoginResponse {
   accessToken: string;
   refreshToken: string;
@@ -348,7 +443,19 @@ export interface ICourseCreateRequest {
   requerEndereco: boolean;
   requerGenero: boolean;
   requerIdade: boolean;
+export interface ICourseCreateRequest {
+  titulo: string;
+  categoria: string;
+  descricao: string;
+  cargaHoraria: string;
+  requerEndereco: boolean;
+  requerGenero: boolean;
+  requerIdade: boolean;
 }
+export interface IApiError {
+  message: string;
+  status: number;
+  timestamp: string;
 export interface IApiError {
   message: string;
   status: number;
@@ -370,6 +477,9 @@ export const TYPES_VERSION = "1.0.0";
   **Duração:** 2 dias (audit, consolidação, refactor de imports)
   **Commits esperados:**
 
+  **Duração:** 2 dias (audit, consolidação, refactor de imports)
+  **Commits esperados:**
+
 ```
 refactor: Consolidar tipos domain + API em @ava-poc/types v1.0
 refactor: Resolver inconsistência role (professor/creator mapeamento)
@@ -388,6 +498,9 @@ type UserProfile = {
   name: string;
   role: "professor" | "student";
   password?: string; // ❌ NUNCA deve existir em produção
+  name: string;
+  role: "professor" | "student";
+  password?: string; // ❌ NUNCA deve existir em produção
 };
 ```
 
@@ -400,6 +513,10 @@ type StoreState = {
   isLoggedIn: boolean;
   token: string | null;
   refreshToken: string | null;
+  currentUser: IUserSession | null;
+  isLoggedIn: boolean;
+  token: string | null;
+  refreshToken: string | null;
 };
 ```
 
@@ -408,6 +525,9 @@ type StoreState = {
 - Remover campo `password` de `UserProfile`
 - Remover hardcoded CREDENTIALS (será integrado com backend em Fase 2)
 - Usar `IUserSession` como fonte de verdade
+  **Duração:** 1 dia
+  **Commit esperado:**
+
   **Duração:** 1 dia
   **Commit esperado:**
 
@@ -430,6 +550,8 @@ import { ILoginRequest } from "@ava-poc/types";
 export const loginSchema = z.object({
   email: z.string().email("Email inválido"),
   senha: z.string().min(6, "Mínimo 6 caracteres"),
+  email: z.string().email("Email inválido"),
+  senha: z.string().min(6, "Mínimo 6 caracteres"),
 }) satisfies z.ZodType<ILoginRequest>;
 export type LoginFormValues = z.infer<typeof loginSchema>;
 ```
@@ -442,9 +564,13 @@ export type LoginFormValues = z.infer<typeof loginSchema>;
 - `fileSchema.ts` → imageSchema, videoSchema, pdfSchema (refatorar para usar Zod + RN07/RN08)
 - `messageSchema.ts` → legado fora do escopo ativo (manter apenas para rastreabilidade)
   **Testes:**
+  **Testes:**
 - Validação de email falha se inválido
 - Validação de CPF passa para CPF válido
 - Validação de imagem 200x200 passa; 100x100 falha
+  **Duração:** 1.5 dias
+  **Commits esperados:**
+
   **Duração:** 1.5 dias
   **Commits esperados:**
 
@@ -461,7 +587,12 @@ test: Validar cobertura de schemas Zod para casos de erro
 **Exemplo de remoção:**
 
 - `ICourseCardProps` → se usada em múltiplas páginas, mover para @ava-poc/types
+
+- `ICourseCardProps` → se usada em múltiplas páginas, mover para @ava-poc/types
 - `IMessageCardProps` → se usada apenas em uma página, deixar no arquivo
+  **Duração:** 1 dia
+  **Commit esperado:**
+
   **Duração:** 1 dia
   **Commit esperado:**
 
@@ -491,6 +622,7 @@ refactor: Remover any de TypeScript — tipos explícitos obrigatórios
 
 ```typescript
 // ❌ Muitas props
+<Card title="Curso" category="Dev" image={url} imageAlt="..."
 <Card title="Curso" category="Dev" image={url} imageAlt="..."
 subtitle="Aprenda" description="..." />
 ```
@@ -560,10 +692,14 @@ subtitle="Aprenda" description="..." />
 - Reutilização aumenta (componentes adaptáveis)
 - DRY: reduz duplicação em Fase 5 (Python vs Power BI)
   **Testes:**
+  **Testes:**
 - Card renderiza slots corretamente (image, header, body, footer)
 - Modal fecha ao clicar Cancelar
 - FormContainer submete dados via `handleSubmit` callback
 - Slots não renderizados → component não quebra
+  **Duração:** 1.5 dias
+  **Commits esperados:**
+
   **Duração:** 1.5 dias
   **Commits esperados:**
 
@@ -643,11 +779,15 @@ getProfile(): Promise<IUserSession>,
 - `POST /auth/redefinir-senha`
 - **Não existe** `POST /auth/logout` nem qualquer endpoint de logout no contrato
   **Testes unitários:**
+  **Testes unitários:**
 - login valido → retorna `ILoginResponse` com tokens
 - login inválido → `IApiError` com status 401
 - register válido → usuario criado
 - register CPF duplicado → `IApiError` com status 409
 - refresh com token expirado → `IApiError` com status 401
+  **Duração:** 2 dias
+  **Commits esperados:**
+
   **Duração:** 2 dias
   **Commits esperados:**
 
@@ -666,6 +806,11 @@ test: Validar authService contra backend (mocks com MSW se backend indisponível
 
 ```typescript
 apiClient.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
   const token = useAuthStore.getState().token;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -701,9 +846,19 @@ export const loginSchema = z.object({
       "E-mail ou nome de usuário inválido",
     ),
   senha: z.string().min(6, "Mínimo 6 caracteres"),
+  emailOuUsuario: z
+    .string()
+    .min(1, "E-mail ou nome de usuário obrigatório")
+    .refine(
+      (value) => isValidEmail(value) || isValidUsername(value),
+      "E-mail ou nome de usuário inválido",
+    ),
+  senha: z.string().min(6, "Mínimo 6 caracteres"),
 });
 export type LoginFormValues = z.infer<typeof loginSchema>;
 // Helpers
+const isValidEmail = (value: string) =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 const isValidEmail = (value: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 const isValidUsername = (value: string) => /^[a-zA-Z0-9_]{3,20}$/.test(value);
@@ -713,6 +868,8 @@ const isValidUsername = (value: string) => /^[a-zA-Z0-9_]{3,20}$/.test(value);
 
 ```typescript
 interface ILoginRequest {
+  emailOuUsuario: string; // Backend detecta se é email ou username
+  senha: string;
   emailOuUsuario: string; // Backend detecta se é email ou username
   senha: string;
 }
@@ -736,8 +893,21 @@ const mutation = useMutation({
   onError: (error: IApiError) => {
     setGeneralError(error.message);
   },
+  mutationFn: (creds: ILoginRequest) =>
+    authService.login(creds.emailOuUsuario, creds.senha),
+  onSuccess: (response) => {
+    useAuthStore
+      .getState()
+      .setToken(response.accessToken, response.refreshToken);
+    useAuthStore.getState().setCurrentUser(response.usuario);
+    navigate("/courses");
+  },
+  onError: (error: IApiError) => {
+    setGeneralError(error.message);
+  },
 });
 const onSubmitValid = (data) => {
+  mutation.mutate(data);
   mutation.mutate(data);
 };
 ```
@@ -750,6 +920,9 @@ const onSubmitValid = (data) => {
 - Login com campo inválido → validação Zod bloqueia
 - Rede indisponível → toast "Erro de conexão"
 - Loading state: botão desabilitado durante submissão
+  **Duração:** 1.5 dias (inclui refactor inline 2.3 de loginSchema)
+  **Commits esperados:**
+
   **Duração:** 1.5 dias (inclui refactor inline 2.3 de loginSchema)
   **Commits esperados:**
 
@@ -780,12 +953,30 @@ export const registerSchema = z
     message: "Senhas não coincidem",
     path: ["senhaConfirm"],
   });
+export const registerSchema = z
+  .object({
+    nome: z.string().min(3, "Mínimo 3 caracteres"),
+    cpf: z.string().regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "CPF inválido"),
+    email: z.string().email("Email inválido"),
+    senha: z.string().min(6, "Mínimo 6 caracteres"),
+    senhaConfirm: z.string(),
+    perfil: z.enum(["professor", "student"]),
+  })
+  .refine((data) => data.senha === data.senhaConfirm, {
+    message: "Senhas não coincidem",
+    path: ["senhaConfirm"],
+  });
 ```
 
 **Mapeamento de payload:**
 
 ```typescript
 const registerPayload: ICadastroRequest = {
+  nome: form.nome,
+  cpf: form.cpf,
+  email: form.email,
+  senha: form.senha,
+  perfil: form.perfil === "professor" ? "PROFESSOR" : "ALUNO",
   nome: form.nome,
   cpf: form.cpf,
   email: form.email,
@@ -801,6 +992,9 @@ const registerPayload: ICadastroRequest = {
 - Email duplicado → erro 409
 - Senhas não coincidem → validação Zod bloqueia
 - Após registro → exibir mensagem "Conta pendente de ativação"
+  **Duração:** 1.5 dias
+  **Commits esperados:**
+
   **Duração:** 1.5 dias
   **Commits esperados:**
 
@@ -821,8 +1015,28 @@ test: Validar registro com validações Zod (CPF, email, senha)
 - Se refresh também falhar → redirect para login
   **Código:**
 
+  **Código:**
+
 ```typescript
 apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401 && !error.config._retry) {
+      error.config._retry = true;
+      try {
+        const refreshToken = useAuthStore.getState().refreshToken;
+        const { accessToken } = await authService.refreshAccessToken(
+          refreshToken!,
+        );
+        useAuthStore.getState().setToken(accessToken, refreshToken);
+        return apiClient(error.config);
+      } catch {
+        useAuthStore.getState().logout();
+        window.location.href = "/";
+      }
+    }
+    return Promise.reject(error);
+  },
   (response) => response,
   async (error) => {
     if (error.response?.status === 401 && !error.config._retry) {
@@ -852,6 +1066,9 @@ apiClient.interceptors.response.use(
   **Duração:** 1.5 dias
   **Commits esperados:**
 
+  **Duração:** 1.5 dias
+  **Commits esperados:**
+
 ```
 feat: Implementar refresh token flow automático em response interceptor
 test: Validar refresh token e reenvio automático de requisição
@@ -869,9 +1086,13 @@ test: Validar refresh token e reenvio automático de requisição
 - `PUT /perfil/senha` → alterar senha (requer senha atual)
   **Ações:**
 
+  **Ações:**
+
 ```typescript
 // Carregar perfil
 const { data: profile } = useQuery({
+  queryKey: ["profile"],
+  queryFn: () => authService.getProfile(),
   queryKey: ["profile"],
   queryFn: () => authService.getProfile(),
 });
@@ -880,9 +1101,14 @@ const changePwdMutation = useMutation({
   mutationFn: (data: IChangePasswordRequest) =>
     authService.changePassword(data.senhaAtual, data.novaSenha),
   onSuccess: () => toast("Senha alterada com sucesso"),
+  mutationFn: (data: IChangePasswordRequest) =>
+    authService.changePassword(data.senhaAtual, data.novaSenha),
+  onSuccess: () => toast("Senha alterada com sucesso"),
 });
 // Upload foto
 const uploadPhotoMutation = useMutation({
+  mutationFn: (file: File) => authService.uploadProfilePhoto(file),
+  onSuccess: () => queryClient.invalidateQueries({ queryKey: ["profile"] }),
   mutationFn: (file: File) => authService.uploadProfilePhoto(file),
   onSuccess: () => queryClient.invalidateQueries({ queryKey: ["profile"] }),
 });
@@ -900,6 +1126,9 @@ const uploadPhotoMutation = useMutation({
   **Duração:** 1.5 dias
   **Commits esperados:**
 
+  **Duração:** 1.5 dias
+  **Commits esperados:**
+
 ```
 refactor: Integrar ProfilePage com GET /perfil e PUT /perfil/senha
 test: Validar carga de perfil, alteração de senha, upload de foto
@@ -911,8 +1140,12 @@ test: Validar carga de perfil, alteração de senha, upload de foto
 
 **Arquivos:**
 
+**Arquivos:**
+
 - `src/pages/ForgotPasswordPage.tsx` (refactor)
 - `src/pages/ResetPasswordPage.tsx` (novo)
+  **Fluxo:**
+
   **Fluxo:**
 
 1. ForgotPasswordPage → `POST /auth/recuperar-senha` com email
@@ -922,11 +1155,17 @@ test: Validar carga de perfil, alteração de senha, upload de foto
    **Rota:** `/reset-password?token=<token>` (pública, sem guard)
    **Testes:**
 
+   **Rota:** `/reset-password?token=<token>` (pública, sem guard)
+   **Testes:**
+
 - Email válido → mensagem "Verifique seu email"
 - Email inválido → erro genérico (sem enumeration)
 - Token expirado → "Token expirado, solicite novo"
 - Token usado (RN09) → "Token já foi utilizado"
 - Redefinição válida → redirect login com mensagem "Senha alterada"
+  **Duração:** 2 dias
+  **Commits esperados:**
+
   **Duração:** 2 dias
   **Commits esperados:**
 
@@ -1001,11 +1240,15 @@ uploadCourseCover(id: string, file: File): Promise<ICourse>,
 - `PATCH /cursos/{id}/status`
 - `GET /cursos/buscar`
   **Testes:**
+  **Testes:**
 - Listar cursos → retorna paginado
 - Criar curso válido → retorna ICourse com id
 - Update curso válido → retorna atualizado
 - Delete curso com alunos → erro 409 (RN02)
 - Buscar por términa → retorna filtrado
+  **Duração:** 1.5 dias
+  **Commits esperados:**
+
   **Duração:** 1.5 dias
   **Commits esperados:**
 
@@ -1023,6 +1266,8 @@ test: Validar courseService contra backend (CRUD de cursos)
 
 ```typescript
 const computacaoCourses = [
+  { id: "power-bi", title: "Power Bi - Fundamentos" },
+  // ... hardcoded
   { id: "power-bi", title: "Power Bi - Fundamentos" },
   // ... hardcoded
 ];
@@ -1064,6 +1309,9 @@ queryFn: () => courseService.fetchCourses({ status }),
   **Duração:** 1.5 dias
   **Commits esperados:**
 
+  **Duração:** 1.5 dias
+  **Commits esperados:**
+
 ```
 refactor: Integrar CoursesPage com GET /cursos e paginação
 test: Validar listaem de cursos por role (professor, student)
@@ -1078,6 +1326,13 @@ test: Validar listaem de cursos por role (professor, student)
 
 ```typescript
 export const courseCreateSchema = z.object({
+  titulo: z.string().min(5, "Mínimo 5 caracteres"),
+  categoria: z.string().min(1, "Categoria obrigatória"),
+  descricao: z.string().min(10, "Mínimo 10 caracteres"),
+  cargaHoraria: z.string().regex(/^\d+h?$/, "Formato: 30h ou 30"),
+  requerEndereco: z.boolean().default(false),
+  requerGenero: z.boolean().default(false),
+  requerIdade: z.boolean().default(false),
   titulo: z.string().min(5, "Mínimo 5 caracteres"),
   categoria: z.string().min(1, "Categoria obrigatória"),
   descricao: z.string().min(10, "Mínimo 10 caracteres"),
@@ -1104,6 +1359,17 @@ const createMutation = useMutation({
     navigate("/courses");
     toast("Curso criado com sucesso");
   },
+  mutationFn: async (data: ICourseCreateRequest) => {
+    const curso = await courseService.createCourse(data);
+    if (coverFile) {
+      await courseService.uploadCourseCover(curso.id, coverFile);
+    }
+    return curso;
+  },
+  onSuccess: (curso) => {
+    navigate("/courses");
+    toast("Curso criado com sucesso");
+  },
 });
 ```
 
@@ -1114,6 +1380,9 @@ const createMutation = useMutation({
 - Capa < 200x200 → erro de validação
 - Capa upload após POST → sucesso
 - Navegação após criação → `/courses`
+  **Duração:** 1.5 dias
+  **Commits esperados:**
+
   **Duração:** 1.5 dias
   **Commits esperados:**
 
@@ -1134,9 +1403,17 @@ test: Validar criação de curso com upload de capa
 const { data: course } = useQuery({
   queryKey: ["courses", courseId],
   queryFn: () => courseService.fetchCourseById(courseId),
+  queryKey: ["courses", courseId],
+  queryFn: () => courseService.fetchCourseById(courseId),
 });
 // Editar curso
 const updateMutation = useMutation({
+  mutationFn: (data: ICourseUpdateRequest) =>
+    courseService.updateCourse(courseId, data),
+  onSuccess: () => {
+    toast("Curso atualizado");
+    queryClient.invalidateQueries({ queryKey: ["courses"] });
+  },
   mutationFn: (data: ICourseUpdateRequest) =>
     courseService.updateCourse(courseId, data),
   onSuccess: () => {
@@ -1156,9 +1433,22 @@ const deleteMutation = useMutation({
       toast("Não é possível deletar curso com alunos matriculados");
     }
   },
+  mutationFn: () => courseService.deleteCourse(courseId),
+  onSuccess: () => {
+    navigate("/courses");
+    toast("Curso removido");
+  },
+  onError: (error) => {
+    if (error.status === 409) {
+      toast("Não é possível deletar curso com alunos matriculados");
+    }
+  },
 });
 // Alterar status
 const statusMutation = useMutation({
+  mutationFn: (status: string) =>
+    courseService.updateCourseStatus(courseId, status),
+  onSuccess: () => queryClient.invalidateQueries({ queryKey: ["courses"] }),
   mutationFn: (status: string) =>
     courseService.updateCourseStatus(courseId, status),
   onSuccess: () => queryClient.invalidateQueries({ queryKey: ["courses"] }),
@@ -1174,6 +1464,9 @@ const statusMutation = useMutation({
 - Deletar curso sem alunos → sucesso
 - Deletar curso com alunos → erro 409 + toast
 - Publicar curso RASCUNHO → status muda para PUBLICADO
+  **Duração:** 2 dias
+  **Commits esperados:**
+
   **Duração:** 2 dias
   **Commits esperados:**
 
@@ -1195,9 +1488,14 @@ test: Validar edição e deleção de cursos (ownership, delete restriction)
 - `PATCH /modulos/{id}/ordem` — reordenar
   **RN04 enforcement:** Ao deletar módulo, backend renumera demais automaticamente.
   **Testes:**
+  **RN04 enforcement:** Ao deletar módulo, backend renumera demais automaticamente.
+  **Testes:**
 - Criar módulo → nome gerado como "Módulo 01"
 - Deletar módulo 2 de 3 → demais renomeados para "Módulo 01", "Módulo 02"
 - Reordenar módulo 1 para posição 2 → ordem persiste
+  **Duração:** 1.5 dias
+  **Commits esperados:**
+
   **Duração:** 1.5 dias
   **Commits esperados:**
 
@@ -1222,11 +1520,17 @@ test: Validar renumeração de módulos ao deletar
   **RN07 enforcement:** Tipos de arquivo: PDF, MP4, AVI, MOV, WebM. Rejeitar outros.
   **RN12 enforcement:** Conteúdo gerado NOT salvo até confirmação explícita.
   **Testes:**
+  **RN07 enforcement:** Tipos de arquivo: PDF, MP4, AVI, MOV, WebM. Rejeitar outros.
+  **RN12 enforcement:** Conteúdo gerado NOT salvo até confirmação explícita.
+  **Testes:**
 - Criar aula com arquivo PDF → sucesso
 - Upload arquivo inválido (`.txt`) → erro RN07
 - Gerar conteúdo IA → preview em modal, NÃO salvo
 - Confirmar conteúdo gerado → persistido em `conteudo_gerado`
 - Reordenar aulas → ordem refletida
+  **Duração:** 2 dias
+  **Commits esperados:**
+
   **Duração:** 2 dias
   **Commits esperados:**
 
@@ -1300,6 +1604,9 @@ fetchExamResults(provaId: string): Promise<IExamStats>,
   **Duração:** 2 dias
   **Commits esperados:**
 
+  **Duração:** 2 dias
+  **Commits esperados:**
+
 ```
 feat: Criar examService.ts com endpoints (CRUD prova/pergunta/alternativa, submit, gerar IA)
 test: Validar validações de pergunta (mín. 2 alternativas, 1 correta)
@@ -1319,9 +1626,16 @@ test: Validar validações de pergunta (mín. 2 alternativas, 1 correta)
    **RN11 enforcement:** Checkboxes independentes em aba Configurações (mostrar respostas erradas/corretas/valores).
    **Testes:**
 
+   **RN05 enforcement:** Validar mín. 2 alternativas e exatamente 1 correta no frontend + backend.
+   **RN11 enforcement:** Checkboxes independentes em aba Configurações (mostrar respostas erradas/corretas/valores).
+   **Testes:**
+
 - Criar prova com 3 perguntas → todas persistidas
 - Pergunta sem alternativa correta → bloqueado salvamento
 - Configurações independentes → todas salvas corretamente
+  **Duração:** 2 dias
+  **Commits esperados:**
+
   **Duração:** 2 dias
   **Commits esperados:**
 
@@ -1361,6 +1675,9 @@ navigate("/courses/power-bi/exam/results", { state: { result } });
   **Duração:** 1.5 dias
   **Commits esperados:**
 
+  **Duração:** 1.5 dias
+  **Commits esperados:**
+
 ```
 refactor: Integrar ExamPage com GET /provas/:id e POST submissão
 test: Validar submissão de prova e cálculo de resultado no backend
@@ -1380,9 +1697,13 @@ test: Validar submissão de prova e cálculo de resultado no backend
 - Status de aprovação (se aplicável)
 - Feedback por pergunta (se configurado em RN11)
   **Testes:**
+  **Testes:**
 - Resultado exibe pontuação correta
 - Percentual calculado corretamente
 - Feedback condicional (mostrar respostas erradas/corretas)
+  **Duração:** 1 dia
+  **Commits esperados:**
+
   **Duração:** 1 dia
   **Commits esperados:**
 
@@ -1401,12 +1722,17 @@ test: Validar exibição de resultado e feedback condicional
 - `src/pages/StudentMessagesPage.tsx`
 - `src/routes.ts`
   **Ação:**
+  **Ação:**
 - Remover/ocultar rotas e chamadas dependentes de `/mensagens`.
 - Manter apenas shell visual quando necessário para preservar UX, sem integração backend.
 - Registrar remoção no plano e na rastreabilidade.
   **Testes:**
+  **Testes:**
 - Nenhuma chamada HTTP para `/mensagens` no fluxo ativo.
 - Rotas não contratuais não aparecem na navegação principal.
+  **Duração:** 1 dia
+  **Commits esperados:**
+
   **Duração:** 1 dia
   **Commits esperados:**
 
@@ -1425,12 +1751,17 @@ test: Garantir ausência de chamadas para /mensagens no fluxo ativo
 - `src/routes.ts`
 - documentação em `/docs/`
   **Ação:**
+  **Ação:**
 - Remover referências a endpoints não documentados em `.claude/commands/doc/arquitetura.md`.
 - Garantir que rotas frontend reflitam somente endpoints contratuais.
 - Atualizar documentação para refletir escopo limpo.
   **Testes:**
+  **Testes:**
 - Busca no código não retorna endpoints fora de `arquitetura.md`.
 - Build/lint/test sem regressão após saneamento.
+  **Duração:** 1.5 dias
+  **Commits esperados:**
+
   **Duração:** 1.5 dias
   **Commits esperados:**
 
@@ -1475,6 +1806,20 @@ docs: Atualizar rastreabilidade removendo endpoints sem contrato
       "pontos": 1
     }
   ]
+  "perguntas": [
+    {
+      "enunciado": "O que é Spring?",
+      "alternativas": ["Framework", "Linguagem", "Bug"],
+      "respostaCorretaIndex": 0,
+      "pontos": 1
+    },
+    {
+      "enunciado": "Qual é a anotação de controller?",
+      "alternativas": ["@Controller", "@Service", "@Repository"],
+      "respostaCorretaIndex": 0,
+      "pontos": 1
+    }
+  ]
 }
 ```
 
@@ -1495,8 +1840,10 @@ docs: Atualizar rastreabilidade removendo endpoints sem contrato
 - Ao clicar "Salvar Quiz", submete perguntas editadas para `POST /provas/{provaId}/perguntas`
 - Cada pergunta registra resposta correta antes de persistir
   **Mapeamento de endpoints:**
+  **Mapeamento de endpoints:**
 - `POST /modulos/{moduloId}/prova/gerar-quiz-ia` — Spring AI
 - `POST /provas/{id}/perguntas` — persist perguntas editadas
+  **Testes:**
   **Testes:**
 - Módulo com aulas → gera perguntas sugeridas (mock ou real backend)
 - Módulo vazio → erro 422 com mensagem orientadora
@@ -1507,12 +1854,19 @@ docs: Atualizar rastreabilidade removendo endpoints sem contrato
   **Duração:** 2-3 dias (integração IA, modal, edição, validações)
   **Commits esperados:**
 
+  **Duração:** 2-3 dias (integração IA, modal, edição, validações)
+  **Commits esperados:**
+
 ```
 feat: Integrar geração de quiz via IA (POST /modulos/:id/prova/gerar-quiz-ia)
 feat: Criar modal de preview e edição de perguntas geradas
 test: Validar geração, edição e persistência condicional de quiz (RF35-RF38)
 test: Validar erro handling para módulo vazio
 ```
+
+## **Impacto:** RN12 enforcement (não salva até confirmação)
+
+**Checklist Fase 4:\*\***
 
 ## **Impacto:** RN12 enforcement (não salva até confirmação)
 
@@ -1537,12 +1891,19 @@ test: Validar erro handling para módulo vazio
 
 **Antes:**
 
+**Antes:**
+
 - `LessonsPage.tsx` (power-bi)
 - `PythonLessonsPage.tsx` (python)
   → 2 componentes idênticos
   **Depois:**
+  → 2 componentes idênticos
+  **Depois:**
 - `LessonPage.tsx` (genérico com `:courseId` na rota)
 - Configuração por curso (expiração, feedback, etc.) vem do backend
+  **Duração:** 1.5 dias
+  **Commit esperado:**
+
   **Duração:** 1.5 dias
   **Commit esperado:**
 
@@ -1560,9 +1921,14 @@ refactor: Extrair LessonPage compartilhada (elimina duplicação Python/Power BI
 - `PythonExamPage.tsx`, `PythonExamResultPage.tsx`, `PythonExamInstructionsPage.tsx` (python)
   → 6 componentes com 95% overlapa
   **Depois:**
+  → 6 componentes com 95% overlapa
+  **Depois:**
 - `/courses/:courseId/exam/instructions`
 - `/courses/:courseId/exam`
 - `/courses/:courseId/exam/results`
+  **Duração:** 2 dias
+  **Commits esperados:**
+
   **Duração:** 2 dias
   **Commits esperados:**
 
@@ -1605,9 +1971,13 @@ refactor: Remover hardcodes de rotas — usar :courseId genérico
 - `mostrarResultadoAposFim` (ex: true)
 - Variações de config por curso
   **Frontend usa configuração para:**
+  **Frontend usa configuração para:**
 - Timer de prova (dinamicamente, não hardcoded em Python vs Power BI)
 - Feedback condicional
 - Renderização de componentes
+  **Duração:** 1 day
+  **Commit esperado:**
+
   **Duração:** 1 day
   **Commit esperado:**
 
@@ -1644,6 +2014,9 @@ refactor: Consumir configuração dinâmica de curso (tempo prova, feedback, etc
   **Duração:** 1 day
   **Commit esperado:**
 
+  **Duração:** 1 day
+  **Commit esperado:**
+
 ```
 refactor: Padronizar breadcrumbs em todas as páginas autenticadas
 ```
@@ -1661,6 +2034,9 @@ refactor: Padronizar breadcrumbs em todas as páginas autenticadas
   **Duração:** 1 day
   **Commit esperado:**
 
+  **Duração:** 1 day
+  **Commit esperado:**
+
 ```
 refactor: Auditoria linguística (código em inglês, UX em português)
 ```
@@ -1675,6 +2051,9 @@ refactor: Auditoria linguística (código em inglês, UX em português)
 - [ ] Keyboard navigation (Tab, Enter, Escape)
 - [ ] Contraste de cores (WCAG AA)
 - [ ] Screen reader testing (NVAccess + Firefox)
+      **Duração:** 1.5 days
+      **Commits esperados:**
+
       **Duração:** 1.5 days
       **Commits esperados:**
 
@@ -1712,6 +2091,9 @@ docs: Atualizar messaging-current.md — histórico persistente
   **Duração:** 0.5 days
   **Commit esperado:**
 
+  **Duração:** 0.5 days
+  **Commit esperado:**
+
 ```
 docs: Atualizar CLAUDE.md — estado de refatoração completo
 ```
@@ -1729,6 +2111,8 @@ docs: Atualizar CLAUDE.md — estado de refatoração completo
 ## 📋 Checklist de Submissão (Desenvolvedor)
 
 - [ ] TDD: RED → GREEN → REFACTOR executado
+
+- [ ] TDD: RED → GREEN → REFACTOR executado
 - [ ] Testes escritos (mín. 2-3 por função)
 - [ ] Cobertura ≥ 80%
 - [ ] `npm run type-check` — zero erros
@@ -1742,8 +2126,11 @@ docs: Atualizar CLAUDE.md — estado de refatoração completo
 - [ ] Aderência contratual confirmada (endpoint, payload, response status)
 - [ ] Commits em português no imperativo com prefixo [TIPO]
   ## 🎯 RFs/RNs Associados
+  ## 🎯 RFs/RNs Associados
 - [ ] RF### — [descrição da funcionalidade]
 - [ ] RN## — [regra de negócio associada]
+  ## 📝 Notas
+  [Detalhes adicionais sobre a mudança, decisões de design, ou problemas encontrados]
   ## 📝 Notas
   [Detalhes adicionais sobre a mudança, decisões de design, ou problemas encontrados]
 ```
@@ -1755,30 +2142,37 @@ docs: Atualizar CLAUDE.md — estado de refatoração completo
 
 ## Clean Code (RNF19)
 
+## Clean Code (RNF19)
+
 - [ ] Funções: < 10 linhas (exceto componentes React com muita JSX)
 - [ ] Zero duplicação de código (DRY)
 - [ ] Nomes descritivos: variáveis, funções, componentes refletem intenção de negócio
 - [ ] Sem `console.log`, `debugger`, ou TODOs em produção
+  ## SOLID (RNF20)
   ## SOLID (RNF20)
 - [ ] Componente: uma única responsabilidade
 - [ ] Separação clara: apresentação / orquestracao / acesso a dados
 - [ ] Sem lógica de negócio em componentes de UI (deslocar para hooks ou services)
 - [ ] Zero Test Doubles desnecessários (mocks bem justificados)
   ## Segurança (OWASP)
+  ## Segurança (OWASP)
 - [ ] Zero Trust Client: sem lógica de autorização/autenticação em cliente
 - [ ] XSS: sem `dangerouslySetInnerHTML` sem sanitização (usar DOMPurify se necessário)
 - [ ] CSRF: tokens validados em requisições de escrita
 - [ ] Tokens JWT: armazenados em cookie httpOnly/Secure (evitar persistência em localStorage/sessionStorage)
+  ## Performance (RNF24-29)
   ## Performance (RNF24-29)
 - [ ] Bundle size: `npm run build -- --analyze` — sem regressões
 - [ ] Lazy loading: componentes pesados com React.lazy() e Suspense
 - [ ] Memo: apenas em componentes com descedentes 100+ elementos ou callbacks custosos
 - [ ] React Query: deduplicacao, refetch inteligente, cache management
   ## Documentação (RNF30)
+  ## Documentação (RNF30)
 - [ ] CLAUDE.md: atualizado se mudança de diretriz ou contrato
 - [ ] RF/RN/RNF: criados ou atualizados no repositório se novo requisito
 - [ ] Tipos: JSDoc com @param, @returns em funções públicas
 - [ ] User Stories: atualizadas se nova jornada de usuário
+  ## Testes (RNF21)
   ## Testes (RNF21)
 - [ ] Cobertura ≥ 80%
 - [ ] TDD: RED → GREEN → REFACTOR evidente nos commits
@@ -1790,6 +2184,8 @@ docs: Atualizar CLAUDE.md — estado de refatoração completo
 
 ```markdown
 ## Critério de Aprovação de PR (RNF30-RNF32)
+
+### Fase de Submissão (Desenvolvedor)
 
 ### Fase de Submissão (Desenvolvedor)
 
@@ -1814,6 +2210,15 @@ docs: Atualizar CLAUDE.md — estado de refatoração completo
 12. **Sem conflitos** com `development`
 13. **Merge:** Squash or Rebase (manter histórico granular)
 14. **Tag de release:** v.X.Y.Z pós-merge em `main`
+15. **Checklist de Submissão:** desenvolvedor completou todos os itens
+16. **CODE_REVIEW_CHECKLIST.md:** validar Clean Code, SOLID, Segurança, Performance
+17. **RFs/RNs:** comportamento implementado alinha-se com contrato
+18. **Testes:** 2-3 casos por função (sucesso, erro, edge case)
+    ### Fase de Aprovação (2 Code Reviews Mínimo)
+19. **CI/CD verde:** tests, lint, type-check, build
+20. **Sem conflitos** com `development`
+21. **Merge:** Squash or Rebase (manter histórico granular)
+22. **Tag de release:** v.X.Y.Z pós-merge em `main`
 ```
 
 4. **Validação piloto da governança**
@@ -1823,11 +2228,15 @@ docs: Atualizar CLAUDE.md — estado de refatoração completo
 - Confirmar rastreabilidade RF/RN/RNF e evidências de não-regressão
 - Registrar ajustes finais na documentação de processo
   **Testes:**
+  **Testes:**
 - PR template aparece ao criar novo PR
 - Todos PRs incluem checklist completo
 - Code review checklist reflete critérios técnicos (Clean Code, SOLID, Performance)
 - Governança validada em PR piloto com ajustes finais registrados
 - Documentação de criteria visível para times
+  **Duração:** 1 dia
+  **Commits esperados:**
+
   **Duração:** 1 dia
   **Commits esperados:**
 
@@ -1837,6 +2246,8 @@ docs: Publicar CODE_REVIEW_CHECKLIST.md com critérios técnicos
 docs: Atualizar CLAUDE.md com critério de aprovação de PR
 docs: Consolidar validação piloto da governança de entrega
 ```
+
+## **Impacto:** Aplicável a todos PRs futuro (gate de qualidade)
 
 ## **Impacto:** Aplicável a todos PRs futuro (gate de qualidade)
 
@@ -1866,6 +2277,17 @@ docs: Consolidar validação piloto da governança de entrega
 | **6**     | 6            | 1-2 sem.          | Baixo     | RNF19-20, RNF30-32 (governance)        |
 | **Total** | **43**       | **11-17 semanas** | **Médio** | Todas                                  |
 
+| Fase      | # Subtarefas | Duração Total     | Risco     | RNF-chave                              |
+| --------- | ------------ | ----------------- | --------- | -------------------------------------- |
+| **0**     | 7            | 1-2 sem.          | Baixo     | RNF16, RNF17, RNF20                    |
+| **1**     | 6            | 1-2 sem.          | Baixo     | RNF15, RNF19, RNF20, RNF21             |
+| **2**     | 7            | 2-3 sem.          | Médio     | RNF02, RNF17, RF02 (email OU username) |
+| **3**     | 6            | 2-3 sem.          | Médio     | RNF16, RNF23                           |
+| **4**     | 7            | 2-3 sem.          | Médio     | RNF10 (AI), RNF16, RNF23, RF35-RF38    |
+| **5**     | 4            | 1-2 sem.          | Médio     | RNF24-29                               |
+| **6**     | 6            | 1-2 sem.          | Baixo     | RNF19-20, RNF30-32 (governance)        |
+| **Total** | **43**       | **11-17 semanas** | **Médio** | Todas                                  |
+
 **Detalhamento de gaps integrados:**
 
 - **0.7** (1.5d): RFC39-RF44, RNF16 — Error handling padronizado
@@ -1873,6 +2295,8 @@ docs: Consolidar validação piloto da governança de entrega
 - **2.3** (refactor inline): RF02 — Email OU username no login
 - **4.7** (2-3d): RF35-RF38, RNF10 — Quiz generation via IA
 - **6.7** (1d): RNF30-RNF32 — Governança PR (checklist, code review, docs)
+
+## **Nota:** Fase 3 e Fase 5 não tém gaps adicionais; contagem acima reflete distribuição final.
 
 ## **Nota:** Fase 3 e Fase 5 não tém gaps adicionais; contagem acima reflete distribuição final.
 
@@ -1920,9 +2344,63 @@ docs: Consolidar validação piloto da governança de entrega
 | Alternativas | PUT    | `/alternativas/{id}`                      | examService         | 4    |
 | Alternativas | DELETE | `/alternativas/{id}`                      | examService         | 4    |
 
+| Domínio      | Método | Endpoint                                  | Service             | Fase |
+| ------------ | ------ | ----------------------------------------- | ------------------- | ---- |
+| Auth         | POST   | `/auth/cadastro`                          | authService         | 2    |
+| Auth         | POST   | `/auth/login`                             | authService         | 2    |
+| Auth         | POST   | `/auth/refresh`                           | authService         | 2    |
+| Auth         | POST   | `/auth/recuperar-senha`                   | authService         | 2    |
+| Auth         | POST   | `/auth/redefinir-senha`                   | authService         | 2    |
+| Perfil       | GET    | `/perfil`                                 | authService         | 2    |
+| Perfil       | PUT    | `/perfil/foto`                            | authService         | 2    |
+| Perfil       | PUT    | `/perfil/senha`                           | authService         | 2    |
+| Admin        | GET    | `/admin/usuarios`                         | adminService (nova) | 2    |
+| Admin        | PATCH  | `/admin/usuarios/{id}/ativar`             | adminService (nova) | 2    |
+| Admin        | PATCH  | `/admin/usuarios/{id}/desativar`          | adminService (nova) | 2    |
+| Cursos       | GET    | `/cursos`                                 | courseService       | 3    |
+| Cursos       | POST   | `/cursos`                                 | courseService       | 3    |
+| Cursos       | GET    | `/cursos/{id}`                            | courseService       | 3    |
+| Cursos       | PUT    | `/cursos/{id}`                            | courseService       | 3    |
+| Cursos       | DELETE | `/cursos/{id}`                            | courseService       | 3    |
+| Cursos       | PATCH  | `/cursos/{id}/status`                     | courseService       | 3    |
+| Cursos       | GET    | `/cursos/buscar`                          | courseService       | 3    |
+| Módulos      | POST   | `/cursos/{cursoId}/modulos`               | modulesService      | 3    |
+| Módulos      | PUT    | `/modulos/{id}`                           | modulesService      | 3    |
+| Módulos      | DELETE | `/modulos/{id}`                           | modulesService      | 3    |
+| Módulos      | PATCH  | `/modulos/{id}/ordem`                     | modulesService      | 3    |
+| Aulas        | POST   | `/modulos/{moduloId}/aulas`               | lessonsService      | 3    |
+| Aulas        | PUT    | `/aulas/{id}`                             | lessonsService      | 3    |
+| Aulas        | DELETE | `/aulas/{id}`                             | lessonsService      | 3    |
+| Aulas        | PATCH  | `/aulas/{id}/ordem`                       | lessonsService      | 3    |
+| Aulas        | POST   | `/aulas/{id}/gerar-conteudo`              | lessonsService      | 3    |
+| Aulas        | POST   | `/aulas/{id}/confirmar-conteudo`          | lessonsService      | 3    |
+| Provas       | POST   | `/modulos/{moduloId}/prova`               | examService         | 4    |
+| Provas       | GET    | `/modulos/{moduloId}/prova`               | examService         | 4    |
+| Provas       | PUT    | `/provas/{id}`                            | examService         | 4    |
+| Provas       | DELETE | `/provas/{id}`                            | examService         | 4    |
+| Provas       | POST   | `/modulos/{moduloId}/prova/gerar-quiz-ia` | examService         | 4.7  |
+| Perguntas    | POST   | `/provas/{provaId}/perguntas`             | examService         | 4    |
+| Perguntas    | PUT    | `/perguntas/{id}`                         | examService         | 4    |
+| Perguntas    | DELETE | `/perguntas/{id}`                         | examService         | 4    |
+| Alternativas | POST   | `/perguntas/{perguntaId}/alternativas`    | examService         | 4    |
+| Alternativas | PUT    | `/alternativas/{id}`                      | examService         | 4    |
+| Alternativas | DELETE | `/alternativas/{id}`                      | examService         | 4    |
+
+## **Nota contratual (regra estrita):** baseline oficial da arquitetura = 39 endpoints. Fluxos sem endpoint em `.claude/commands/doc/arquitetura.md` devem ser removidos do escopo ativo e da implementacao.
+
 ## **Nota contratual (regra estrita):** baseline oficial da arquitetura = 39 endpoints. Fluxos sem endpoint em `.claude/commands/doc/arquitetura.md` devem ser removidos do escopo ativo e da implementacao.
 
 ## Decisões Arquiteturais Consolidadas
+
+| Decisão                   | Aplicação                                                                                           |
+| ------------------------- | --------------------------------------------------------------------------------------------------- |
+| **JWT + Refresh Token**   | Fase 2: access (curta) + refresh (longa) via cookies httpOnly/Secure + estado em memória no cliente |
+| **Zustand + React Query** | Fase 0+: estado global (auth, user) em Zustand; dados remotos em React Query                        |
+| **Zod Schemas**           | Fase 1+: todas validações de input em schemas reutilizáveis, exportadas de validations/             |
+| **Service Layer**         | Fase 2+: todos endpoints via services (authService, courseService, etc.), não direto em páginas     |
+| **Error Handling**        | Fases 2+: resposta interceptor trata erros, converte a IApiError, toast ou redirect conforme status |
+| **Code Splitting**        | Fase 5+: lazy load de páginas secundárias; bundle analysis                                          |
+| **Type Safety**           | Fase 1+: tipos explícitos; zero `any`; strict mode obrigatório                                      |
 
 | Decisão                   | Aplicação                                                                                           |
 | ------------------------- | --------------------------------------------------------------------------------------------------- |
@@ -1946,6 +2424,11 @@ docs: Consolidar validação piloto da governança de entrega
 
 ## Matriz de Rastreabilidade de User Stories (US)
 
+| Persona   | Stories                | Fases                                             |
+| --------- | ---------------------- | ------------------------------------------------- |
+| ADMIN     | US-A01, US-A02, US-A03 | Fase 0 (guard) + Fase 2 (auth/admin endpoints)    |
+| PROFESSOR | US-P01..US-P37         | Fases 2, 3 e 4                                    |
+| ALUNO     | US-AL01..US-AL07       | Fora do escopo desta execucao (Fase 2 do produto) |
 | Persona   | Stories                | Fases                                             |
 | --------- | ---------------------- | ------------------------------------------------- |
 | ADMIN     | US-A01, US-A02, US-A03 | Fase 0 (guard) + Fase 2 (auth/admin endpoints)    |
@@ -2040,8 +2523,12 @@ git add . && git commit -m "[TIPO] Descrição (max 72 caracteres)"
 | **Testes** | 3/3 passando |
 | **Branch** | feature/refactor-auth-guard-global | ## 📈 Progresso da Sessão
 | # | Subtarefa | Status | Commits | Testes | Notas |
+| **Branch** | feature/refactor-auth-guard-global | ## 📈 Progresso da Sessão
+| # | Subtarefa | Status | Commits | Testes | Notas |
 |---|---|---|---|---|---|
 | 0.1 | Criar ProtectedRoute | ✅ DONE | 2 | 3/3 | Sem token → redirect ✓ |
+| 0.2 | Integrar routes.ts | 🔄 IN_PROGRESS | 1 | 2/5 | Faltam testes para admin role | ## 🎯 Próxima Ação
+**Subtarefa:** 0.2 — Integrar ProtectedRoute em routes.ts  
 | 0.2 | Integrar routes.ts | 🔄 IN_PROGRESS | 1 | 2/5 | Faltam testes para admin role | ## 🎯 Próxima Ação
 **Subtarefa:** 0.2 — Integrar ProtectedRoute em routes.ts  
 **Etapa:** Testes RED (escrever 3 testes falhando)  
@@ -2051,6 +2538,10 @@ git add . && git commit -m "[TIPO] Descrição (max 72 caracteres)"
 1. Escrever teste: professor acessa /create-course → OK
 2. Escrever teste: student acessa /create-course → 404
 3. Escrever teste: sem token → redirect / ## 🚦 Bloqueadores
+   **Nenhum no momento.** ## 💾 Estado das Sessão
+   **Último commit:** feat(0.1): Criar ProtectedRoute com validação de autenticação  
+   **Próximo:** feature/refactor-auth-guard-global — 0.2 tests RED
+4. Escrever teste: sem token → redirect / ## 🚦 Bloqueadores
    **Nenhum no momento.** ## 💾 Estado das Sessão
    **Último commit:** feat(0.1): Criar ProtectedRoute com validação de autenticação  
    **Próximo:** feature/refactor-auth-guard-global — 0.2 tests RED
@@ -2077,10 +2568,14 @@ git add . && git commit -m "[TIPO] Descrição (max 72 caracteres)"
 - RNF16: Erros padronizados em toast/modal, sem quebrar jornada visual
   **Duração:** 1.5 dias
   **Testes:**
+  **Duração:** 1.5 dias
+  **Testes:**
 - Erro 401 → redirect login + toast "Sessão expirada"
 - Erro 409 → toast "Recurso em conflito"
 - Erro 422 → validação inline "Campo inválido"
 - Estado vazio em lista cursos → exibir "Crie seu primeiro curso"
+  **Commit esperado:**
+
   **Commit esperado:**
 
 ```
@@ -2105,10 +2600,14 @@ test: Validar toasts de erro, loading states, estados vazios
 - Submit salva via endpoint padrão `POST /provas`
   **Duração:** 2-3 dias
   **Testes:**
+  **Duração:** 2-3 dias
+  **Testes:**
 - Gerar quiz com conteúdo legível → retorna perguntas sugeridas
 - Módulo vazio → erro 422 "Nenhum conteúdo para processar"
 - Editar pergunta sugerida → não salva até confirmar submit
 - Submit → cria prova com perguntas editadas
+  **Commit esperado:**
+
   **Commit esperado:**
 
 ```
@@ -2128,9 +2627,19 @@ test: Validar geração e edição de quiz antes de persistência
 export const loginSchema = z.object({
   email: z.string().email("Email inválido"),
   senha: z.string().min(6),
+  email: z.string().email("Email inválido"),
+  senha: z.string().min(6),
 });
 // Depois (com Gap 3):
 export const loginSchema = z.object({
+  emailOuUsuario: z
+    .string()
+    .min(1, "E-mail ou nome de usuário obrigatório")
+    .refine(
+      (value) => isValidEmail(value) || isValidUsername(value),
+      "E-mail ou nome de usuário inválido",
+    ),
+  senha: z.string().min(6, "Mínimo 6 caracteres"),
   emailOuUsuario: z
     .string()
     .min(1, "E-mail ou nome de usuário obrigatório")
@@ -2146,6 +2655,8 @@ export const loginSchema = z.object({
 
 ```typescript
 interface ILoginRequest {
+  emailOuUsuario: string; // backend detecta se é email ou username
+  senha: string;
   emailOuUsuario: string; // backend detecta se é email ou username
   senha: string;
 }
@@ -2192,9 +2703,13 @@ interface ILoginRequest {
 - Aderência contratual confirmada (comentário checando RF/RN relacionados)
   **Duração:** 1 dia
   **Documentos a criar:**
+  **Duração:** 1 dia
+  **Documentos a criar:**
 - `.github/pull_request_template.md` — checklist em cada PR
 - `.github/CODE_REVIEW_CHECKLIST.md` — critérios RNF30-31-32
 - Instruções em CLAUDE.md § "Critério de Aprovação de PR"
+  **Commit esperado:**
+
   **Commit esperado:**
 
 ```
@@ -2262,14 +2777,19 @@ docs: Publicar CODE_REVIEW_CHECKLIST.md com critérios técnicos
 - Reutilização aumenta (componentes adaptáveis)
   **Duração:** 1.5 dias
   **Componentes a refatorar (uso de Slots):**
+  **Duração:** 1.5 dias
+  **Componentes a refatorar (uso de Slots):**
 - Card (existente em shadcn, validar)
 - Modal
 - FormContainer (novo, base para CreateCoursePage, CreateExamPage, etc.)
 - Layout (Header, Body, Footer)
   **Testes:**
+  **Testes:**
 - Card renderiza slots corretamente
 - Modal fecha ao clicar Cancelar
 - FormContainer submete dados via handleSubmit
+  **Commit esperado:**
+
   **Commit esperado:**
 
 ```
@@ -2286,6 +2806,14 @@ test: Validar composição de slots em componentes
 ---
 
 ## Resumo de Gaps + Duração Total
+
+| Gap | Fase | Subtarefa                                | Duração     | RNF/RF/RN      |
+| --- | ---- | ---------------------------------------- | ----------- | -------------- |
+| 1   | 0    | 0.7 Tratamento de erros padronizado      | 1.5d        | RF39-44, RNF16 |
+| 2   | 4    | 4.7 Geração de quiz via IA               | 2-3d        | RF35-38        |
+| 3   | 2    | 2.3 (refactor) Login email OU username   | 1d (inline) | RF02           |
+| 4   | 6    | 6.7 Governança de entrega (PR checklist) | 1d          | RNF30-32       |
+| 5   | 1    | 1.6 Slots Pattern para componentes       | 1.5d        | CLAUDE.md      |
 
 | Gap | Fase | Subtarefa                                | Duração     | RNF/RF/RN      |
 | --- | ---- | ---------------------------------------- | ----------- | -------------- |
@@ -2332,6 +2860,13 @@ Total de 43 subtarefas (gap 3 de refactor inline não adiciona nova subtarefa, a
 8. **Atualizar MEMORY.MD session:** Registrar progresso da sessão ( status inicial, próxima subtarefa)
 9. **Commits granulares:** Cada subtarefa = 1-2 commits com rastreabilidade a RNF/RF/RN
 10. **Revisão peer:** PR review obrigatório antes de merge em development
+
+11. **Validar com time backend:** Confirmar que todos endpoints listados existem ou estão planejados
+12. **Priorizar:** Há alguma fase com maior urgência de negócio? (Recomendação: Fase 0 → Fase 1 → Fase 2)
+13. **Se autorizar a execução da Fase 0:** Branch `feature/refactor-auth-guard-global`, 1º commit é ProtectedRoute
+14. **Atualizar MEMORY.MD session:** Registrar progresso da sessão ( status inicial, próxima subtarefa)
+15. **Commits granulares:** Cada subtarefa = 1-2 commits com rastreabilidade a RNF/RF/RN
+16. **Revisão peer:** PR review obrigatório antes de merge em development
 
 ---
 

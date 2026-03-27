@@ -41,11 +41,13 @@ Este projeto usa **GitFlow** com 5 tipos de branches hierárquicos:
 **Destino:** `development` (via PR + code review)
 
 **Naming:**
+
 - `feature/refactor-auth` (Fase 2 - Autenticação)
 - `feature/refactor-courses` (Fase 3 - Cursos)
 - `feature/refactor-exams` (Fase 4 - Provas)
 
 **Ciclo de Vida:**
+
 ```bash
 # 1. Criar a partir de development
 git checkout development
@@ -82,16 +84,19 @@ git push origin --delete feature/refactor-auth
 **Destino:** `development` (via PR)
 
 **Naming:**
+
 - `bugfix/fix-form-validation` (validação incorreta)
 - `bugfix/fix-jwt-refresh` (token refresh não funciona)
 - `bugfix/fix-logout-storage` (localStorage não limpa)
 
 **Quando usar:**
+
 - Bug descoberto em development (não em produção)
 - Deve ser fixado antes de próxima feature branch
 - Exemplo: Testes falhando, comportamento inesperado
 
 **Ciclo de Vida:**
+
 ```bash
 # 1. Criar bugfix branch
 git checkout development
@@ -120,6 +125,7 @@ git branch -d bugfix/fix-form-validation
 **Destino:** `main` **E** `development` (2 PRs)
 
 **Naming:**
+
 - `hotfix/fix-login-crash` (login crashes em produção)
 - `hotfix/fix-session-expired` (tokens não expiram)
 - `hotfix/fix-data-corruption` (dados corrompidos)
@@ -127,6 +133,7 @@ git branch -d bugfix/fix-form-validation
 **IMPORTANTE:** Hotfix é a ÚNICA branch que sai de `main` (não de `development`).
 
 **Ciclo de Vida:**
+
 ```bash
 # 1. Criar hotfix a partir de main
 git checkout main
@@ -163,6 +170,7 @@ git branch -d hotfix/fix-login-crash
 **Destino:** Envia PRs para main (periódico, após fases estáveis)
 
 **Características:**
+
 - ✅ Sempre buildable (CI/CD roda em todo PR)
 - ✅ Testes passando
 - ✅ Code review obrigatório
@@ -178,6 +186,7 @@ git branch -d hotfix/fix-login-crash
 **Destino:** Nunca faz checkout para trabalhar (é read-only)
 
 **Características:**
+
 - ✅ Sempre stable
 - ✅ Tagged com versão (v1.0.0, v1.0.1, v1.1.0)
 - ✅ Merges manuais (sem fast-forward)
@@ -231,9 +240,30 @@ git push origin v1.1.0
 
 ---
 
+## Operação em Múltiplas Máquinas
+
+Antes de iniciar em uma máquina diferente:
+
+```bash
+git checkout development
+git pull origin development
+git fetch --all --prune
+git branch --show-current
+```
+
+Checklist obrigatório:
+
+- Ler `MEMORY.md` na raiz antes de codificar
+- Confirmar branch ativa correta (`development` ou `feature/refactor-*`)
+- Validar `apps/poc-react-vite/.env.local` para o backend da máquina atual
+- Evitar sessões paralelas na mesma branch em duas máquinas sem sync intermediário
+
+---
+
 ## Naming Conventions Detalhadas
 
 ### Formato Geral
+
 ```
 <tipo>/<escopo>-<descrição>
 
@@ -245,31 +275,31 @@ Onde:
 
 ### Exemplos por Fase
 
-| Fase | Branch | Exemplo |
-|------|--------|---------|
-| 0 | feature/refactor-<tema> | feature/refactor-security-routing |
-| 1 | feature/refactor-<tema> | feature/refactor-types-validation |
-| 2 | feature/refactor-<tema> | feature/refactor-auth-backend |
-| 3 | feature/refactor-<tema> | feature/refactor-courses-modules |
-| 4 | feature/refactor-<tema> | feature/refactor-exams-messages |
-| 5 | feature/refactor-<tema> | feature/refactor-deduplication-routes |
-| 6 | feature/refactor-<tema> | feature/refactor-hardening-a11y |
+| Fase | Branch                  | Exemplo                               |
+| ---- | ----------------------- | ------------------------------------- |
+| 0    | feature/refactor-<tema> | feature/refactor-security-routing     |
+| 1    | feature/refactor-<tema> | feature/refactor-types-validation     |
+| 2    | feature/refactor-<tema> | feature/refactor-auth-backend         |
+| 3    | feature/refactor-<tema> | feature/refactor-courses-modules      |
+| 4    | feature/refactor-<tema> | feature/refactor-exams-messages       |
+| 5    | feature/refactor-<tema> | feature/refactor-deduplication-routes |
+| 6    | feature/refactor-<tema> | feature/refactor-hardening-a11y       |
 
 ### Bugfix Examples
 
-| Bug | Branch |
-|-----|--------|
-| Form validation broken | bugfix/fix-form-validation |
-| JWT refresh not working | bugfix/fix-jwt-refresh |
-| Logout doesn't clear storage | bugfix/fix-logout-cleanup |
+| Bug                          | Branch                     |
+| ---------------------------- | -------------------------- |
+| Form validation broken       | bugfix/fix-form-validation |
+| JWT refresh not working      | bugfix/fix-jwt-refresh     |
+| Logout doesn't clear storage | bugfix/fix-logout-cleanup  |
 
 ### Hotfix Examples
 
-| Critical Issue | Branch |
-|---|---|
-| Login crashes on expired token | hotfix/fix-login-crash |
-| Session not expiring | hotfix/fix-session-expiration |
-| XSS vulnerability | hotfix/fix-xss-vulnerability |
+| Critical Issue                 | Branch                        |
+| ------------------------------ | ----------------------------- |
+| Login crashes on expired token | hotfix/fix-login-crash        |
+| Session not expiring           | hotfix/fix-session-expiration |
+| XSS vulnerability              | hotfix/fix-xss-vulnerability  |
 
 ---
 
@@ -303,6 +333,7 @@ git checkout -b feature/refactor-<dominio>
 - Usar comando: `git commit -m "[TIPO] Descrição"` com idioma e formato correto
 
 **Exemplo durante refactoring de Auth:**
+
 ```bash
 git commit -m "refactor: Extrair validacoes de autenticacao para schema Zod dedicado"
 git commit -m "refactor: Criar custom hook useAuthentication para orquestracao de login"
@@ -349,6 +380,7 @@ git push origin feature/refactor-<dominio>
 (Ver seção "PR Template Completo" para exemplo)
 
 **Estado esperado:**
+
 - ✅ CI/CD rodando (GitHub Actions)
 - ⏳ Aguardando reviews
 
@@ -357,6 +389,7 @@ git push origin feature/refactor-<dominio>
 ### 7. Acompanhar code review e mergear quando aprovado
 
 **Fluxo:**
+
 1. Reviewers comentam / aprovam
 2. Resolver comentários (se houver) → novo commit
 3. Após 2+ aprovações + CI/CD verde ✅
@@ -364,6 +397,7 @@ git push origin feature/refactor-<dominio>
 5. **Deletar feature branch** (automático ou manual)
 
 **Local:**
+
 ```bash
 git checkout development
 git pull origin development
@@ -406,14 +440,14 @@ git commit -m "feat: Implementar ProtectedRoute (encontra validação)"
 
 ### Tipos de Commit
 
-| Tipo | Mapa | Exemplo |
-|------|------|---------|
-| `feat` | RF (novo requisito) | feat: Integrar login com endpoint POST /auth/login |
-| `refactor` | RNF (qualidade) | refactor: Extrair validações de autenticação para schema Zod |
-| `test` | RNF (TDD obrigatório) | test: Adicionar testes para ProtectedRoute (sem token, role inválido) |
-| `fix` | RN (correção) | fix: Logout não limpava localStorage |
-| `docs` | RNF (documentação) | docs: Atualizar MEMORY.md com subtarefa 0.1 completa |
-| `chore` | — | chore: Atualizar dependências, setup husky |
+| Tipo       | Mapa                  | Exemplo                                                               |
+| ---------- | --------------------- | --------------------------------------------------------------------- |
+| `feat`     | RF (novo requisito)   | feat: Integrar login com endpoint POST /auth/login                    |
+| `refactor` | RNF (qualidade)       | refactor: Extrair validações de autenticação para schema Zod          |
+| `test`     | RNF (TDD obrigatório) | test: Adicionar testes para ProtectedRoute (sem token, role inválido) |
+| `fix`      | RN (correção)         | fix: Logout não limpava localStorage                                  |
+| `docs`     | RNF (documentação)    | docs: Atualizar MEMORY.md com subtarefa 0.1 completa                  |
+| `chore`    | —                     | chore: Atualizar dependências, setup husky                            |
 
 ### Associação com Regras
 
@@ -526,16 +560,19 @@ Após push de feature branch, **sempre use este template**:
 ### P: Devo fazer merge de feature em main após completar uma fase?
 
 **R:** Não durante o desenvolvimento. A estratégia é:
+
 - Fases 0-6 → feature branches → PRs → development
 - Após Fase 6 completa → development → main (1 grande merge com tag de release)
 
 ### P: Se descobrir bug DURANTE implementação de fase, faço bugfix ou continuo?
 
 **R:** Depende:
+
 - **Bug na subtarefa atual:** Corrija na mesma feature branch, novo commit
 - **Bug não relacionado:** Cria bugfix/xxx, arruma, volta à feature depois
 
 Exemplo:
+
 ```bash
 # Estava em feature/refactor-auth, descobriu bug em form validation
 git checkout -b bugfix/fix-form-validation
@@ -549,6 +586,7 @@ git merge development (trazer fix)
 ### P: Se ouver conflito em merge, o que faço?
 
 **R:** Git vai avisar. Resolva manualmente:
+
 ```bash
 git merge development  # Ou git pull se já mergeou
 # Abra arquivos com <<<<<<< >>>>>>
@@ -560,6 +598,7 @@ git commit -m "merge: Resolver conflitos com development"
 ### P: Posso fazer push direto em development sem PR?
 
 **R:** **Não**. Workflow obrigatório:
+
 1. Design: `git checkout -b feature/refactor-X`
 2. Code: commits
 3. Validar: type-check, lint, test, build
@@ -579,6 +618,7 @@ Se ficar > 5 dias aberta → possível blocker → documentar em MEMORY.md.
 ### P: Como fazer se precisar de feature branch de feature?
 
 **R:** Não faça. Estrutura é flat:
+
 - Todas features saem de `development`
 - Não há sub-branches
 
@@ -617,6 +657,7 @@ Se precisa de organização: use labels no GitHub (label: phase-2, label: auth).
 ### Agente: `implement-and-commit.agent.md`
 
 **Deve:**
+
 - ✅ Fazer `git checkout development; git pull` antes de criar feature branch
 - ✅ Criar `git checkout -b feature/refactor-<dominio>` na PREP stage
 - ✅ Validar GitFlow antes de iniciar
@@ -627,6 +668,7 @@ Se precisa de organização: use labels no GitHub (label: phase-2, label: auth).
 ### Agente: `status-refactoring.agent.md`
 
 **Deve:**
+
 - ✅ Mostrar branch atual em status
 - ✅ Alertar se dev está em branch errada (ex: ainda em hotfix depois de merge)
 - ✅ Sugerir `git checkout development` se necessário

@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { CourseInfoData } from "./CreateCoursePage";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Modal } from "@/components/ui/modal";
+import { Modal } from "@/components/ui/modal";
 import {
   createModulesSchema,
   type CreateModulesFormValues,
@@ -16,8 +17,6 @@ const docPath =
   "M19.6667 5.66667H7.66667V27H23.6667V9.66667H19.6667V5.66667ZM7.66667 3H21L26.3333 8.33333V27C26.3333 27.7072 26.0524 28.3855 25.5523 28.8856C25.0522 29.3857 24.3739 29.6667 23.6667 29.6667H7.66667C6.95942 29.6667 6.28115 29.3857 5.78105 28.8856C5.28095 28.3855 5 27.7072 5 27V5.66667C5 4.95942 5.28095 4.28115 5.78105 3.78105C6.28115 3.28095 6.95942 3 7.66667 3ZM10.3333 15H21V17.6667H10.3333V15ZM10.3333 20.3333H21V23H10.3333V20.3333Z";
 const closeLgPath =
   "M12.4332 14.0828L5.83333 7.483L7.483 5.83333L14.0828 12.4332L20.6827 5.83333L22.3323 7.483L15.7325 14.0828L22.3323 20.6827L20.6827 22.3323L14.0828 15.7325L7.483 22.3323L5.83333 20.6827L12.4332 14.0828Z";
-const closeSmPath =
-  "M10.657 12.071L5 6.414L6.414 5L12.071 10.657L17.728 5L19.142 6.414L13.485 12.071L19.142 17.728L17.728 19.142L12.071 13.485L6.414 19.142L5 17.728L10.657 12.071Z";
 const checkPath = "M5 9L3 11L9 17L19 7L17 5L9 13L5 9Z";
 const imgIconPath =
   "M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z";
@@ -111,26 +110,7 @@ function AddLessonPopup({
               {step === 1 ? "Adicionar Aula" : "Confirmar Aula"}
             </p>
           </div>
-          <button
-            type="button"
-            aria-label="Fechar"
-            onClick={onClose}
-            className="size-[44px] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded flex items-center justify-center"
-          >
-            <svg
-              className="size-full"
-              fill="none"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                clipRule="evenodd"
-                d={closeSmPath}
-                fill="#021B59"
-                fillRule="evenodd"
-              />
-            </svg>
-          </button>
+          <div className="size-[44px]" aria-hidden="true" />
         </div>
 
         {/* Step indicator */}

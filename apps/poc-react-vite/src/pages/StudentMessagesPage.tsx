@@ -39,19 +39,12 @@ const PROFESSOR_NAME = "Prof. Eduardo Silva";
 
 // ─── MessageCard ──────────────────────────────────────────────────────────────
 
-interface MessageCardProps {
-  message: SentMessage;
-  isExpanded: boolean;
-  onToggle: () => void;
-  isUnread: boolean;
-}
-
 function MessageCard({
   message,
   isExpanded,
   onToggle,
   isUnread,
-}: MessageCardProps) {
+}: IMessageCardProps) {
   const preview =
     message.body.length > 130 ? message.body.slice(0, 130) + "…" : message.body;
 
@@ -188,6 +181,8 @@ export function StudentMessagesPage() {
   const navigate = useNavigate();
   const { currentUser, sentMessages } = useAuthStore();
   const { enrolledCourses } = useCourseStore();
+  const userName = currentUser?.name ?? "Estudante";
+  const userPhotoUrl = currentUser?.photoUrl;
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [readIds, setReadIds] = useState<Set<string>>(new Set());

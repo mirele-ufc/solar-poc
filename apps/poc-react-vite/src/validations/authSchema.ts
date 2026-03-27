@@ -82,6 +82,11 @@ export const loginSchema = z.object({
   password: z.string().trim().min(1, "Senha não informada"),
 });
 
+export const loginRequestSchema = z.object({
+  email: z.email("Email inválido"),
+  senha: z.string().trim().min(6, "A senha deve ter ao menos 6 caracteres"),
+}) satisfies z.ZodType<ILoginRequest>;
+
 export const forgotPasswordSchema = z.object({
   email: z
     .string()

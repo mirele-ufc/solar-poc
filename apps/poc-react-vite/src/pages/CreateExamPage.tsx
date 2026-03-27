@@ -702,9 +702,8 @@ export function CreateExamPage() {
   );
 
   // State for modules (to allow removing lessons)
-  const [modulesList, setModulesList] = useState<ICourseManageModule[]>(
-    modules,
-  );
+  const [modulesList, setModulesList] =
+    useState<ICourseManageModule[]>(modules);
 
   // Inline lesson editing state
   const [editingLesson, setEditingLesson] = useState<{

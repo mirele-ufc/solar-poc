@@ -27,7 +27,13 @@ interface AuthStore {
   sendMessage: (msg: Omit<SentMessage, "id" | "sentAt">) => void;
 }
 
-type AuthStoreSnapshot = Pick<AuthStore, "currentUser" | "isLoggedIn">;
+/**
+ * Type alias for store snapshot (used in selectors)
+ */
+type AuthStoreSnapshot = {
+  currentUser: IUserSession | null;
+  isLoggedIn: boolean;
+};
 
 /**
  * Hardcoded credentials for prototype demonstration
@@ -65,8 +71,8 @@ const CREDENTIALS: Record<string, { password: string; profile: IUserSession }> =
   };
 
 /**
- * Default user profile when not logged in
- * Uses student credentials as default
+ * Initial state when user is not logged in
+ * currentUser is null until user successfully authenticates
  */
 const DEFAULT_USER: IUserSession = CREDENTIALS.estudante.profile;
 
@@ -109,10 +115,15 @@ const MOCK_MESSAGES: SentMessage[] = [
  * Usage:
  * const { currentUser, login, logout } = useAuthStore();
  */
+/**
+ * Zustand authentication store
+ * Manages user profile, authentication state, and messages
+ *
+ * Usage:
+ * const { currentUser, login, logout } = useAuthStore();
+ */
 export const useAuthStore = create<AuthStore>((set) => ({
-  currentUser: DEFAULT_USER,
-  sentMessages: MOCK_MESSAGES,
-  isLoggedIn: false,
+  ...INITIAL_STATE,
 
   /**
    * Authenticate user with username and password
@@ -138,13 +149,14 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
   /**
    * Logout current user
-   * Resets to default user state
+   * Clears authentication state completely
+   * - Sets currentUser to null
+   * - Sets isLoggedIn to false
+   * - Clears sentMessages array
    */
   logout: () => {
     set({
-      currentUser: DEFAULT_USER,
-      isLoggedIn: false,
-      sentMessages: MOCK_MESSAGES,
+      ...INITIAL_STATE,
     });
   },
 
@@ -155,7 +167,9 @@ export const useAuthStore = create<AuthStore>((set) => ({
    */
   updateCurrentUser: (partial: Partial<IUserSession>) => {
     set((state) => ({
-      currentUser: { ...state.currentUser, ...partial },
+      currentUser: state.currentUser
+        ? { ...state.currentUser, ...partial }
+        : null,
     }));
   },
 
@@ -179,7 +193,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
 }));
 
 export function selectCanManageCourses(state: AuthStoreSnapshot): boolean {
-  return state.currentUser.role === "professor";
+  return state.currentUser?.role === "professor" || false;
 }
 
 export function selectCurrentUser(state: AuthStoreSnapshot): IUserSession {

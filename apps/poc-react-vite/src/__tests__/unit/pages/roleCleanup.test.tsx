@@ -5,13 +5,10 @@ import { MessagePage } from "@/pages/MessagePage";
 import { MessagesPage } from "@/pages/MessagesPage";
 import { MyCoursesPage } from "@/pages/MyCoursesPage";
 import { useCourseStore } from "@/store/useCourseStore";
-import {
-  useAuthStore,
-  type SentMessage,
-  type UserProfile,
-} from "@/store/useAuthStore";
+import { useAuthStore, type SentMessage } from "@/store/useAuthStore";
+import type { IUserSession } from "@ava-poc/types";
 
-function buildUser(role: UserProfile["role"]): UserProfile {
+function buildUser(role: IUserSession["role"]): IUserSession {
   if (role === "professor") {
     return {
       id: "test-prof-001",
@@ -20,6 +17,7 @@ function buildUser(role: UserProfile["role"]): UserProfile {
       email: "professor@ufc.br",
       fotoUrl: undefined,
       role,
+      status: "ATIVO",
       status: "ATIVO",
     };
   }
@@ -66,6 +64,7 @@ describe("role cleanup in protected pages", () => {
     renderWithRouter(<MessagePage />);
 
     expect(screen.queryByText("Acesso restrito a professores.")).toBeNull();
+    expect(screen.queryByText("Acesso restrito a professores.")).toBeNull();
     expect(
       screen.getByRole("button", { name: "Enviar mensagem" }),
     ).toBeDefined();
@@ -74,6 +73,7 @@ describe("role cleanup in protected pages", () => {
   it("renders MessagesPage without local authorization alert", () => {
     renderWithRouter(<MessagesPage />);
 
+    expect(screen.queryByText("Acesso restrito a professores.")).toBeNull();
     expect(screen.queryByText("Acesso restrito a professores.")).toBeNull();
     expect(
       screen.getByRole("button", { name: "Criar nova mensagem" }),
@@ -85,6 +85,7 @@ describe("role cleanup in protected pages", () => {
     renderWithRouter(<MyCoursesPage />);
 
     expect(screen.getByText("Cursos que leciono")).toBeDefined();
+    expect(screen.getByText("Cursos em que estou matriculado")).toBeDefined();
     expect(screen.getByText("Cursos em que estou matriculado")).toBeDefined();
     expect(
       screen.queryByText("Você ainda não está matriculado em nenhum curso"),

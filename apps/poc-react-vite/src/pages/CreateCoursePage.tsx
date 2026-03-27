@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { FormContainer } from "@/components/shared/FormContainer";
 import { PageHeader } from "@/components/shared/PageHeader";
 import {
   createCourseSchema,
@@ -231,85 +232,93 @@ export function CreateCoursePage() {
           ]}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
-          <FieldInput
-            label="Título do curso"
-            placeholder="Digite o título"
-            id="titulo"
-            value={form.title}
-            onChange={(v) => setField("title", v)}
-            hasError={showFieldErrors && !!errors.title}
-          />
-          <FieldInput
-            label="Categoria"
-            placeholder="Ex: Computação, Design"
-            id="categoria"
-            value={form.category}
-            onChange={(v) => setField("category", v)}
-            hasError={showFieldErrors && !!errors.category}
-          />
-        </div>
-        <FieldInput
-          label="Descrição"
-          placeholder="Descreva o curso"
-          id="descricao"
-          value={form.description}
-          onChange={(v) => setField("description", v)}
-          hasError={showFieldErrors && !!errors.description}
-        />
-        <FieldInput
-          label="Carga horária"
-          placeholder="Ex: 30h"
-          id="horas"
-          value={form.hours}
-          onChange={(v) => setField("hours", v)}
-          hasError={showFieldErrors && !!errors.hours}
-        />
+        <FormContainer
+          onSubmit={(e) => e.preventDefault()}
+          aria-label="Formulário de criação de curso"
+        >
+          <FormContainer.Body className="flex flex-col gap-[20px]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
+              <FieldInput
+                label="Título do curso"
+                placeholder="Digite o título"
+                id="titulo"
+                value={form.title}
+                onChange={(v) => setField("title", v)}
+                hasError={showFieldErrors && !!errors.title}
+              />
+              <FieldInput
+                label="Categoria"
+                placeholder="Ex: Computação, Design"
+                id="categoria"
+                value={form.category}
+                onChange={(v) => setField("category", v)}
+                hasError={showFieldErrors && !!errors.category}
+              />
+            </div>
+            <FieldInput
+              label="Descrição"
+              placeholder="Descreva o curso"
+              id="descricao"
+              value={form.description}
+              onChange={(v) => setField("description", v)}
+              hasError={showFieldErrors && !!errors.description}
+            />
+            <FieldInput
+              label="Carga horária"
+              placeholder="Ex: 30h"
+              id="horas"
+              value={form.hours}
+              onChange={(v) => setField("hours", v)}
+              hasError={showFieldErrors && !!errors.hours}
+            />
 
-        {/* Required registration fields */}
-        <div className="flex flex-col gap-[10px]">
-          <p className="font-['Figtree:Medium',sans-serif] font-medium text-black text-[18px] leading-[28px]">
-            Selecione quais dados os cadastrados deverão informar para cursar:
-          </p>
-          <div className="flex flex-col gap-[4px]">
-            {requiredFieldOptions.map((field) => {
-              const checked = form.requiredFields.includes(field);
-              return (
-                <button
-                  key={field}
-                  type="button"
-                  role="checkbox"
-                  aria-checked={checked}
-                  onClick={() => toggleRequired(field)}
-                  className="flex items-center gap-[12px] py-[8px] text-left w-fit focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded-sm"
-                >
-                  <div
-                    className={`size-[22px] border-2 border-[#021b59] rounded-[4px] flex items-center justify-center flex-shrink-0 transition-colors ${checked ? "bg-[#ffeac4]" : "bg-white"}`}
-                  >
-                    {checked && (
-                      <svg
-                        className="size-[14px]"
-                        fill="none"
-                        viewBox="0 0 22 22"
-                        aria-hidden="true"
+            {/* Required registration fields */}
+            <div className="flex flex-col gap-[10px]">
+              <p className="font-['Figtree:Medium',sans-serif] font-medium text-black text-[18px] leading-[28px]">
+                Selecione quais dados os cadastrados deverão informar para
+                cursar:
+              </p>
+              <div className="flex flex-col gap-[4px]">
+                {requiredFieldOptions.map((field) => {
+                  const checked = form.requiredFields.includes(field);
+                  return (
+                    <button
+                      key={field}
+                      type="button"
+                      role="checkbox"
+                      aria-checked={checked}
+                      onClick={() => toggleRequired(field)}
+                      className="flex items-center gap-[12px] py-[8px] text-left w-fit focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded-sm"
+                    >
+                      <div
+                        className={`size-[22px] border-2 border-[#021b59] rounded-[4px] flex items-center justify-center flex-shrink-0 transition-colors ${checked ? "bg-[#ffeac4]" : "bg-white"}`}
                       >
-                        <path
-                          clipRule="evenodd"
-                          d={checkPath}
-                          fill="#021B59"
-                          fillRule="evenodd"
-                        />
-                      </svg>
-                    )}
-                  </div>
-                  <span className="font-['Figtree:Regular',sans-serif] font-normal text-black text-[16px]">
-                    {field}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+                        {checked && (
+                          <svg
+                            className="size-[14px]"
+                            fill="none"
+                            viewBox="0 0 22 22"
+                            aria-hidden="true"
+                          >
+                            <path
+                              clipRule="evenodd"
+                              d={checkPath}
+                              fill="#021B59"
+                              fillRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                      <span className="font-['Figtree:Regular',sans-serif] font-normal text-black text-[16px]">
+                        {field}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </FormContainer.Body>
+        </FormContainer>
       </div>
 
       {/* Sticky Próximo */}

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuthStore } from "@/store/useAuthStore";
+import { FormContainer } from "@/components/shared/FormContainer";
 import svgPaths from "@/assets/svg-ppphmxjoa5";
 import imgUfcLogo1 from "@/assets/9098abf5bf97a1aac4c76f171ec108cee92cfddb.png";
 import imgAtivo224X1 from "@/assets/a17a08a750e97ba9bb12c3ad582c426a8debf0fa.png";
@@ -90,12 +91,13 @@ export function LoginPage() {
         </div>
 
         {/* Form */}
-        <form
-          className="flex flex-col gap-[12px] items-start w-full"
+        <FormContainer
+          className="w-full"
           noValidate
           onSubmit={handleSubmit(onSubmitValid, onSubmitInvalid)}
           aria-label="Formulário de login"
         >
+          <FormContainer.Body className="flex flex-col gap-[12px] items-start w-full">
           {/* Error Message */}
           {showErrors && generalError && (
             <div
@@ -280,7 +282,8 @@ export function LoginPage() {
               </span>
             </button>
           </div>
-        </form>
+          </FormContainer.Body>
+        </FormContainer>
 
         {/* Footer */}
         <nav

@@ -131,6 +131,11 @@ export function ProfilePage() {
   const navigate = useNavigate();
   const { currentUser, updateCurrentUser } = useAuthStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const user = currentUser;
+
+  if (!user) {
+    return null;
+  }
 
   // password form state
   const [currentPw, setCurrentPw] = useState("");
@@ -302,8 +307,8 @@ export function ProfilePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
-            <ReadonlyField label="CPF" value={maskCPF(currentUser.cpf)} />
-            <ReadonlyField label="E-mail" value={currentUser.email} />
+            <ReadonlyField label="CPF" value={maskCPF(user.cpf)} />
+            <ReadonlyField label="E-mail" value={user.email} />
           </div>
           <p className="mt-[10px] font-['Figtree:Regular',sans-serif] font-normal text-[#595959] text-[13px] leading-[20px]">
             CPF e e-mail são dados de identificação e não podem ser alterados

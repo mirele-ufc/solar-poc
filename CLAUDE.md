@@ -79,7 +79,7 @@ No frontend, o escopo atual inclui refatoracao incremental de codigo mantendo la
 
 - O frontend atual possui fluxos visuais abrangentes com uso de mocks em varios dominios.
 - A integracao deve migrar os fluxos para endpoints reais sem mudar navegacao e layout.
-- Toda divergencia de payload, status e regra de nego  cio deve ser resolvida na documentacao antes da codificacao.
+- Toda divergencia de payload, status e regra de nego cio deve ser resolvida na documentacao antes da codificacao.
 - Quando nao houver endpoint backend documentado em `.claude/commands/doc/arquitetura.md`, o fluxo/rota deve ser removido do escopo e da implementacao frontend ate formalizacao contratual.
 
 ### Fonte de Verdade Contratual (Obrigatoria)
@@ -219,6 +219,13 @@ As diretrizes abaixo sao obrigatorias em toda codificacao frontend e backend.
 - Nao duplicar regras de negocio do backend em componentes de UI sem necessidade.
 - Priorizar aderencia contratual: endpoint, request, response, regras RN e codigos HTTP.
 - Qualquer excecao de contrato deve ser documentada antes da implementacao.
+
+## Operacao Portavel (Cross-Machine)
+
+- Neste ciclo, a implementacao e frontend-only.
+- O estado operacional deve ser retomado sempre a partir de `MEMORY.md` na raiz.
+- Documentacao e comandos devem usar caminhos relativos, sem dependencias de path local absoluto.
+- Setup local do frontend deve partir de `apps/poc-react-vite/.env.example` para `.env.local`.
 
 ## Estrutura de Branches (GitFlow)
 

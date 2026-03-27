@@ -2,10 +2,10 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
-import type { UserProfile } from "@/store/useAuthStore";
+import type { IUserSession } from "@ava-poc/types";
 import { useAuthStore } from "@/store/useAuthStore";
 
-function buildUser(role: UserProfile["role"]): UserProfile {
+function buildUser(role: IUserSession["role"]): IUserSession {
   if (role === "professor") {
     return {
       id: "test-prof-001",
@@ -14,6 +14,7 @@ function buildUser(role: UserProfile["role"]): UserProfile {
       email: "professor@ufc.br",
       fotoUrl: undefined,
       role,
+      status: "ATIVO",
       status: "ATIVO",
     };
   }

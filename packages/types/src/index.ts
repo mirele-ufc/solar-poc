@@ -18,10 +18,10 @@ export const TYPES_VERSION = "1.0.0";
  */
 export interface IUserSession {
   id: string;
-  nome: string;
+  name: string;
   cpf: string;
   email: string;
-  fotoUrl?: string;
+  photoUrl?: string;
   role: "professor" | "student" | "admin";
   status: "ATIVO" | "INATIVO";
 }
@@ -225,17 +225,14 @@ export interface ICourseCardProps {
 }
 
 /**
- * Props for message card component
+ * Shared props for accordion-like message cards
  * Used in MessagesPage and StudentMessagesPage
  */
 export interface IMessageCardProps {
-  messageId: string;
-  senderName: string;
-  subject: string;
-  preview: string;
-  timestamp: string;
-  isRead: boolean;
-  onClickMessage?: (messageId: string) => void;
+  message: SentMessage;
+  isExpanded: boolean;
+  onToggle: () => void;
+  isUnread?: boolean;
 }
 
 /**
@@ -281,72 +278,70 @@ export interface ICourseManageModule {
  * Type selector for ModulesPage and PythonModulesPage items
  * Used to differentiate lesson and module rendering
  */
-export type ModuleItemType = "lesson" | "module";
+export type ModuleItemType = "lesson" | "exam";
 
 /**
- * Lesson item data structure for module rendering
+ * Lesson or exam item rendered within a module
  * Used in ModulesPage and PythonModulesPage
  */
 export interface ILessonItem {
   id: string;
-  title: string;
-  type: "video" | "text" | "quiz";
-  isCompleted: boolean;
-  order: number;
+  label: string;
+  type: ModuleItemType;
+  modId?: string;
 }
 
 /**
- * Module data structure with lessons
+ * Module structure rendered in course module pages
  * Used in ModulesPage and PythonModulesPage
  */
 export interface IModuleData {
   id: string;
   title: string;
-  order: number;
-  lessons: ILessonItem[];
-  totalLessons: number;
-  completedLessons: number;
-  progressPercentage: number;
+  items: ILessonItem[];
 }
 
 /**
- * Props for progress bar component showing module progress
+ * Props for module progress bars
  * Used in ModulesPage and PythonModulesPage
  */
 export interface IProgressBarProps {
-  completed: number;
+  visited: number;
   total: number;
-  showPercentage?: boolean;
 }
 
 /**
- * Modal data for enrollment declaration
- * Used in ModulesPage
+ * Shared props for enrollment declaration modals
+ * Used in ModulesPage and PythonModulesPage
  */
 export interface IEnrollmentDeclarationModal {
-  isOpen: boolean;
-  onConfirm: () => void;
-  onCancel: () => void;
+  onClose: () => void;
+  studentName: string;
+  validationCode: string;
+  emissionDate: Date;
 }
 
 /**
- * Modal data for completion declaration
- * Used in ModulesPage
+ * Shared props for completion declaration modals
+ * Used in ModulesPage and PythonModulesPage
  */
 export interface ICompletionDeclarationModal {
-  isOpen: boolean;
-  onConfirm: () => void;
-  onCancel: () => void;
+  onClose: () => void;
+  studentName: string;
+  validationCode: string;
+  emissionDate: Date;
+  conclusionDate: Date;
 }
 
 /**
- * Alert data structure for requirements display
- * Used in ModulesPage
+ * Shared props for requirements alert modals
+ * Used in ModulesPage and PythonModulesPage
  */
 export interface IRequirementsAlert {
-  isVisible: boolean;
-  title: string;
-  requirements: string[];
+  totalLessons: number;
+  visitedLessons: number;
+  totalExams: number;
+  visitedExams: number;
   onClose: () => void;
 }
 

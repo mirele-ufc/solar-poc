@@ -1,10 +1,12 @@
-# MEMORY.md — Rastreamento de Progresso Contínuo
+# Rastreamento de Progresso Contínuo
 
 > **Fonte de verdade única** para progresso do refactoring UFC LMS React.  
 > Atualizado automaticamente pelo agente **IMPLEMENT-AND-COMMIT** após cada subtarefa.  
 > Lido pelo agente **STATUS-REFACTORING** para gerar dashboard.
 
 ---
+
+## MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
 
 ## MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
 
@@ -52,16 +54,21 @@
 
 ### ✅ Completes
 
-| Sub | Title                                           | Status | Date       | Commit                                | PR  |
-| --- | ----------------------------------------------- | ------ | ---------- | ------------------------------------- | --- |
-| 0.1 | Criar ProtectedRoute com validação de role      | ✅     | 25/03      | ce2df32                               | —   |
-| 0.2 | Integrar ProtectedRoute em routes.ts            | ✅     | 25/03/2026 | 028ba89                               | —   |
-| 0.3 | Remover hardcodes de role em páginas            | ✅     | 25/03/2026 | 41a3b29                               | —   |
-| 0.4 | Implementar logout seguro local                 | ✅     | 26/03/2026 | 7689a26 + cd395ac                     | —   |
-| 0.5 | Implementar Unauthorized page                   | ✅     | 26/03/2026 | 8fa0cd3 + 00d9fe6                     | —   |
-| 0.6 | Validar rotas públicas sem guard incorreto      | ✅     | 26/03/2026 | 189c57f                               | —   |
-| 0.7 | HTTP error interceptor + loading + empty states | ✅     | 26/03/2026 | 1aac552 + 3edb2fc + 41cb179 + 4390f75 | —   |
-| 1.1 | Auditar e consolidar tipos em @ava-poc/types    | ✅     | 26/03/2026 | 9bb4021 + 910841e                     | —   |
+| Sub | Title                                           | Status | Date       | Commit                                                    | PR  |
+| --- | ----------------------------------------------- | ------ | ---------- | --------------------------------------------------------- | --- |
+| 0.1 | Criar ProtectedRoute com validação de role      | ✅     | 25/03      | ce2df32                                                   | —   |
+| 0.2 | Integrar ProtectedRoute em routes.ts            | ✅     | 25/03/2026 | 028ba89                                                   | —   |
+| 0.3 | Remover hardcodes de role em páginas            | ✅     | 25/03/2026 | 41a3b29                                                   | —   |
+| 0.4 | Implementar logout seguro local                 | ✅     | 26/03/2026 | 7689a26 + cd395ac                                         | —   |
+| 0.5 | Implementar Unauthorized page                   | ✅     | 26/03/2026 | 8fa0cd3 + 00d9fe6                                         | —   |
+| 0.6 | Validar rotas públicas sem guard incorreto      | ✅     | 26/03/2026 | 189c57f                                                   | —   |
+| 0.7 | HTTP error interceptor + loading + empty states | ✅     | 26/03/2026 | 1aac552 + 3edb2fc + 41cb179 + 4390f75                     | —   |
+| 1.1 | Auditar e consolidar tipos em @ava-poc/types    | ✅     | 26/03/2026 | 9bb4021 + 910841e                                         | —   |
+| 1.2 | Migrar useAuthStore para tipos globais          | ✅     | 26/03/2026 | 6dfa8ae + 146efd2 + 99f8ba3 + 6a664e6 + d285b57           | —   |
+| 1.3 | Centralizar e alinhar schemas Zod               | ✅     | 26/03/2026 | 088d981 + 3b25f55 + 39c4cbe                               | —   |
+| 1.4 | Remover tipos locais duplicados de pages        | ✅     | 26/03/2026 | f0e773e                                                   | —   |
+| 1.5 | Validar zero `any` em TypeScript                | ✅     | 26/03/2026 | 324708d + 7822e32                                         | —   |
+| 1.6 | Refatorar componentes com Slots Pattern         | ✅     | 27/03/2026 | `0080137` + `9090c6a` + `4ecc3d7` + `b24fbb4` + `32558a8` | —   |
 
 - **Completa recente:** 2.1 — authService endpoints (Auth/Perfil) ✅ (commits: `3ece624`, `a2ec8eb`, `877540a`)
 
@@ -70,7 +77,7 @@
 | Phase     | Complete | Total  | %       | Status             | Start Date | Est. End |
 | --------- | -------- | ------ | ------- | ------------------ | ---------- | -------- |
 | 0         | 7        | 7      | 100%    | ✅ COMPLETA        | 25/03      | 26/03    |
-| 1         | 1        | 6      | 16%     | 🔄 IN_PROGRESS     | 26/03      | —        |
+| 1         | 6        | 6      | 100%    | ✅ COMPLETA        | 26/03      | 27/03    |
 | 2         | 1        | 7      | 14%     | 🔄 IN_PROGRESS     | 27/03      | —        |
 | 3         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
 | 4         | 0        | 7      | 0%      | ⏳ FUTURE          | —          | —        |
@@ -98,7 +105,7 @@
 
 ### ⛔ Blockers
 
-❌ **Nenhum blocker detectado.**
+✅ **Nenhum blocker detectado.**
 
 - ✅ Backend: aguardando ambiente local completo (Docker em instalação)
 - ✅ Tests: Vitest pronto para usar
@@ -308,27 +315,12 @@ Quando finalizar story, verificar:
 
 ## 🔗 Links de Referência
 
-| Link                                            | Propósito                                                      |
-| ----------------------------------------------- | -------------------------------------------------------------- |
-| `/memories/REFACTORING_PLAN_FINAL.md`           | Plano técnico completo (fases, stories, endpoints)             |
-| `/memories/refactoring-quick-ref.md`            | Quick reference (decisões, stack, próximas ações)              |
-| `/memories/sprint-tracking.md`                  | Rastreamento de progresso global                               |
-| `CLAUDE.md`                                     | Diretrizes de código, SOLID, Clean Code                        |
-| `.claude/commands/doc/requisitos-funcionais.md` | RFs — orienta quais endpoints/funcionalidades implementar      |
-| `.claude/commands/doc/user-stories.md`          | USs — contexto de negócio por perfil (ADMIN, PROFESSOR, ALUNO) |
-
----
-
-## 🔄 Histórico de Updates Nesta Sessão
-
-```
-[HH:MM] Iniciada sessão, chat #X
-[HH:MM] Story X.Y.1 — DONE (testes + implementação + commit)
-[HH:MM] Story X.Y.2 — Em testes, 2/2 passando
-[HH:MM] MEMORY.md atualizado — próximo: implementar arquivo2.tsx
-```
-
----
+| Link                                   | Propósito                                  |
+| -------------------------------------- | ------------------------------------------ |
+| `docs/REFACTORING_PLAN_GRANULAR_V2.md` | Plano mestre de execução das 43 subtarefas |
+| `docs/REFACTORING_QUICK_REFERENCE.md`  | Resumo operacional do fluxo de refatoração |
+| `docs/COMO_COMECAR.md`                 | Setup e workflow de trabalho               |
+| `CLAUDE.md`                            | Diretrizes de código, contrato e escopo    |
 
 ## 🛑 Pausar / Retomar
 
