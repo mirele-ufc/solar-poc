@@ -1,8 +1,9 @@
 import { create } from "zustand";
-import type { UserProfile, SentMessage } from "@ava-poc/types";
+import type { IUserSession, SentMessage } from "@ava-poc/types";
 
 // Re-export types for external imports (tests, components)
-export type { UserProfile, SentMessage };
+export type UserProfile = IUserSession;
+export type { SentMessage };
 
 /**
  * Authentication store state and actions
@@ -15,14 +16,14 @@ export type { UserProfile, SentMessage };
  */
 interface AuthStore {
   // State
-  currentUser: UserProfile;
+  currentUser: IUserSession;
   sentMessages: SentMessage[];
   isLoggedIn: boolean;
 
   // Actions
   login: (username: string, password: string) => boolean;
   logout: () => void;
-  updateCurrentUser: (partial: Partial<UserProfile>) => void;
+  updateCurrentUser: (partial: Partial<IUserSession>) => void;
   sendMessage: (msg: Omit<SentMessage, "id" | "sentAt">) => void;
 }
 
@@ -35,26 +36,30 @@ type AuthStoreSnapshot = Pick<AuthStore, "currentUser" | "isLoggedIn">;
  * ⚠️ PROTOTYPE ONLY:
  * In production, authentication must be backend-driven with secure token management.
  */
-const CREDENTIALS: Record<string, { password: string; profile: UserProfile }> =
+const CREDENTIALS: Record<string, { password: string; profile: IUserSession }> =
   {
     professor: {
       password: "professor",
       profile: {
-        name: "Prof. Eduardo Silva",
+        id: "user-professor-001",
+        nome: "Prof. Eduardo Silva",
         cpf: "98765432100",
         email: "professor@ufc.br",
-        photoUrl: null,
+        fotoUrl: undefined,
         role: "professor",
+        status: "ATIVO",
       },
     },
     estudante: {
       password: "estudante",
       profile: {
-        name: "Eduardo Marinho",
+        id: "user-student-001",
+        nome: "Eduardo Marinho",
         cpf: "12345678901",
         email: "eduardo.marinho@ufc.br",
-        photoUrl: null,
+        fotoUrl: undefined,
         role: "student",
+        status: "ATIVO",
       },
     },
   };
@@ -63,7 +68,7 @@ const CREDENTIALS: Record<string, { password: string; profile: UserProfile }> =
  * Default user profile when not logged in
  * Uses student credentials as default
  */
-const DEFAULT_USER: UserProfile = CREDENTIALS.estudante.profile;
+const DEFAULT_USER: IUserSession = CREDENTIALS.estudante.profile;
 
 /**
  * Mock messages for prototype demonstration
@@ -148,7 +153,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
    *
    * @param partial - Partial user profile to merge with current user
    */
-  updateCurrentUser: (partial: Partial<UserProfile>) => {
+  updateCurrentUser: (partial: Partial<IUserSession>) => {
     set((state) => ({
       currentUser: { ...state.currentUser, ...partial },
     }));
@@ -177,6 +182,6 @@ export function selectCanManageCourses(state: AuthStoreSnapshot): boolean {
   return state.currentUser.role === "professor";
 }
 
-export function selectCurrentUser(state: AuthStoreSnapshot): UserProfile {
+export function selectCurrentUser(state: AuthStoreSnapshot): IUserSession {
   return state.currentUser;
 }

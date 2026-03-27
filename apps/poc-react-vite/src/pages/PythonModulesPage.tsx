@@ -1012,7 +1012,7 @@ export function PythonModulesPage() {
       {showMatriculaModal && (
         <DeclaracaoMatriculaModal
           onClose={() => setShowMatriculaModal(false)}
-          studentName={currentUser.name}
+          studentName={currentUser.nome}
           validationCode={matriculaCode}
           emissionDate={emissionDate}
         />
@@ -1020,7 +1020,7 @@ export function PythonModulesPage() {
       {showConclusaoModal && (
         <DeclaracaoConclusaoModal
           onClose={() => setShowConclusaoModal(false)}
-          studentName={currentUser.name}
+          studentName={currentUser.nome}
           validationCode={conclusaoCode}
           emissionDate={emissionDate}
           conclusionDate={emissionDate}
