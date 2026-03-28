@@ -1176,11 +1176,11 @@ test: Validar fluxo de recuperação de senha (token expirado, código usado)
 
 **Checklist Fase 2:**
 
-- [ ] authService.ts criado com endpoints contratuais (login, register, forgot, refresh, reset, profile)
-- [ ] Request interceptor injeta JWT
-- [ ] LoginPage integrada com backend
-- [ ] RegisterPage integrada com backend
-- [ ] Refresh token flow automático
+- [x] authService.ts criado com endpoints contratuais (login, register, forgot, refresh, reset, profile)
+- [x] Request interceptor injeta JWT
+- [x] LoginPage integrada com backend
+- [x] RegisterPage integrada com backend
+- [x] Refresh token flow automático
 - [ ] ProfilePage integrada com backend (GET /perfil, PUT /perfil/senha)
 - [ ] ForgotPasswordPage + ResetPasswordPage integradas
 - [ ] Logout permanece local e não chama endpoint inexistente
