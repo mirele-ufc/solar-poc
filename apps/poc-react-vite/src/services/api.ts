@@ -26,6 +26,14 @@ apiClient.interceptors.response.use(
   (error: unknown) => {
     if (error instanceof AxiosError) {
       const status = error.response?.status;
+      const errorMessage = error.response?.data?.message || error.message;
+
+      // Debug: log all errors to console for troubleshooting
+      console.error(
+        "[API Error]",
+        { status, message: errorMessage, url: error.config?.url, code: error.code },
+        error,
+      );
 
       if (status === 401) {
         toast.error("Sessão expirada. Faça login novamente.");
@@ -39,13 +47,15 @@ apiClient.interceptors.response.use(
         toast.error("Dados inválidos. Verifique os campos.");
       } else if (status !== undefined && status >= 500) {
         toast.error("Erro no servidor. Tente novamente.");
+      } else if (error.code === "ERR_NETWORK" || !status) {
+        // Network error or CORS issue
+        toast.error(
+          `Erro de conexão: ${errorMessage}. Verifique se a API está rodando em ${import.meta.env.VITE_API_URL}`,
+        );
       }
 
       const apiError: IApiError = {
-        message:
-          error.response?.data?.message ||
-          error.message ||
-          "An unexpected error occurred",
+        message: errorMessage || "An unexpected error occurred",
         status,
         statusText: error.response?.statusText,
         timestamp: new Date().toISOString(),
@@ -60,6 +70,7 @@ apiClient.interceptors.response.use(
       timestamp: new Date().toISOString(),
     };
 
+    console.error("[API Error - Unknown]", apiError, error);
     return Promise.reject(apiError);
   },
 );
@@ -73,10 +84,12 @@ apiClient.interceptors.response.use(
  */
 apiClient.interceptors.request.use(
   (config) => {
-    const token = useAuthStore.getState().token;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const storeToken = useAuthStore.getState().token;
+
+    if (storeToken) {
+      config.headers.Authorization = `Bearer ${storeToken}`;
     }
+
     return config;
   },
   (error) => {
