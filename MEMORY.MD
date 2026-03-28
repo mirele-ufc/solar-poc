@@ -10,9 +10,9 @@
 
 ## MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
 
-**Última atualização:** 27/03/2026 19:32 (2.2 ✅ completa, 15/43 = 35%, Fase 2 em progresso)  
+**Última atualização:** 28/03/2026 09:45 (2.3 ✅ completa, 16/43 = 37%, Fase 2 em progresso)  
 **Sprint ativo:** Fase 2 — Autenticação com Backend  
-**Status geral:** 35% (15/43 subtarefas concluídas)
+**Status geral:** 37% (16/43 subtarefas concluídas)
 
 ---
 
@@ -61,6 +61,7 @@
 | 1.6 | Refatorar componentes com Slots Pattern         | ✅     | 27/03/2026 | `0080137` + `9090c6a` + `4ecc3d7` + `b24fbb4` + `32558a8` | —   |
 | 2.1 | authService endpoints (Auth/Perfil)            | ✅     | 27/03/2026 | `3ece624` + `a2ec8eb` + `877540a`                        | —   |
 | 2.2 | Implementar Request Interceptor em api.ts       | ✅     | 27/03/2026 | `0ae5cf1` + `cb93963` + `2279807`                        | —   |
+| 2.3 | Integrar LoginPage com POST /auth/login         | ✅     | 28/03/2026 | `0db7f21`                                                | —   |
 
 ### 📊 By-Phase Metrics
 
@@ -68,12 +69,12 @@
 | --------- | -------- | ------ | ------- | ------------------ | ---------- | -------- |
 | 0         | 7        | 7      | 100%    | ✅ COMPLETA        | 25/03      | 26/03    |
 | 1         | 6        | 6      | 100%    | ✅ COMPLETA        | 26/03      | 27/03    |
-| 2         | 2        | 7      | 29%     | 🔄 IN_PROGRESS     | 27/03      | —        |
+| 2         | 3        | 7      | 43%     | 🔄 IN_PROGRESS     | 27/03      | —        |
 | 3         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
 | 4         | 0        | 7      | 0%      | ⏳ FUTURE          | —          | —        |
 | 5         | 0        | 4      | 0%      | ⏳ FUTURE          | —          | —        |
 | 6         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
-| **TOTAL** | **15**   | **43** | **35%** | **🟢 IN PROGRESS** | 25/03      | —        |
+| **TOTAL** | **16**   | **43** | **37%** | **🟢 IN PROGRESS** | 25/03      | —        |
 
 ### ⏳ Next Ready (First 3)
 
