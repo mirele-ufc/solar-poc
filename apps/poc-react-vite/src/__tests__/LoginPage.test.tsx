@@ -118,4 +118,147 @@ describe("LoginPage", () => {
       expect(useAuthStore.getState().isLoggedIn).toBe(false);
     });
   });
+
+  it("deve fazer login com username com sucesso e redirecionar", async () => {
+    mockedAuthService.login.mockResolvedValueOnce({
+      accessToken: "access-222",
+      refreshToken: "refresh-222",
+    });
+    mockedAuthService.getProfile.mockResolvedValueOnce(defaultUser);
+
+    render(
+      <MemoryRouter>
+        <LoginPage />
+      </MemoryRouter>,
+    );
+
+    fireEvent.change(screen.getByPlaceholderText(/nome de usuário ou email/i), {
+      target: { value: "prof_teste" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Insira sua senha/i), {
+      target: { value: "senha123" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /acessar/i }));
+
+    await waitFor(() => {
+      expect(authService.login).toHaveBeenCalledWith(
+        "prof_teste",
+        "senha123",
+      );
+      expect(useAuthStore.getState().token).toBe("access-222");
+      expect(useAuthStore.getState().isLoggedIn).toBe(true);
+    });
+  });
+
+  it("deve desabilitar botão durante carregamento", async () => {
+    mockedAuthService.login.mockImplementationOnce(
+      () => new Promise((resolve) => setTimeout(() => resolve({
+        accessToken: "token",
+        refreshToken: "refresh",
+      }), 100)),
+    );
+    mockedAuthService.getProfile.mockResolvedValueOnce(defaultUser);
+
+    render(
+      <MemoryRouter>
+        <LoginPage />
+      </MemoryRouter>,
+    );
+
+    fireEvent.change(screen.getByPlaceholderText(/nome de usuário ou email/i), {
+      target: { value: "professor@ufc.br" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Insira sua senha/i), {
+      target: { value: "senha123" },
+    });
+
+    const submitButton = screen.getByRole("button", { name: /acessar/i }) as HTMLButtonElement;
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(submitButton).toBeDisabled();
+    });
+
+    await waitFor(() => {
+      expect(submitButton).not.toBeDisabled();
+    }, { timeout: 200 });
+  });
+
+  it("deve tratar erro de rede com mensagem apropriada", async () => {
+    mockedAuthService.login.mockRejectedValueOnce({
+      message: "Erro de conexão",
+      status: 0,
+    });
+
+    render(
+      <MemoryRouter>
+        <LoginPage />
+      </MemoryRouter>,
+    );
+
+    fireEvent.change(screen.getByPlaceholderText(/nome de usuário ou email/i), {
+      target: { value: "professor@ufc.br" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Insira sua senha/i), {
+      target: { value: "senha123" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /acessar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Erro de conexão/i)).toBeInTheDocument();
+      expect(useAuthStore.getState().isLoggedIn).toBe(false);
+    });
+  });
+
+  it("deve validar email inválido no schema Zod", async () => {
+    render(
+      <MemoryRouter>
+        <LoginPage />
+      </MemoryRouter>,
+    );
+
+    fireEvent.change(screen.getByPlaceholderText(/nome de usuário ou email/i), {
+      target: { value: "email invalido com espacos" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Insira sua senha/i), {
+      target: { value: "senha123" },
+    });
+
+    const submitButton = screen.getByRole("button", { name: /acessar/i });
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/E-mail ou nome de usuário inválido/i),
+      ).toBeInTheDocument();
+      expect(authService.login).not.toHaveBeenCalled();
+    });
+  });
+
+  it("deve validar username com menos de 3 caracteres", async () => {
+    render(
+      <MemoryRouter>
+        <LoginPage />
+      </MemoryRouter>,
+    );
+
+    fireEvent.change(screen.getByPlaceholderText(/nome de usuário ou email/i), {
+      target: { value: "ab" },
+    });
+    fireEvent.change(screen.getByPlaceholderText(/Insira sua senha/i), {
+      target: { value: "senha123" },
+    });
+
+    const submitButton = screen.getByRole("button", { name: /acessar/i });
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/E-mail ou nome de usuário inválido/i),
+      ).toBeInTheDocument();
+      expect(authService.login).not.toHaveBeenCalled();
+    });
+  });
 });
