@@ -14,7 +14,8 @@
     },
     "onlyBuiltDependencies": [
       "@tailwindcss/oxide",
-      "esbuild"
+      "esbuild",
+      "msw"
     ]
   },
   "devDependencies": {

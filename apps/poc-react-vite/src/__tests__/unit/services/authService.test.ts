@@ -47,7 +47,7 @@ describe("authService", () => {
     const result = await authService.login("professor@ufc.br", "123456");
 
     expect(mockedPost).toHaveBeenCalledWith("/auth/login", {
-      emailOuUsuario: "professor@ufc.br",
+      email: "professor@ufc.br",
       senha: "123456",
     });
     expect(result).toEqual(loginResponse);

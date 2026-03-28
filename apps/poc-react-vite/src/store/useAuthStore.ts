@@ -25,6 +25,7 @@ interface AuthStore {
   // Actions
   login: (username: string, password: string) => boolean;
   logout: () => void;
+  setCurrentUser: (user: IUserSession | null) => void;
   updateCurrentUser: (partial: Partial<IUserSession>) => void;
   setTokens: (token: string | null, refreshToken?: string | null) => void;
   sendMessage: (msg: Omit<SentMessage, "id" | "sentAt">) => void;
@@ -138,6 +139,13 @@ export const useAuthStore = create<AuthStore>((set) => ({
     if (typeof window !== "undefined") {
       window.history.replaceState({}, "", "/");
     }
+  },
+
+  setCurrentUser: (user: IUserSession | null) => {
+    set({
+      currentUser: user,
+      isLoggedIn: Boolean(user),
+    });
   },
 
   /**

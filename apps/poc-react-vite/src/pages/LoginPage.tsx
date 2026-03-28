@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuthStore } from "@/store/useAuthStore";
+import { zodResolver } from "@hookform/resolvers/zod";import { authService } from "@/services/authService";import { useAuthStore } from "@/store/useAuthStore";
 import { FormContainer } from "@/components/shared/FormContainer";
 import svgPaths from "@/assets/svg-ppphmxjoa5";
 import imgUfcLogo1 from "@/assets/9098abf5bf97a1aac4c76f171ec108cee92cfddb.png";
@@ -15,7 +14,6 @@ export function LoginPage() {
   const [generalError, setGeneralError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuthStore();
 
   const {
     watch,
@@ -25,25 +23,41 @@ export function LoginPage() {
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
-      password: "",
+      emailOuUsuario: "",
+      senha: "",
     },
   });
 
   const form = watch();
 
-  const onSubmitValid = (values: LoginFormValues) => {
+  const { setTokens, setCurrentUser } = useAuthStore();
+
+  const onSubmitValid = async (values: LoginFormValues) => {
     setIsLoading(true);
-    const ok = login(values.username.trim(), values.password);
-    if (ok) {
+
+    try {
+      const loginResponse = await authService.login(
+        values.emailOuUsuario.trim(),
+        values.senha,
+      );
+
+      setTokens(loginResponse.accessToken, loginResponse.refreshToken);
+
+      const profile = await authService.getProfile();
+      setCurrentUser(profile);
+
       setGeneralError("");
       setShowErrors(false);
       navigate("/courses");
-    } else {
-      setGeneralError("Usuário ou senha incorretos");
+    } catch (error) {
+      const apiError = error as { message?: string };
+      setGeneralError(
+        apiError.message || "Usuário ou senha incorretos",
+      );
       setShowErrors(true);
-      setIsLoading(false);
       window.scrollTo({ top: 0, behavior: "smooth" });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -113,37 +127,37 @@ export function LoginPage() {
           {/* Login */}
           <div className="flex flex-col items-start w-full gap-[2px]">
             <label
-              htmlFor="username"
+              htmlFor="emailOuUsuario"
               className="font-['Figtree:Medium',sans-serif] font-medium leading-[30px] text-[#ffeac4] text-[20px] w-full"
             >
               Login
             </label>
             <div
               className={`bg-white h-[60px] w-full rounded-[12px] relative overflow-hidden ${
-                showErrors && !!errors.username
+                showErrors && !!errors.emailOuUsuario
                   ? "border-2 border-[#c0392b]"
                   : "border border-[#5f5f5f]"
               }`}
             >
               <div className="flex items-center px-[20px] py-[12px] h-full">
                 <input
-                  id="username"
+                  id="emailOuUsuario"
                   type="text"
                   autoComplete="username"
                   placeholder="Insira seu nome de usuário ou email"
-                  value={form.username}
+                  value={form.emailOuUsuario}
                   onChange={(e) =>
-                    setValue("username", e.target.value, {
+                    setValue("emailOuUsuario", e.target.value, {
                       shouldDirty: true,
                       shouldValidate: showErrors,
                     })
                   }
                   aria-invalid={
-                    showErrors && !!errors.username ? "true" : undefined
+                    showErrors && !!errors.emailOuUsuario ? "true" : undefined
                   }
                   aria-describedby={
-                    showErrors && !!errors.username
-                      ? "username-error"
+                    showErrors && !!errors.emailOuUsuario
+                      ? "email-usuario-error"
                       : undefined
                   }
                   className="flex-1 font-['Figtree:Regular',sans-serif] font-normal text-[16px] text-[#1a1a1a] placeholder-[#595959] bg-transparent outline-none focus-visible:outline-none w-full"
@@ -152,19 +166,19 @@ export function LoginPage() {
               <div
                 aria-hidden="true"
                 className={`absolute inset-0 pointer-events-none rounded-[12px] ${
-                  showErrors && !!errors.username
+                  showErrors && !!errors.emailOuUsuario
                     ? ""
                     : "focus-within:outline focus-within:outline-[3px] focus-within:outline-[#ffeac4] focus-within:outline-offset-[-1px]"
                 }`}
               />
             </div>
-            {showErrors && !!errors.username && (
+            {showErrors && !!errors.emailOuUsuario && (
               <p
-                id="username-error"
+                id="email-usuario-error"
                 role="alert"
                 className="font-['Figtree:Regular',sans-serif] font-normal text-[14px] mt-[4px] text-[#ff6f6f]"
               >
-                {errors.username.message}
+                {errors.emailOuUsuario.message}
               </p>
             )}
           </div>
@@ -179,7 +193,7 @@ export function LoginPage() {
             </label>
             <div
               className={`bg-white h-[60px] w-full rounded-[12px] relative overflow-hidden ${
-                showErrors && !!errors.password
+                showErrors && !!errors.senha
                   ? "border-2 border-[#c0392b]"
                   : "border border-[#5f5f5f]"
               }`}
@@ -190,20 +204,18 @@ export function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   placeholder="Insira sua senha"
-                  value={form.password}
+                  value={form.senha}
                   onChange={(e) =>
-                    setValue("password", e.target.value, {
+                    setValue("senha", e.target.value, {
                       shouldDirty: true,
                       shouldValidate: showErrors,
                     })
                   }
                   aria-invalid={
-                    showErrors && !!errors.password ? "true" : undefined
+                    showErrors && !!errors.senha ? "true" : undefined
                   }
                   aria-describedby={
-                    showErrors && !!errors.password
-                      ? "password-error"
-                      : undefined
+                    showErrors && !!errors.senha ? "senha-error" : undefined
                   }
                   className="flex-1 font-['Figtree:Regular',sans-serif] font-normal text-[16px] text-[#1a1a1a] placeholder-[#595959] bg-transparent outline-none focus-visible:outline-none min-w-0"
                 />
@@ -232,19 +244,19 @@ export function LoginPage() {
               <div
                 aria-hidden="true"
                 className={`absolute inset-0 pointer-events-none rounded-[12px] ${
-                  showErrors && !!errors.password
+                  showErrors && !!errors.senha
                     ? ""
                     : "focus-within:outline focus-within:outline-[3px] focus-within:outline-[#ffeac4] focus-within:outline-offset-[-1px]"
                 }`}
               />
             </div>
-            {showErrors && !!errors.password && (
+            {showErrors && !!errors.senha && (
               <p
-                id="password-error"
+                id="senha-error"
                 role="alert"
                 className="font-['Figtree:Regular',sans-serif] font-normal text-[14px] mt-[4px] text-[#ff6f6f]"
               >
-                {errors.password.message}
+                {errors.senha.message}
               </p>
             )}
           </div>

@@ -10,7 +10,7 @@ import type {
 export const authService = {
   async login(emailOuUsuario: string, senha: string): Promise<ILoginResponse> {
     const response = await apiClient.post<ILoginResponse>("/auth/login", {
-      emailOuUsuario,
+      email: emailOuUsuario,
       senha,
     });
 
