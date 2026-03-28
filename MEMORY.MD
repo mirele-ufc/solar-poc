@@ -10,9 +10,9 @@
 
 ## MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
 
-**Última atualização:** 28/03/2026 09:45 (2.3 ✅ completa, 16/43 = 37%, Fase 2 em progresso)  
+**Última atualização:** 28/03/2026 14:00 (2.4 ✅ completa, 17/43 = 39%, Fase 2 em progresso)  
 **Sprint ativo:** Fase 2 — Autenticação com Backend  
-**Status geral:** 37% (16/43 subtarefas concluídas)
+**Status geral:** 39% (17/43 subtarefas concluídas)
 
 ---
 
@@ -62,6 +62,7 @@
 | 2.1 | authService endpoints (Auth/Perfil)            | ✅     | 27/03/2026 | `3ece624` + `a2ec8eb` + `877540a`                        | —   |
 | 2.2 | Implementar Request Interceptor em api.ts       | ✅     | 27/03/2026 | `0ae5cf1` + `cb93963` + `2279807`                        | —   |
 | 2.3 | Integrar LoginPage com POST /auth/login         | ✅     | 28/03/2026 | `0db7f21`                                                | —   |
+| 2.4 | Integrar RegisterPage com POST /auth/cadastro   | ✅     | 28/03/2026 | (commits git manuais + testes 9/9 PASS)                  | —   |
 
 ### 📊 By-Phase Metrics
 
@@ -69,30 +70,30 @@
 | --------- | -------- | ------ | ------- | ------------------ | ---------- | -------- |
 | 0         | 7        | 7      | 100%    | ✅ COMPLETA        | 25/03      | 26/03    |
 | 1         | 6        | 6      | 100%    | ✅ COMPLETA        | 26/03      | 27/03    |
-| 2         | 3        | 7      | 43%     | 🔄 IN_PROGRESS     | 27/03      | —        |
+| 2         | 4        | 7      | 57%     | 🔄 IN_PROGRESS     | 27/03      | —        |
 | 3         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
 | 4         | 0        | 7      | 0%      | ⏳ FUTURE          | —          | —        |
 | 5         | 0        | 4      | 0%      | ⏳ FUTURE          | —          | —        |
 | 6         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
-| **TOTAL** | **16**   | **43** | **37%** | **🟢 IN PROGRESS** | 25/03      | —        |
+| **TOTAL** | **17**   | **43** | **39%** | **🟢 IN PROGRESS** | 25/03      | —        |
 
 ### ⏳ Next Ready (First 3)
 
-1. **2.4 — Integrar RegisterPage com backend**
+1. **2.5 — Implementar refresh token flow automático**
    - Duração: 1 dia
-   - Dependências: 2.3 ✅
-   - Status: ✅ **READY NOW** (após git push 2.3)
-   - Detalhes: `docs/REFACTORING_PLAN_GRANULAR_V2.md` § 2.4
+   - Dependências: 2.4 ✅
+   - Status: ✅ **READY NOW**
+   - Detalhes: `docs/REFACTORING_PLAN_GRANULAR_V2.md` § 2.5
 
-2. **2.5 — Implementar refresh token flow**
-   - Duração: 1 dia
-   - Dependências: 2.4
-   - Status: ⏳ NEXT
-
-3. **2.6 — Integrar ProfilePage com backend**
+2. **2.6 — Integrar ProfilePage com backend (GET /perfil)**
    - Duração: 1-1.5 dia
    - Dependências: 2.5
-   - Status: ⏳ BLOCKED on 2.5
+   - Status: ⏳ NEXT
+
+3. **2.7 — Implementar troca de senha (PUT /perfil/senha)**
+   - Duração: 1 dia
+   - Dependências: 2.5, 2.6
+   - Status: ⏳ FUTURE
 
 ### ⛔ Blockers
 
@@ -116,6 +117,7 @@
 | 5   | 0.5.1 | ✅ DONE | 2/2     | 3/3    | src/**tests**/unit/pages/UnauthorizedPage.test.tsx                                                    | RED validado (import da página ausente)     | UnauthorizedPage criada com botão de retorno e redirecionamento automático para /courses             |
 | 6   | 0.6.1 | ✅ DONE | 1/1     | 4/4    | src/**tests**/unit/routes/publicRoutes.test.tsx                                                       | RED estrutural (testes antes de rodar)      | Suite valida que /, /register, /forgot-password e /unauthorized são acessíveis sem autenticação      |
 | 7   | 1.1.1 | ✅ DONE | 2/2     | 27/27  | Type-check OK; Vitest: 27/27 testes passando                                                          | Draft: tipos consolidados em @ava-poc/types | Consolidação de tipos em v1.0 + resolução de role (professor/student/admin) + imports bem-definidos  |
+| 8   | 2.4.1 | ✅ DONE | (git manual) | 9/9    | src/__tests__/RegisterPage.test.tsx                                                                    | RED escrito (9 testes antes da implementação) | Integração RegisterPage com POST /auth/cadastro; mapeamento perfil professor↔PROFESSOR, student↔ALUNO |
 
 **Resumo:** Fases 0 e 1 concluídas e auditadas (100%). Fase 2 em progresso: 2.1 concluída (commits: 3ece624, a2ec8eb, 877540a). Próxima: 2.2 (Request Interceptor).
 
@@ -127,13 +129,10 @@
 - Testes: 19/19
 - Evidência: `src/__tests__/unit/services/authService.test.ts` e `src/__tests__/unit/services/api.interceptor.test.ts`
 
-### Observações Contratuais da 0.2
+### Observações Contratuais
 
 - A rota `/admin/usuarios` não existe no roteador atual (`src/routes.ts`); registrado para implementação posterior quando a rota/página admin estiver no escopo ativo.
-
-### For Next Session
-
-- A rota `/admin/usuarios` não existe no roteador atual (`src/routes.ts`); registrado para implementação posterior quando a rota/página admin estiver no escopo ativo.
+- Task 2.4 implementada com validações Zod (nome, cpf, email, senha, perfil) e integração com POST /auth/cadastro
 
 ### For Next Session
 
@@ -143,8 +142,8 @@ Quando você voltar para continuar:
 # 1. Antes de tudo, validar contexto
 /status-refactoring
 
-# 2. Começar Fase 2.2
-Implemente 2.2 (Implementar Request Interceptor em api.ts)
+# 2. Começar Fase 2.5 (Refresh Token Flow)
+Implemente 2.5 (Implementar refresh token flow automático)
 ```
 
 ### Important Notes
