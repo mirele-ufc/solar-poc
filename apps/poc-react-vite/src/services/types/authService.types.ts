@@ -3,6 +3,7 @@ export interface IRegisterPayload {
   cpf: string;
   email: string;
   senha: string;
+  perfil?: "PROFESSOR" | "ALUNO";
 }
 
 export interface IChangePasswordPayload {

@@ -49,6 +49,11 @@ export const forgotPasswordRequestSchema = z.object({
 
 export const registerSchema = z
   .object({
+    nome: z
+      .string()
+      .trim()
+      .min(1, "Nome não informado")
+      .min(3, "Mínimo 3 caracteres"),
     cpf: z
       .string()
       .trim()
@@ -68,7 +73,9 @@ export const registerSchema = z
       .string()
       .trim()
       .min(1, "Confirmação de senha não informada"),
-    gender: z.string().trim().min(1, "Gênero não informado"),
+    perfil: z.enum(["professor", "student"], {
+      message: "Perfil inválido. Escolha professor ou student",
+    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],

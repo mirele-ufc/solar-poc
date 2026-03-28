@@ -3,6 +3,8 @@ import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormContainer } from "@/components/shared/FormContainer";
+import { authService } from "@/services/authService";
+import { toast } from "sonner";
 import imgUfcLogo1 from "@/assets/9098abf5bf97a1aac4c76f171ec108cee92cfddb.png";
 import imgAtivo224X1 from "@/assets/a17a08a750e97ba9bb12c3ad582c426a8debf0fa.png";
 import {
@@ -196,6 +198,7 @@ export function RegisterPage() {
   const [agreed, setAgreed] = useState(false);
   const [showErrors, setShowErrors] = useState(false);
   const [generalError, setGeneralError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const {
     watch,
     setValue,
@@ -204,20 +207,57 @@ export function RegisterPage() {
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
+      nome: "",
       cpf: "",
       email: "",
       password: "",
       confirmPassword: "",
-      gender: "",
+      perfil: undefined as any,
     },
   });
 
   const form = watch();
 
-  const onSubmitValid = () => {
+  const onSubmitValid = async () => {
+    if (!agreed) {
+      setGeneralError("Você deve aceitar os termos de privacidade e segurança");
+      setShowErrors(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
     setGeneralError("");
-    setShowErrors(false);
-    navigate("/courses");
+    setIsLoading(true);
+
+    try {
+      const perfil = form.perfil === "professor" ? "PROFESSOR" : "ALUNO";
+      await authService.register({
+        nome: form.nome,
+        cpf: form.cpf,
+        email: form.email,
+        senha: form.password,
+        perfil,
+      });
+
+      toast.success("Conta pendente de ativação. Verifique seu email.");
+      navigate("/");
+    } catch (error: any) {
+      const errorMessage = error.message || "Erro ao cadastrar usuário";
+      
+      // Tratamento específico de erros
+      if (error.status === 409) {
+        setGeneralError(
+          "CPF ou email já cadastrados no sistema. Tente outro ou faça login."
+        );
+      } else {
+        setGeneralError(errorMessage);
+      }
+      
+      setShowErrors(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const onSubmitInvalid = () => {
@@ -228,11 +268,9 @@ export function RegisterPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const genderOptions = [
-    { value: "feminino", label: "Feminino" },
-    { value: "masculino", label: "Masculino" },
-    { value: "outro", label: "Outro" },
-    { value: "prefiro-nao-informar", label: "Prefiro não informar" },
+  const perfilOptions = [
+    { value: "professor", label: "Professor" },
+    { value: "student", label: "Aluno" },
   ];
 
   return (
@@ -290,6 +328,19 @@ export function RegisterPage() {
         >
           <FormContainer.Body className="flex flex-col gap-[12px] items-start w-full">
           <InputField
+            label="Nome"
+            placeholder="Insira seu nome completo"
+            value={form.nome}
+            onChange={(value) =>
+              setValue("nome", value, {
+                shouldDirty: true,
+                shouldValidate: showErrors,
+              })
+            }
+            hasError={showErrors && !!errors.nome}
+            errorMessage={errors.nome?.message}
+          />
+          <InputField
             label="CPF"
             placeholder="Formato: 000.000.000-00"
             value={form.cpf}
@@ -345,17 +396,17 @@ export function RegisterPage() {
             errorMessage={errors.confirmPassword?.message}
           />
           <SelectField
-            label="Gênero"
-            value={form.gender}
+            label="Perfil"
+            value={form.perfil || ""}
             onChange={(value) =>
-              setValue("gender", value, {
+              setValue("perfil", value as "professor" | "student", {
                 shouldDirty: true,
                 shouldValidate: showErrors,
               })
             }
-            options={genderOptions}
-            hasError={showErrors && !!errors.gender}
-            errorMessage={errors.gender?.message}
+            options={perfilOptions}
+            hasError={showErrors && !!errors.perfil}
+            errorMessage={errors.perfil?.message}
           />
 
           {/* Terms — checkbox nativo para semântica e acessibilidade corretas */}
@@ -397,10 +448,11 @@ export function RegisterPage() {
           <div className="flex flex-col gap-[20px] w-full mt-[8px]">
             <button
               type="submit"
-              className="bg-[#ffeac4] h-[50px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-white focus-visible:outline-offset-[2px]"
+              disabled={isLoading}
+              className="bg-[#ffeac4] h-[50px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-white focus-visible:outline-offset-[2px] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
-                Cadastrar
+                {isLoading ? "Cadastrando..." : "Cadastrar"}
               </span>
             </button>
             <button
