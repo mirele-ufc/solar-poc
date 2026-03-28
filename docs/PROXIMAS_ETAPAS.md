@@ -12,10 +12,45 @@
 |---|-----------|--------|---------|--------------|
 | 2.1 | authService endpoints (Auth/Perfil) | ✅ DONE | 1 dia | - |
 | 2.2 | Request Interceptor JWT | ✅ DONE | 1 dia | 2.1 |
-| 2.4 | Integrar RegisterPage com backend | ⏳ NEXT | 1 dia | 2.2 |
+| 2.3 | Integrar LoginPage com POST /auth/login | ⏳ NEXT | 1.5 dias | 2.2 |
+| 2.4 | Integrar RegisterPage com backend | ⏳ BLOCKED | 1 dia | 2.3 |
 | 2.5 | Implementar refresh token flow | ⏳ BLOCKED | 1 dia | 2.4 |
 | 2.6 | Integrar ProfilePage com backend | ⏳ BLOCKED | 1.5 dias | 2.5 |
 | 2.7 | Admin: Ativar/desativar contas | ⏳ BLOCKED | 1 dia | 2.1 |
+
+---
+
+## 🎯 Subtarefa 2.3 — Integrar LoginPage com POST /auth/login
+
+**Objetivo:** Conectar formulário de login (frontend) com endpoint `POST /auth/login` (backend), suportando **email OU username**.
+
+### Componentes Afetados
+- `src/pages/LoginPage.tsx` — Formulário de autenticação
+- `src/services/authService.ts` — Método login() já existe
+- `src/validations/authSchema.ts` — Schemas Zod (refactor para email OU username)
+
+### Fluxo
+1. Usuário preenche: email/username + senha
+2. Frontend valida com Zod (aceita ambos)
+3. POST `/auth/login` com payload `{ emailOuUsuario, senha }`
+4. Backend detecta se é email ou username internamente
+5. Backend retorna JWT (accessToken + refreshToken) + usuário
+6. Frontend armazena tokens em store (Zustand) + solicita header Authorization
+7. Redireciona para `/courses` (dashboard)
+
+### Testes Esperados
+- Login com **email válido** → sucesso + redirect `/courses`
+- Login com **username válido** → sucesso + redirect `/courses`
+- Login com credenciais inválidas → toast "Usuário ou senha incorretos"
+- Validação Zod: rejeita email inválido E username inválido (< 3 chars)
+- Rede indisponível → toast "Erro de conexão"
+- Loading state: botão desabilitado durante submissão
+- JWT armazenado corretamente em store
+
+### Estimativa
+- Implementação: 1.5 dias
+- Testes: paralelo
+- Commits: 3-4 commits granulares
 
 ---
 
@@ -86,11 +121,12 @@
 ```
 2.1 (authService) ✅
   └── 2.2 (Request Interceptor) ✅
-      ├── 2.4 (RegisterPage) ⏳
-      │   └── 2.5 (Refresh Token) ⏳
-      │       └── 2.6 (ProfilePage) ⏳
-      │
-      └── 2.7 (Admin activation) ⏳
+      └── 2.3 (LoginPage) ⏳
+          ├── 2.4 (RegisterPage) ⏳
+          │   └── 2.5 (Refresh Token) ⏳
+          │       └── 2.6 (ProfilePage) ⏳
+          │
+          └── 2.7 (Admin activation) ⏳
 ```
 
 ---
@@ -143,8 +179,19 @@ Response (200 OK):
 
 ---
 
+## ✅ Checklist Antes de Começar 2.3
+
+- [ ] Backend `POST /auth/login` verificado no Swagger
+- [ ] Email/username validation testada (regex em Zod)
+- [ ] Schemas Zod atualizados para aceitar email OU username
+- [ ] LoginPage.tsx aberta e analisada
+- [ ] Testes unitários preparados (RED)
+
+---
+
 ## ✅ Checklist Antes de Começar 2.4
 
+- [ ] 2.3 (LoginPage) ✅ commitada e mergeada em development
 - [ ] Backend `POST /auth/cadastro` verificado no Swagger
 - [ ] Validação de CPF testada manualmente
 - [ ] Schemas Zod atualizados para CadastroRequest
@@ -185,8 +232,8 @@ git status          # ✅ Sem tracked/untracked
 
 ---
 
-**Próximo agente:** Use `/status-refactoring` para validar readiness de 2.4  
-**Executar 2.4:** Use `Implemente 2.4` após aprovação
+**Próximo agente:** Use `/status-refactoring` para validar readiness de 2.3  
+**Executar 2.3:** Use `Implemente 2.3` após aprovação
 
 ---
 

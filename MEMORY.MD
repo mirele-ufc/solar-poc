@@ -32,15 +32,15 @@
 
 ## SECTION: GLOBAL PROGRESS
 
-| Campo      | Valor                                 |
-| ---------- | ------------------------------------- |
-| **Fase**   | 2 — Autenticação com Backend          |
-| **Módulo** | 2.2 — Implementar Request Interceptor |
-| **Story**  | 2.2 — JWT Interceptor em api.ts       |
-| **Status** | NOT_STARTED (ready)                   |
-| **Branch** | feature/refactor-auth-service-2-1     |
+| Campo      | Valor                                     |
+| ---------- | ----------------------------------------- |
+| **Fase**   | 2 — Autenticação com Backend              |
+| **Módulo** | 2.3 — Integrar LoginPage com /auth/login  |
+| **Story**  | 2.3 — LoginPage com email OU username     |
+| **Status** | READY (awaiting implementation)           |
+| **Branch** | (novo) feature/refactor-auth-login-2-3    |
 
-**Status:** Fases 0 e 1 concluídas e auditadas (100%). Fase 2 em progresso — 2.1 concluída, 2.2 pronta para iniciar.
+**Status:** Fases 0, 1 e 2.1, 2.2 concluídas. Fase 2 em progresso — 2.3 pronta para iniciar.
 
 ### ✅ Completes
 
