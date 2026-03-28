@@ -77,21 +77,21 @@
 
 ### ⏳ Next Ready (First 3)
 
-1. **2.3 — Integrar LoginPage com backend**
-   - Duração: 1-1.5 dia
-   - Dependências: 2.2 ✅
-   - Status: ✅ **READY NOW**
-   - Detalhes: `docs/REFACTORING_PLAN_GRANULAR_V2.md` § 2.3
-
-2. **2.4 — Integrar RegisterPage com backend**
+1. **2.4 — Integrar RegisterPage com backend**
    - Duração: 1 dia
-   - Dependências: 2.3
+   - Dependências: 2.3 ✅
+   - Status: ✅ **READY NOW** (após git push 2.3)
+   - Detalhes: `docs/REFACTORING_PLAN_GRANULAR_V2.md` § 2.4
+
+2. **2.5 — Implementar refresh token flow**
+   - Duração: 1 dia
+   - Dependências: 2.4
    - Status: ⏳ NEXT
 
-3. **2.5 — Implementar refresh token flow**
-   - Duração: 1 dia
-   - Dependências: 2.3, 2.4
-   - Status: ⏳ BLOCKED on 2.4
+3. **2.6 — Integrar ProfilePage com backend**
+   - Duração: 1-1.5 dia
+   - Dependências: 2.5
+   - Status: ⏳ BLOCKED on 2.5
 
 ### ⛔ Blockers
 
@@ -126,25 +126,11 @@
 - Testes: 19/19
 - Evidência: `src/__tests__/unit/services/authService.test.ts` e `src/__tests__/unit/services/api.interceptor.test.ts`
 
-### Last Action
-
-- **Date:** 27/03/2026 UTC 19:32
-- **Machine:** local
-- **What:** Implementar 2.2 (Request Interceptor em api.ts) — concluída com êxito
-  - Adicionado campos `token` e `refreshToken` em useAuthStore
-  - Implementado request interceptor que injeta `Authorization: Bearer <token>` em requisições
-  - 3 commits granulares: test, refactor (impl), refactor (types)
-  - 4/4 testes passando ✅
-  - Type-check: zero erros ✅
-  - Build: sucesso ✅
-- **Commits realizados:**
-  - `0ae5cf1` — test: Adicionar testes para request interceptor JWT
-  - `cb93963` — refactor: Implementar request interceptor para injetar JWT em headers
-  - `2279807` — refactor: Corrigir tipos TypeScript em testes de request interceptor
-- **Status:** 2.2 ✅ COMPLETA. Fase 2 agora em 2/7 (29%). Total: 15/43 (35%)
-- **Próxima:** 2.3 (Integrar LoginPage com backend) — READY NOW
-
 ### Observações Contratuais da 0.2
+
+- A rota `/admin/usuarios` não existe no roteador atual (`src/routes.ts`); registrado para implementação posterior quando a rota/página admin estiver no escopo ativo.
+
+### For Next Session
 
 - A rota `/admin/usuarios` não existe no roteador atual (`src/routes.ts`); registrado para implementação posterior quando a rota/página admin estiver no escopo ativo.
 
