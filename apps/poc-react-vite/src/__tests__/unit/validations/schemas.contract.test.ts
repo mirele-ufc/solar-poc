@@ -36,11 +36,12 @@ describe("schemas contract alignment", () => {
 
   it("should pass register with valid CPF", () => {
     const result = registerSchema.safeParse({
+      nome: "João Silva",
       cpf: "12345678901",
       email: "valid@ufc.br",
       password: "123456",
       confirmPassword: "123456",
-      gender: "masculino",
+      perfil: "professor",
     });
 
     expect(result.success).toBe(true);

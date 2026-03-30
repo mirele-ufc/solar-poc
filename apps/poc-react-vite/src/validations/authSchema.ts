@@ -49,6 +49,11 @@ export const forgotPasswordRequestSchema = z.object({
 
 export const registerSchema = z
   .object({
+    nome: z
+      .string()
+      .trim()
+      .min(1, "Nome não informado")
+      .min(3, "Mínimo 3 caracteres"),
     cpf: z
       .string()
       .trim()
@@ -68,7 +73,9 @@ export const registerSchema = z
       .string()
       .trim()
       .min(1, "Confirmação de senha não informada"),
-    gender: z.string().trim().min(1, "Gênero não informado"),
+    perfil: z.enum(["professor", "student"], {
+      message: "Perfil inválido. Escolha professor ou student",
+    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],
@@ -78,8 +85,17 @@ export const registerSchema = z
 export type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export const loginSchema = z.object({
-  username: z.string().trim().min(1, "Login não informado"),
-  password: z.string().trim().min(1, "Senha não informada"),
+  emailOuUsuario: z
+    .string()
+    .trim()
+    .min(1, "E-mail ou nome de usuário obrigatório")
+    .refine(
+      (value) =>
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ||
+        /^[a-zA-Z0-9._-]{3,50}$/.test(value),
+      "E-mail ou nome de usuário inválido",
+    ),
+  senha: z.string().trim().min(6, "Mínimo 6 caracteres"),
 });
 
 export const forgotPasswordSchema = z.object({
@@ -95,8 +111,8 @@ export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 
 export function toLoginRequest(values: LoginFormValues): ILoginRequest {
   return {
-    email: values.username.trim(),
-    senha: values.password,
+    email: values.emailOuUsuario.trim(),
+    senha: values.senha,
   };
 }
 

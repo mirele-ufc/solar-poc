@@ -8,11 +8,14 @@ import {
   forgotPasswordSchema,
   type ForgotPasswordFormValues,
 } from "@/validations/authSchema";
+import { authService } from "@/services/authService";
 
 export function ForgotPasswordPage() {
   const navigate = useNavigate();
   const [showErrors, setShowErrors] = useState(false);
   const [generalError, setGeneralError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
   const {
     watch,
     setValue,
@@ -27,10 +30,25 @@ export function ForgotPasswordPage() {
 
   const form = watch();
 
-  const onSubmitValid = () => {
+  const onSubmitValid = async (values: ForgotPasswordFormValues) => {
     setShowErrors(false);
     setGeneralError("");
-    navigate("/");
+    setLoading(true);
+    try {
+      await authService.requestPasswordReset(values.email);
+      setSuccess(true);
+      setTimeout(() => {
+        navigate("/login");
+      }, 2500);
+    } catch (err: any) {
+      setGeneralError(
+        err?.response?.data?.message ||
+          "Erro ao solicitar recuperação de senha. Tente novamente.",
+      );
+      setShowErrors(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onSubmitInvalid = () => {
@@ -97,6 +115,13 @@ export function ForgotPasswordPage() {
             </div>
           )}
 
+          {/* Success Message */}
+          {success && (
+            <div className="bg-green-600 border border-green-600 rounded-[12px] p-[16px] w-full text-white text-center">
+              Solicitação enviada! Verifique seu email para redefinir a senha.
+            </div>
+          )}
+
           <form
             className="flex flex-col gap-[20px] w-full"
             onSubmit={handleSubmit(onSubmitValid, onSubmitInvalid)}
@@ -129,6 +154,7 @@ export function ForgotPasswordPage() {
                       })
                     }
                     className="flex-1 font-['Figtree:Regular',sans-serif] font-normal text-[16px] text-[#1a1a1a] placeholder-[#595959] bg-transparent outline-none focus-visible:outline-none"
+                    disabled={loading || success}
                   />
                 </div>
                 <div
@@ -150,15 +176,17 @@ export function ForgotPasswordPage() {
             <button
               type="submit"
               className="bg-[#ffeac4] h-[50px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-white focus-visible:outline-offset-[2px]"
+              disabled={loading || success}
             >
               <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
-                Enviar
+                {loading ? "Enviando..." : "Enviar"}
               </span>
             </button>
             <button
               type="button"
               onClick={() => navigate("/")}
               className="h-[50px] w-full border-2 border-[#ffeac4] rounded-[26px] cursor-pointer hover:bg-white/10 transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#ffeac4] focus-visible:outline-offset-[2px]"
+              disabled={loading}
             >
               <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#ffeac4] text-[20px]">
                 Voltar ao login
