@@ -102,7 +102,7 @@ const handlePasswordSave = () => {
               <li class="flex items-center gap-[4px]">
                 <button
                   type="button"
-                  @click="router.push('/cursos')"
+                  @click="router.push('/courses')"
                   class="font-['Figtree:Regular',sans-serif] font-normal text-[#ffeac4]/70 text-[13px] hover:text-[#ffeac4] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#ffeac4] rounded-sm"
                 >
                   Cursos

@@ -143,9 +143,9 @@ const handleNext = () => {
       
       <PageHeader
         title="Criar Curso"
-        back-path="/cursos"
+        back-path="/courses"
         :crumbs="[
-          { label: 'Cursos', path: '/cursos' },
+          { label: 'Cursos', path: '/courses' },
           { label: 'Criar Curso' },
         ]"
       />

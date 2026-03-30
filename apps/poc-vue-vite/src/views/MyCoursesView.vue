@@ -59,9 +59,9 @@ const studentCourses = computed(() => {
 
 const getCourseTarget = (id: string) => {
   if (isProfessor && PROFESSOR_TAUGHT_COURSES.includes(id)) {
-    return `/cursos/${id}/manage`; // Ajustado para condizer com o router.ts vue anterior
+    return `/courses/${id}/manage`; // Ajustado para condizer com o router.ts vue anterior
   }
-  return `/cursos/${id}`;
+  return `/courses/${id}`;
 };
 
 const handleNavigate = (path: string) => router.push(path);
@@ -71,9 +71,9 @@ const handleNavigate = (path: string) => router.push(path);
   <div v-if="!isProfessor" class="bg-white flex flex-col gap-[24px] pt-[24px] px-[20px] md:px-[40px] pb-[60px]">
     <PageHeader
       title="Meus Cursos"
-      backPath="/cursos"
+      backPath="/courses"
       :crumbs="[
-        { label: 'Cursos', path: '/cursos' },
+        { label: 'Cursos', path: '/courses' },
         { label: 'Meus Cursos' },
       ]"
     />
@@ -92,7 +92,7 @@ const handleNavigate = (path: string) => router.push(path);
       </div>
       <button
         type="button"
-        @click="handleNavigate('/cursos')"
+        @click="handleNavigate('/courses')"
         class="bg-[#ffeac4] h-[46px] px-[32px] rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59]"
       >
         <span class="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[17px]">
@@ -107,7 +107,7 @@ const handleNavigate = (path: string) => router.push(path);
         :key="course.id"
         v-bind="course"
         :badge="{ label: 'Matriculado', bg: '#e6f9ee', text: '#155724' }"
-        @click="handleNavigate(`/cursos/${course.id}`)"
+        @click="handleNavigate(`/courses/${course.id}`)"
       />
     </div>
   </div>
@@ -115,9 +115,9 @@ const handleNavigate = (path: string) => router.push(path);
   <div v-else class="bg-white flex flex-col gap-[32px] pt-[24px] px-[20px] md:px-[40px] pb-[60px]">
     <PageHeader
       title="Meus Cursos"
-      backPath="/cursos"
+      backPath="/courses"
       :crumbs="[
-        { label: 'Cursos', path: '/cursos' },
+        { label: 'Cursos', path: '/courses' },
         { label: 'Meus Cursos' },
       ]"
     />
@@ -176,7 +176,7 @@ const handleNavigate = (path: string) => router.push(path);
         </p>
         <button
           type="button"
-          @click="handleNavigate('/cursos')"
+          @click="handleNavigate('/courses')"
           class="bg-[#ffeac4] h-[46px] px-[28px] rounded-[26px] hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59]"
         >
           <span class="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[16px]">
@@ -190,7 +190,7 @@ const handleNavigate = (path: string) => router.push(path);
           :key="course.id"
           v-bind="course"
           :badge="{ label: 'Matriculado', bg: '#e6f9ee', text: '#155724' }"
-          @click="handleNavigate(`/cursos/${course.id}`)"
+          @click="handleNavigate(`/courses/${course.id}`)"
         />
       </div>
     </section>
