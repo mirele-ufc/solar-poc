@@ -1,8 +1,8 @@
 # 🔄 Próximas Etapas — Fase 2 (Autenticação com Backend)
 
 **Data:** 30/03/2026  
-**Status Atual:** Fase 2 — 4/7 subtarefas completadas (57%)  
-**Total Progresso:** 17/43 subtarefas (40%)
+**Status Atual:** Fase 2 — 5/7 subtarefas completadas (71%)  
+**Total Progresso:** 18/43 subtarefas (42%)
 
 ---
 
@@ -14,8 +14,8 @@
 | 2.2 | Request Interceptor JWT                 | ✅ DONE    | 1 dia    | 2.1          |
 | 2.3 | Integrar LoginPage com POST /auth/login | ✅ DONE    | 1.5 dias | 2.2          |
 | 2.4 | Integrar RegisterPage com backend       | ✅ DONE    | 1 dia    | 2.3          |
-| 2.5 | Implementar refresh token flow          | ⏳ NEXT    | 1 dia    | 2.4          |
-| 2.6 | Integrar ProfilePage com backend        | ⏳ BLOCKED | 1.5 dias | 2.5          |
+| 2.5 | Implementar refresh token flow          | ✅ DONE    | 1 dia    | 2.4          |
+| 2.6 | Integrar ProfilePage com backend        | ⏳ NEXT    | 1.5 dias | 2.5          |
 | 2.7 | Admin: Ativar/desativar contas          | ⏳ BLOCKED | 1 dia    | 2.1          |
 
 ---
@@ -93,7 +93,7 @@
 
 ---
 
-## 🎯 Subtarefa 2.5 — Refresh Token Flow (próxima)
+## ✅ Subtarefa 2.5 — Refresh Token Flow
 
 **Objetivo:** Implementar renovação automática de JWT quando accessToken expirar.
 
@@ -249,8 +249,8 @@ git status          # ✅ Sem tracked/untracked
 
 ---
 
-**Próximo agente:** Use `/status-refactoring` para validar readiness de 2.5  
-**Executar 2.5:** Use `Implemente 2.5` após aprovação
+**Próximo agente:** Use `/status-refactoring` para validar readiness de 2.6  
+**Executar 2.6:** Use `Implemente 2.6` após aprovação
 
 ---
 
