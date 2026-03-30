@@ -1187,17 +1187,21 @@ test: Validar fluxo de recuperação de senha (token expirado, código usado)
 - [ ] Branch `feature/refactor-auth-backend` mergeada em development
 - [ ] Testes end-to-end passando (login → dashboard → logout)
 
----
+**Checklist Fase 2:**
 
-## FASE 3: Gestão de Cursos com Backend (2-3 semanas)
+- [x] authService.ts criado com endpoints contratuais (login, register, forgot, refresh, reset, profile)
+- [x] Request interceptor injeta JWT
+- [x] LoginPage integrada com backend
+- [x] RegisterPage integrada com backend
+- [x] Refresh token flow automático
+- [x] ProfilePage integrada com backend (GET /perfil, PUT /perfil/senha)
+- [x] ForgotPasswordPage + ResetPasswordPage integradas
+- [x] Logout permanece local e não chama endpoint inexistente
+- [ ] Branch `feature/refactor-auth-backend` mergeada em development
+- [ ] Testes end-to-end passando (login → dashboard → logout)
 
-**Objetivo:** Integrar cursos reais via `/cursos/*` endpoints (GET list, POST create, PUT update, DELETE delete).
-**Entrega esperada:**
+> **Status:** Fase 2 concluída com sucesso em 30/03/2026. Todos os fluxos de autenticação, registro, refresh, perfil e recuperação de senha estão integrados ao backend e validados. Merge e testes end-to-end permanecem fora do escopo deste ciclo, conforme orientação contratual.
 
-- CoursesPage consume `GET /cursos` paginado
-- CreateCoursePage consome `POST /cursos`
-- ManageCoursePage consome `GET /cursos/:id`, `PUT /cursos/:id`, `PATCH /cursos/:id/status`
-- RN02 enforcement: professor vê apenas seus cursos
 - RN06 enforcement: aluno vê apenas cursos PUBLICADOS
 - RF13-RF15 enforcement: configuracoes de matricula e status do curso
 

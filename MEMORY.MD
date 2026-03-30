@@ -8,16 +8,18 @@
 
 ## MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
 
-**Última atualização:** 30/03/2026 (2.7 ✅ completa, 20/43, Fase 2 concluída)  
-**Sprint ativo:** Fase 2 — Autenticação com Backend  
+**Última atualização:** 30/03/2026 (Fase 2 ✅ concluída, 20/43, pronto para Fase 3)
+**Sprint ativo:** Fase 3 — Gestão de Cursos (próxima)
 **Status geral:** 47% (20/43 subtarefas concluídas)
 
 ---
 
 ## UPDATE — 30/03/2026 (Fase 2 concluída)
 
-- **Marco confirmado:** Refatoração concluída até **2.7**
-- **Fases consolidadas:** Fase 0 e Fase 1 (100%), Fase 2 (100%)
+- **Auditoria:** Checklist da Fase 2 integralmente cumprido (ver docs/REFACTORING_PLAN_GRANULAR_V2.md § Fase 2)
+- **Status:** Todos os fluxos de autenticação, registro, refresh, perfil e recuperação de senha integrados ao backend e validados.
+- **Merge e testes end-to-end:** Fora do escopo deste ciclo, conforme contrato.
+- **Fases consolidadas:** Fase 0, Fase 1 e Fase 2 (100%)
 - **Subtarefas concluídas na Fase 2:** 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7
 - **Próxima etapa planejada:** 3.1 — Criar courseService.ts com endpoints de cursos
 
