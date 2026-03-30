@@ -3,6 +3,7 @@ import { createElement } from "react";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
+import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import { UnauthorizedPage } from "./pages/UnauthorizedPage";
 import { AuthLayout } from "./components/shared/AuthLayout";
 import { CoursesPage } from "./pages/CoursesPage";
@@ -46,10 +47,10 @@ const STUDENT_AND_PROFESSOR_ROLES: ReadonlyArray<UserRole> = [
 const PROFESSOR_ONLY_ROLES: ReadonlyArray<UserRole> = ["professor"];
 const STUDENT_ONLY_ROLES: ReadonlyArray<UserRole> = ["student"];
 
-export const router = createBrowserRouter([
   { index: true, Component: LoginPage },
   { path: "register", Component: RegisterPage },
   { path: "forgot-password", Component: ForgotPasswordPage },
+  { path: "reset-password", Component: ResetPasswordPage },
   { path: "unauthorized", Component: UnauthorizedPage },
   {
     Component: createRoleGuard(STUDENT_AND_PROFESSOR_ROLES),
