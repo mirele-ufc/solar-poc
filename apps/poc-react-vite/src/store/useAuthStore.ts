@@ -135,10 +135,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({
       ...INITIAL_STATE,
     });
-
-    if (typeof window !== "undefined") {
-      window.history.replaceState({}, "", "/");
-    }
+    // Nunca força navegação. O componente decide o redirect se necessário.
   },
 
   setCurrentUser: (user: IUserSession | null) => {

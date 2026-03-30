@@ -32,7 +32,13 @@ type RetryableRequestConfig = InternalAxiosRequestConfig & {
 function handleSessionExpired(): void {
   toast.error("Sessão expirada. Faça login novamente.");
   useAuthStore.getState().logout();
-  window.location.href = "/";
+  // Só redireciona se não estiver na tela de login
+  if (
+    window.location.pathname !== "/" &&
+    window.location.pathname !== "/login"
+  ) {
+    window.location.href = "/";
+  }
 }
 
 /**
@@ -134,8 +140,15 @@ apiClient.interceptors.response.use(
       } else if (status !== undefined && status >= 500) {
         toast.error("Erro no servidor. Tente novamente.");
       } else if (status === 401) {
-        // 401 with _retry already set - don't retry again
-        handleSessionExpired();
+        // Só redireciona se usuário já está autenticado e não está na tela de login
+        const { token, isLoggedIn } = useAuthStore.getState();
+        const isLoginScreen =
+          window.location.pathname === "/" ||
+          window.location.pathname === "/login";
+        if ((token || isLoggedIn) && !isLoginScreen) {
+          handleSessionExpired();
+        }
+        // Se não, apenas rejeita para o componente tratar
       } else if (error.code === "ERR_NETWORK" || !status) {
         // Network error or CORS issue
         toast.error(

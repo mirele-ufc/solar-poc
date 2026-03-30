@@ -65,6 +65,11 @@ export function LoginPage() {
       setShowErrors(true);
       setIsLoading(false);
       window.scrollTo({ top: 0, behavior: "smooth" });
+      // Foco no campo login para facilitar nova tentativa
+      // const loginInput = document.getElementById("emailOuUsuario");
+      // if (loginInput) {
+      //   (loginInput as HTMLInputElement).focus();
+      // }
     }
   };
 
@@ -73,6 +78,7 @@ export function LoginPage() {
     setShowErrors(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+  // Não limpa o erro até o usuário tentar novamente
 
   return (
     <main className="bg-gradient-to-b from-[#021b59] to-[#042e99] flex flex-col items-center p-[20px] min-h-screen">
@@ -153,12 +159,22 @@ export function LoginPage() {
                     autoComplete="username"
                     placeholder="Insira seu nome de usuário ou email"
                     value={form.emailOuUsuario}
-                    onChange={(e) =>
+                    // onChange={(e) =>
+                    //   setValue("emailOuUsuario", e.target.value, {
+                    //     shouldDirty: true,
+                    //     shouldValidate: showErrors,
+                    //   })
+                    // }
+                    onChange={(e) => {
                       setValue("emailOuUsuario", e.target.value, {
                         shouldDirty: true,
                         shouldValidate: showErrors,
-                      })
-                    }
+                      });
+                      if (generalError) {
+                        setGeneralError("");
+                        setShowErrors(false);
+                      }
+                    }}
                     aria-invalid={
                       showErrors && !!errors.emailOuUsuario ? "true" : undefined
                     }
@@ -212,12 +228,22 @@ export function LoginPage() {
                     autoComplete="current-password"
                     placeholder="Insira sua senha"
                     value={form.senha}
-                    onChange={(e) =>
+                    // onChange={(e) =>
+                    //   setValue("senha", e.target.value, {
+                    //     shouldDirty: true,
+                    //     shouldValidate: showErrors,
+                    //   })
+                    // }
+                    onChange={(e) => {
                       setValue("senha", e.target.value, {
                         shouldDirty: true,
                         shouldValidate: showErrors,
-                      })
-                    }
+                      });
+                      if (generalError) {
+                        setGeneralError("");
+                        setShowErrors(false);
+                      }
+                    }}
                     aria-invalid={
                       showErrors && !!errors.senha ? "true" : undefined
                     }
