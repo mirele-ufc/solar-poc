@@ -141,9 +141,9 @@ export function MyCoursesPage() {
   // Destino do clique no card
   const getCourseTarget = (id: string) => {
     if (isProfessor && PROFESSOR_TAUGHT_COURSES.includes(id)) {
-      return `/cursos/${id}/gerenciar`;
+      return `/courses/${id}/manage`;
     }
-    return `/cursos/${id}`;
+    return `/courses/${id}`;
   };
 
   // Vista para estudante (comportamento original)
@@ -156,9 +156,9 @@ export function MyCoursesPage() {
       <div className="bg-white flex flex-col gap-[24px] pt-[24px] px-[20px] md:px-[40px] pb-[60px]">
         <PageHeader
           title="Meus Cursos"
-          backPath="/cursos"
+          backPath="/courses"
           crumbs={[
-            { label: "Cursos", path: "/cursos" },
+            { label: "Cursos", path: "/courses" },
             { label: "Meus Cursos" },
           ]}
         />
@@ -183,7 +183,7 @@ export function MyCoursesPage() {
             </div>
             <button
               type="button"
-              onClick={() => navigate("/cursos")}
+              onClick={() => navigate("/courses")}
               className="bg-[#ffeac4] h-[46px] px-[32px] rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59]"
             >
               <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[17px]">
@@ -198,7 +198,7 @@ export function MyCoursesPage() {
                 key={course.id}
                 {...course}
                 badge={{ label: "Matriculado", bg: "#e6f9ee", text: "#155724" }}
-                onClick={() => navigate(`/cursos/${course.id}`)}
+                onClick={() => navigate(`/courses/${course.id}`)}
               />
             ))}
           </div>
@@ -212,9 +212,9 @@ export function MyCoursesPage() {
     <div className="bg-white flex flex-col gap-[32px] pt-[24px] px-[20px] md:px-[40px] pb-[60px]">
       <PageHeader
         title="Meus Cursos"
-        backPath="/cursos"
+        backPath="/courses"
         crumbs={[
-          { label: "Cursos", path: "/cursos" },
+          { label: "Cursos", path: "/courses" },
           { label: "Meus Cursos" },
         ]}
       />
@@ -307,7 +307,7 @@ export function MyCoursesPage() {
             </p>
             <button
               type="button"
-              onClick={() => navigate("/cursos")}
+              onClick={() => navigate("/courses")}
               className="bg-[#ffeac4] h-[46px] px-[28px] rounded-[26px] hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59]"
             >
               <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[16px]">
@@ -322,7 +322,7 @@ export function MyCoursesPage() {
                 key={course.id}
                 {...course}
                 badge={{ label: "Matriculado", bg: "#e6f9ee", text: "#155724" }}
-                onClick={() => navigate(`/cursos/${course.id}`)}
+                onClick={() => navigate(`/courses/${course.id}`)}
               />
             ))}
           </div>

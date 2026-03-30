@@ -1,7 +1,14 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import type { CourseInfoData } from "./CreateCoursePage";
 import { PageHeader } from "@/components/shared/PageHeader";
+import {
+  createModulesSchema,
+  type CreateModulesFormValues,
+} from "@/validations/courseSchema";
+import { imageFileSchema, uploadFileSchema } from "@/validations/fileSchema";
 
 // ── SVG paths ──────────────────────────────────────────────────────────────────
 const docPath =
@@ -15,7 +22,12 @@ const imgIconPath =
   "M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z";
 
 type Lesson = { id: string; name: string; file: string | null };
-type Module = { id: string; name: string; image: string | null; lessons: Lesson[] };
+type Module = {
+  id: string;
+  name: string;
+  image: string | null;
+  lessons: Lesson[];
+};
 
 let nextId = 1;
 const uid = () => String(nextId++);
@@ -46,7 +58,20 @@ function AddLessonPopup({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
-    if (f) setFile(f.name);
+    if (!f) {
+      setFile(null);
+      return;
+    }
+
+    const parsed = uploadFileSchema.safeParse(f);
+    if (!parsed.success) {
+      setError(parsed.error.issues[0]?.message ?? "Arquivo inválido");
+      setFile(null);
+      return;
+    }
+
+    setError("");
+    setFile(f.name);
   };
 
   const handleConfirm = () => {
@@ -60,10 +85,11 @@ function AddLessonPopup({
       aria-modal="true"
       aria-label="Adicionar aula"
       className="fixed inset-0 z-50 flex items-center justify-center px-[20px] bg-black/40 backdrop-blur-sm"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
       <div className="bg-white rounded-[16px] shadow-2xl w-full max-w-[420px] p-[24px] flex flex-col gap-[20px]">
-
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-[10px]">
@@ -71,10 +97,15 @@ function AddLessonPopup({
               <button
                 type="button"
                 aria-label="Voltar"
-                onClick={() => { setStep(1); setFile(null); }}
+                onClick={() => {
+                  setStep(1);
+                  setFile(null);
+                }}
                 className="size-[44px] flex items-center justify-center hover:bg-[#f5f5f5] rounded focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
               >
-                <span className="text-[#021b59] text-[18px] leading-none">‹</span>
+                <span className="text-[#021b59] text-[18px] leading-none">
+                  ‹
+                </span>
               </button>
             )}
             <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
@@ -87,23 +118,41 @@ function AddLessonPopup({
             onClick={onClose}
             className="size-[44px] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded flex items-center justify-center"
           >
-            <svg className="size-full" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-              <path clipRule="evenodd" d={closeSmPath} fill="#021B59" fillRule="evenodd" />
+            <svg
+              className="size-full"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                clipRule="evenodd"
+                d={closeSmPath}
+                fill="#021B59"
+                fillRule="evenodd"
+              />
             </svg>
           </button>
         </div>
 
         {/* Step indicator */}
-        <div className="flex items-center gap-[8px]" aria-label={`Passo ${step} de 2`}>
+        <div
+          className="flex items-center gap-[8px]"
+          aria-label={`Passo ${step} de 2`}
+        >
           <div className="flex-1 h-[4px] rounded-full bg-[#021b59]" />
-          <div className={`flex-1 h-[4px] rounded-full transition-colors ${step === 2 ? "bg-[#021b59]" : "bg-[#e0e0e0]"}`} />
+          <div
+            className={`flex-1 h-[4px] rounded-full transition-colors ${step === 2 ? "bg-[#021b59]" : "bg-[#e0e0e0]"}`}
+          />
         </div>
 
         {/* ── Step 1: Lesson name ── */}
         {step === 1 && (
           <>
             <div className="flex flex-col gap-[6px]">
-              <label htmlFor="lesson-name" className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[18px]">
+              <label
+                htmlFor="lesson-name"
+                className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[18px]"
+              >
                 Nome da aula
               </label>
               <div className="border border-[#8e8e8e] rounded-[12px] h-[50px] relative">
@@ -113,20 +162,31 @@ function AddLessonPopup({
                   placeholder="Ex: Aula 01"
                   value={lessonName}
                   onChange={(e) => setLessonName(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter") handleStep1(); }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleStep1();
+                  }}
                   className="w-full h-full px-[16px] font-['Figtree:Regular',sans-serif] text-[16px] text-[#333] placeholder-[#8e8e8e] bg-transparent outline-none rounded-[12px]"
                   autoFocus
                 />
-                <div aria-hidden="true" className="absolute inset-0 pointer-events-none focus-within:outline focus-within:outline-[2px] focus-within:outline-[#021b59] rounded-[12px]" />
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 pointer-events-none focus-within:outline focus-within:outline-[2px] focus-within:outline-[#021b59] rounded-[12px]"
+                />
               </div>
-              {error && <p role="alert" className="text-[#c0392b] text-[13px]">{error}</p>}
+              {error && (
+                <p role="alert" className="text-[#c0392b] text-[13px]">
+                  {error}
+                </p>
+              )}
             </div>
             <button
               type="button"
               onClick={handleStep1}
               className="bg-[#ffeac4] h-[46px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
             >
-              <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[18px]">Próximo</span>
+              <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[18px]">
+                Próximo
+              </span>
             </button>
           </>
         )}
@@ -136,11 +196,23 @@ function AddLessonPopup({
           <>
             {/* Show saved lesson name as read-only */}
             <div className="bg-[#c5d6ff] rounded-[12px] px-[16px] py-[12px] flex items-center gap-[10px]">
-              <svg className="size-[22px] shrink-0" fill="none" viewBox="0 0 22 22" aria-hidden="true">
-                <path clipRule="evenodd" d={checkPath} fill="#021b59" fillRule="evenodd" />
+              <svg
+                className="size-[22px] shrink-0"
+                fill="none"
+                viewBox="0 0 22 22"
+                aria-hidden="true"
+              >
+                <path
+                  clipRule="evenodd"
+                  d={checkPath}
+                  fill="#021b59"
+                  fillRule="evenodd"
+                />
               </svg>
               <div>
-                <p className="font-['Figtree:Regular',sans-serif] text-[12px] text-[#595959]">Nome salvo:</p>
+                <p className="font-['Figtree:Regular',sans-serif] text-[12px] text-[#595959]">
+                  Nome salvo:
+                </p>
                 <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[17px]">
                   {lessonName}
                 </p>
@@ -150,7 +222,10 @@ function AddLessonPopup({
             {/* File upload */}
             <div className="flex flex-col gap-[6px]">
               <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[18px]">
-                Arquivo da aula <span className="text-[#8e8e8e] text-[14px] font-normal">(opcional)</span>
+                Arquivo da aula{" "}
+                <span className="text-[#8e8e8e] text-[14px] font-normal">
+                  (opcional)
+                </span>
               </p>
               <button
                 type="button"
@@ -165,6 +240,7 @@ function AddLessonPopup({
               <input
                 ref={fileInputRef}
                 type="file"
+                accept="image/jpeg,image/png,application/pdf"
                 className="hidden"
                 aria-hidden="true"
                 tabIndex={-1}
@@ -179,10 +255,13 @@ function AddLessonPopup({
                 className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[18px]"
               >
                 Gerar quiz com IA{" "}
-                <span className="text-[#8e8e8e] text-[14px] font-normal">(opcional)</span>
+                <span className="text-[#8e8e8e] text-[14px] font-normal">
+                  (opcional)
+                </span>
               </label>
               <p className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[13px] leading-[20px]">
-                Cole um texto abaixo e a IA gerará automaticamente um quiz para a aula.
+                Cole um texto abaixo e a IA gerará automaticamente um quiz para
+                a aula.
               </p>
               <div className="relative border border-[#8e8e8e] rounded-[12px] overflow-hidden focus-within:outline focus-within:outline-[2px] focus-within:outline-[#021b59]">
                 <textarea
@@ -214,12 +293,22 @@ function AddLessonPopup({
                   type="button"
                   onClick={() => {
                     /* TODO: integrar com API de IA para geração do quiz */
-                    alert("Quiz gerado pela IA com base no texto fornecido. (Funcionalidade em desenvolvimento)");
+                    alert(
+                      "Quiz gerado pela IA com base no texto fornecido. (Funcionalidade em desenvolvimento)",
+                    );
                   }}
                   className="flex items-center justify-center gap-[8px] h-[40px] w-full rounded-[26px] bg-[#021b59] hover:bg-[#042e99] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
                 >
-                  <svg className="size-[16px] shrink-0" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12 2L9.09 8.26L2 9.27L7 14.14L5.82 21.02L12 17.77L18.18 21.02L17 14.14L22 9.27L14.91 8.26L12 2Z" fill="#ffeac4" />
+                  <svg
+                    className="size-[16px] shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M12 2L9.09 8.26L2 9.27L7 14.14L5.82 21.02L12 17.77L18.18 21.02L17 14.14L22 9.27L14.91 8.26L12 2Z"
+                      fill="#ffeac4"
+                    />
                   </svg>
                   <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#ffeac4] text-[15px]">
                     Gerar quiz com IA
@@ -233,7 +322,9 @@ function AddLessonPopup({
               onClick={handleConfirm}
               className="bg-[#ffeac4] h-[46px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
             >
-              <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[18px]">Finalizar</span>
+              <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[18px]">
+                Finalizar
+              </span>
             </button>
           </>
         )}
@@ -254,56 +345,118 @@ export function CreateModulesPage() {
   const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [showErrors, setShowErrors] = useState(false);
+  const [moduleImageFiles, setModuleImageFiles] = useState<
+    Record<string, File | undefined>
+  >({});
+  const {
+    setValue,
+    trigger,
+    formState: { errors },
+  } = useForm<CreateModulesFormValues>({
+    resolver: zodResolver(createModulesSchema),
+    defaultValues: {
+      modules: [{ imageFile: undefined }],
+    },
+  });
 
   // per-module image input refs
   const imgRefs = useRef<Record<string, HTMLInputElement | null>>({});
+
+  useEffect(() => {
+    const moduleValues = modules.map((moduleItem) => ({
+      imageFile: moduleImageFiles[moduleItem.id],
+    }));
+    setValue("modules", moduleValues, {
+      shouldDirty: true,
+      shouldValidate: showErrors,
+    });
+  }, [modules, moduleImageFiles, setValue, showErrors]);
 
   const addModule = () => {
     const n = modules.length + 1;
     setModules((prev) => [
       ...prev,
-      { id: uid(), name: `Módulo ${String(n).padStart(2, "0")}`, image: null, lessons: [] },
+      {
+        id: uid(),
+        name: `Módulo ${String(n).padStart(2, "0")}`,
+        image: null,
+        lessons: [],
+      },
     ]);
   };
 
   const removeLesson = (modId: string, lessonId: string) => {
     setModules((prev) =>
       prev.map((m) =>
-        m.id === modId ? { ...m, lessons: m.lessons.filter((l) => l.id !== lessonId) } : m
-      )
+        m.id === modId
+          ? { ...m, lessons: m.lessons.filter((l) => l.id !== lessonId) }
+          : m,
+      ),
     );
   };
 
   const removeModule = (modId: string) => {
     setModules((prev) => prev.filter((m) => m.id !== modId));
+    setModuleImageFiles((prev) => {
+      const next = { ...prev };
+      delete next[modId];
+      return next;
+    });
   };
 
-  const handleAddLesson = (modId: string, name: string, file: string | null) => {
+  const handleAddLesson = (
+    modId: string,
+    name: string,
+    file: string | null,
+  ) => {
     setModules((prev) =>
       prev.map((m) =>
         m.id === modId
           ? { ...m, lessons: [...m.lessons, { id: uid(), name, file }] }
-          : m
-      )
+          : m,
+      ),
     );
   };
 
-  const handleModuleImageChange = (modId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleModuleImageChange = (
+    modId: string,
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    const parsed = imageFileSchema.safeParse(file);
+    if (!parsed.success) {
+      setShowErrors(true);
+      setError(parsed.error.issues[0]?.message ?? "Arquivo inválido");
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = () => {
       setModules((prev) =>
-        prev.map((m) => (m.id === modId ? { ...m, image: reader.result as string } : m))
+        prev.map((m) =>
+          m.id === modId ? { ...m, image: reader.result as string } : m,
+        ),
       );
+      setModuleImageFiles((prev) => ({ ...prev, [modId]: file }));
     };
     reader.readAsDataURL(file);
+    setError("");
   };
 
-  const handleNext = () => {
-    const missingImage = modules.some((m) => !m.image);
-    if (missingImage) {
-      setError("Por favor, preencha os campos destacados para finalizar o cadastro");
+  const handleNext = async () => {
+    setShowErrors(true);
+    const isValid = await trigger("modules");
+
+    if (!isValid) {
+      const firstModuleError = errors.modules?.find(
+        (moduleError) => moduleError?.imageFile?.message,
+      )?.imageFile?.message;
+      setError(
+        firstModuleError ??
+          "Por favor, preencha os campos destacados para finalizar o cadastro",
+      );
       setShowErrors(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -314,16 +467,19 @@ export function CreateModulesPage() {
 
   return (
     <div className="bg-white flex flex-col pb-[100px]">
-
       {/* Error banner */}
       {error && (
-        <div role="alert" className="w-full bg-[#c0392b]/10 border-l-4 border-[#c0392b] px-[20px] py-[14px]">
-          <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#c0392b] text-[15px]">{error}</p>
+        <div
+          role="alert"
+          className="w-full bg-[#c0392b]/10 border-l-4 border-[#c0392b] px-[20px] py-[14px]"
+        >
+          <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#c0392b] text-[15px]">
+            {error}
+          </p>
         </div>
       )}
 
       <div className="max-w-[900px] mx-auto flex flex-col gap-[20px] px-[20px] md:px-[40px] pt-[24px] w-full">
-
         {/* Page header with back + breadcrumb */}
         <PageHeader
           title="Estrutura de Módulos"
@@ -340,8 +496,9 @@ export function CreateModulesPage() {
         </h2>
 
         {/* Module cards */}
-        {modules.map((mod) => {
-          const imgMissing = showErrors && !mod.image;
+        {modules.map((mod, modIndex) => {
+          const moduleError = errors.modules?.[modIndex]?.imageFile?.message;
+          const imgMissing = showErrors && !!moduleError;
           return (
             <div
               key={mod.id}
@@ -359,7 +516,12 @@ export function CreateModulesPage() {
                       onClick={() => removeModule(mod.id)}
                       className="shrink-0 flex items-center gap-[6px] px-[12px] h-[32px] rounded-[26px] border border-[#801436] text-[#801436] hover:bg-[#801436]/10 transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#801436]"
                     >
-                      <svg className="size-[14px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                      <svg
+                        className="size-[14px]"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
                         <path
                           d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"
                           stroke="#801436"
@@ -383,10 +545,19 @@ export function CreateModulesPage() {
                   className={`w-full h-[140px] rounded-[8px] overflow-hidden flex flex-col items-center justify-center transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] ${mod.image ? "" : imgMissing ? "bg-[#c0392b]/10 border-2 border-dashed border-[#c0392b]" : "bg-[#f0f0f0] border-2 border-dashed border-[#8e8e8e] hover:bg-[#e8e8e8]"}`}
                 >
                   {mod.image ? (
-                    <img src={mod.image} alt={`Imagem de ${mod.name}`} className="w-full h-full object-cover" />
+                    <img
+                      src={mod.image}
+                      alt={`Imagem de ${mod.name}`}
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <>
-                      <svg className="size-[32px] mb-[6px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                      <svg
+                        className="size-[32px] mb-[6px]"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
                         <path
                           d={imgIconPath}
                           stroke={imgMissing ? "#c0392b" : "#595959"}
@@ -395,16 +566,22 @@ export function CreateModulesPage() {
                           strokeLinejoin="round"
                         />
                       </svg>
-                      <p className={`font-['Figtree:Regular',sans-serif] text-[14px] ${imgMissing ? "text-[#c0392b]" : "text-[#595959]"}`}>
-                        {imgMissing ? "Imagem obrigatória" : "Clique para adicionar imagem do módulo"}
+                      <p
+                        className={`font-['Figtree:Regular',sans-serif] text-[14px] ${imgMissing ? "text-[#c0392b]" : "text-[#595959]"}`}
+                      >
+                        {imgMissing
+                          ? moduleError
+                          : "Clique para adicionar imagem do módulo"}
                       </p>
                     </>
                   )}
                 </button>
                 <input
-                  ref={(el) => { imgRefs.current[mod.id] = el; }}
+                  ref={(el) => {
+                    imgRefs.current[mod.id] = el;
+                  }}
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/png"
                   className="hidden"
                   aria-hidden="true"
                   tabIndex={-1}
@@ -441,25 +618,42 @@ export function CreateModulesPage() {
                       >
                         <input
                           type="file"
+                          accept="image/jpeg,image/png,application/pdf"
                           className="sr-only"
                           onChange={(e) => {
                             const f = e.target.files?.[0];
                             if (!f) return;
+                            const parsed = uploadFileSchema.safeParse(f);
+                            if (!parsed.success) {
+                              setError(
+                                parsed.error.issues[0]?.message ??
+                                  "Arquivo inválido",
+                              );
+                              setShowErrors(true);
+                              return;
+                            }
                             setModules((prev) =>
                               prev.map((m) =>
                                 m.id === mod.id
                                   ? {
                                       ...m,
                                       lessons: m.lessons.map((l) =>
-                                        l.id === lesson.id ? { ...l, file: f.name } : l
+                                        l.id === lesson.id
+                                          ? { ...l, file: f.name }
+                                          : l,
                                       ),
                                     }
-                                  : m
-                              )
+                                  : m,
+                              ),
                             );
                           }}
                         />
-                        <svg className="size-[16px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                        <svg
+                          className="size-[16px]"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                        >
                           <path
                             d="M15.232 5.232l3.536 3.536M9 11l6.586-6.586a2 2 0 012.828 0l.172.172a2 2 0 010 2.828L12 14H9v-3z"
                             stroke="#021b59"
@@ -482,8 +676,18 @@ export function CreateModulesPage() {
                         onClick={() => removeLesson(mod.id, lesson.id)}
                         className="shrink-0 size-[26px] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded"
                       >
-                        <svg className="size-full" fill="none" viewBox="0 0 28 28" aria-hidden="true">
-                          <path clipRule="evenodd" d={closeLgPath} fill="#801436" fillRule="evenodd" />
+                        <svg
+                          className="size-full"
+                          fill="none"
+                          viewBox="0 0 28 28"
+                          aria-hidden="true"
+                        >
+                          <path
+                            clipRule="evenodd"
+                            d={closeLgPath}
+                            fill="#801436"
+                            fillRule="evenodd"
+                          />
                         </svg>
                       </button>
                     </div>
@@ -498,7 +702,12 @@ export function CreateModulesPage() {
                   onClick={() => setActiveModuleId(mod.id)}
                   className="h-[48px] w-full border-2 border-[#021b59] rounded-[26px] flex items-center justify-center gap-[8px] cursor-pointer hover:bg-[#021b59]/5 transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
                 >
-                  <svg className="size-[24px] shrink-0" fill="none" viewBox="0 0 32 32.6667" aria-hidden="true">
+                  <svg
+                    className="size-[24px] shrink-0"
+                    fill="none"
+                    viewBox="0 0 32 32.6667"
+                    aria-hidden="true"
+                  >
                     <path d={docPath} fill="#021B59" />
                   </svg>
                   <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[18px]">
@@ -516,7 +725,12 @@ export function CreateModulesPage() {
           onClick={addModule}
           className="h-[50px] w-full border-2 border-[#021b59] rounded-[26px] flex items-center justify-center gap-[8px] cursor-pointer hover:bg-[#021b59]/5 transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
         >
-          <svg className="size-[28px] shrink-0" fill="none" viewBox="0 0 32 32.6667" aria-hidden="true">
+          <svg
+            className="size-[28px] shrink-0"
+            fill="none"
+            viewBox="0 0 32 32.6667"
+            aria-hidden="true"
+          >
             <path d={docPath} fill="#021B59" />
           </svg>
           <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
@@ -529,7 +743,9 @@ export function CreateModulesPage() {
       {activeModuleId && (
         <AddLessonPopup
           onClose={() => setActiveModuleId(null)}
-          onConfirm={(name, file) => handleAddLesson(activeModuleId, name, file)}
+          onConfirm={(name, file) =>
+            handleAddLesson(activeModuleId, name, file)
+          }
         />
       )}
 

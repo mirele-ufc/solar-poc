@@ -792,10 +792,10 @@ export function PythonModulesPage() {
       <div className="max-w-[900px] mx-auto flex flex-col gap-[20px] px-[16px] md:px-[40px] pt-[20px] w-full">
         <PageHeader
           title="Módulos"
-          backPath="/cursos/python"
+          backPath="/courses/python"
           crumbs={[
-            { label: "Cursos", path: "/cursos" },
-            { label: "Python Iniciante", path: "/cursos/python" },
+            { label: "Cursos", path: "/courses" },
+            { label: "Python Iniciante", path: "/courses/python" },
             { label: "Módulos" },
           ]}
         />
@@ -1012,7 +1012,7 @@ export function PythonModulesPage() {
       {showMatriculaModal && (
         <DeclaracaoMatriculaModal
           onClose={() => setShowMatriculaModal(false)}
-          studentName={user.name}
+          studentName={currentUser.name}
           validationCode={matriculaCode}
           emissionDate={emissionDate}
         />
@@ -1020,7 +1020,7 @@ export function PythonModulesPage() {
       {showConclusaoModal && (
         <DeclaracaoConclusaoModal
           onClose={() => setShowConclusaoModal(false)}
-          studentName={user.name}
+          studentName={currentUser.name}
           validationCode={conclusaoCode}
           emissionDate={emissionDate}
           conclusionDate={emissionDate}

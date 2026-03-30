@@ -50,7 +50,7 @@ export function PythonDetailPage() {
       description: "Seu acesso ao conteúdo de Python Iniciante foi removido.",
       duration: 5000,
     });
-    navigate("/cursos");
+    navigate("/courses");
   };
 
   return (
@@ -68,9 +68,9 @@ export function PythonDetailPage() {
       <div className="max-w-[900px] mx-auto flex flex-col gap-[24px] px-[20px] md:px-[40px] pt-[24px] w-full">
         <PageHeader
           title="Python Iniciante"
-          backPath="/cursos"
+          backPath="/courses"
           crumbs={[
-            { label: "Cursos", path: "/cursos" },
+            { label: "Cursos", path: "/courses" },
             { label: "Python Iniciante" },
           ]}
         />

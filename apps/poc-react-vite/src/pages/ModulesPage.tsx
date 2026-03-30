@@ -964,12 +964,12 @@ export function ModulesPage() {
     });
 
     if (type === "prova") {
-      navigate("/cursos/power-bi/prova/instrucoes");
+      navigate("/courses/power-bi/exam/instructions");
     } else {
       const mod = MODULOS.find((m) => m.id === modId);
       const aulaItems = mod?.items.filter((i) => i.type === "aula") ?? [];
       const aulaIndex = aulaItems.findIndex((i) => i.id === lessonId);
-      navigate(`/cursos/power-bi/modulos/${modId}`, {
+      navigate(`/courses/power-bi/modules/${modId}`, {
         state: { aulaIndex: aulaIndex >= 0 ? aulaIndex : 0 },
       });
     }
@@ -992,10 +992,10 @@ export function ModulesPage() {
         {/* Breadcrumb + back */}
         <PageHeader
           title="Módulos"
-          backPath="/cursos/power-bi"
+          backPath="/courses/power-bi"
           crumbs={[
-            { label: "Cursos", path: "/cursos" },
-            { label: "Power BI - Fundamentos", path: "/cursos/power-bi" },
+            { label: "Cursos", path: "/courses" },
+            { label: "Power BI - Fundamentos", path: "/courses/power-bi" },
             { label: "Módulos" },
           ]}
         />

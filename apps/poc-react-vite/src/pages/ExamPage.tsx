@@ -64,7 +64,7 @@ export function ExamPage() {
         }
         if (next === 0) {
           clearInterval(timer);
-          navigate("/cursos/power-bi/prova/resultado", { state: { answers } });
+          navigate("/courses/power-bi/exam/results", { state: { answers } });
         }
         return next;
       });
@@ -102,7 +102,7 @@ export function ExamPage() {
   }
 
   function confirmSubmit() {
-    navigate("/cursos/power-bi/prova/resultado", { state: { answers } });
+    navigate("/courses/power-bi/exam/results", { state: { answers } });
   }
 
   function cancelSubmit() {
@@ -118,12 +118,12 @@ export function ExamPage() {
       <div className="max-w-[900px] mx-auto flex flex-col gap-[28px] px-[20px] md:px-[40px] pt-[30px]">
         <PageHeader
           title="Prova 01"
-          backPath="/cursos/power-bi/modulos/1"
+          backPath="/courses/power-bi/modules/1"
           crumbs={[
-            { label: "Cursos", path: "/cursos" },
-            { label: "Power BI - Fundamentos", path: "/cursos/power-bi" },
-            { label: "Módulos", path: "/cursos/power-bi/modulos" },
-            { label: "Módulo 01", path: "/cursos/power-bi/modulos/1" },
+            { label: "Cursos", path: "/courses" },
+            { label: "Power BI - Fundamentos", path: "/courses/power-bi" },
+            { label: "Módulos", path: "/courses/power-bi/modules" },
+            { label: "Módulo 01", path: "/courses/power-bi/modules/1" },
             { label: "Prova 01" },
           ]}
         />

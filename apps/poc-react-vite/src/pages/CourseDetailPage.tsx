@@ -73,9 +73,9 @@ export function CourseDetailPage() {
       <div className="max-w-[900px] mx-auto flex flex-col gap-[24px] px-[20px] md:px-[40px] pt-[24px] w-full">
         <PageHeader
           title="Power BI - Fundamentos"
-          backPath="/cursos"
+          backPath="/courses"
           crumbs={[
-            { label: "Cursos", path: "/cursos" },
+            { label: "Cursos", path: "/courses" },
             { label: "Power BI - Fundamentos" },
           ]}
         />

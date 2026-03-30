@@ -132,7 +132,7 @@ export function TeacherCoursePage() {
           {/* Editar curso */}
           <button
             type="button"
-            onClick={() => navigate("/criar-curso/prova")}
+            onClick={() => navigate("/create-course/exam")}
             className="flex-1 flex items-center justify-center gap-[10px] h-[56px] bg-[#ffeac4] rounded-[26px] hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px]"
             aria-label="Editar módulos e aulas do curso"
           >
@@ -147,7 +147,7 @@ export function TeacherCoursePage() {
           {/* Back */}
           <button
             type="button"
-            onClick={() => navigate("/mensagem")}
+            onClick={() => navigate("/message")}
             className="flex-1 flex items-center justify-center h-[56px] border-2 border-[#021b59] rounded-[26px] hover:bg-[#021b59]/5 transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
           >
             <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[18px]">Enviar comunicado</span>
