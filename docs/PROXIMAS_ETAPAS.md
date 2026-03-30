@@ -1,35 +1,37 @@
 # 🔄 Próximas Etapas — Fase 2 (Autenticação com Backend)
 
-**Data:** 27/03/2026  
-**Status Atual:** Fase 2 — 3/7 subtarefas completadas (43%)  
-**Total Progresso:** 16/43 subtarefas (37%)
+**Data:** 30/03/2026  
+**Status Atual:** Fase 2 — 4/7 subtarefas completadas (57%)  
+**Total Progresso:** 17/43 subtarefas (40%)
 
 ---
 
 ## 📋 Fase 2 — Roadmap (7 subtarefas)
 
-| # | Subtarefa | Status | Duração | Dependências |
-|---|-----------|--------|---------|--------------|
-| 2.1 | authService endpoints (Auth/Perfil) | ✅ DONE | 1 dia | - |
-| 2.2 | Request Interceptor JWT | ✅ DONE | 1 dia | 2.1 |
-| 2.3 | Integrar LoginPage com POST /auth/login | ⏳ NEXT | 1.5 dias | 2.2 |
-| 2.4 | Integrar RegisterPage com backend | ⏳ BLOCKED | 1 dia | 2.3 |
-| 2.5 | Implementar refresh token flow | ⏳ BLOCKED | 1 dia | 2.4 |
-| 2.6 | Integrar ProfilePage com backend | ⏳ BLOCKED | 1.5 dias | 2.5 |
-| 2.7 | Admin: Ativar/desativar contas | ⏳ BLOCKED | 1 dia | 2.1 |
+| #   | Subtarefa                               | Status     | Duração  | Dependências |
+| --- | --------------------------------------- | ---------- | -------- | ------------ |
+| 2.1 | authService endpoints (Auth/Perfil)     | ✅ DONE    | 1 dia    | -            |
+| 2.2 | Request Interceptor JWT                 | ✅ DONE    | 1 dia    | 2.1          |
+| 2.3 | Integrar LoginPage com POST /auth/login | ✅ DONE    | 1.5 dias | 2.2          |
+| 2.4 | Integrar RegisterPage com backend       | ✅ DONE    | 1 dia    | 2.3          |
+| 2.5 | Implementar refresh token flow          | ⏳ NEXT    | 1 dia    | 2.4          |
+| 2.6 | Integrar ProfilePage com backend        | ⏳ BLOCKED | 1.5 dias | 2.5          |
+| 2.7 | Admin: Ativar/desativar contas          | ⏳ BLOCKED | 1 dia    | 2.1          |
 
 ---
 
-## 🎯 Subtarefa 2.3 — Integrar LoginPage com POST /auth/login
+## ✅ Subtarefa 2.3 — Integrar LoginPage com POST /auth/login
 
 **Objetivo:** Conectar formulário de login (frontend) com endpoint `POST /auth/login` (backend), suportando **email OU username**.
 
 ### Componentes Afetados
+
 - `src/pages/LoginPage.tsx` — Formulário de autenticação
 - `src/services/authService.ts` — Método login() já existe
 - `src/validations/authSchema.ts` — Schemas Zod (refactor para email OU username)
 
 ### Fluxo
+
 1. Usuário preenche: email/username + senha
 2. Frontend valida com Zod (aceita ambos)
 3. POST `/auth/login` com payload `{ emailOuUsuario, senha }`
@@ -39,6 +41,7 @@
 7. Redireciona para `/courses` (dashboard)
 
 ### Testes Esperados
+
 - Login com **email válido** → sucesso + redirect `/courses`
 - Login com **username válido** → sucesso + redirect `/courses`
 - Login com credenciais inválidas → toast "Usuário ou senha incorretos"
@@ -48,22 +51,25 @@
 - JWT armazenado corretamente em store
 
 ### Estimativa
+
 - Implementação: 1.5 dias
 - Testes: paralelo
 - Commits: 3-4 commits granulares
 
 ---
 
-## 🎯 Subtarefa 2.4 — Integrar RegisterPage com Backend
+## ✅ Subtarefa 2.4 — Integrar RegisterPage com Backend
 
 **Objetivo:** Conectar formulário de registro (frontend) com endpoint `POST /auth/cadastro` (backend).
 
 ### Componentes Afetados
+
 - `src/pages/RegisterPage.tsx` — Formulário de registro
 - `src/services/authService.ts` — Método register() já existe
 - `src/validations/authSchema.ts` — Schemas Zod
 
 ### Fluxo
+
 1. Usuário preenche: nome, email, CPF, senha, confirmação
 2. Frontend valida com Zod
 3. POST `/auth/cadastro` com payload
@@ -72,6 +78,7 @@
 6. Redireciona para login (ou painel se auto-ativado)
 
 ### Testes Esperados
+
 - Validação de CPF format válido
 - Validação de email único
 - Validação de senha mínima
@@ -79,22 +86,25 @@
 - Caso de erro: exibir mensagem específica
 
 ### Estimativa
+
 - Implementação: 1 dia
 - Testes: 1 dia em paralelo
 - Commits: 3-4 commits granulares
 
 ---
 
-## 🎯 Subtarefa 2.5 — Refresh Token Flow
+## 🎯 Subtarefa 2.5 — Refresh Token Flow (próxima)
 
 **Objetivo:** Implementar renovação automática de JWT quando accessToken expirar.
 
 ### Componentes Afetados
+
 - `src/services/authService.ts` — Método refreshAccessToken()
 - `src/services/api.ts` — Interceptor para renovação automática
 - `src/store/useAuthStore.ts` — Armazenar refreshToken
 
 ### Fluxo
+
 1. Usuário está logado (accessToken + refreshToken em store)
 2. AccessToken expira (401 do backend)
 3. API interceptor detecta 401
@@ -104,12 +114,14 @@
 7. Usuário não percebe (transparente)
 
 ### Testes Esperados
+
 - Interceptor detecta 401
 - Refresh token é enviado corretamente
 - Nova requisição passa com novo token
 - Se refresh falhar: logout + redireciona para login
 
 ### Estimativa
+
 - Implementação: 1 dia
 - Testes: 1 dia em paralelo
 - Commits: 3-4 commits
@@ -121,8 +133,8 @@
 ```
 2.1 (authService) ✅
   └── 2.2 (Request Interceptor) ✅
-      └── 2.3 (LoginPage) ⏳
-          ├── 2.4 (RegisterPage) ⏳
+      └── 2.3 (LoginPage) ✅
+          ├── 2.4 (RegisterPage) ✅
           │   └── 2.5 (Refresh Token) ⏳
           │       └── 2.6 (ProfilePage) ⏳
           │
@@ -134,6 +146,7 @@
 ## 🔑 Contratos Backend (Verificados)
 
 ### POST /auth/cadastro
+
 ```json
 Request:
 {
@@ -160,6 +173,7 @@ Response (201 Created):
 ```
 
 ### POST /auth/refresh
+
 ```json
 Request:
 {
@@ -179,35 +193,37 @@ Response (200 OK):
 
 ---
 
-## ✅ Checklist Antes de Começar 2.3
+## ✅ Checklist de Conclusão 2.3
 
-- [ ] Backend `POST /auth/login` verificado no Swagger
-- [ ] Email/username validation testada (regex em Zod)
-- [ ] Schemas Zod atualizados para aceitar email OU username
-- [ ] LoginPage.tsx aberta e analisada
-- [ ] Testes unitários preparados (RED)
+- [x] Backend `POST /auth/login` verificado
+- [x] Email/username validation testada (regex em Zod)
+- [x] Schemas Zod atualizados para aceitar email OU username
+- [x] LoginPage.tsx integrada com serviço
+- [x] Testes unitários executados
 
 ---
 
-## ✅ Checklist Antes de Começar 2.4
+## ✅ Checklist de Conclusão 2.4
 
-- [ ] 2.3 (LoginPage) ✅ commitada e mergeada em development
-- [ ] Backend `POST /auth/cadastro` verificado no Swagger
-- [ ] Validação de CPF testada manualmente
-- [ ] Schemas Zod atualizados para CadastroRequest
-- [ ] RegisterPage.tsx aberta e analisada
-- [ ] Testes unitários preparados (RED)
+- [x] 2.3 (LoginPage) concluída
+- [x] Backend `POST /auth/cadastro` integrado
+- [x] Validação de CPF aplicada no schema
+- [x] Schemas Zod atualizados para CadastroRequest
+- [x] RegisterPage.tsx integrada com serviço
+- [x] Testes unitários executados
 
 ---
 
 ## 📝 Notas Gerais para Fase 2
 
 ### Convenção de Commits
+
 - `test:` testes para subtarefa
 - `refactor:` implementação + sincronizações
 - `chore:` deps, configs, updates
 
 ### Princípios Mantidos
+
 - ✅ TDD: testes antes da implementação
 - ✅ Types estritos (zero `any`)
 - ✅ Validações Zod centralizadas
@@ -215,6 +231,7 @@ Response (200 OK):
 - ✅ PR para review antes de merge
 
 ### Validações Pré-Push
+
 ```bash
 pnpm type-check    # ✅ Zero erros TypeScript
 pnpm lint           # ✅ Zero avisos ESLint
@@ -232,10 +249,10 @@ git status          # ✅ Sem tracked/untracked
 
 ---
 
-**Próximo agente:** Use `/status-refactoring` para validar readiness de 2.3  
-**Executar 2.3:** Use `Implemente 2.3` após aprovação
+**Próximo agente:** Use `/status-refactoring` para validar readiness de 2.5  
+**Executar 2.5:** Use `Implemente 2.5` após aprovação
 
 ---
 
-**Última atualização:** 27/03/2026 21:45  
+**Última atualização:** 30/03/2026  
 **Mantido por:** Agente de Refatoração UFC LMS
