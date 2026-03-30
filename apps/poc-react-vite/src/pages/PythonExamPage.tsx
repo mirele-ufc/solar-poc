@@ -1,12 +1,18 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router";
-import { fetchPythonExamQuestions, fetchOptionLabels, type Question } from "@/services/mocks/pythonExamMock";
+import { useNavigate } from "react-router-dom";
+import {
+  fetchPythonExamQuestions,
+  fetchOptionLabels,
+  type Question,
+} from "@/services/mocks/pythonExamMock";
 import { useEnrollmentGuard } from "@/hooks/useEnrollmentGuard";
 
 const TOTAL_SECONDS = 20 * 60; // 20 minutos
 
 function formatTime(secs: number): string {
-  const m = Math.floor(secs / 60).toString().padStart(2, "0");
+  const m = Math.floor(secs / 60)
+    .toString()
+    .padStart(2, "0");
   const s = (secs % 60).toString().padStart(2, "0");
   return `${m}:${s}`;
 }
@@ -68,11 +74,11 @@ export function PythonExamPage() {
     setSubmitted(true);
     clearInterval(timerRef.current!);
 
-    const finalAnswers = autoSubmit
-      ? answers
-      : answers;
+    const finalAnswers = autoSubmit ? answers : answers;
 
-    navigate("/courses/python/exam/results", { state: { answers: finalAnswers } });
+    navigate("/courses/python/exam/results", {
+      state: { answers: finalAnswers },
+    });
   };
 
   const answeredCount = Object.keys(answers).length;
@@ -81,7 +87,6 @@ export function PythonExamPage() {
   return (
     <div className="bg-white min-h-screen pb-[120px]">
       <div className="max-w-[900px] mx-auto px-[20px] md:px-[40px] pt-[24px] flex flex-col gap-[28px] w-full">
-
         {/* Header */}
         <div className="flex items-center justify-between gap-[12px] flex-wrap">
           <div>
@@ -96,13 +101,20 @@ export function PythonExamPage() {
           {/* Timer */}
           <div
             className={`flex items-center gap-[8px] px-[16px] h-[44px] rounded-[26px] border-2 shrink-0 ${
-              isUrgent ? "border-[#de2e66] bg-[#fde8ef]" : "border-[#021b59] bg-[#f5f8ff]"
+              isUrgent
+                ? "border-[#de2e66] bg-[#fde8ef]"
+                : "border-[#021b59] bg-[#f5f8ff]"
             }`}
             role="timer"
             aria-live="polite"
             aria-label={`Tempo restante: ${formatTime(timeLeft)}`}
           >
-            <svg className="size-[18px] shrink-0" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+            <svg
+              className="size-[18px] shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
               <path
                 d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"
                 fill={isUrgent ? "#de2e66" : "#021b59"}
@@ -119,7 +131,9 @@ export function PythonExamPage() {
         </div>
 
         {isLoading ? (
-          <p className="text-center text-[#606060] py-[40px]">Carregando prova...</p>
+          <p className="text-center text-[#606060] py-[40px]">
+            Carregando prova...
+          </p>
         ) : (
           <>
             {/* Progress indicator */}
@@ -127,7 +141,9 @@ export function PythonExamPage() {
               <div className="flex-1 h-[5px] bg-[#e0e0e0] rounded-full overflow-hidden">
                 <div
                   className="h-full bg-[#042e99] rounded-full transition-all duration-300"
-                  style={{ width: `${(answeredCount / questions.length) * 100}%` }}
+                  style={{
+                    width: `${(answeredCount / questions.length) * 100}%`,
+                  }}
                   aria-hidden="true"
                 />
               </div>
@@ -143,11 +159,17 @@ export function PythonExamPage() {
                 return (
                   <fieldset key={q.id} className="flex flex-col gap-[14px]">
                     <legend className="font-['Figtree:Bold',sans-serif] font-bold text-black text-[18px] leading-[28px] mb-[4px]">
-                      <span className="text-[#021b59]">Questão {qIdx + 1} — </span>
+                      <span className="text-[#021b59]">
+                        Questão {qIdx + 1} —{" "}
+                      </span>
                       {q.text}
                     </legend>
 
-                    <div className="flex flex-col gap-[8px]" role="radiogroup" aria-labelledby={`q-${q.id}-label`}>
+                    <div
+                      className="flex flex-col gap-[8px]"
+                      role="radiogroup"
+                      aria-labelledby={`q-${q.id}-label`}
+                    >
                       {q.options.map((opt, idx) => {
                         const isSelected = selectedIdx === idx;
                         return (
@@ -182,10 +204,14 @@ export function PythonExamPage() {
                                 <div className="size-[8px] rounded-full bg-white" />
                               )}
                             </div>
-                            <span className={`font-['Figtree:Medium',sans-serif] font-medium text-[15px] shrink-0 ${isSelected ? "text-[#042e99]" : "text-[#021b59]"}`}>
+                            <span
+                              className={`font-['Figtree:Medium',sans-serif] font-medium text-[15px] shrink-0 ${isSelected ? "text-[#042e99]" : "text-[#021b59]"}`}
+                            >
                               {optionLabels[idx]})
                             </span>
-                            <span className={`font-['Figtree:Regular',sans-serif] text-[15px] leading-[24px] flex-1 ${isSelected ? "text-[#021b59]" : "text-[#333]"}`}>
+                            <span
+                              className={`font-['Figtree:Regular',sans-serif] text-[15px] leading-[24px] flex-1 ${isSelected ? "text-[#021b59]" : "text-[#333]"}`}
+                            >
                               {opt}
                             </span>
                           </label>
@@ -205,7 +231,8 @@ export function PythonExamPage() {
         <div className="w-full max-w-[900px] flex flex-col gap-[6px]">
           {answeredCount < questions.length && (
             <p className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[13px] text-center">
-              Responda todas as questões antes de finalizar ({answeredCount}/{questions.length})
+              Responda todas as questões antes de finalizar ({answeredCount}/
+              {questions.length})
             </p>
           )}
           <button

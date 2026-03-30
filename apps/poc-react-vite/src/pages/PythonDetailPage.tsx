@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useCourseStore } from "@/store/useCourseStore";
 import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
 import { PageHeader } from "@/components/shared/PageHeader";

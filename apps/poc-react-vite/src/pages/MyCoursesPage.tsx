@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useCourseStore } from "@/store/useCourseStore";
 import { CourseCard } from "@/components/shared/CourseCard";
 import { PageHeader } from "@/components/shared/PageHeader";

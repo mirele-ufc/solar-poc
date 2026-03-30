@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { useEnrollmentGuard } from "@/hooks/useEnrollmentGuard";
 
@@ -9,7 +9,6 @@ export function PythonExamInstructionsPage() {
   return (
     <div className="flex flex-col min-h-[calc(100vh-70px)] pb-[120px] bg-[#ffffff]">
       <div className="max-w-[900px] mx-auto flex flex-col gap-[28px] px-[20px] md:px-[40px] pt-[30px] w-full">
-
         <PageHeader
           title="Instructions"
           backPath="/courses/python/modules"
@@ -35,9 +34,15 @@ export function PythonExamInstructionsPage() {
             <ul className="list-disc mb-0 space-y-[8px]">
               <li className="ms-[24px]">A prova tem 3 questões;</li>
               <li className="ms-[24px]">O tempo total é de 20 minutos;</li>
-              <li className="ms-[24px]">O cronômetro começa ao acessar a prova;</li>
-              <li className="ms-[24px]">As respostas são salvas automaticamente;</li>
-              <li className="ms-[24px]">Ao acabar o tempo, a prova é encerrada automaticamente.</li>
+              <li className="ms-[24px]">
+                O cronômetro começa ao acessar a prova;
+              </li>
+              <li className="ms-[24px]">
+                As respostas são salvas automaticamente;
+              </li>
+              <li className="ms-[24px]">
+                Ao acabar o tempo, a prova é encerrada automaticamente.
+              </li>
               <li className="ms-[24px]">Você terá apenas 1 tentativa.</li>
             </ul>
 

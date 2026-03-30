@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { useEnrollmentGuard } from "@/hooks/useEnrollmentGuard";
 
@@ -15,7 +15,8 @@ const AULA = {
   ],
 };
 
-const ARROW_BACK = "M20 11H7.83L13.42 5.41L12 4L4 12L12 20L13.41 18.59L7.83 13H20V11Z";
+const ARROW_BACK =
+  "M20 11H7.83L13.42 5.41L12 4L4 12L12 20L13.41 18.59L7.83 13H20V11Z";
 
 export function PythonLessonsPage() {
   const navigate = useNavigate();
@@ -24,7 +25,6 @@ export function PythonLessonsPage() {
   return (
     <div className="bg-white min-h-screen pb-[60px]">
       <div className="max-w-[900px] mx-auto flex flex-col gap-[24px] px-[20px] md:px-[40px] pt-[24px] w-full">
-
         <PageHeader
           title={AULA.subtitle}
           backPath="/courses/python/modules"
@@ -67,7 +67,7 @@ export function PythonLessonsPage() {
             Exemplo — Python
           </p>
           <pre className="font-mono text-[14px] leading-[24px] text-white overflow-x-auto">
-{`# Seu primeiro programa em Python
+            {`# Seu primeiro programa em Python
 nome = "Estudante"
 print("Olá,", nome)
 
@@ -87,7 +87,12 @@ print(saudacao(nome))`}
             className="flex items-center gap-[8px] h-[48px] px-[20px] border-2 border-[#021b59] rounded-[26px] hover:bg-[#021b59]/5 transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px]"
             aria-label="Voltar para lista de módulos"
           >
-            <svg className="size-[20px] shrink-0" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+            <svg
+              className="size-[20px] shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
               <path d={ARROW_BACK} fill="#021b59" />
             </svg>
             <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[16px]">

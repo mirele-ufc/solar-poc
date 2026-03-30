@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { useEnrollmentGuard } from "@/hooks/useEnrollmentGuard";
 
@@ -9,7 +9,6 @@ export function ExamInstructionsPage() {
   return (
     <div className="flex flex-col min-h-[calc(100vh-70px)] pb-[120px] bg-[#ffffff]">
       <div className="max-w-[900px] mx-auto flex flex-col gap-[28px] px-[20px] md:px-[40px] pt-[30px] w-full">
-        
         {/* Page header with back + breadcrumb */}
         <PageHeader
           title="Instruções"
@@ -34,15 +33,11 @@ export function ExamInstructionsPage() {
           <h3 className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[20px] mb-[16px]">
             Instruções
           </h3>
-          
+
           <div className="font-['Figtree:Regular',sans-serif] font-normal text-[#333] text-[16px] leading-[24px]">
             <ul className="list-disc mb-0 space-y-[8px]">
-              <li className="ms-[24px]">
-                A prova tem 10 questões;
-              </li>
-              <li className="ms-[24px]">
-                O tempo total é de 60 minutos;
-              </li>
+              <li className="ms-[24px]">A prova tem 10 questões;</li>
+              <li className="ms-[24px]">O tempo total é de 60 minutos;</li>
               <li className="ms-[24px]">
                 O cronômetro começa ao acessar a prova;
               </li>
@@ -50,13 +45,12 @@ export function ExamInstructionsPage() {
                 As respostas são salvas automaticamente;
               </li>
               <li className="ms-[24px]">
-                Ao acabar o tempo, a prova é encerrada automaticamente e suas respostas ficam registradas.
+                Ao acabar o tempo, a prova é encerrada automaticamente e suas
+                respostas ficam registradas.
               </li>
-              <li className="ms-[24px]">
-                Você terá apenas 1 tentativa.
-              </li>
+              <li className="ms-[24px]">Você terá apenas 1 tentativa.</li>
             </ul>
-            
+
             <p className="mt-[24px] font-['Figtree:Medium',sans-serif] font-medium text-[#021b59]">
               Boa prova!
             </p>

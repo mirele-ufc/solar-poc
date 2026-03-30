@@ -1,22 +1,44 @@
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
 
 // ── Mock quiz response data ────────────────────────────────────────────────────
 const mockStats = [
   {
     id: 1,
-    question: "No Microsoft Power BI, qual é a principal função do Power Query?",
+    question:
+      "No Microsoft Power BI, qual é a principal função do Power Query?",
     total: 35,
     options: [
-      { label: "A", text: "Criar dashboards interativos para apresentação final", pct: 15, correct: false },
-      { label: "B", text: "Realizar tratamento, limpeza e transformação de dados", pct: 62, correct: true },
-      { label: "C", text: "Publicar relatórios na nuvem", pct: 13, correct: false },
-      { label: "D", text: "Criar gráficos avançados com animações", pct: 10, correct: false },
+      {
+        label: "A",
+        text: "Criar dashboards interativos para apresentação final",
+        pct: 15,
+        correct: false,
+      },
+      {
+        label: "B",
+        text: "Realizar tratamento, limpeza e transformação de dados",
+        pct: 62,
+        correct: true,
+      },
+      {
+        label: "C",
+        text: "Publicar relatórios na nuvem",
+        pct: 13,
+        correct: false,
+      },
+      {
+        label: "D",
+        text: "Criar gráficos avançados com animações",
+        pct: 10,
+        correct: false,
+      },
     ],
   },
   {
     id: 2,
-    question: "Qual linguagem é utilizada no Power BI para criação de medidas e cálculos personalizados?",
+    question:
+      "Qual linguagem é utilizada no Power BI para criação de medidas e cálculos personalizados?",
     total: 35,
     options: [
       { label: "A", text: "SQL", pct: 8, correct: false },
@@ -51,7 +73,9 @@ function OptionBar({
 }) {
   const count = Math.round((pct / 100) * total);
   return (
-    <div className={`flex flex-col gap-[4px] p-[12px] rounded-[12px] ${correct ? "bg-[#e6f9ee]" : "bg-[#f5f5f5]"}`}>
+    <div
+      className={`flex flex-col gap-[4px] p-[12px] rounded-[12px] ${correct ? "bg-[#e6f9ee]" : "bg-[#f5f5f5]"}`}
+    >
       <div className="flex items-center justify-between gap-[8px]">
         <div className="flex items-center gap-[8px] flex-1 min-w-0">
           <span
@@ -111,7 +135,6 @@ export function TeacherCoursePage() {
       </div>
 
       <div className="max-w-[900px] mx-auto flex flex-col gap-[28px] px-[20px] md:px-[40px] pt-[24px] w-full">
-
         {/* Course info */}
         <div className="flex flex-col gap-[4px]">
           <div className="flex items-start justify-between gap-[12px] flex-wrap">
@@ -136,7 +159,12 @@ export function TeacherCoursePage() {
             className="flex-1 flex items-center justify-center gap-[10px] h-[56px] bg-[#ffeac4] rounded-[26px] hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px]"
             aria-label="Editar módulos e aulas do curso"
           >
-            <svg className="size-[20px] shrink-0" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+            <svg
+              className="size-[20px] shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
               <path d={editPath} fill="#333" />
             </svg>
             <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[18px]">
@@ -150,7 +178,9 @@ export function TeacherCoursePage() {
             onClick={() => navigate("/message")}
             className="flex-1 flex items-center justify-center h-[56px] border-2 border-[#021b59] rounded-[26px] hover:bg-[#021b59]/5 transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
           >
-            <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[18px]">Enviar comunicado</span>
+            <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[18px]">
+              Enviar comunicado
+            </span>
           </button>
         </div>
 
@@ -160,7 +190,12 @@ export function TeacherCoursePage() {
         {/* Responses section */}
         <div className="flex flex-col gap-[20px]">
           <div className="flex items-center gap-[10px]">
-            <svg className="size-[24px] shrink-0" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+            <svg
+              className="size-[24px] shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
               <path d={chartPath} fill="#021b59" />
             </svg>
             <h2 className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[22px]">
@@ -170,12 +205,16 @@ export function TeacherCoursePage() {
 
           <div className="bg-[#f5f5f5] rounded-[12px] px-[16px] py-[12px] flex flex-col sm:flex-row sm:items-center gap-[4px] sm:gap-[24px]">
             <p className="font-['Figtree:Regular',sans-serif] text-[#333] text-[15px]">
-              <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[17px]">35</span>{" "}
+              <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[17px]">
+                35
+              </span>{" "}
               alunos responderam a prova
             </p>
             <p className="font-['Figtree:Regular',sans-serif] text-[#333] text-[15px]">
               Média de acertos:{" "}
-              <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#c0396b] text-[17px]">67%</span>
+              <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#c0396b] text-[17px]">
+                67%
+              </span>
             </p>
           </div>
 

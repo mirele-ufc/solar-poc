@@ -4,7 +4,7 @@
  * Valida que as rotas públicas NÃO são bloqueadas pelo ProtectedRoute
  * quando o usuário não está autenticado.
  *
- * Estrutura de rotas espelhada de routes.ts:
+ * Estrutura de rotas espelhada de routes.tsx:
  *   /                → LoginPage       (pública)
  *   /register        → RegisterPage    (pública)
  *   /forgot-password → ForgotPasswordPage (pública)
@@ -52,7 +52,7 @@ function buildUnauthenticatedState() {
 }
 
 /**
- * Renderiza a estrutura de rotas espelhando routes.ts:
+ * Renderiza a estrutura de rotas espelhando routes.tsx:
  * - Rotas públicas fora do guard
  * - ProtectedRoute presente como guard para confirmar que não afeta rotas públicas
  */
@@ -66,7 +66,7 @@ function renderPublicRoute(path: string) {
         <Route path="forgot-password" element={<ForgotPasswordPage />} />
         <Route path="unauthorized" element={<UnauthorizedPage />} />
 
-        {/* Guard — protege rotas privadas (espelha a estrutura de routes.ts) */}
+        {/* Guard — protege rotas privadas (espelha a estrutura de routes.tsx) */}
         <Route
           element={<ProtectedRoute allowedRoles={["professor", "student"]} />}
         >

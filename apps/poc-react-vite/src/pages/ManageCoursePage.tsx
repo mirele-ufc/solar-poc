@@ -1,6 +1,6 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { useState, useRef } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router-dom";
 import type { ICourseManageModule } from "@ava-poc/types";
 import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
 import { Modal } from "@/components/ui/modal";
@@ -366,90 +366,90 @@ function EditLessonModal({
       overlayClassName="px-[20px] bg-black/40"
     >
       <Modal.Body className="flex flex-col gap-[20px]">
-          <h2
-            id="edit-lesson-dlg-title"
-            className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[20px] leading-[30px]"
+        <h2
+          id="edit-lesson-dlg-title"
+          className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[20px] leading-[30px]"
+        >
+          Editar aula
+        </h2>
+
+        <div className="flex flex-col gap-[6px]">
+          <label
+            htmlFor="dlg-lesson-name"
+            className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[16px]"
           >
-            Editar aula
-          </h2>
+            Nome da aula
+          </label>
+          <input
+            id="dlg-lesson-name"
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSave();
+              if (e.key === "Escape") onClose();
+            }}
+            autoFocus
+            className="w-full border border-[#8e8e8e] h-[50px] rounded-[12px] px-[16px] font-['Figtree:Regular',sans-serif] text-[16px] text-[#333] bg-white focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+          />
+        </div>
 
-          <div className="flex flex-col gap-[6px]">
-            <label
-              htmlFor="dlg-lesson-name"
-              className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[16px]"
-            >
-              Nome da aula
-            </label>
-            <input
-              id="dlg-lesson-name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSave();
-                if (e.key === "Escape") onClose();
-              }}
-              autoFocus
-              className="w-full border border-[#8e8e8e] h-[50px] rounded-[12px] px-[16px] font-['Figtree:Regular',sans-serif] text-[16px] text-[#333] bg-white focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
-            />
-          </div>
-
-          <div className="flex flex-col gap-[8px]">
-            <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[16px]">
-              Arquivo da aula
+        <div className="flex flex-col gap-[8px]">
+          <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[16px]">
+            Arquivo da aula
+          </p>
+          <p className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[14px] leading-[22px]">
+            Deseja substituir o arquivo atual por um novo?
+          </p>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="application/pdf,video/*,image/*"
+            className="hidden"
+            aria-hidden="true"
+            tabIndex={-1}
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) {
+                setReplaceFile(true);
+                setFileName(f.name);
+              }
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            className="w-full h-[40px] bg-[#ffeac4] rounded-[26px] hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[15px]"
+          >
+            {replaceFile ? "Substituir arquivo" : "Selecionar novo arquivo"}
+          </button>
+          {fileName && (
+            <p className="font-['Figtree:Regular',sans-serif] text-[#333] text-[13px]">
+              Selecionado:{" "}
+              <span className="font-['Figtree:Medium',sans-serif] font-medium">
+                {fileName}
+              </span>
             </p>
-            <p className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[14px] leading-[22px]">
-              Deseja substituir o arquivo atual por um novo?
-            </p>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="application/pdf,video/*,image/*"
-              className="hidden"
-              aria-hidden="true"
-              tabIndex={-1}
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) {
-                  setReplaceFile(true);
-                  setFileName(f.name);
-                }
-              }}
-            />
-            <button
-              type="button"
-              onClick={() => fileRef.current?.click()}
-              className="w-full h-[40px] bg-[#ffeac4] rounded-[26px] hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[15px]"
-            >
-              {replaceFile ? "Substituir arquivo" : "Selecionar novo arquivo"}
-            </button>
-            {fileName && (
-              <p className="font-['Figtree:Regular',sans-serif] text-[#333] text-[13px]">
-                Selecionado:{" "}
-                <span className="font-['Figtree:Medium',sans-serif] font-medium">
-                  {fileName}
-                </span>
-              </p>
-            )}
-          </div>
+          )}
+        </div>
 
-          <div className="flex gap-[12px]">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 h-[46px] border-2 border-[#021b59] rounded-[26px] font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[16px] hover:bg-[#021b59]/5 transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={!name.trim()}
-              className="flex-1 h-[46px] bg-[#021b59] rounded-[26px] font-['Figtree:Medium',sans-serif] font-medium text-[#ffeac4] text-[16px] hover:bg-[#042e99] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              Salvar
-            </button>
-          </div>
+        <div className="flex gap-[12px]">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 h-[46px] border-2 border-[#021b59] rounded-[26px] font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[16px] hover:bg-[#021b59]/5 transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={!name.trim()}
+            className="flex-1 h-[46px] bg-[#021b59] rounded-[26px] font-['Figtree:Medium',sans-serif] font-medium text-[#ffeac4] text-[16px] hover:bg-[#042e99] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Salvar
+          </button>
+        </div>
       </Modal.Body>
     </Modal>
   );
@@ -472,111 +472,109 @@ function ParticipantsPanel({ onClose }: { onClose: () => void }) {
       overlayClassName="items-end sm:items-center justify-center sm:px-[20px] p-0 bg-black/40"
     >
       <Modal.Body className="p-0">
-          <div className="flex items-center justify-between px-[20px] py-[16px] border-b border-[#e0e0e0] shrink-0">
-            <h2
-              id="participants-title"
-              className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[20px]"
+        <div className="flex items-center justify-between px-[20px] py-[16px] border-b border-[#e0e0e0] shrink-0">
+          <h2
+            id="participants-title"
+            className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[20px]"
+          >
+            Participantes ({MOCK_STUDENTS.length})
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Fechar"
+            className="size-[44px] flex items-center justify-center rounded focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] hover:opacity-70"
+          >
+            <svg
+              className="size-[20px]"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
             >
-              Participantes ({MOCK_STUDENTS.length})
-            </h2>
+              <path
+                clipRule="evenodd"
+                d={CLOSE_SM}
+                fill="#333"
+                fillRule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+
+        {/* Filters */}
+        <div className="flex gap-[8px] px-[20px] pt-[12px] pb-[8px] overflow-x-auto no-scrollbar shrink-0">
+          {(
+            [
+              "todos",
+              "concluiu",
+              "em_andamento",
+              "parou",
+              "nao_acessou",
+            ] as const
+          ).map((f) => (
             <button
+              key={f}
               type="button"
-              onClick={onClose}
-              aria-label="Fechar"
-              className="size-[44px] flex items-center justify-center rounded focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] hover:opacity-70"
+              onClick={() => setFilter(f)}
+              className={`shrink-0 h-[44px] px-[14px] rounded-[26px] text-[13px] font-['Figtree:Medium',sans-serif] font-medium transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] ${
+                filter === f
+                  ? "bg-[#021b59] text-white"
+                  : "bg-[#f0f0f0] text-[#333] hover:bg-[#e0e0e0]"
+              }`}
             >
-              <svg
-                className="size-[20px]"
-                fill="none"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  clipRule="evenodd"
-                  d={CLOSE_SM}
-                  fill="#333"
-                  fillRule="evenodd"
-                />
-              </svg>
+              {f === "todos" ? "Todos" : STATUS_META[f as StudentStatus].label}
             </button>
-          </div>
+          ))}
+        </div>
 
-          {/* Filters */}
-          <div className="flex gap-[8px] px-[20px] pt-[12px] pb-[8px] overflow-x-auto no-scrollbar shrink-0">
-            {(
-              [
-                "todos",
-                "concluiu",
-                "em_andamento",
-                "parou",
-                "nao_acessou",
-              ] as const
-            ).map((f) => (
-              <button
-                key={f}
-                type="button"
-                onClick={() => setFilter(f)}
-                className={`shrink-0 h-[44px] px-[14px] rounded-[26px] text-[13px] font-['Figtree:Medium',sans-serif] font-medium transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] ${
-                  filter === f
-                    ? "bg-[#021b59] text-white"
-                    : "bg-[#f0f0f0] text-[#333] hover:bg-[#e0e0e0]"
-                }`}
+        <ul className="flex flex-col overflow-y-auto px-[20px] py-[8px] gap-[2px]">
+          {filtered.map((p) => {
+            const meta = STATUS_META[p.status];
+            return (
+              <li
+                key={p.id}
+                className="flex items-center gap-[12px] py-[10px] border-b border-[#f0f0f0] last:border-0"
               >
-                {f === "todos"
-                  ? "Todos"
-                  : STATUS_META[f as StudentStatus].label}
-              </button>
-            ))}
-          </div>
-
-          <ul className="flex flex-col overflow-y-auto px-[20px] py-[8px] gap-[2px]">
-            {filtered.map((p) => {
-              const meta = STATUS_META[p.status];
-              return (
-                <li
-                  key={p.id}
-                  className="flex items-center gap-[12px] py-[10px] border-b border-[#f0f0f0] last:border-0"
-                >
-                  <div className="flex flex-col gap-[2px] flex-1 min-w-0">
-                    <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[15px] truncate">
-                      {p.name}
+                <div className="flex flex-col gap-[2px] flex-1 min-w-0">
+                  <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[15px] truncate">
+                    {p.name}
+                  </p>
+                  <p className="font-['Figtree:Regular',sans-serif] text-[#8e8e8e] text-[12px] truncate">
+                    {p.email}
+                  </p>
+                  {p.stoppedAt && (
+                    <p className="font-['Figtree:Regular',sans-serif] text-[#801436] text-[12px]">
+                      Parou em: {p.stoppedAt}
                     </p>
-                    <p className="font-['Figtree:Regular',sans-serif] text-[#8e8e8e] text-[12px] truncate">
-                      {p.email}
-                    </p>
-                    {p.stoppedAt && (
-                      <p className="font-['Figtree:Regular',sans-serif] text-[#801436] text-[12px]">
-                        Parou em: {p.stoppedAt}
-                      </p>
-                    )}
-                  </div>
-                  <div className="shrink-0 flex flex-col items-end gap-[6px]">
-                    <span
-                      className="text-[11px] font-['Figtree:Medium',sans-serif] font-medium px-[8px] py-[2px] rounded-full"
-                      style={{ color: meta.color, background: meta.bg }}
-                    >
-                      {meta.label}
-                    </span>
-                    <div className="flex items-center gap-[6px]">
-                      <div className="w-[50px] h-[4px] bg-[#e0e0e0] rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full"
-                          style={{
-                            width: `${p.progress}%`,
-                            background: meta.dotColor,
-                          }}
-                          aria-hidden="true"
-                        />
-                      </div>
-                      <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[12px]">
-                        {p.progress}%
-                      </span>
+                  )}
+                </div>
+                <div className="shrink-0 flex flex-col items-end gap-[6px]">
+                  <span
+                    className="text-[11px] font-['Figtree:Medium',sans-serif] font-medium px-[8px] py-[2px] rounded-full"
+                    style={{ color: meta.color, background: meta.bg }}
+                  >
+                    {meta.label}
+                  </span>
+                  <div className="flex items-center gap-[6px]">
+                    <div className="w-[50px] h-[4px] bg-[#e0e0e0] rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          width: `${p.progress}%`,
+                          background: meta.dotColor,
+                        }}
+                        aria-hidden="true"
+                      />
                     </div>
+                    <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[12px]">
+                      {p.progress}%
+                    </span>
                   </div>
-                </li>
-              );
-            })}
-          </ul>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       </Modal.Body>
     </Modal>
   );
@@ -603,132 +601,130 @@ function ProvaResponsesPanel({
       overlayClassName="items-end sm:items-center justify-center sm:px-[20px] p-0 bg-black/40"
     >
       <Modal.Body className="p-0">
-          <div className="flex items-center justify-between px-[20px] py-[16px] border-b border-[#e0e0e0] shrink-0">
-            <div className="flex flex-col gap-[2px]">
-              <h2
-                id="prova-resp-title"
-                className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[18px]"
-              >
-                Respostas da prova
-              </h2>
-              <p className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[13px]">
-                {modName}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Fechar"
-              className="size-[32px] flex items-center justify-center rounded focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] hover:opacity-70"
+        <div className="flex items-center justify-between px-[20px] py-[16px] border-b border-[#e0e0e0] shrink-0">
+          <div className="flex flex-col gap-[2px]">
+            <h2
+              id="prova-resp-title"
+              className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[18px]"
             >
-              <svg
-                className="size-[20px]"
-                fill="none"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  clipRule="evenodd"
-                  d={CLOSE_SM}
-                  fill="#333"
-                  fillRule="evenodd"
-                />
-              </svg>
-            </button>
+              Respostas da prova
+            </h2>
+            <p className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[13px]">
+              {modName}
+            </p>
           </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Fechar"
+            className="size-[32px] flex items-center justify-center rounded focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] hover:opacity-70"
+          >
+            <svg
+              className="size-[20px]"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                clipRule="evenodd"
+                d={CLOSE_SM}
+                fill="#333"
+                fillRule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
 
-          <div className="overflow-y-auto px-[20px] py-[16px] flex flex-col gap-[20px]">
-            {!data ? (
-              <p className="font-['Figtree:Regular',sans-serif] text-[#8e8e8e] text-[15px] text-center py-[24px]">
-                Nenhuma prova respondida ainda neste módulo.
-              </p>
-            ) : (
-              <>
-                <div className="bg-[#f5f5f5] rounded-[12px] px-[16px] py-[12px] flex flex-col sm:flex-row sm:items-center gap-[4px] sm:gap-[24px]">
-                  <p className="font-['Figtree:Regular',sans-serif] text-[#333] text-[14px]">
-                    <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[16px]">
-                      {data.total}
-                    </span>{" "}
-                    alunos responderam
-                  </p>
-                  <p className="font-['Figtree:Regular',sans-serif] text-[#333] text-[14px]">
-                    Média de acertos:{" "}
-                    <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#c0396b] text-[16px]">
-                      {data.avgPct}%
-                    </span>
-                  </p>
-                </div>
+        <div className="overflow-y-auto px-[20px] py-[16px] flex flex-col gap-[20px]">
+          {!data ? (
+            <p className="font-['Figtree:Regular',sans-serif] text-[#8e8e8e] text-[15px] text-center py-[24px]">
+              Nenhuma prova respondida ainda neste módulo.
+            </p>
+          ) : (
+            <>
+              <div className="bg-[#f5f5f5] rounded-[12px] px-[16px] py-[12px] flex flex-col sm:flex-row sm:items-center gap-[4px] sm:gap-[24px]">
+                <p className="font-['Figtree:Regular',sans-serif] text-[#333] text-[14px]">
+                  <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[16px]">
+                    {data.total}
+                  </span>{" "}
+                  alunos responderam
+                </p>
+                <p className="font-['Figtree:Regular',sans-serif] text-[#333] text-[14px]">
+                  Média de acertos:{" "}
+                  <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#c0396b] text-[16px]">
+                    {data.avgPct}%
+                  </span>
+                </p>
+              </div>
 
-                {data.questions.map((q, idx) => (
-                  <div key={q.id} className="flex flex-col gap-[10px]">
-                    <div>
-                      <p className="font-['Figtree:Bold',sans-serif] font-bold text-black text-[16px]">
-                        Questão {String(idx + 1).padStart(2, "0")}
-                      </p>
-                      <p className="font-['Figtree:Regular',sans-serif] text-[#595959] text-[14px] leading-[22px] mt-[2px]">
-                        {q.text}
-                      </p>
-                    </div>
-                    <div className="flex flex-col gap-[6px]">
-                      {q.options.map((opt) => (
-                        <div
-                          key={opt.label}
-                          className={`flex flex-col gap-[4px] p-[10px] rounded-[10px] ${
-                            opt.correct ? "bg-[#e6f9ee]" : "bg-[#f5f5f5]"
-                          }`}
-                        >
-                          <div className="flex items-center justify-between gap-[8px]">
-                            <div className="flex items-center gap-[6px] flex-1 min-w-0">
-                              <span
-                                className={`shrink-0 font-['Figtree:Medium',sans-serif] font-medium text-[14px] ${
-                                  opt.correct
-                                    ? "text-[#155724]"
-                                    : "text-[#021b59]"
-                                }`}
-                              >
-                                {opt.label})
-                              </span>
-                              <span className="font-['Figtree:Regular',sans-serif] text-[13px] text-black flex-1 min-w-0 truncate">
-                                {opt.text}
-                              </span>
-                              {opt.correct && (
-                                <span className="shrink-0 text-[11px] font-['Figtree:Medium',sans-serif] font-medium text-[#155724] bg-[#d4edda] px-[6px] py-[1px] rounded-full">
-                                  Correta
-                                </span>
-                              )}
-                            </div>
-                            <span
-                              className={`shrink-0 font-['Figtree:Medium',sans-serif] font-medium text-[13px] ${
-                                opt.correct
-                                  ? "text-[#c0396b]"
-                                  : "text-[#595959]"
-                              }`}
-                            >
-                              {opt.pct}%
-                            </span>
-                          </div>
-                          <div className="w-full h-[5px] bg-white rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full ${opt.correct ? "bg-[#28a745]" : "bg-[#8e8e8e]"}`}
-                              style={{ width: `${opt.pct}%` }}
-                              aria-hidden="true"
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <p className="font-['Figtree:Regular',sans-serif] text-[#8e8e8e] text-[12px]">
-                      Total:{" "}
-                      <span className="text-[#c0396b] font-['Figtree:Medium',sans-serif] font-medium">
-                        {data.total} pessoas
-                      </span>{" "}
-                      responderam
+              {data.questions.map((q, idx) => (
+                <div key={q.id} className="flex flex-col gap-[10px]">
+                  <div>
+                    <p className="font-['Figtree:Bold',sans-serif] font-bold text-black text-[16px]">
+                      Questão {String(idx + 1).padStart(2, "0")}
+                    </p>
+                    <p className="font-['Figtree:Regular',sans-serif] text-[#595959] text-[14px] leading-[22px] mt-[2px]">
+                      {q.text}
                     </p>
                   </div>
-                ))}
-              </>
-            )}
-          </div>
+                  <div className="flex flex-col gap-[6px]">
+                    {q.options.map((opt) => (
+                      <div
+                        key={opt.label}
+                        className={`flex flex-col gap-[4px] p-[10px] rounded-[10px] ${
+                          opt.correct ? "bg-[#e6f9ee]" : "bg-[#f5f5f5]"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-[8px]">
+                          <div className="flex items-center gap-[6px] flex-1 min-w-0">
+                            <span
+                              className={`shrink-0 font-['Figtree:Medium',sans-serif] font-medium text-[14px] ${
+                                opt.correct
+                                  ? "text-[#155724]"
+                                  : "text-[#021b59]"
+                              }`}
+                            >
+                              {opt.label})
+                            </span>
+                            <span className="font-['Figtree:Regular',sans-serif] text-[13px] text-black flex-1 min-w-0 truncate">
+                              {opt.text}
+                            </span>
+                            {opt.correct && (
+                              <span className="shrink-0 text-[11px] font-['Figtree:Medium',sans-serif] font-medium text-[#155724] bg-[#d4edda] px-[6px] py-[1px] rounded-full">
+                                Correta
+                              </span>
+                            )}
+                          </div>
+                          <span
+                            className={`shrink-0 font-['Figtree:Medium',sans-serif] font-medium text-[13px] ${
+                              opt.correct ? "text-[#c0396b]" : "text-[#595959]"
+                            }`}
+                          >
+                            {opt.pct}%
+                          </span>
+                        </div>
+                        <div className="w-full h-[5px] bg-white rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full ${opt.correct ? "bg-[#28a745]" : "bg-[#8e8e8e]"}`}
+                            style={{ width: `${opt.pct}%` }}
+                            aria-hidden="true"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="font-['Figtree:Regular',sans-serif] text-[#8e8e8e] text-[12px]">
+                    Total:{" "}
+                    <span className="text-[#c0396b] font-['Figtree:Medium',sans-serif] font-medium">
+                      {data.total} pessoas
+                    </span>{" "}
+                    responderam
+                  </p>
+                </div>
+              ))}
+            </>
+          )}
+        </div>
       </Modal.Body>
     </Modal>
   );

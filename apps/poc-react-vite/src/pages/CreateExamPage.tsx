@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { useNavigate, useLocation } from "react-router";
+import { useNavigate, useLocation } from "react-router-dom";
 import type { CourseInfoData } from "./CreateCoursePage";
 import type { ICourseManageModule } from "@ava-poc/types";
 import { Modal } from "@/components/ui/modal";

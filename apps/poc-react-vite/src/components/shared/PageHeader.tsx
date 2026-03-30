@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 const BACK_ARROW =
   "M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2Z";
@@ -24,7 +24,12 @@ export function PageHeader({ title, backPath, crumbs }: PageHeaderProps) {
           onClick={() => navigate(backPath)}
           className="shrink-0 flex items-center justify-center size-[44px] rounded-full hover:bg-[#021b59]/10 transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
         >
-          <svg className="size-[22px]" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+          <svg
+            className="size-[22px]"
+            fill="none"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
             <path d={BACK_ARROW} fill="#021B59" />
           </svg>
         </button>
@@ -44,7 +49,10 @@ export function PageHeader({ title, backPath, crumbs }: PageHeaderProps) {
             return (
               <li key={crumb.label + i} className="flex items-center gap-[4px]">
                 {i > 0 && (
-                  <span className="text-[#8e8e8e] text-[13px] select-none" aria-hidden="true">
+                  <span
+                    className="text-[#8e8e8e] text-[13px] select-none"
+                    aria-hidden="true"
+                  >
                     ›
                   </span>
                 )}

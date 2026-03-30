@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Outlet, useNavigate } from "react-router";
+import { Outlet, useNavigate } from "react-router-dom";
 import svgPaths from "@/assets/svg-3imqnb48ew";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Toaster } from "sonner";
