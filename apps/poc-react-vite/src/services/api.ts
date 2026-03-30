@@ -14,7 +14,8 @@ import { authService } from "@/services/authService";
  * Centralizes all API communication with consistent settings and global error handling
  */
 const apiClient: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "/api",
+  // Usa URL explícita do backend local por padrão para evitar 404 em rotas com prefixo /api inexistente.
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
