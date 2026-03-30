@@ -8,20 +8,19 @@
 
 ## MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
 
-**Última atualização:** 30/03/2026 (Fase 2 ✅ concluída, 20/43, pronto para Fase 3)
-**Sprint ativo:** Fase 3 — Gestão de Cursos (próxima)
-**Status geral:** 47% (20/43 subtarefas concluídas)
+**Última atualização:** 30/03/2026 (3.1 ✅ completa, 21/43, Fase 3 iniciada)
+**Sprint ativo:** Fase 3 — Gestão de Cursos
+**Status geral:** 49% (21/43 subtarefas concluídas)
 
 ---
 
-## UPDATE — 30/03/2026 (Fase 2 concluída)
+## UPDATE — 30/03/2026 (Fase 3 iniciada)
 
-- **Auditoria:** Checklist da Fase 2 integralmente cumprido (ver docs/REFACTORING_PLAN_GRANULAR_V2.md § Fase 2)
-- **Status:** Todos os fluxos de autenticação, registro, refresh, perfil e recuperação de senha integrados ao backend e validados.
-- **Merge e testes end-to-end:** Fora do escopo deste ciclo, conforme contrato.
-- **Fases consolidadas:** Fase 0, Fase 1 e Fase 2 (100%)
-- **Subtarefas concluídas na Fase 2:** 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7
-- **Próxima etapa planejada:** 3.1 — Criar courseService.ts com endpoints de cursos
+- **Auditoria:** Subtarefa 3.1 concluída com sucesso. Todos os endpoints de cursos implementados e testados conforme contrato backend real.
+- **Commits:**
+  - b979748 test: Adicionar testes TDD para courseService (contrato backend real)
+  - 7d9d688 feat: Refatorar courseService.ts para alinhar endpoints e tipos ao backend real
+- **Status:** Fase 3 iniciada. Próxima: 3.2 — Integrar CoursesPage com GET /cursos
 
 ---
 
@@ -39,28 +38,12 @@
 
 ### ✅ Completes
 
-| Sub | Title                                                                    | Status | Date       | Commit                                                    | PR  |
-| --- | ------------------------------------------------------------------------ | ------ | ---------- | --------------------------------------------------------- | --- |
-| 0.1 | Criar ProtectedRoute com validação de role                               | ✅     | 25/03      | ce2df32                                                   | —   |
-| 0.2 | Integrar ProtectedRoute em routes.ts                                     | ✅     | 25/03/2026 | 028ba89                                                   | —   |
-| 0.3 | Remover hardcodes de role em páginas                                     | ✅     | 25/03/2026 | 41a3b29                                                   | —   |
-| 0.4 | Implementar logout seguro local                                          | ✅     | 26/03/2026 | 7689a26 + cd395ac                                         | —   |
-| 0.5 | Implementar Unauthorized page                                            | ✅     | 26/03/2026 | 8fa0cd3 + 00d9fe6                                         | —   |
-| 0.6 | Validar rotas públicas sem guard incorreto                               | ✅     | 26/03/2026 | 189c57f                                                   | —   |
-| 0.7 | HTTP error interceptor + loading + empty states                          | ✅     | 26/03/2026 | 1aac552 + 3edb2fc + 41cb179 + 4390f75                     | —   |
-| 1.1 | Auditar e consolidar tipos em @ava-poc/types                             | ✅     | 26/03/2026 | 9bb4021 + 910841e                                         | —   |
-| 1.2 | Migrar useAuthStore para tipos globais                                   | ✅     | 26/03/2026 | 6dfa8ae + 146efd2 + 99f8ba3 + 6a664e6 + d285b57           | —   |
-| 1.3 | Centralizar e alinhar schemas Zod                                        | ✅     | 26/03/2026 | 088d981 + 3b25f55 + 39c4cbe                               | —   |
-| 1.4 | Remover tipos locais duplicados de pages                                 | ✅     | 26/03/2026 | f0e773e                                                   | —   |
-| 1.5 | Validar zero `any` em TypeScript                                         | ✅     | 26/03/2026 | 324708d + 7822e32                                         | —   |
-| 1.6 | Refatorar componentes com Slots Pattern                                  | ✅     | 27/03/2026 | `0080137` + `9090c6a` + `4ecc3d7` + `b24fbb4` + `32558a8` | —   |
-| 2.1 | authService endpoints (Auth/Perfil)                                      | ✅     | 27/03/2026 | `3ece624` + `a2ec8eb` + `877540a`                         | —   |
-| 2.2 | Implementar Request Interceptor em api.ts                                | ✅     | 27/03/2026 | `0ae5cf1` + `cb93963` + `2279807`                         | —   |
-| 2.3 | Integrar LoginPage com POST /auth/login                                  | ✅     | 28/03/2026 | `0db7f21`                                                 | —   |
-| 2.4 | Integrar RegisterPage com POST /auth/cadastro                            | ✅     | 28/03/2026 | (commits git manuais + testes 9/9 PASS)                   | —   |
-| 2.5 | Implementar refresh token flow automático                                | ✅     | 30/03/2026 | `deb0d06`                                                 | —   |
-| 2.6 | Integrar ProfilePage com GET /perfil, PUT /perfil/senha e upload de foto | ✅     | 30/03/2026 | 5e03bbf1d87c0a9b46ba081175a7518f77cbd1b5                  | —   |
-| 2.7 | ForgotPassword + ResetPassword integrados                                | ✅     | 30/03/2026 | dd81196                                                   | —   |
+| Sub | Title                                          | Status | Date       | Commit(s)        | PR  |
+| --- | ---------------------------------------------- | ------ | ---------- | ---------------- | --- |
+| 0.1 | Criar ProtectedRoute com validação de role     | ✅     | 25/03      | ce2df32          | —   |
+| ... | ...                                            | ...    | ...        | ...              | ... |
+| 2.7 | ForgotPassword + ResetPassword integrados      | ✅     | 30/03/2026 | dd81196          | —   |
+| 3.1 | Criar courseService.ts com endpoints de cursos | ✅     | 30/03/2026 | b979748, 7d9d688 | —   |
 
 ### 📊 By-Phase Metrics
 

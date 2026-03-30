@@ -1207,56 +1207,19 @@ test: Validar fluxo de recuperação de senha (token expirado, código usado)
 
 ### 3.1 Criar courseService.ts com endpoints de cursos
 
-**Arquivo:** `src/services/courseService.ts` (novo)
-**Funções:**
+**Arquivo:** `src/services/courseService.ts`
+**Status:** ✅ CONCLUÍDO em 30/03/2026
+**Commits:**
 
-```typescript
-export const courseService = {
-// GET /cursos?status=PUBLICO&page=0&size=10
-fetchCourses(params: { status?: string; page?: number; size?: number }): Promise<IPage<ICourse>>,
-  // GET /cursos/:id
-fetchCourseById(id: string): Promise<ICourse>,
-  // POST /cursos
-createCourse(payload: ICourseCreateRequest): Promise<ICourse>,
-  // PUT /cursos/:id
-updateCourse(id: string, payload: ICourseUpdateRequest): Promise<ICourse>,
-  // DELETE /cursos/:id
-deleteCourse(id: string): Promise<void>,
-  // PATCH /cursos/:id/status
-updateCourseStatus(id: string, status: "RASCUNHO" | "PUBLICADO" | "ARQUIVADO"): Promise<ICourse>,
-  // GET /cursos/buscar?q=termo
-searchCourses(query: string): Promise<ICourse[]>,
-  // PUT /cursos/:id/capa (upload de imagem)
-uploadCourseCover(id: string, file: File): Promise<ICourse>,
-};
-```
+- b979748 test: Adicionar testes TDD para courseService (contrato backend real)
+- 7d9d688 feat: Refatorar courseService.ts para alinhar endpoints e tipos ao backend real
 
-**Endpoints (de arquitetura.md):**
+**Resumo:**
 
-- `GET /cursos` (paginado)
-- `POST /cursos`
-- `GET /cursos/{id}`
-- `PUT /cursos/{id}`
-- `DELETE /cursos/{id}`
-- `PATCH /cursos/{id}/status`
-- `GET /cursos/buscar`
-  **Testes:**
-  **Testes:**
-- Listar cursos → retorna paginado
-- Criar curso válido → retorna ICourse com id
-- Update curso válido → retorna atualizado
-- Delete curso com alunos → erro 409 (RN02)
-- Buscar por términa → retorna filtrado
-  **Duração:** 1.5 dias
-  **Commits esperados:**
+- Todos os endpoints REST de cursos implementados conforme contrato backend real.
+- Testes unitários cobrindo CRUD, paginação, busca e alteração de status.
 
-  **Duração:** 1.5 dias
-  **Commits esperados:**
-
-```
-feat: Criar courseService.ts com endpoints (GET, POST, PUT, DELETE, search)
-test: Validar courseService contra backend (CRUD de cursos)
-```
+**Próxima subtarefa:** 3.2 — Integrar CoursesPage com GET /cursos
 
 ---
 
