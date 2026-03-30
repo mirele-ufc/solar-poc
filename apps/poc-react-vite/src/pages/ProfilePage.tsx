@@ -1,6 +1,8 @@
-import { useRef, useState, useId } from "react";
+import { useEffect, useRef, useState, useId } from "react";
+import { getFriendlyErrorMessage } from "../utils/httpErrorMessages";
 import { useNavigate } from "react-router";
 import { useAuthStore } from "@/store/useAuthStore";
+import { authService } from "@/services/authService";
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 function maskCPF(raw: string) {
@@ -129,13 +131,18 @@ function PasswordField({
 // ── main component ────────────────────────────────────────────────────────────
 export function ProfilePage() {
   const navigate = useNavigate();
-  const { currentUser, updateCurrentUser } = useAuthStore();
+  const { currentUser, updateCurrentUser, setCurrentUser, token, isLoggedIn } =
+    useAuthStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const user = currentUser;
+  const [isProfileLoading, setIsProfileLoading] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
 
-  if (!user) {
-    return null;
-  }
+  const [isPhotoUploading, setIsPhotoUploading] = useState(false);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+  const [photoSuccess, setPhotoSuccess] = useState<string | null>(null);
+
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   // password form state
   const [currentPw, setCurrentPw] = useState("");
@@ -144,22 +151,156 @@ export function ProfilePage() {
   const [pwErrors, setPwErrors] = useState<Record<string, string>>({});
   const [pwSuccess, setPwSuccess] = useState(false);
 
-  // photo upload handler
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        updateCurrentUser({ fotoUrl: reader.result });
+  const user = currentUser;
+
+  useEffect(() => {
+    let active = true;
+
+    const loadProfile = async () => {
+      if (!token || !isLoggedIn) return;
+      if (currentUser) return;
+
+      setIsProfileLoading(true);
+      setProfileError(null);
+
+      try {
+        const profile = await authService.getProfile();
+        if (!active) return;
+        setCurrentUser(profile);
+      } catch (error) {
+        if (!active) return;
+        // Tenta extrair status code do erro
+        const status = (error as any)?.status ?? 0;
+        setProfileError(getFriendlyErrorMessage(status, "perfil"));
+      } finally {
+        if (!active) return;
+        setIsProfileLoading(false);
       }
     };
-    reader.readAsDataURL(file);
+
+    void loadProfile();
+
+    return () => {
+      active = false;
+    };
+  }, [token, isLoggedIn, currentUser, setCurrentUser]);
+
+  if (isProfileLoading) {
+    return (
+      <div className="bg-white flex items-center justify-center min-h-[calc(100vh-70px)] px-[20px]">
+        <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[16px]">
+          Carregando perfil...
+        </p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="bg-white flex items-center justify-center min-h-[calc(100vh-70px)] px-[20px]">
+        <div className="flex flex-col items-center gap-[12px] text-center max-w-[440px]">
+          <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#c0392b] text-[16px]">
+            {profileError ?? "Perfil indisponível no momento."}
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate("/")}
+            className="bg-[#ffeac4] h-[44px] px-[24px] rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[15px]"
+          >
+            Voltar ao início
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const validatePhotoFile = async (file: File): Promise<string | null> => {
+    const supportedTypes = ["image/jpeg", "image/png", "image/gif"];
+    if (!supportedTypes.includes(file.type)) {
+      return "Formato inválido. Use JPG, PNG ou GIF.";
+    }
+
+    const objectUrl = URL.createObjectURL(file);
+
+    try {
+      const dimensions = await new Promise<{ width: number; height: number }>(
+        (resolve, reject) => {
+          const image = new Image();
+          image.onload = () => {
+            resolve({ width: image.width, height: image.height });
+          };
+          image.onerror = () => reject(new Error("Imagem inválida"));
+          image.src = objectUrl;
+        },
+      );
+
+      if (dimensions.width < 200 || dimensions.height < 200) {
+        return "Imagem muito pequena. Use no mínimo 200x200 px.";
+      }
+
+      return null;
+    } catch {
+      return "Não foi possível processar a imagem selecionada.";
+    } finally {
+      URL.revokeObjectURL(objectUrl);
+    }
+  };
+
+  // photo upload handler
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setPhotoError(null);
+    setPhotoSuccess(null);
+
+    const validationError = await validatePhotoFile(file);
+    if (validationError) {
+      setPhotoError(validationError);
+      e.target.value = "";
+      return;
+    }
+
+    setIsPhotoUploading(true);
+
+    try {
+      await authService.uploadProfilePhoto(file);
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === "string") {
+          updateCurrentUser({ fotoUrl: reader.result });
+        }
+      };
+      reader.readAsDataURL(file);
+
+      setPhotoSuccess("Foto atualizada com sucesso!");
+    } catch (error) {
+      const status = (error as any)?.status ?? 0;
+      setPhotoError(getFriendlyErrorMessage(status, "perfil"));
+    } finally {
+      setIsPhotoUploading(false);
+      e.target.value = "";
+    }
+  };
+
+  const removePhoto = async () => {
+    setPhotoError(null);
+    setPhotoSuccess(null);
+
+    try {
+      updateCurrentUser({ fotoUrl: undefined });
+      setPhotoSuccess("Foto removida localmente.");
+    } catch {
+      setPhotoError("Não foi possível remover a foto.");
+    }
   };
 
   // password change handler
-  const handlePasswordSave = () => {
+  const handlePasswordSave = async () => {
+    setPasswordError(null);
+    setPwSuccess(false);
+
     const errors: Record<string, string> = {};
     if (!currentPw) errors.current = "Informe a senha atual.";
     if (!newPw) errors.new = "Informe a nova senha.";
@@ -172,13 +313,34 @@ export function ProfilePage() {
     setPwErrors(errors);
     if (Object.keys(errors).length > 0) return;
 
-    setCurrentPw("");
-    setNewPw("");
-    setConfirmPw("");
-    setPwErrors({});
-    setPwSuccess(true);
-    setTimeout(() => setPwSuccess(false), 4000);
+    setIsChangingPassword(true);
+
+    try {
+      await authService.changePassword({
+        senhaAtual: currentPw,
+        novaSenha: newPw,
+      });
+
+      setCurrentPw("");
+      setNewPw("");
+      setConfirmPw("");
+      setPwErrors({});
+      setPwSuccess(true);
+      setTimeout(() => setPwSuccess(false), 4000);
+    } catch (error) {
+      const status = (error as any)?.status ?? 0;
+      setPasswordError(getFriendlyErrorMessage(status, "perfil"));
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
+
+  const profileRoleLabel =
+    currentUser.role === "professor"
+      ? "Professor"
+      : currentUser.role === "admin"
+        ? "Administrador"
+        : "Estudante";
 
   return (
     <div className="bg-white flex flex-col min-h-[calc(100vh-70px)]">
@@ -258,6 +420,7 @@ export function ProfilePage() {
                 onClick={() => fileInputRef.current?.click()}
                 aria-label="Alterar foto de perfil"
                 className="absolute bottom-0 right-0 size-[34px] rounded-full bg-[#ffeac4] border-2 border-[#021b59] flex items-center justify-center shadow-md hover:bg-white transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#ffeac4] focus-visible:outline-offset-[2px]"
+                disabled={isPhotoUploading}
               >
                 <svg
                   className="size-[18px]"
@@ -274,11 +437,13 @@ export function ProfilePage() {
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/gif"
               aria-hidden="true"
               tabIndex={-1}
               className="hidden"
-              onChange={handlePhotoChange}
+              onChange={(event) => {
+                void handlePhotoChange(event);
+              }}
             />
 
             <div className="text-center">
@@ -286,7 +451,7 @@ export function ProfilePage() {
                 {currentUser.nome}
               </p>
               <p className="font-['Figtree:Regular',sans-serif] font-normal text-[#ffeac4]/80 text-[14px] mt-[2px]">
-                Estudante
+                {profileRoleLabel}
               </p>
             </div>
           </div>
@@ -355,20 +520,43 @@ export function ProfilePage() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="bg-[#ffeac4] h-[44px] px-[24px] rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[15px]"
+                  className="bg-[#ffeac4] h-[44px] px-[24px] rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[15px] disabled:opacity-60"
+                  disabled={isPhotoUploading}
                 >
-                  {currentUser.fotoUrl ? "Trocar foto" : "Adicionar foto"}
+                  {isPhotoUploading
+                    ? "Enviando..."
+                    : currentUser.fotoUrl
+                      ? "Trocar foto"
+                      : "Adicionar foto"}
                 </button>
                 {currentUser.fotoUrl && (
                   <button
                     type="button"
-                    onClick={() => updateCurrentUser({ fotoUrl: undefined })}
+                    onClick={() => {
+                      void removePhoto();
+                    }}
                     className="h-[44px] px-[24px] rounded-[26px] border-2 border-[#c0392b] cursor-pointer hover:bg-[#fdecea] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#c0392b] font-['Figtree:Medium',sans-serif] font-medium text-[#c0392b] text-[15px]"
                   >
                     Remover foto
                   </button>
                 )}
               </div>
+              {photoError && (
+                <p
+                  role="alert"
+                  className="text-[#c0392b] text-[13px] font-['Figtree:Regular',sans-serif]"
+                >
+                  {photoError}
+                </p>
+              )}
+              {photoSuccess && (
+                <p
+                  role="status"
+                  className="text-[#155724] text-[13px] font-['Figtree:Regular',sans-serif]"
+                >
+                  {photoSuccess}
+                </p>
+              )}
             </div>
           </div>
         </section>
@@ -389,7 +577,7 @@ export function ProfilePage() {
             noValidate
             onSubmit={(e) => {
               e.preventDefault();
-              handlePasswordSave();
+              void handlePasswordSave();
             }}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px]">
@@ -438,13 +626,23 @@ export function ProfilePage() {
               </div>
             )}
 
+            {passwordError && (
+              <p
+                role="alert"
+                className="text-[#c0392b] text-[13px] font-['Figtree:Regular',sans-serif]"
+              >
+                {passwordError}
+              </p>
+            )}
+
             <div className="flex justify-start mt-[4px]">
               <button
                 type="submit"
-                className="bg-[#ffeac4] h-[50px] px-[40px] rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px]"
+                className="bg-[#ffeac4] h-[50px] px-[40px] rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px] disabled:opacity-60"
+                disabled={isChangingPassword}
               >
                 <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[18px]">
-                  Salvar senha
+                  {isChangingPassword ? "Salvando..." : "Salvar senha"}
                 </span>
               </button>
             </div>

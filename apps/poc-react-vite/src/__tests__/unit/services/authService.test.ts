@@ -12,14 +12,14 @@ vi.mock("@/services/api", () => ({
   apiClient: {
     post: vi.fn(),
     get: vi.fn(),
-    put: vi.fn(),
+    patch: vi.fn(),
   },
 }));
 
 describe("authService", () => {
   const mockedPost = vi.mocked(apiClient.post);
   const mockedGet = vi.mocked(apiClient.get);
-  const mockedPut = vi.mocked(apiClient.put);
+  const mockedPatch = vi.mocked(apiClient.patch);
 
   const buildUser = (): IUserSession => ({
     id: "u-1",
@@ -36,13 +36,19 @@ describe("authService", () => {
   });
 
   it("login válido retorna payload de sessão com tokens", async () => {
-    const loginResponse: ILoginResponse = {
+    const loginData: ILoginResponse = {
       accessToken: "access-token",
       refreshToken: "refresh-token",
       usuario: buildUser(),
     };
 
-    mockedPost.mockResolvedValueOnce({ data: loginResponse } as never);
+    mockedPost.mockResolvedValueOnce({
+      data: {
+        data: loginData,
+        message: "Login realizado com sucesso.",
+        status: 200,
+      },
+    } as never);
 
     const result = await authService.login("professor@ufc.br", "123456");
 
@@ -50,7 +56,7 @@ describe("authService", () => {
       email: "professor@ufc.br",
       senha: "123456",
     });
-    expect(result).toEqual(loginResponse);
+    expect(result).toEqual(loginData);
   });
 
   it("login inválido propaga IApiError 401", async () => {
@@ -77,18 +83,24 @@ describe("authService", () => {
       senha: "123456",
     };
 
-    const registerResponse: ILoginResponse = {
+    const registerData: ILoginResponse = {
       accessToken: "access-token",
       refreshToken: "refresh-token",
       usuario: buildUser(),
     };
 
-    mockedPost.mockResolvedValueOnce({ data: registerResponse } as never);
+    mockedPost.mockResolvedValueOnce({
+      data: {
+        data: registerData,
+        message: "Cadastro realizado com sucesso.",
+        status: 201,
+      },
+    } as never);
 
     const result = await authService.register(payload);
 
     expect(mockedPost).toHaveBeenCalledWith("/auth/cadastro", payload);
-    expect(result).toEqual(registerResponse);
+    expect(result).toEqual(registerData);
   });
 
   it("register com CPF duplicado propaga IApiError 409", async () => {
@@ -132,7 +144,13 @@ describe("authService", () => {
   it("refresh válido retorna novo accessToken", async () => {
     const payload: IRefreshResponse = { accessToken: "new-access-token" };
 
-    mockedPost.mockResolvedValueOnce({ data: payload } as never);
+    mockedPost.mockResolvedValueOnce({
+      data: {
+        data: payload,
+        message: "Token renovado com sucesso.",
+        status: 200,
+      },
+    } as never);
 
     const result = await authService.refreshAccessToken("valid-refresh");
 
@@ -143,7 +161,13 @@ describe("authService", () => {
   });
 
   it("requestPasswordReset chama endpoint contratual", async () => {
-    mockedPost.mockResolvedValueOnce({ data: { message: "ok" } } as never);
+    mockedPost.mockResolvedValueOnce({
+      data: {
+        data: { message: "ok" },
+        message: "Email enviado",
+        status: 200,
+      },
+    } as never);
 
     const result = await authService.requestPasswordReset("mail@ufc.br");
 
@@ -154,7 +178,13 @@ describe("authService", () => {
   });
 
   it("resetPassword chama endpoint contratual", async () => {
-    mockedPost.mockResolvedValueOnce({ data: { message: "ok" } } as never);
+    mockedPost.mockResolvedValueOnce({
+      data: {
+        data: { message: "ok" },
+        message: "Senha redefinida",
+        status: 200,
+      },
+    } as never);
 
     const result = await authService.resetPassword("token-1", "nova-senha");
 
@@ -166,28 +196,51 @@ describe("authService", () => {
   });
 
   it("getProfile consulta /perfil", async () => {
-    const user = buildUser();
-    mockedGet.mockResolvedValueOnce({ data: user } as never);
+    mockedGet.mockResolvedValueOnce({
+      data: {
+        data: {
+          id: 1,
+          nome: "Professor UFC",
+          cpf: "***.***.***-01",
+          email: "professor@ufc.br",
+          perfil: "PROFESSOR",
+          status: "ATIVO",
+          fotoPerfil: null,
+        },
+        message: "Perfil carregado",
+        status: 200,
+      },
+    } as never);
 
     const result = await authService.getProfile();
 
     expect(mockedGet).toHaveBeenCalledWith("/perfil");
-    expect(result).toEqual(user);
+    expect(result).toEqual(
+      expect.objectContaining({
+        id: "1",
+        role: "professor",
+        status: "ATIVO",
+      }),
+    );
   });
 
-  it("changePassword chama PUT /perfil/senha", async () => {
+  it("changePassword chama PATCH /perfil/senha", async () => {
     const payload: IChangePasswordPayload = {
       senhaAtual: "senha-atual",
       novaSenha: "nova-senha",
     };
 
-    mockedPut.mockResolvedValueOnce({
-      data: { message: "Senha alterada" },
+    mockedPatch.mockResolvedValueOnce({
+      data: {
+        data: { message: "Senha alterada" },
+        message: "Senha alterada com sucesso",
+        status: 200,
+      },
     } as never);
 
     const result = await authService.changePassword(payload);
 
-    expect(mockedPut).toHaveBeenCalledWith("/perfil/senha", payload);
+    expect(mockedPatch).toHaveBeenCalledWith("/perfil/senha", payload);
     expect(result).toEqual({ message: "Senha alterada" });
   });
 
@@ -195,19 +248,23 @@ describe("authService", () => {
     const file = new File(["photo-content"], "profile.png", {
       type: "image/png",
     });
-    mockedPut.mockResolvedValueOnce({
-      data: { message: "Foto atualizada" },
+    mockedPatch.mockResolvedValueOnce({
+      data: {
+        data: { message: "Foto atualizada" },
+        message: "Foto atualizada com sucesso",
+        status: 200,
+      },
     } as never);
 
     const result = await authService.uploadProfilePhoto(file);
 
-    const putArgs = mockedPut.mock.calls[0];
-    const sentFormData = putArgs?.[1] as FormData;
+    const patchArgs = mockedPatch.mock.calls[0];
+    const sentFormData = patchArgs?.[1] as FormData;
 
-    expect(mockedPut).toHaveBeenCalledTimes(1);
-    expect(putArgs?.[0]).toBe("/perfil/foto");
+    expect(mockedPatch).toHaveBeenCalledTimes(1);
+    expect(patchArgs?.[0]).toBe("/perfil/foto");
     expect(sentFormData).toBeInstanceOf(FormData);
-    expect(putArgs?.[2]).toEqual(
+    expect(patchArgs?.[2]).toEqual(
       expect.objectContaining({
         headers: expect.objectContaining({
           "Content-Type": "multipart/form-data",

@@ -86,7 +86,9 @@ describe("LoginPage", () => {
     await waitFor(() => {
       expect(useAuthStore.getState().token).toBe("access-111");
       expect(useAuthStore.getState().refreshToken).toBe("refresh-111");
-      expect(useAuthStore.getState().currentUser?.email).toBe("professor@ufc.br");
+      expect(useAuthStore.getState().currentUser?.email).toBe(
+        "professor@ufc.br",
+      );
       expect(useAuthStore.getState().isLoggedIn).toBe(true);
     });
   });
@@ -114,7 +116,9 @@ describe("LoginPage", () => {
 
     await waitFor(() => {
       expect(authService.login).toHaveBeenCalled();
-      expect(screen.getByText(/Usuário ou senha incorretos/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Credenciais inválidas.*401/i),
+      ).toBeInTheDocument();
       expect(useAuthStore.getState().isLoggedIn).toBe(false);
     });
   });
@@ -142,10 +146,7 @@ describe("LoginPage", () => {
     fireEvent.click(screen.getByRole("button", { name: /acessar/i }));
 
     await waitFor(() => {
-      expect(authService.login).toHaveBeenCalledWith(
-        "prof_teste",
-        "senha123",
-      );
+      expect(authService.login).toHaveBeenCalledWith("prof_teste", "senha123");
       expect(useAuthStore.getState().token).toBe("access-222");
       expect(useAuthStore.getState().isLoggedIn).toBe(true);
     });
@@ -153,10 +154,17 @@ describe("LoginPage", () => {
 
   it("deve desabilitar botão durante carregamento", async () => {
     mockedAuthService.login.mockImplementationOnce(
-      () => new Promise((resolve) => setTimeout(() => resolve({
-        accessToken: "token",
-        refreshToken: "refresh",
-      }), 100)),
+      () =>
+        new Promise((resolve) =>
+          setTimeout(
+            () =>
+              resolve({
+                accessToken: "token",
+                refreshToken: "refresh",
+              }),
+            100,
+          ),
+        ),
     );
     mockedAuthService.getProfile.mockResolvedValueOnce(defaultUser);
 
@@ -173,16 +181,21 @@ describe("LoginPage", () => {
       target: { value: "senha123" },
     });
 
-    const submitButton = screen.getByRole("button", { name: /acessar/i }) as HTMLButtonElement;
+    const submitButton = screen.getByRole("button", {
+      name: /acessar/i,
+    }) as HTMLButtonElement;
     fireEvent.click(submitButton);
 
     await waitFor(() => {
       expect(submitButton).toBeDisabled();
     });
 
-    await waitFor(() => {
-      expect(submitButton).not.toBeDisabled();
-    }, { timeout: 200 });
+    await waitFor(
+      () => {
+        expect(submitButton).not.toBeDisabled();
+      },
+      { timeout: 200 },
+    );
   });
 
   it("deve tratar erro de rede com mensagem apropriada", async () => {
@@ -207,7 +220,9 @@ describe("LoginPage", () => {
     fireEvent.click(screen.getByRole("button", { name: /acessar/i }));
 
     await waitFor(() => {
-      expect(screen.getByText(/Erro de conexão/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Ocorreu um erro inesperado.*0/i),
+      ).toBeInTheDocument();
       expect(useAuthStore.getState().isLoggedIn).toBe(false);
     });
   });
