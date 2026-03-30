@@ -1,4 +1,9 @@
-import axios, { AxiosInstance, AxiosError, AxiosResponse } from "axios";
+import axios, {
+  AxiosInstance,
+  AxiosError,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from "axios";
 import { toast } from "sonner";
 import { IApiError } from "@ava-poc/types";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -16,6 +21,10 @@ const apiClient: AxiosInstance = axios.create({
   },
 });
 
+type RetryableRequestConfig = InternalAxiosRequestConfig & {
+  _retry?: boolean;
+};
+
 /**
  * Helper function to handle session expiration
  * Displays error toast, clears authentication state, and redirects to login
@@ -28,7 +37,7 @@ function handleSessionExpired(): void {
 
 /**
  * Response interceptor with automatic refresh token flow
- * 
+ *
  * Behavior:
  * 1. On 401 (token expired):
  *    - Check if already retried (prevent infinite loop via _retry flag)
@@ -36,11 +45,11 @@ function handleSessionExpired(): void {
  *    - Request new access token using refresh token
  *    - Update store with new tokens
  *    - Retry original request with new token
- * 
+ *
  * 2. If refresh fails (e.g., refresh token expired):
  *    - Clear session (logout)
  *    - Redirect to login page
- * 
+ *
  * 3. For all other errors:
  *    - Show appropriate user-facing toast notifications
  *    - Pass error to caller
@@ -55,14 +64,21 @@ apiClient.interceptors.response.use(
       // Debug: log all errors to console for troubleshooting
       console.error(
         "[API Error]",
-        { status, message: errorMessage, url: error.config?.url, code: error.code },
+        {
+          status,
+          message: errorMessage,
+          url: error.config?.url,
+          code: error.code,
+        },
         error,
       );
 
       // Handle 401 with automatic refresh token flow
-      if (status === 401 && error.config && !(error.config as any)._retry) {
+      const requestConfig = error.config as RetryableRequestConfig | undefined;
+
+      if (status === 401 && requestConfig && !requestConfig._retry) {
         // Mark this config as retry to prevent infinite loop
-        (error.config as any)._retry = true;
+        requestConfig._retry = true;
 
         try {
           // Get refresh token from store
@@ -85,12 +101,12 @@ apiClient.interceptors.response.use(
           useAuthStore.getState().setTokens(response.accessToken, refreshToken);
 
           // Update the original request's Authorization header with new token
-          if (error.config.headers) {
-            error.config.headers.Authorization = `Bearer ${response.accessToken}`;
+          if (requestConfig.headers) {
+            requestConfig.headers.Authorization = `Bearer ${response.accessToken}`;
           }
 
           // Retry the original request with new token
-          return apiClient(error.config);
+          return apiClient(requestConfig);
         } catch (refreshError) {
           // Refresh token is invalid or expired - must log out
           console.error("[API Refresh Failed]", refreshError);

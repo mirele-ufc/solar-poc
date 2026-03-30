@@ -1,134 +1,169 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import {
+  AxiosError,
+  type AxiosResponse,
+  type InternalAxiosRequestConfig,
+} from "axios";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-/**
- * Test suite for API response interceptor with automatic refresh token flow
- * 
- * Purpose:
- * - Validate that 401 errors trigger automatic token refresh
- * - Validate that requests are retried with new token after refresh
- * - Validate that failed refresh redirects to login
- * - Validate that refresh is not attempted twice (infinite loop prevention)
- */
+const mockToastError = vi.fn();
+const mockRefreshAccessToken = vi.fn();
+const mockLogout = vi.fn();
+const mockSetTokens = vi.fn();
 
-// We'll test the interceptor logic without deep mocking
+type StoreSnapshot = {
+  token: string | null;
+  refreshToken: string | null;
+  logout: () => void;
+  setTokens: (token: string | null, refreshToken?: string | null) => void;
+};
 
-describe("API Response Interceptor - Refresh Token Flow", () => {
-  const mockRefreshToken = "refresh-token-123";
-  const mockNewAccessToken = "new-access-token-456";
-  const mockOldAccessToken = "old-token-xyz";
+const storeState: StoreSnapshot = {
+  token: "expired-token",
+  refreshToken: "refresh-token-123",
+  logout: mockLogout,
+  setTokens: mockSetTokens,
+};
 
+const mockGetState = vi.fn(() => storeState);
+
+vi.mock("sonner", () => ({
+  toast: {
+    error: mockToastError,
+  },
+}));
+
+vi.mock("@/store/useAuthStore", () => ({
+  useAuthStore: {
+    getState: mockGetState,
+  },
+}));
+
+vi.mock("@/services/authService", () => ({
+  authService: {
+    refreshAccessToken: mockRefreshAccessToken,
+  },
+}));
+
+function makeAxios401(config: InternalAxiosRequestConfig): AxiosError {
+  const error = new AxiosError("Unauthorized", "ERR_BAD_REQUEST", config);
+  const response: AxiosResponse = {
+    data: { message: "Token expirado" },
+    status: 401,
+    statusText: "Unauthorized",
+    headers: {},
+    config,
+  };
+  error.response = response;
+  return error;
+}
+
+async function loadClient() {
+  const mod = await import("@/services/api");
+  return mod.apiClient;
+}
+
+describe("apiClient response interceptor - refresh token flow", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-  });
+    vi.resetModules();
 
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
+    storeState.token = "expired-token";
+    storeState.refreshToken = "refresh-token-123";
 
-  it("should detect 401 status as refresh trigger", () => {
-    // Arrange: 401 status indicates token expiration
-    const status401 = 401;
-
-    // Act & Assert: 401 should be recognized
-    expect(status401).toBe(401);
-    expect([401]).toContain(status401);
-  });
-
-  it("should flag request as retry to prevent infinite loops", () => {
-    // Arrange: Original request config
-    const config = {
-      url: "/cursos",
-      method: "GET",
-      _retry: false,
-    };
-
-    // Act: Mark config as retry
-    const retryConfig = { ...config, _retry: true };
-
-    // Assert: Retry flag should be set
-    expect(retryConfig._retry).toBe(true);
-    expect(config._retry).toBe(false); // Original unchanged
-  });
-
-  it("should construct new Authorization header with refreshed token", () => {
-    // Arrange: Old and new tokens
-    const oldToken = mockOldAccessToken;
-    const newToken = mockNewAccessToken;
-
-    const oldHeader = `Bearer ${oldToken}`;
-    const newHeader = `Bearer ${newToken}`;
-
-    // Act & Assert: Headers should use correct token format
-    expect(oldHeader).toBe("Bearer old-token-xyz");
-    expect(newHeader).toBe("Bearer new-access-token-456");
-    expect(newHeader).not.toBe(oldHeader);
-  });
-
-  it("should store refresh token for future use", () => {
-    // Arrange: Tokens to store
-    const tokens = {
-      accessToken: mockNewAccessToken,
-      refreshToken: mockRefreshToken,
-    };
-
-    // Act & Assert: Both tokens preserved
-    expect(tokens.accessToken).toBe(mockNewAccessToken);
-    expect(tokens.refreshToken).toBe(mockRefreshToken);
-    expect(tokens).toHaveProperty("accessToken");
-    expect(tokens).toHaveProperty("refreshToken");
-  });
-
-  it("should validate refresh token response structure", () => {
-    // Arrange: Expected response structure from /auth/refresh endpoint
-    const refreshResponse = {
-      accessToken: mockNewAccessToken,
-      refreshToken: mockRefreshToken,
-    };
-
-    // Act & Assert: Structure should match expected shape
-    expect(refreshResponse).toHaveProperty("accessToken");
-    expect(refreshResponse).toHaveProperty("refreshToken");
-    expect(typeof refreshResponse.accessToken).toBe("string");
-    expect(typeof refreshResponse.refreshToken).toBe("string");
-  });
-
-  it("should preserve original request data during retry", () => {
-    // Arrange: POST request with payload
-    const originalRequest = {
-      method: "POST",
-      url: "/cursos",
-      data: { nome: "Novo Curso", descricao: "Teste" },
-    };
-
-    // Act: Create retry config preserving original data
-    const retryRequest = {
-      ...originalRequest,
-      _retry: true,
-    };
-
-    // Assert: Data preserved for retry
-    expect(retryRequest.data).toEqual(originalRequest.data);
-    expect(retryRequest.method).toBe("POST");
-  });
-
-  it("should validate authorization header format", () => {
-    // Arrange & Act: Build auth header
-    const token = mockNewAccessToken;
-    const authHeader = `Bearer ${token}`;
-
-    // Assert: Header format should be correct
-    expect(authHeader).toMatch(/^Bearer /);
-    expect(authHeader).toContain(token);
-    expect(authHeader.split(" ")).toHaveLength(2);
-  });
-
-  it("should handle non-401 errors without refresh attempt", () => {
-    // Arrange: List of non-401 error codes
-    const nonRefreshableErrors = [400, 403, 404, 500, 502, 503];
-
-    // Act & Assert: Only 401 should trigger refresh
-    nonRefreshableErrors.forEach((status) => {
-      expect(status).not.toBe(401);
+    mockSetTokens.mockImplementation((token, refreshToken) => {
+      storeState.token = token;
+      storeState.refreshToken = refreshToken ?? null;
     });
+
+    delete (window as { location?: Location }).location;
+    (window as { location: Partial<Location> }).location = {
+      href: "http://localhost/",
+    };
+  });
+
+  it("faz refresh e reenvia a requisição original com novo access token", async () => {
+    const apiClient = await loadClient();
+    mockRefreshAccessToken.mockResolvedValue({ accessToken: "new-token-456" });
+
+    let attempt = 0;
+    apiClient.defaults.adapter = async (config) => {
+      attempt += 1;
+      const authHeader = String(config.headers?.Authorization ?? "");
+
+      if (attempt === 1) {
+        expect(authHeader).toBe("Bearer expired-token");
+        return Promise.reject(makeAxios401(config));
+      }
+
+      expect(authHeader).toBe("Bearer new-token-456");
+      return {
+        data: { ok: true },
+        status: 200,
+        statusText: "OK",
+        headers: {},
+        config,
+      };
+    };
+
+    const response = await apiClient.get("/protected-resource");
+
+    expect(response.status).toBe(200);
+    expect(mockRefreshAccessToken).toHaveBeenCalledWith("refresh-token-123");
+    expect(mockSetTokens).toHaveBeenCalledWith(
+      "new-token-456",
+      "refresh-token-123",
+    );
+    expect(mockLogout).not.toHaveBeenCalled();
+    expect(attempt).toBe(2);
+  });
+
+  it("faz logout e redireciona quando não existe refresh token", async () => {
+    const apiClient = await loadClient();
+    storeState.refreshToken = null;
+
+    apiClient.defaults.adapter = async (config) => {
+      return Promise.reject(makeAxios401(config));
+    };
+
+    await expect(apiClient.get("/protected-resource")).rejects.toBeDefined();
+
+    expect(mockRefreshAccessToken).not.toHaveBeenCalled();
+    expect(mockLogout).toHaveBeenCalledTimes(1);
+    expect(mockToastError).toHaveBeenCalledWith(
+      "Sessão expirada. Faça login novamente.",
+    );
+    expect(window.location.href).toBe("/");
+  });
+
+  it("não entra em loop infinito quando a requisição retry também retorna 401", async () => {
+    const apiClient = await loadClient();
+    mockRefreshAccessToken.mockResolvedValue({ accessToken: "new-token-456" });
+
+    apiClient.defaults.adapter = async (config) => {
+      return Promise.reject(makeAxios401(config));
+    };
+
+    await expect(apiClient.get("/protected-resource")).rejects.toBeDefined();
+
+    expect(mockRefreshAccessToken).toHaveBeenCalledTimes(1);
+    expect(mockLogout).toHaveBeenCalledTimes(1);
+    expect(window.location.href).toBe("/");
+  });
+
+  it("faz logout quando refresh token falha", async () => {
+    const apiClient = await loadClient();
+    mockRefreshAccessToken.mockRejectedValue(new Error("refresh failed"));
+
+    apiClient.defaults.adapter = async (config) => {
+      return Promise.reject(makeAxios401(config));
+    };
+
+    await expect(apiClient.get("/protected-resource")).rejects.toBeDefined();
+
+    expect(mockRefreshAccessToken).toHaveBeenCalledTimes(1);
+    expect(mockLogout).toHaveBeenCalledTimes(1);
+    expect(mockToastError).toHaveBeenCalledWith(
+      "Sessão expirada. Faça login novamente.",
+    );
   });
 });
