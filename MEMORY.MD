@@ -8,18 +8,18 @@
 
 ## MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
 
-**Última atualização:** 30/03/2026 (2.6 ✅ completa, 19/43, Fase 2 em progresso)  
+**Última atualização:** 30/03/2026 (2.7 ✅ completa, 20/43, Fase 2 concluída)  
 **Sprint ativo:** Fase 2 — Autenticação com Backend  
-**Status geral:** 44% (19/43 subtarefas concluídas)
+**Status geral:** 47% (20/43 subtarefas concluídas)
 
 ---
 
-## UPDATE — 30/03/2026 (Consolidação de status da Fase 2)
+## UPDATE — 30/03/2026 (Fase 2 concluída)
 
-- **Marco confirmado:** Refatoração concluída até **2.6**
-- **Fases consolidadas:** Fase 0 e Fase 1 (100%), Fase 2 em andamento
-- **Subtarefas concluídas na Fase 2:** 2.1, 2.2, 2.3, 2.4, 2.5, 2.6
-- **Próxima etapa planejada:** 2.7 — Integrar ForgotPasswordPage e ResetPasswordPage
+- **Marco confirmado:** Refatoração concluída até **2.7**
+- **Fases consolidadas:** Fase 0 e Fase 1 (100%), Fase 2 (100%)
+- **Subtarefas concluídas na Fase 2:** 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7
+- **Próxima etapa planejada:** 3.1 — Criar courseService.ts com endpoints de cursos
 
 ---
 
@@ -30,7 +30,7 @@
 | **Fase**   | 2 — Autenticação com Backend              |
 | **Módulo** | 2.7 — ForgotPassword + ResetPassword      |
 | **Story**  | 2.7 — Recuperação e redefinição de senha  |
-| **Status** | READY (awaiting implementation)           |
+| **Status** | ✅ COMPLETA                               |
 | **Branch** | feature/refactor-auth-request-interceptor |
 
 **Status:** Fases 0 e 1 concluídas. Fase 2 em progresso — 2.1 a 2.6 concluídas e 2.7 pronta para iniciar.
@@ -58,6 +58,7 @@
 | 2.4 | Integrar RegisterPage com POST /auth/cadastro                            | ✅     | 28/03/2026 | (commits git manuais + testes 9/9 PASS)                   | —   |
 | 2.5 | Implementar refresh token flow automático                                | ✅     | 30/03/2026 | `deb0d06`                                                 | —   |
 | 2.6 | Integrar ProfilePage com GET /perfil, PUT /perfil/senha e upload de foto | ✅     | 30/03/2026 | 5e03bbf1d87c0a9b46ba081175a7518f77cbd1b5                  | —   |
+| 2.7 | ForgotPassword + ResetPassword integrados                                | ✅     | 30/03/2026 | dd81196                                                   | —   |
 
 ### 📊 By-Phase Metrics
 
@@ -74,9 +75,9 @@
 
 ### ⏳ Next Ready (First 3)
 
-1. **2.7 — Integrar ForgotPasswordPage e ResetPasswordPage**
-   - Duração: 1-2 dias
-   - Dependências: 2.6 ✅
+1. **3.1 — Criar courseService.ts com endpoints de cursos**
+   - Duração: 1-1.5 dia
+   - Dependências: Fase 2 concluída
    - Status: ✅ **READY NOW**
    - Detalhes: `docs/REFACTORING_PLAN_GRANULAR_V2.md` § 2.7
 
