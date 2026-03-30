@@ -8,18 +8,18 @@
 
 ## MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
 
-**Última atualização:** 30/03/2026 (2.5 ✅ completa, 18/43, Fase 2 em progresso)  
+**Última atualização:** 30/03/2026 (2.6 ✅ completa, 19/43, Fase 2 em progresso)  
 **Sprint ativo:** Fase 2 — Autenticação com Backend  
-**Status geral:** 42% (18/43 subtarefas concluídas)
+**Status geral:** 44% (19/43 subtarefas concluídas)
 
 ---
 
 ## UPDATE — 30/03/2026 (Consolidação de status da Fase 2)
 
-- **Marco confirmado:** Refatoração concluída até **2.5**
+- **Marco confirmado:** Refatoração concluída até **2.6**
 - **Fases consolidadas:** Fase 0 e Fase 1 (100%), Fase 2 em andamento
-- **Subtarefas concluídas na Fase 2:** 2.1, 2.2, 2.3, 2.4, 2.5
-- **Próxima etapa planejada:** 2.6 — Integrar ProfilePage com backend
+- **Subtarefas concluídas na Fase 2:** 2.1, 2.2, 2.3, 2.4, 2.5, 2.6
+- **Próxima etapa planejada:** 2.7 — Integrar ForgotPasswordPage e ResetPasswordPage
 
 ---
 
@@ -28,35 +28,36 @@
 | Campo      | Valor                                     |
 | ---------- | ----------------------------------------- |
 | **Fase**   | 2 — Autenticação com Backend              |
-| **Módulo** | 2.6 — Integrar ProfilePage com backend    |
-| **Story**  | 2.6 — GET /perfil e atualização de perfil |
+| **Módulo** | 2.7 — ForgotPassword + ResetPassword      |
+| **Story**  | 2.7 — Recuperação e redefinição de senha  |
 | **Status** | READY (awaiting implementation)           |
 | **Branch** | feature/refactor-auth-request-interceptor |
 
-**Status:** Fases 0 e 1 concluídas. Fase 2 em progresso — 2.1 a 2.5 concluídas e 2.6 pronta para iniciar.
+**Status:** Fases 0 e 1 concluídas. Fase 2 em progresso — 2.1 a 2.6 concluídas e 2.7 pronta para iniciar.
 
 ### ✅ Completes
 
-| Sub | Title                                           | Status | Date       | Commit                                                    | PR  |
-| --- | ----------------------------------------------- | ------ | ---------- | --------------------------------------------------------- | --- |
-| 0.1 | Criar ProtectedRoute com validação de role      | ✅     | 25/03      | ce2df32                                                   | —   |
-| 0.2 | Integrar ProtectedRoute em routes.ts            | ✅     | 25/03/2026 | 028ba89                                                   | —   |
-| 0.3 | Remover hardcodes de role em páginas            | ✅     | 25/03/2026 | 41a3b29                                                   | —   |
-| 0.4 | Implementar logout seguro local                 | ✅     | 26/03/2026 | 7689a26 + cd395ac                                         | —   |
-| 0.5 | Implementar Unauthorized page                   | ✅     | 26/03/2026 | 8fa0cd3 + 00d9fe6                                         | —   |
-| 0.6 | Validar rotas públicas sem guard incorreto      | ✅     | 26/03/2026 | 189c57f                                                   | —   |
-| 0.7 | HTTP error interceptor + loading + empty states | ✅     | 26/03/2026 | 1aac552 + 3edb2fc + 41cb179 + 4390f75                     | —   |
-| 1.1 | Auditar e consolidar tipos em @ava-poc/types    | ✅     | 26/03/2026 | 9bb4021 + 910841e                                         | —   |
-| 1.2 | Migrar useAuthStore para tipos globais          | ✅     | 26/03/2026 | 6dfa8ae + 146efd2 + 99f8ba3 + 6a664e6 + d285b57           | —   |
-| 1.3 | Centralizar e alinhar schemas Zod               | ✅     | 26/03/2026 | 088d981 + 3b25f55 + 39c4cbe                               | —   |
-| 1.4 | Remover tipos locais duplicados de pages        | ✅     | 26/03/2026 | f0e773e                                                   | —   |
-| 1.5 | Validar zero `any` em TypeScript                | ✅     | 26/03/2026 | 324708d + 7822e32                                         | —   |
-| 1.6 | Refatorar componentes com Slots Pattern         | ✅     | 27/03/2026 | `0080137` + `9090c6a` + `4ecc3d7` + `b24fbb4` + `32558a8` | —   |
-| 2.1 | authService endpoints (Auth/Perfil)             | ✅     | 27/03/2026 | `3ece624` + `a2ec8eb` + `877540a`                         | —   |
-| 2.2 | Implementar Request Interceptor em api.ts       | ✅     | 27/03/2026 | `0ae5cf1` + `cb93963` + `2279807`                         | —   |
-| 2.3 | Integrar LoginPage com POST /auth/login         | ✅     | 28/03/2026 | `0db7f21`                                                 | —   |
-| 2.4 | Integrar RegisterPage com POST /auth/cadastro   | ✅     | 28/03/2026 | (commits git manuais + testes 9/9 PASS)                   | —   |
-| 2.5 | Implementar refresh token flow automático       | ✅     | 30/03/2026 | `deb0d06`                                                 | —   |
+| Sub | Title                                                                    | Status | Date       | Commit                                                    | PR  |
+| --- | ------------------------------------------------------------------------ | ------ | ---------- | --------------------------------------------------------- | --- |
+| 0.1 | Criar ProtectedRoute com validação de role                               | ✅     | 25/03      | ce2df32                                                   | —   |
+| 0.2 | Integrar ProtectedRoute em routes.ts                                     | ✅     | 25/03/2026 | 028ba89                                                   | —   |
+| 0.3 | Remover hardcodes de role em páginas                                     | ✅     | 25/03/2026 | 41a3b29                                                   | —   |
+| 0.4 | Implementar logout seguro local                                          | ✅     | 26/03/2026 | 7689a26 + cd395ac                                         | —   |
+| 0.5 | Implementar Unauthorized page                                            | ✅     | 26/03/2026 | 8fa0cd3 + 00d9fe6                                         | —   |
+| 0.6 | Validar rotas públicas sem guard incorreto                               | ✅     | 26/03/2026 | 189c57f                                                   | —   |
+| 0.7 | HTTP error interceptor + loading + empty states                          | ✅     | 26/03/2026 | 1aac552 + 3edb2fc + 41cb179 + 4390f75                     | —   |
+| 1.1 | Auditar e consolidar tipos em @ava-poc/types                             | ✅     | 26/03/2026 | 9bb4021 + 910841e                                         | —   |
+| 1.2 | Migrar useAuthStore para tipos globais                                   | ✅     | 26/03/2026 | 6dfa8ae + 146efd2 + 99f8ba3 + 6a664e6 + d285b57           | —   |
+| 1.3 | Centralizar e alinhar schemas Zod                                        | ✅     | 26/03/2026 | 088d981 + 3b25f55 + 39c4cbe                               | —   |
+| 1.4 | Remover tipos locais duplicados de pages                                 | ✅     | 26/03/2026 | f0e773e                                                   | —   |
+| 1.5 | Validar zero `any` em TypeScript                                         | ✅     | 26/03/2026 | 324708d + 7822e32                                         | —   |
+| 1.6 | Refatorar componentes com Slots Pattern                                  | ✅     | 27/03/2026 | `0080137` + `9090c6a` + `4ecc3d7` + `b24fbb4` + `32558a8` | —   |
+| 2.1 | authService endpoints (Auth/Perfil)                                      | ✅     | 27/03/2026 | `3ece624` + `a2ec8eb` + `877540a`                         | —   |
+| 2.2 | Implementar Request Interceptor em api.ts                                | ✅     | 27/03/2026 | `0ae5cf1` + `cb93963` + `2279807`                         | —   |
+| 2.3 | Integrar LoginPage com POST /auth/login                                  | ✅     | 28/03/2026 | `0db7f21`                                                 | —   |
+| 2.4 | Integrar RegisterPage com POST /auth/cadastro                            | ✅     | 28/03/2026 | (commits git manuais + testes 9/9 PASS)                   | —   |
+| 2.5 | Implementar refresh token flow automático                                | ✅     | 30/03/2026 | `deb0d06`                                                 | —   |
+| 2.6 | Integrar ProfilePage com GET /perfil, PUT /perfil/senha e upload de foto | ✅     | 30/03/2026 | 5e03bbf1d87c0a9b46ba081175a7518f77cbd1b5                  | —   |
 
 ### 📊 By-Phase Metrics
 
@@ -64,29 +65,29 @@
 | --------- | -------- | ------ | ------- | ------------------ | ---------- | -------- |
 | 0         | 7        | 7      | 100%    | ✅ COMPLETA        | 25/03      | 26/03    |
 | 1         | 6        | 6      | 100%    | ✅ COMPLETA        | 26/03      | 27/03    |
-| 2         | 5        | 7      | 71%     | 🔄 IN_PROGRESS     | 27/03      | —        |
+| 2         | 6        | 7      | 86%     | 🔄 IN_PROGRESS     | 27/03      | —        |
 | 3         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
 | 4         | 0        | 7      | 0%      | ⏳ FUTURE          | —          | —        |
 | 5         | 0        | 4      | 0%      | ⏳ FUTURE          | —          | —        |
 | 6         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
-| **TOTAL** | **18**   | **43** | **42%** | **🟢 IN PROGRESS** | 25/03      | —        |
+| **TOTAL** | **19**   | **43** | **44%** | **🟢 IN PROGRESS** | 25/03      | —        |
 
 ### ⏳ Next Ready (First 3)
 
-1. **2.6 — Integrar ProfilePage com backend (GET /perfil)**
-   - Duração: 1-1.5 dia
-   - Dependências: 2.5 ✅
+1. **2.7 — Integrar ForgotPasswordPage e ResetPasswordPage**
+   - Duração: 1-2 dias
+   - Dependências: 2.6 ✅
    - Status: ✅ **READY NOW**
-   - Detalhes: `docs/REFACTORING_PLAN_GRANULAR_V2.md` § 2.6
+   - Detalhes: `docs/REFACTORING_PLAN_GRANULAR_V2.md` § 2.7
 
-2. **2.7 — Implementar troca de senha (PUT /perfil/senha)**
-   - Duração: 1 dia
-   - Dependências: 2.5, 2.6
+2. **3.1 — Criar courseService.ts com endpoints de cursos**
+   - Duração: 1-1.5 dia
+   - Dependências: Fase 2 concluída
    - Status: ⏳ NEXT
 
-3. **2.8 — Integrar ForgotPasswordPage e ResetPasswordPage**
+3. **3.2 — Integrar CoursesPage com GET /cursos**
    - Duração: 1-2 dias
-   - Dependências: 2.6
+   - Dependências: 3.1
    - Status: ⏳ FUTURE
 
 ### ⛔ Blockers
@@ -102,19 +103,20 @@
 
 ## SECTION: SESSION CONTEXT
 
-| #   | Story | Status  | Commits      | Testes | Evidencia de teste criado                                                                             | Evidencia RED inicial                         | Notas                                                                                                 |
-| --- | ----- | ------- | ------------ | ------ | ----------------------------------------------------------------------------------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| 1   | 0.1.1 | ✅ DONE | 1/1          | 2/2    | src/**tests**/unit/routes/ProtectedRoute.test.tsx                                                     | RED inicial registrado no ciclo da story      | Guard global aplicado no roteamento + commit realizado                                                |
-| 2   | 0.2.1 | ✅ DONE | 1/1          | 3/3    | src/**tests**/unit/routes/ProtectedRoute.test.tsx                                                     | RED registrado na suite de rotas              | routes.ts segmentado por role (professor/student e professor only) + commit realizado                 |
-| 3   | 0.3.1 | ✅ DONE | 1/1          | 3/3    | src/**tests**/unit/pages/roleCleanup.test.tsx                                                         | Suite de regressão criada no ciclo            | Role cleanup concluído em pages; mensageria protegida por rota; commits 41a3b29 + 1d0cccb publicados  |
-| 4   | 0.4.1 | ✅ DONE | 2/2          | 3/3    | src/**tests**/unit/store/authLogout.test.ts, src/**tests**/unit/components/AuthLayout.logout.test.tsx | RED validado (1 falha funcional)              | Logout local aplicado no AuthLayout sem endpoint backend                                              |
-| 5   | 0.5.1 | ✅ DONE | 2/2          | 3/3    | src/**tests**/unit/pages/UnauthorizedPage.test.tsx                                                    | RED validado (import da página ausente)       | UnauthorizedPage criada com botão de retorno e redirecionamento automático para /courses              |
-| 6   | 0.6.1 | ✅ DONE | 1/1          | 4/4    | src/**tests**/unit/routes/publicRoutes.test.tsx                                                       | RED estrutural (testes antes de rodar)        | Suite valida que /, /register, /forgot-password e /unauthorized são acessíveis sem autenticação       |
-| 7   | 1.1.1 | ✅ DONE | 2/2          | 27/27  | Type-check OK; Vitest: 27/27 testes passando                                                          | Draft: tipos consolidados em @ava-poc/types   | Consolidação de tipos em v1.0 + resolução de role (professor/student/admin) + imports bem-definidos   |
-| 8   | 2.4.1 | ✅ DONE | (git manual) | 9/9    | src/**tests**/RegisterPage.test.tsx                                                                   | RED escrito (9 testes antes da implementação) | Integração RegisterPage com POST /auth/cadastro; mapeamento perfil professor↔PROFESSOR, student↔ALUNO |
-| 9   | 2.5.1 | ✅ DONE | `deb0d06`    | 4/4    | src/**tests**/unit/services/api.refresh-interceptor.test.ts                                           | RED validado via testes do fluxo 401          | Refresh automático com retry seguro; fallback de logout sem loop infinito                             |
+| #   | Story | Status  | Commits      | Testes | Evidencia de teste criado                                                                             | Evidencia RED inicial                                    | Notas                                                                                                 |
+| --- | ----- | ------- | ------------ | ------ | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| 1   | 0.1.1 | ✅ DONE | 1/1          | 2/2    | src/**tests**/unit/routes/ProtectedRoute.test.tsx                                                     | RED inicial registrado no ciclo da story                 | Guard global aplicado no roteamento + commit realizado                                                |
+| 2   | 0.2.1 | ✅ DONE | 1/1          | 3/3    | src/**tests**/unit/routes/ProtectedRoute.test.tsx                                                     | RED registrado na suite de rotas                         | routes.ts segmentado por role (professor/student e professor only) + commit realizado                 |
+| 3   | 0.3.1 | ✅ DONE | 1/1          | 3/3    | src/**tests**/unit/pages/roleCleanup.test.tsx                                                         | Suite de regressão criada no ciclo                       | Role cleanup concluído em pages; mensageria protegida por rota; commits 41a3b29 + 1d0cccb publicados  |
+| 4   | 0.4.1 | ✅ DONE | 2/2          | 3/3    | src/**tests**/unit/store/authLogout.test.ts, src/**tests**/unit/components/AuthLayout.logout.test.tsx | RED validado (1 falha funcional)                         | Logout local aplicado no AuthLayout sem endpoint backend                                              |
+| 5   | 0.5.1 | ✅ DONE | 2/2          | 3/3    | src/**tests**/unit/pages/UnauthorizedPage.test.tsx                                                    | RED validado (import da página ausente)                  | UnauthorizedPage criada com botão de retorno e redirecionamento automático para /courses              |
+| 6   | 0.6.1 | ✅ DONE | 1/1          | 4/4    | src/**tests**/unit/routes/publicRoutes.test.tsx                                                       | RED estrutural (testes antes de rodar)                   | Suite valida que /, /register, /forgot-password e /unauthorized são acessíveis sem autenticação       |
+| 7   | 1.1.1 | ✅ DONE | 2/2          | 27/27  | Type-check OK; Vitest: 27/27 testes passando                                                          | Draft: tipos consolidados em @ava-poc/types              | Consolidação de tipos em v1.0 + resolução de role (professor/student/admin) + imports bem-definidos   |
+| 8   | 2.4.1 | ✅ DONE | (git manual) | 9/9    | src/**tests**/RegisterPage.test.tsx                                                                   | RED escrito (9 testes antes da implementação)            | Integração RegisterPage com POST /auth/cadastro; mapeamento perfil professor↔PROFESSOR, student↔ALUNO |
+| 9   | 2.5.1 | ✅ DONE | `deb0d06`    | 4/4    | src/**tests**/unit/services/api.refresh-interceptor.test.ts                                           | RED validado via testes do fluxo 401                     | Refresh automático com retry seguro; fallback de logout sem loop infinito                             |
+| 10  | 2.6.1 | ✅ DONE | (sem commit) | 4/4    | src/**tests**/ProfilePage.test.tsx                                                                    | RED validado (falha inicial de render na regra de hooks) | ProfilePage integrada com GET /perfil, PUT /perfil/senha e upload de foto validado                    |
 
-**Resumo:** Fases 0 e 1 concluídas e auditadas (100%). Fase 2 em progresso: 2.1, 2.2, 2.3, 2.4 e 2.5 concluídas. Próxima: 2.6 (ProfilePage).
+**Resumo:** Fases 0 e 1 concluídas e auditadas (100%). Fase 2 em progresso: 2.1, 2.2, 2.3, 2.4, 2.5 e 2.6 concluídas. Próxima: 2.7 (Forgot/Reset password).
 
 **Atualização 2.1 (fora da tabela por limite de largura):**
 
@@ -129,14 +131,13 @@
 - A rota `/admin/usuarios` não existe no roteador atual (`src/routes.ts`); registrado para implementação posterior quando a rota/página admin estiver no escopo ativo.
 - Task 2.4 implementada com validações Zod (nome, cpf, email, senha, perfil) e integração com POST /auth/cadastro
 
-**UPDATE 30/03/2026 — Subtarefa 2.5 concluída (com commit):**
+**UPDATE 30/03/2026 — Subtarefa 2.6 concluída (sem commit/push):**
 
-- Commit registrado: `deb0d06` — `refactor: tipar retry config e ajustar interceptor de refresh` (30/03/2026 09:55)
-- Arquivos alterados: `src/services/api.ts` e `src/__tests__/unit/services/api.refresh-interceptor.test.ts`
-- Testes executados: 4/4 (refresh interceptor) + 12/12 (interceptors relacionados)
+- Arquivos alterados: `src/pages/ProfilePage.tsx` e `src/__tests__/ProfilePage.test.tsx`
+- Testes executados: 4/4 (ProfilePage) + 4/4 (refresh interceptor)
 - Type-check: ✅ sem erros
-- Próxima implementação definida em 2.6
-- Métricas recalculadas: 18/43 (42%) e Fase 2 em 5/7 (71%)
+- Próxima implementação definida em 2.7
+- Métricas recalculadas: 19/43 (44%) e Fase 2 em 6/7 (86%)
 
 ### For Next Session
 
@@ -146,8 +147,8 @@ Quando você voltar para continuar:
 # 1. Antes de tudo, validar contexto
 /status-refactoring
 
-# 2. Começar Fase 2.6 (ProfilePage com backend)
-Implemente 2.6 (Integrar ProfilePage com GET /perfil)
+# 2. Começar Fase 2.7 (Forgot + Reset password)
+Implemente 2.7 (Integrar ForgotPasswordPage e ResetPasswordPage)
 
 # OU se preferir planejamento antes:
 /start-implementation
@@ -240,7 +241,7 @@ _Será atualizada conforme velocidade real for estabelecida._
 | Ação                            | Comando                                |
 | ------------------------------- | -------------------------------------- |
 | Ver status atual                | `/status-refactoring`                  |
-| Começar implementação           | `Implemente 2.6`                       |
+| Começar implementação           | `Implemente 2.7`                       |
 | Ver contexto                    | Ler este arquivo: **MEMORY.md**        |
 | Consultar detalhes da subtarefa | `docs/REFACTORING_PLAN_GRANULAR_V2.md` |
 | Validar contexto todo           | `/start-implementation`                |
@@ -272,7 +273,7 @@ _Será atualizada conforme velocidade real for estabelecida._
 
 ## 🚦 Bloqueadores
 
-Nenhum blocker técnico para continuar 2.6 no frontend.
+Nenhum blocker técnico para continuar 2.7 no frontend.
 
 ---
 
@@ -283,7 +284,7 @@ Nenhum blocker técnico para continuar 2.6 no frontend.
 - **TypeScript:** strict mode — validar interface de store
 - **Padrão TDD:** Aprovado, seguir AAA (Arrange, Act, Assert)
 - **Commits:** 2.1 concluída com sequência granular test → feat → refactor
-- **Próximo foco:** 2.6 integração do perfil com endpoints reais
+- **Próximo foco:** 2.7 recuperação e redefinição de senha com tokens
 
 ---
 
@@ -330,5 +331,5 @@ Quando finalizar story, verificar:
 ---
 
 **Última atualização:** 30/03/2026  
-**Status:** Fase 2.5 concluída, 2.6 ready  
+**Status:** Fase 2.6 concluída, 2.7 ready  
 **Sessão ativa:** SIM

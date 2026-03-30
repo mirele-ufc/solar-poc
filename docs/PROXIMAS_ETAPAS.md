@@ -1,22 +1,22 @@
 # 🔄 Próximas Etapas — Fase 2 (Autenticação com Backend)
 
 **Data:** 30/03/2026  
-**Status Atual:** Fase 2 — 5/7 subtarefas completadas (71%)  
-**Total Progresso:** 18/43 subtarefas (42%)
+**Status Atual:** Fase 2 — 6/7 subtarefas completadas (86%)  
+**Total Progresso:** 19/43 subtarefas (44%)
 
 ---
 
 ## 📋 Fase 2 — Roadmap (7 subtarefas)
 
-| #   | Subtarefa                               | Status     | Duração  | Dependências |
-| --- | --------------------------------------- | ---------- | -------- | ------------ |
-| 2.1 | authService endpoints (Auth/Perfil)     | ✅ DONE    | 1 dia    | -            |
-| 2.2 | Request Interceptor JWT                 | ✅ DONE    | 1 dia    | 2.1          |
-| 2.3 | Integrar LoginPage com POST /auth/login | ✅ DONE    | 1.5 dias | 2.2          |
-| 2.4 | Integrar RegisterPage com backend       | ✅ DONE    | 1 dia    | 2.3          |
-| 2.5 | Implementar refresh token flow          | ✅ DONE    | 1 dia    | 2.4          |
-| 2.6 | Integrar ProfilePage com backend        | ⏳ NEXT    | 1.5 dias | 2.5          |
-| 2.7 | Admin: Ativar/desativar contas          | ⏳ BLOCKED | 1 dia    | 2.1          |
+| #   | Subtarefa                               | Status  | Duração  | Dependências |
+| --- | --------------------------------------- | ------- | -------- | ------------ |
+| 2.1 | authService endpoints (Auth/Perfil)     | ✅ DONE | 1 dia    | -            |
+| 2.2 | Request Interceptor JWT                 | ✅ DONE | 1 dia    | 2.1          |
+| 2.3 | Integrar LoginPage com POST /auth/login | ✅ DONE | 1.5 dias | 2.2          |
+| 2.4 | Integrar RegisterPage com backend       | ✅ DONE | 1 dia    | 2.3          |
+| 2.5 | Implementar refresh token flow          | ✅ DONE | 1 dia    | 2.4          |
+| 2.6 | Integrar ProfilePage com backend        | ✅ DONE | 1.5 dias | 2.5          |
+| 2.7 | Integrar ForgotPassword + ResetPassword | ⏳ NEXT | 2 dias   | 2.6          |
 
 ---
 
@@ -135,10 +135,10 @@
   └── 2.2 (Request Interceptor) ✅
       └── 2.3 (LoginPage) ✅
           ├── 2.4 (RegisterPage) ✅
-          │   └── 2.5 (Refresh Token) ⏳
-          │       └── 2.6 (ProfilePage) ⏳
+          │   └── 2.5 (Refresh Token) ✅
+          │       └── 2.6 (ProfilePage) ✅
           │
-          └── 2.7 (Admin activation) ⏳
+          └── 2.7 (Forgot + Reset Password) ⏳
 ```
 
 ---
@@ -249,8 +249,8 @@ git status          # ✅ Sem tracked/untracked
 
 ---
 
-**Próximo agente:** Use `/status-refactoring` para validar readiness de 2.6  
-**Executar 2.6:** Use `Implemente 2.6` após aprovação
+**Próximo agente:** Use `/status-refactoring` para validar readiness de 2.7  
+**Executar 2.7:** Use `Implemente 2.7` após aprovação
 
 ---
 

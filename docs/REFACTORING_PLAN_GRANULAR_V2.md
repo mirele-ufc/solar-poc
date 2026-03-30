@@ -1181,7 +1181,7 @@ test: Validar fluxo de recuperação de senha (token expirado, código usado)
 - [x] LoginPage integrada com backend
 - [x] RegisterPage integrada com backend
 - [x] Refresh token flow automático
-- [ ] ProfilePage integrada com backend (GET /perfil, PUT /perfil/senha)
+- [x] ProfilePage integrada com backend (GET /perfil, PUT /perfil/senha)
 - [ ] ForgotPasswordPage + ResetPasswordPage integradas
 - [ ] Logout permanece local e não chama endpoint inexistente
 - [ ] Branch `feature/refactor-auth-backend` mergeada em development
