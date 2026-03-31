@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter as Router } from "react-router";
+import { MemoryRouter as Router } from "react-router-dom";
 import { RegisterPage } from "@/pages/RegisterPage";
 import * as authService from "@/services/authService";
 import { toast } from "sonner";

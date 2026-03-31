@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter, Route, Routes } from "react-router";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
 import type { IUserSession } from "@ava-poc/types";
 import { useAuthStore } from "@/store/useAuthStore";

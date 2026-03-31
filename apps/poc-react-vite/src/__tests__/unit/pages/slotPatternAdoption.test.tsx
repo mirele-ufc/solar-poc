@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it } from "vitest";
 import { CourseDetailPage } from "@/pages/CourseDetailPage";
 import { CoursesPage } from "@/pages/CoursesPage";
