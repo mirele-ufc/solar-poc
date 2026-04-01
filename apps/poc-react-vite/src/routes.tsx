@@ -34,11 +34,11 @@ import { PythonExamResultPage } from "./pages/PythonExamResultPage";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 import type { UserRole } from "./routes/types";
 
-function createRoleGuard(allowedRoles: ReadonlyArray<UserRole>) {
-  return function RoleGuard() {
-    return createElement(ProtectedRoute, { allowedRoles });
-  };
-}
+// function createRoleGuard(allowedRoles: ReadonlyArray<UserRole>) {
+//   return function RoleGuard() {
+//     return createElement(ProtectedRoute, { allowedRoles });
+//   };
+// }
 
 const STUDENT_AND_PROFESSOR_ROLES: ReadonlyArray<UserRole> = [
   "professor",
