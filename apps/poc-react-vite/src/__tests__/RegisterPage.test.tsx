@@ -3,11 +3,15 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter as Router } from "react-router-dom";
 import { RegisterPage } from "@/pages/RegisterPage";
-import * as authService from "@/services/authService";
+import { mockAuthService } from "@/services/mockAuthService";
 import { toast } from "sonner";
 
 // Mock dependencies
-vi.mock("@/services/authService");
+vi.mock("@/services/mockAuthService", () => ({
+  mockAuthService: {
+    register: vi.fn(),
+  },
+}));
 vi.mock("sonner", () => ({
   toast: {
     success: vi.fn(),
@@ -25,7 +29,7 @@ describe("RegisterPage - Task 2.4", () => {
     render(
       <Router>
         <RegisterPage />
-      </Router>
+      </Router>,
     );
 
     const nomeInput = screen.getByLabelText(/nome/i);
@@ -48,7 +52,7 @@ describe("RegisterPage - Task 2.4", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(/por favor, preencha os campos destacados/i)
+        screen.getByText(/por favor, preencha os campos destacados/i),
       ).toBeInTheDocument();
     });
   });
@@ -58,7 +62,7 @@ describe("RegisterPage - Task 2.4", () => {
     render(
       <Router>
         <RegisterPage />
-      </Router>
+      </Router>,
     );
 
     const nomeInput = screen.getByLabelText(/nome/i);
@@ -80,7 +84,7 @@ describe("RegisterPage - Task 2.4", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(/a senha deve ter ao menos 6 caracteres/i)
+        screen.getByText(/a senha deve ter ao menos 6 caracteres/i),
       ).toBeInTheDocument();
     });
   });
@@ -90,7 +94,7 @@ describe("RegisterPage - Task 2.4", () => {
     render(
       <Router>
         <RegisterPage />
-      </Router>
+      </Router>,
     );
 
     const nomeInput = screen.getByLabelText(/nome/i);
@@ -111,30 +115,18 @@ describe("RegisterPage - Task 2.4", () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/as senhas não coincidem/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/as senhas não coincidem/i)).toBeInTheDocument();
     });
   });
 
   it("cadastra com sucesso e exibe mensagem de conta pendente", async () => {
     const user = userEvent.setup();
-    vi.mocked(authService.authService.register).mockResolvedValue({
-      accessToken: "token123",
-      refreshToken: "refresh123",
-      usuario: {
-        id: 1,
-        nome: "João Silva",
-        email: "joao@example.com",
-        perfil: "PROFESSOR",
-        status: "INATIVO",
-      },
-    } as any);
+    vi.mocked(mockAuthService.register).mockResolvedValue(undefined);
 
     render(
       <Router>
         <RegisterPage />
-      </Router>
+      </Router>,
     );
 
     const nomeInput = screen.getByLabelText(/nome/i);
@@ -158,7 +150,7 @@ describe("RegisterPage - Task 2.4", () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(authService.authService.register).toHaveBeenCalledWith({
+      expect(mockAuthService.register).toHaveBeenCalledWith({
         nome: "João Silva",
         cpf: "123.456.789-01",
         email: "joao@example.com",
@@ -169,14 +161,14 @@ describe("RegisterPage - Task 2.4", () => {
 
     await waitFor(() => {
       expect(toast.success).toHaveBeenCalledWith(
-        "Conta pendente de ativação. Verifique seu email."
+        "Conta pendente de ativação. Verifique seu email.",
       );
     });
   });
 
   it("trata erro 409 de CPF/email duplicado", async () => {
     const user = userEvent.setup();
-    vi.mocked(authService.authService.register).mockRejectedValue({
+    vi.mocked(mockAuthService.register).mockRejectedValue({
       status: 409,
       message: "CPF already exists",
     });
@@ -184,7 +176,7 @@ describe("RegisterPage - Task 2.4", () => {
     render(
       <Router>
         <RegisterPage />
-      </Router>
+      </Router>,
     );
 
     const nomeInput = screen.getByLabelText(/nome/i);
@@ -209,7 +201,7 @@ describe("RegisterPage - Task 2.4", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(/cpf ou email já cadastrados no sistema/i)
+        screen.getByText(/cpf ou email já cadastrados no sistema/i),
       ).toBeInTheDocument();
     });
   });
@@ -219,7 +211,7 @@ describe("RegisterPage - Task 2.4", () => {
     render(
       <Router>
         <RegisterPage />
-      </Router>
+      </Router>,
     );
 
     const nomeInput = screen.getByLabelText(/nome/i);
@@ -243,11 +235,11 @@ describe("RegisterPage - Task 2.4", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(/deve aceitar os termos de privacidade/i)
+        screen.getByText(/deve aceitar os termos de privacidade/i),
       ).toBeInTheDocument();
     });
 
-    expect(authService.authService.register).not.toHaveBeenCalled();
+    expect(mockAuthService.register).not.toHaveBeenCalled();
   });
 
   it("valida nome mínimo 3 caracteres", async () => {
@@ -255,7 +247,7 @@ describe("RegisterPage - Task 2.4", () => {
     render(
       <Router>
         <RegisterPage />
-      </Router>
+      </Router>,
     );
 
     const nomeInput = screen.getByLabelText(/nome/i);
@@ -282,15 +274,12 @@ describe("RegisterPage - Task 2.4", () => {
 
   it("mapeia perfil professor corretamente para PROFESSOR", async () => {
     const user = userEvent.setup();
-    vi.mocked(authService.authService.register).mockResolvedValue({
-      accessToken: "token123",
-      refreshToken: "refresh123",
-    } as any);
+    vi.mocked(mockAuthService.register).mockResolvedValue(undefined);
 
     render(
       <Router>
         <RegisterPage />
-      </Router>
+      </Router>,
     );
 
     const nomeInput = screen.getByLabelText(/nome/i);
@@ -314,25 +303,22 @@ describe("RegisterPage - Task 2.4", () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(authService.authService.register).toHaveBeenCalledWith(
+      expect(mockAuthService.register).toHaveBeenCalledWith(
         expect.objectContaining({
           perfil: "PROFESSOR",
-        })
+        }),
       );
     });
   });
 
   it("mapeia perfil student corretamente para ALUNO", async () => {
     const user = userEvent.setup();
-    vi.mocked(authService.authService.register).mockResolvedValue({
-      accessToken: "token123",
-      refreshToken: "refresh123",
-    } as any);
+    vi.mocked(mockAuthService.register).mockResolvedValue(undefined);
 
     render(
       <Router>
         <RegisterPage />
-      </Router>
+      </Router>,
     );
 
     const nomeInput = screen.getByLabelText(/nome/i);
@@ -356,10 +342,10 @@ describe("RegisterPage - Task 2.4", () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(authService.authService.register).toHaveBeenCalledWith(
+      expect(mockAuthService.register).toHaveBeenCalledWith(
         expect.objectContaining({
           perfil: "ALUNO",
-        })
+        }),
       );
     });
   });

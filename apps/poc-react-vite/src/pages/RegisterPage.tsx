@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormContainer } from "@/components/shared/FormContainer";
-import { authService } from "@/services/authService";
+import { mockAuthService } from "@/services/mockAuthService";
 import { toast } from "sonner";
 import imgUfcLogo1 from "@/assets/9098abf5bf97a1aac4c76f171ec108cee92cfddb.png";
 import imgAtivo224X1 from "@/assets/a17a08a750e97ba9bb12c3ad582c426a8debf0fa.png";
@@ -231,7 +231,7 @@ export function RegisterPage() {
 
     try {
       const perfil = form.perfil === "professor" ? "PROFESSOR" : "ALUNO";
-      await authService.register({
+      await mockAuthService.register({
         nome: form.nome,
         cpf: form.cpf,
         email: form.email,
