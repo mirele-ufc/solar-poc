@@ -1,0 +1,115 @@
+/**
+ * Constantes de endpoints da API
+ * Centralizado para facilitar manutenção
+ */
+
+const API_BASE = process.env.VITE_API_URL || 'http://localhost:8080';
+
+export const API_ENDPOINTS = {
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // AUTH
+  // ═══════════════════════════════════════════════════════════════════════════════
+  AUTH: {
+    LOGIN: `${API_BASE}/auth/login`,
+    CADASTRO: `${API_BASE}/auth/cadastro`,
+    REFRESH: `${API_BASE}/auth/refresh`,
+    RECUPERAR_SENHA: `${API_BASE}/auth/recuperar-senha`,
+    REDEFINIR_SENHA: `${API_BASE}/auth/redefinir-senha`,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // PERFIL
+  // ═══════════════════════════════════════════════════════════════════════════════
+  PERFIL: {
+    GET: `${API_BASE}/perfil`,
+    UPLOAD_FOTO: `${API_BASE}/perfil/foto`,
+    ALTERAR_SENHA: `${API_BASE}/perfil/senha`,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // ADMIN
+  // ═══════════════════════════════════════════════════════════════════════════════
+  ADMIN: {
+    USUARIOS: `${API_BASE}/admin/usuarios`,
+    USUARIO_ATIVAR: (id: string) => `${API_BASE}/admin/usuarios/${id}/ativar`,
+    USUARIO_DESATIVAR: (id: string) => `${API_BASE}/admin/usuarios/${id}/desativar`,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // CURSOS
+  // ═══════════════════════════════════════════════════════════════════════════════
+  CURSOS: {
+    LIST: `${API_BASE}/cursos`,
+    CREATE: `${API_BASE}/cursos`,
+    GET: (id: string) => `${API_BASE}/cursos/${id}`,
+    UPDATE: (id: string) => `${API_BASE}/cursos/${id}`,
+    DELETE: (id: string) => `${API_BASE}/cursos/${id}`,
+    STATUS: (id: string) => `${API_BASE}/cursos/${id}/status`,
+    SEARCH: `${API_BASE}/cursos/buscar`,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // MÓDULOS
+  // ═══════════════════════════════════════════════════════════════════════════════
+  MODULOS: {
+    CREATE: (cursoId: string) => `${API_BASE}/cursos/${cursoId}/modulos`,
+    UPDATE: (id: string) => `${API_BASE}/modulos/${id}`,
+    DELETE: (id: string) => `${API_BASE}/modulos/${id}`,
+    REORDER: (id: string) => `${API_BASE}/modulos/${id}/ordem`,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // AULAS
+  // ═══════════════════════════════════════════════════════════════════════════════
+  AULAS: {
+    CREATE: (moduloId: string) => `${API_BASE}/modulos/${moduloId}/aulas`,
+    UPDATE: (id: string) => `${API_BASE}/aulas/${id}`,
+    DELETE: (id: string) => `${API_BASE}/aulas/${id}`,
+    REORDER: (id: string) => `${API_BASE}/aulas/${id}/ordem`,
+    GERAR_CONTEUDO: (id: string) => `${API_BASE}/aulas/${id}/gerar-conteudo`,
+    CONFIRMAR_CONTEUDO: (id: string) => `${API_BASE}/aulas/${id}/confirmar-conteudo`,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // PROVAS
+  // ═══════════════════════════════════════════════════════════════════════════════
+  PROVAS: {
+    CREATE: (moduloId: string) => `${API_BASE}/modulos/${moduloId}/prova`,
+    GET: (moduloId: string) => `${API_BASE}/modulos/${moduloId}/prova`,
+    UPDATE: (id: string) => `${API_BASE}/provas/${id}`,
+    DELETE: (id: string) => `${API_BASE}/provas/${id}`,
+    GERAR_QUIZ_IA: (moduloId: string) => `${API_BASE}/modulos/${moduloId}/prova/gerar-quiz-ia`,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // PERGUNTAS
+  // ═══════════════════════════════════════════════════════════════════════════════
+  PERGUNTAS: {
+    CREATE: (provaId: string) => `${API_BASE}/provas/${provaId}/perguntas`,
+    UPDATE: (id: string) => `${API_BASE}/perguntas/${id}`,
+    DELETE: (id: string) => `${API_BASE}/perguntas/${id}`,
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // ALTERNATIVAS
+  // ═══════════════════════════════════════════════════════════════════════════════
+  ALTERNATIVAS: {
+    CREATE: (perguntaId: string) => `${API_BASE}/perguntas/${perguntaId}/alternativas`,
+    UPDATE: (id: string) => `${API_BASE}/alternativas/${id}`,
+    DELETE: (id: string) => `${API_BASE}/alternativas/${id}`,
+  },
+} as const;
+
+/**
+ * Verificar se a URL é de um endpoint da API
+ */
+export function isApiUrl(url: string): boolean {
+  return url.startsWith(API_BASE);
+}
+
+/**
+ * Extrair endpoint relativo (sem base URL)
+ */
+export function getRelativeUrl(fullUrl: string): string {
+  return fullUrl.replace(API_BASE, '');
+}
