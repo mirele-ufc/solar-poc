@@ -41,7 +41,7 @@ describe("useAuthStore", () => {
 
   describe("Login - acessar()", () => {
     it("deve atualizar currentUser após login bem-sucedido", () => {
-      useAuthStore.getState().login("professor", "professor");
+      useAuthStore.getState().login("professor", "senha123");
       const state = useAuthStore.getState();
 
       expect(state.currentUser).not.toBeNull();
@@ -49,7 +49,7 @@ describe("useAuthStore", () => {
     });
 
     it("deve atualizar isLoggedIn = true após login bem-sucedido", () => {
-      useAuthStore.getState().login("professor", "professor");
+      useAuthStore.getState().login("professor", "senha123");
       const state = useAuthStore.getState();
 
       expect(state.isLoggedIn).toBe(true);
@@ -66,7 +66,7 @@ describe("useAuthStore", () => {
   describe("Logout - sair()", () => {
     it("deve limpar currentUser após logout", () => {
       // Setup: login first
-      useAuthStore.getState().login("professor", "professor");
+      useAuthStore.getState().login("professor", "senha123");
       expect(useAuthStore.getState().isLoggedIn).toBe(true);
 
       // Action: logout
@@ -79,7 +79,7 @@ describe("useAuthStore", () => {
 
     it("deve atualizar isLoggedIn = false após logout", () => {
       // Setup: login first
-      useAuthStore.getState().login("professor", "professor");
+      useAuthStore.getState().login("professor", "senha123");
 
       // Action: logout
       useAuthStore.getState().logout();
@@ -90,7 +90,7 @@ describe("useAuthStore", () => {
 
     it("deve limpar sentMessages após logout", () => {
       // Setup: login and send message
-      useAuthStore.getState().login("professor", "professor");
+      useAuthStore.getState().login("professor", "senha123");
       useAuthStore.getState().sendMessage({
         recipientId: "class-001",
         recipientLabel: "Minha Turma",
@@ -150,7 +150,7 @@ describe("useAuthStore", () => {
 
   describe("updateCurrentUser()", () => {
     it("deve atualizar propriedades de currentUser", () => {
-      useAuthStore.getState().login("professor", "professor");
+      useAuthStore.getState().login("professor", "senha123");
 
       useAuthStore.getState().updateCurrentUser({
         nome: "Prof. Updated",

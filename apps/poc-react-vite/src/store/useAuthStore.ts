@@ -39,40 +39,43 @@ type AuthStoreSnapshot = {
   isLoggedIn: boolean;
 };
 
+type MockUserCredential = {
+  identifiers: string[];
+  password: string;
+  profile: IUserSession;
+};
+
 /**
- * Hardcoded credentials for prototype demonstration
- * Maps username to password and user profile
- *
- * ⚠️ PROTOTYPE ONLY:
- * In production, authentication must be backend-driven with secure token management.
+ * Mock users for local authentication without backend/database.
  */
-const CREDENTIALS: Record<string, { password: string; profile: IUserSession }> =
+const MOCK_USERS: MockUserCredential[] = [
   {
-    professor: {
-      password: "professor",
-      profile: {
-        id: "user-professor-001",
-        nome: "Prof. Eduardo Silva",
-        cpf: "98765432100",
-        email: "professor@ufc.br",
-        fotoUrl: undefined,
-        role: "professor",
-        status: "ATIVO",
-      },
+    identifiers: ["professor", "professor@ufc.br", "prof_teste"],
+    password: "senha123",
+    profile: {
+      id: "user-professor-001",
+      nome: "Prof. Eduardo Silva",
+      cpf: "98765432100",
+      email: "professor@ufc.br",
+      fotoUrl: undefined,
+      role: "professor",
+      status: "ATIVO",
     },
-    estudante: {
-      password: "estudante",
-      profile: {
-        id: "user-student-001",
-        nome: "Eduardo Marinho",
-        cpf: "12345678901",
-        email: "eduardo.marinho@ufc.br",
-        fotoUrl: undefined,
-        role: "student",
-        status: "ATIVO",
-      },
+  },
+  {
+    identifiers: ["estudante", "aluno", "aluno@ufc.br"],
+    password: "senha123",
+    profile: {
+      id: "user-student-001",
+      nome: "Eduardo Marinho",
+      cpf: "12345678901",
+      email: "aluno@ufc.br",
+      fotoUrl: undefined,
+      role: "student",
+      status: "ATIVO",
     },
-  };
+  },
+];
 
 const INITIAL_STATE: Pick<
   AuthStore,
@@ -112,8 +115,14 @@ export const useAuthStore = create<AuthStore>((set) => ({
    * @returns true if login successful, false otherwise
    */
   login: (username: string, password: string): boolean => {
-    const entry = CREDENTIALS[username.toLowerCase()];
-    if (entry && entry.password === password) {
+    const normalizedIdentifier = username.trim().toLowerCase();
+    const entry = MOCK_USERS.find(
+      (user) =>
+        user.identifiers.includes(normalizedIdentifier) &&
+        user.password === password,
+    );
+
+    if (entry) {
       set((state) => ({
         ...state,
         currentUser: { ...entry.profile },
