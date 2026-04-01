@@ -117,11 +117,6 @@ export const authService = {
     const response = await apiClient.patch<ApiEnvelope<IMessageResponse>>(
       "/perfil/foto",
       formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      },
     );
 
     return response.data.data;

@@ -5,6 +5,28 @@ import {
   IUpdateCoursePayload,
 } from "@ava-poc/types";
 
+type ApiEnvelope<T> = {
+  data: T;
+  message: string;
+  status: number;
+};
+
+export type BackendCourseCreatePayload = {
+  title: string;
+  category: string;
+  description: string;
+};
+
+export type BackendCourseResponse = {
+  id: number;
+  title: string;
+  category: string;
+  description: string;
+  imagePath: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 /**
  * Fetch all courses from the back-end
  * Returns a list of all available courses
@@ -59,6 +81,33 @@ export async function createCourse(
     console.error("Failed to create course:", error);
     throw error;
   }
+}
+
+/**
+ * Create a course using the backend contract for PoC (multipart/form-data).
+ * - `dados`: JSON part with title/category/description
+ * - `imagem`: optional image file
+ */
+export async function createCourseWithBackend(
+  payload: BackendCourseCreatePayload,
+  imageFile?: File,
+): Promise<BackendCourseResponse> {
+  const formData = new FormData();
+  formData.append(
+    "dados",
+    new Blob([JSON.stringify(payload)], { type: "application/json" }),
+  );
+
+  if (imageFile) {
+    formData.append("imagem", imageFile);
+  }
+
+  const response = await apiClient.post<ApiEnvelope<BackendCourseResponse>>(
+    "/courses",
+    formData,
+  );
+
+  return response.data.data;
 }
 
 /**
