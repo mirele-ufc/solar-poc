@@ -1,7 +1,7 @@
 # MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
 
-**Última atualização:** 2026-04-01T16:15:00Z
-**Status geral:** 30% (Fases 0.0 + 0.1 concluídas; 0.2 próxima)
+**Última atualização:** 2026-04-01T17:45:00Z
+**Status geral:** 45% (Fase 0 concluída; Fase 1 próxima)
 **Git branch:** feature/refactor-auth-data-layer
 **Stack:** React 18 + Vite + TypeScript 5.9.3 + Zustand 4.5.7 + TanStack Query 5.96.1 + Zod 3.25.76
 
@@ -11,47 +11,53 @@
 
 | Fase | Módulo | Status | Commits | Testes | Notas |
 |------|--------|--------|---------|--------|-------|
-| **0.0** | Setup: Arquivos config | ✅ DONE | 0/1 | 0/0 | MEMORY.md, SETUP.md, .env.example criados |
-| **0.1** | Setup: Estrutura + tipos + HTTP | ✅ DONE | 0/1 | 0/0 | 12 dirs, tipos (index/api/errors), client.ts, endpoints.ts |
-| **0.2** | Setup: Validação + Store + Providers | 🔄 IN_PROGRESS | 0/1 | 0/0 | Criando Zod schemas, Zustand stores, providers |
-| **1.0** | Auth: Integração JWT real | ⏳ NOT_STARTED | 0/1 | 0/1 | Aguardando 0.2 |
+| **0.0** | Setup: Arquivos config | ✅ DONE | 1/1 | 0/0 | MEMORY.md, SETUP.md, .env.example |
+| **0.1** | Setup: Estrutura + tipos + HTTP | ✅ DONE | 1/1 | 0/0 | 12 dirs, tipos, client, endpoints |
+| **0.2** | Setup: Validação + Store + Providers | ✅ DONE | 0/1 | 0/0 | Zod schemas, Zustand stores, providers criados |
+| **1.0** | Auth: Integração JWT real | 🔄 IN_PROGRESS | 0/1 | 0/1 | Próxima: implementar LoginPage integration |
 | **1.1** | Auth: useAuthentication hook | ⏳ NOT_STARTED | 0/1 | 0/1 | Aguardando 1.0 |
-| **1.2** | Auth: LoginPage refactor | ⏳ NOT_STARTED | 0/1 | 0/1 | Aguardando 1.1 |
+| **1.2** | Auth: CadastroPage refactor | ⏳ NOT_STARTED | 0/1 | 0/1 | Aguardando 1.1 |
 
 ---
 
 ## Próxima Ação
 
-**Story:** 0.2 — Criar Zod schemas + Zustand stores + Providers
-**Etapa:** Criar validações centralizadas + state management + app-level providers
+**Story:** 1.0 — Integração de Autenticação JWT (LoginPage)
+**Etapa:** Criar custom hook useAuthentication com chamadas ao API
 **Arquivos:** 
-- Criar: `src/validations/authSchema.ts`, `courseSchema.ts`, `moduleSchema.ts`, etc (5 arquivos)
-- Criar: `src/store/useAuthStore.ts`, `useCourseStore.ts`, etc (5 arquivos)
-- Criar: `src/providers/QueryClientProvider.tsx`, `ErrorBoundary.tsx` (2 arquivos)
-- Criar: `src/utils/formatters.ts`, `errorHandler.ts` (2 arquivos)
-**Estimativa:** 3-4h
-**Verificação:** `npm run type-check` deve passar (todos os arquivos novos)
+- Criar: `src/hooks/useAuthentication.ts` (orquestracao de login + Zustand store)
+- Refactor: `src/app/components/LoginPage.tsx` (usar hook + validação Zod)
+**Estimativa:** 2-3h
+**Verificação:** `npm run type-check` sem erros; login form funciona com API real
 
 ---
 
 ## Arquivos em Edição
 
-- [x] MEMORY.md (✅ CRIADO e atualizado)
-- [x] SETUP.md (✅ CRIADO)
-- [x] .env.example (✅ CRIADO)
-- [x] src/types/index.ts (✅ CRIADO — 150 linhas, tipos base)
-- [x] src/types/api.ts (✅ CRIADO — 250 linhas, request/response)
-- [x] src/types/errors.ts (✅ CRIADO — 100 linhas, error handling)
-- [x] src/services/api/client.ts (✅ CRIADO — 300 linhas, Axios + interceptors)
-- [x] src/services/api/endpoints.ts (✅ CRIADO — 80 linhas, constantes)
-- [x] package.json (✅ ATUALIZADO — scripts + 8 deps)
-- [x] tsconfig.json (✅ CRIADO — strict mode)
-- [x] tsconfig.node.json (✅ CRIADO)
-- [ ] src/validations/authSchema.ts (TODO)
-- [ ] src/validations/courseSchema.ts (TODO)
-- [ ] src/store/useAuthStore.ts (TODO)
-- [ ] src/providers/QueryClientProvider.tsx (TODO)
-- [ ] ... (ver `/memories/session/plan.md` para lista completa)
+**Phase 0 — CONCLUÍDA:**
+- [x] MEMORY.md (✅)
+- [x] SETUP.md (✅)
+- [x] .env.example (✅)
+- [x] src/types/index.ts (✅)
+- [x] src/types/api.ts (✅)
+- [x] src/types/errors.ts (✅)
+- [x] src/services/api/client.ts (✅)
+- [x] src/services/api/endpoints.ts (✅)
+- [x] tsconfig.json (✅)
+- [x] package.json (✅)
+
+**Phase 0.2 — RECÉM CONCLUÍDA:**
+- [x] src/validations/authSchema.ts (✅)
+- [x] src/validations/courseSchema.ts (✅)
+- [x] src/validations/moduleSchema.ts (✅)
+- [x] src/validations/lessonSchema.ts (✅)
+- [x] src/validations/quizSchema.ts (✅)
+- [x] src/store/useAuthStore.ts (✅)
+- [x] src/store/useContentStore.ts (✅)
+- [x] src/providers/ErrorBoundary.tsx (✅)
+- [x] src/providers/QueryClientProvider.tsx (✅)
+- [x] src/utils/formatters.ts (✅)
+- [x] src/utils/errorHandler.ts (✅)
 
 ---
 

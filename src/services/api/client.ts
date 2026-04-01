@@ -13,7 +13,6 @@ import axios, {
 } from 'axios';
 
 import { ApiErrorException, ErrorCode, ValidationError, FieldError } from '../../types/errors';
-import type { ApiResponse } from '../../types';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // ◆ TIPOS
@@ -120,9 +119,10 @@ class ApiClient {
       // 401 Unauthorized → precisa fazer login
       if (status === 401) {
         // Limpar token e redirecionar será feito no React layer
+        const message = typeof data?.message === 'string' ? data.message : 'Não autorizado. Faça login novamente.';
         return new ApiErrorException(
           ErrorCode.UNAUTHORIZED,
-          data?.message || 'Não autorizado. Faça login novamente.',
+          message,
           undefined,
           401,
         );
@@ -133,12 +133,14 @@ class ApiClient {
         // Tentar extrair erros de validação
         const errors = this.extractValidationErrors(data);
         if (errors.length > 0) {
-          return new ValidationError(errors, data?.message || 'Erro de validação');
+          const message = typeof data?.message === 'string' ? data.message : 'Erro de validação';
+          return new ValidationError(errors, message);
         }
 
+        const message = typeof data?.message === 'string' ? data.message : 'Dados inválidos';
         return new ApiErrorException(
           ErrorCode.INVALID_INPUT,
-          data?.message || 'Dados inválidos',
+          message,
           data,
           400,
         );
@@ -146,9 +148,10 @@ class ApiClient {
 
       // 404 Not Found
       if (status === 404) {
+        const message = typeof data?.message === 'string' ? data.message : 'Recurso não encontrado';
         return new ApiErrorException(
           ErrorCode.NOT_FOUND,
-          data?.message || 'Recurso não encontrado',
+          message,
           undefined,
           404,
         );
@@ -156,18 +159,20 @@ class ApiClient {
 
       // 5xx Server Error
       if (status >= 500) {
+        const message = typeof data?.message === 'string' ? data.message : 'Erro no servidor. Tente novamente mais tarde.';
         return new ApiErrorException(
           ErrorCode.SERVER_ERROR,
-          data?.message || 'Erro no servidor. Tente novamente mais tarde.',
+          message,
           undefined,
           status,
         );
       }
 
       // Erro genérico
+      const message = typeof data?.message === 'string' ? data.message : 'Erro desconhecido';
       return new ApiErrorException(
         ErrorCode.UNKNOWN_ERROR,
-        data?.message || 'Erro desconhecido',
+        message,
         data,
         status,
       );
