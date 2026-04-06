@@ -207,7 +207,7 @@ export function CreateCoursePage() {
       {/* Image placeholder */}
       <button
         type="button"
-        aria-label="Clique para adicionar imagem do curso (obrigatório)"
+        aria-label="Clique para adicionar imagem do curso (opcional)"
         onClick={() => imageInputRef.current?.click()}
         className={`w-full h-[218px] md:h-[280px] flex flex-col items-center justify-center hover:bg-[#3a3a3a] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] overflow-hidden ${showFieldErrors && !!errors.coverFile ? "bg-[#c0392b]/20 outline outline-2 outline-[#c0392b]" : "bg-[#484848]"}`}
       >

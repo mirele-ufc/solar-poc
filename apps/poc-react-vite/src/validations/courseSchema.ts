@@ -21,7 +21,7 @@ export const createCourseSchema = z.object({
   category: z.string().trim().min(1, "A categoria é obrigatória"),
   hours: z.string().trim().min(1, "A carga horária é obrigatória"),
   requiredFields: z.array(z.string()),
-  coverFile: imageFileSchema,
+  coverFile: imageFileSchema.optional(),
 });
 
 export const courseCreateSchema = z.object({
