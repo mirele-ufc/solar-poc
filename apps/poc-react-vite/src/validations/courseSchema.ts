@@ -54,20 +54,7 @@ export const moduleImageSchema = z.object({
 });
 
 export const createModulesSchema = z.object({
-  modules: z
-    .array(moduleImageSchema)
-    .min(1, "Adicione ao menos um módulo")
-    .superRefine((modules, ctx) => {
-      modules.forEach((moduleItem, index) => {
-        if (!moduleItem.imageFile) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Imagem obrigatória",
-            path: [index, "imageFile"],
-          });
-        }
-      });
-    }),
+  modules: z.array(moduleImageSchema).min(1, "Adicione ao menos um módulo"),
 });
 
 export type CreateCourseFormValues = z.infer<typeof createCourseSchema>;

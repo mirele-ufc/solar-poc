@@ -9,7 +9,9 @@ import {
   createModulesSchema,
   type CreateModulesFormValues,
 } from "@/validations/courseSchema";
-import { imageFileSchema, uploadFileSchema } from "@/validations/fileSchema";
+import { imageFileSchema, lessonFileSchema } from "@/validations/fileSchema";
+import { createModuleWithBackend } from "@/services/moduleService";
+import { createLessonWithBackend } from "@/services/lessonService";
 
 // ── SVG paths ──────────────────────────────────────────────────────────────────
 const docPath =
@@ -20,9 +22,20 @@ const checkPath = "M5 9L3 11L9 17L19 7L17 5L9 13L5 9Z";
 const imgIconPath =
   "M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z";
 
-type Lesson = { id: string; name: string; file: string | null };
+type Lesson = {
+  id: string;
+  backendLessonId?: string;
+  name: string;
+  file: string | null;
+  fileBlob?: File;
+  contentEditor?: string | null;
+};
+
+type LessonDraft = Pick<Lesson, "name" | "file" | "fileBlob" | "contentEditor">;
+
 type Module = {
   id: string;
+  backendModuleId?: string;
   name: string;
   image: string | null;
   lessons: Lesson[];
@@ -37,12 +50,12 @@ function AddLessonPopup({
   onConfirm,
 }: {
   onClose: () => void;
-  onConfirm: (name: string, file: string | null) => void;
+  onConfirm: (lesson: LessonDraft) => void;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<1 | 2>(1);
   const [lessonName, setLessonName] = useState("");
-  const [file, setFile] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [aiText, setAiText] = useState("");
 
@@ -58,23 +71,28 @@ function AddLessonPopup({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) {
-      setFile(null);
+      setSelectedFile(null);
       return;
     }
 
-    const parsed = uploadFileSchema.safeParse(f);
+    const parsed = lessonFileSchema.safeParse(f);
     if (!parsed.success) {
       setError(parsed.error.issues[0]?.message ?? "Arquivo inválido");
-      setFile(null);
+      setSelectedFile(null);
       return;
     }
 
     setError("");
-    setFile(f.name);
+    setSelectedFile(f);
   };
 
   const handleConfirm = () => {
-    onConfirm(lessonName.trim(), file);
+    onConfirm({
+      name: lessonName.trim(),
+      file: selectedFile?.name ?? null,
+      fileBlob: selectedFile ?? undefined,
+      contentEditor: aiText.trim() || null,
+    });
     onClose();
   };
 
@@ -96,7 +114,7 @@ function AddLessonPopup({
                 aria-label="Voltar"
                 onClick={() => {
                   setStep(1);
-                  setFile(null);
+                  setSelectedFile(null);
                 }}
                 className="size-[44px] flex items-center justify-center hover:bg-[#f5f5f5] rounded focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
               >
@@ -212,13 +230,15 @@ function AddLessonPopup({
                 className="w-full h-[72px] border border-dashed border-[#8e8e8e] rounded-[12px] flex items-center justify-center hover:bg-[#f5f5f5] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
               >
                 <p className="font-['Figtree:Regular',sans-serif] font-normal text-[#606060] text-[14px] text-center px-[10px]">
-                  {file ? `✓ ${file}` : "Clique para selecionar um arquivo"}
+                  {selectedFile
+                    ? `✓ ${selectedFile.name}`
+                    : "Clique para selecionar um PDF ou documento de texto"}
                 </p>
               </button>
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/jpeg,image/png,application/pdf"
+                accept=".pdf,.txt,.md,.doc,.docx,.odt,text/plain,text/markdown,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.oasis.opendocument.text"
                 className="hidden"
                 aria-hidden="true"
                 tabIndex={-1}
@@ -317,12 +337,11 @@ export function CreateModulesPage() {
   const location = useLocation();
   const courseData = (location.state?.courseData ?? {}) as CourseInfoData;
 
-  const [modules, setModules] = useState<Module[]>([
-    { id: uid(), name: "Módulo 01", image: null, lessons: [] },
-  ]);
+  const [modules, setModules] = useState<Module[]>([]);
   const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [showErrors, setShowErrors] = useState(false);
+  const [isSavingModules, setIsSavingModules] = useState(false);
   const [moduleImageFiles, setModuleImageFiles] = useState<
     Record<string, File | undefined>
   >({});
@@ -333,7 +352,7 @@ export function CreateModulesPage() {
   } = useForm<CreateModulesFormValues>({
     resolver: zodResolver(createModulesSchema),
     defaultValues: {
-      modules: [{ imageFile: undefined }],
+      modules: [],
     },
   });
 
@@ -382,15 +401,23 @@ export function CreateModulesPage() {
     });
   };
 
-  const handleAddLesson = (
-    modId: string,
-    name: string,
-    file: string | null,
-  ) => {
+  const handleAddLesson = (modId: string, lessonDraft: LessonDraft) => {
     setModules((prev) =>
       prev.map((m) =>
         m.id === modId
-          ? { ...m, lessons: [...m.lessons, { id: uid(), name, file }] }
+          ? {
+              ...m,
+              lessons: [
+                ...m.lessons,
+                {
+                  id: uid(),
+                  name: lessonDraft.name,
+                  file: lessonDraft.file,
+                  fileBlob: lessonDraft.fileBlob,
+                  contentEditor: lessonDraft.contentEditor,
+                },
+              ],
+            }
           : m,
       ),
     );
@@ -440,8 +467,103 @@ export function CreateModulesPage() {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
+
+    if (!courseData.backendCourseId) {
+      setError(
+        "O curso ainda não foi criado no backend. Volte para a etapa anterior e tente novamente.",
+      );
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
     setError("");
-    navigate("/create-course/exam", { state: { courseData, modules } });
+    setIsSavingModules(true);
+
+    try {
+      const persistedModules: Module[] = [];
+
+      for (const moduleItem of modules) {
+        let persistedModule = { ...moduleItem };
+
+        if (!persistedModule.backendModuleId) {
+          const createdModule = await createModuleWithBackend(
+            courseData.backendCourseId,
+            {
+              name: moduleItem.name.trim(),
+            },
+            moduleImageFiles[moduleItem.id],
+          );
+
+          persistedModule = {
+            ...persistedModule,
+            backendModuleId: String(createdModule.id),
+            image: moduleItem.image ?? createdModule.imagePath,
+          };
+        }
+
+        const backendModuleId = persistedModule.backendModuleId;
+
+        if (!backendModuleId) {
+          throw new Error(
+            "Não foi possível identificar o módulo criado no backend.",
+          );
+        }
+
+        const persistedLessons: Lesson[] = [];
+
+        for (const lesson of persistedModule.lessons) {
+          if (lesson.backendLessonId) {
+            persistedLessons.push(lesson);
+            continue;
+          }
+
+          const createdLesson = await createLessonWithBackend(
+            backendModuleId,
+            {
+              name: lesson.name.trim(),
+              contentEditor: lesson.contentEditor?.trim() || undefined,
+            },
+            lesson.fileBlob,
+          );
+
+          persistedLessons.push({
+            ...lesson,
+            backendLessonId: String(createdLesson.id),
+            file: lesson.file ?? createdLesson.filePath,
+            contentEditor:
+              lesson.contentEditor ?? createdLesson.contentEditor ?? null,
+          });
+        }
+
+        persistedModule = {
+          ...persistedModule,
+          lessons: persistedLessons,
+        };
+
+        persistedModules.push(persistedModule);
+      }
+
+      setModules(persistedModules);
+      navigate("/create-course/exam", {
+        state: { courseData, modules: persistedModules },
+      });
+    } catch (apiError) {
+      const err = apiError as { message?: string; status?: number };
+      if (err.status === 400 || err.status === 422) {
+        setError("Dados inválidos para criação dos módulos. Revise os campos.");
+      } else if (err.status === 404) {
+        setError(
+          "Curso não encontrado no backend. Recrie o curso e tente novamente.",
+        );
+      } else {
+        setError(
+          err.message || "Não foi possível criar os módulos no momento.",
+        );
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } finally {
+      setIsSavingModules(false);
+    }
   };
 
   return (
@@ -529,7 +651,7 @@ export function CreateModulesPage() {
                   {/* Module image upload */}
                   <button
                     type="button"
-                    aria-label={`Adicionar imagem para ${mod.name} (obrigatório)`}
+                    aria-label={`Adicionar imagem para ${mod.name} (opcional)`}
                     onClick={() => imgRefs.current[mod.id]?.click()}
                     className={`w-full h-[140px] rounded-[8px] overflow-hidden flex flex-col items-center justify-center transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] ${mod.image ? "" : imgMissing ? "bg-[#c0392b]/10 border-2 border-dashed border-[#c0392b]" : "bg-[#f0f0f0] border-2 border-dashed border-[#8e8e8e] hover:bg-[#e8e8e8]"}`}
                   >
@@ -560,7 +682,7 @@ export function CreateModulesPage() {
                         >
                           {imgMissing
                             ? moduleError
-                            : "Clique para adicionar imagem do módulo"}
+                            : "Clique para adicionar imagem do módulo (opcional)"}
                         </p>
                       </>
                     )}
@@ -607,12 +729,12 @@ export function CreateModulesPage() {
                         >
                           <input
                             type="file"
-                            accept="image/jpeg,image/png,application/pdf"
+                            accept=".pdf,.txt,.md,.doc,.docx,.odt,text/plain,text/markdown,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.oasis.opendocument.text"
                             className="sr-only"
                             onChange={(e) => {
                               const f = e.target.files?.[0];
                               if (!f) return;
-                              const parsed = uploadFileSchema.safeParse(f);
+                              const parsed = lessonFileSchema.safeParse(f);
                               if (!parsed.success) {
                                 setError(
                                   parsed.error.issues[0]?.message ??
@@ -628,7 +750,11 @@ export function CreateModulesPage() {
                                         ...m,
                                         lessons: m.lessons.map((l) =>
                                           l.id === lesson.id
-                                            ? { ...l, file: f.name }
+                                            ? {
+                                                ...l,
+                                                file: f.name,
+                                                fileBlob: f,
+                                              }
                                             : l,
                                         ),
                                       }
@@ -733,8 +859,8 @@ export function CreateModulesPage() {
       {activeModuleId && (
         <AddLessonPopup
           onClose={() => setActiveModuleId(null)}
-          onConfirm={(name, file) =>
-            handleAddLesson(activeModuleId, name, file)
+          onConfirm={(lessonDraft) =>
+            handleAddLesson(activeModuleId, lessonDraft)
           }
         />
       )}
@@ -745,10 +871,12 @@ export function CreateModulesPage() {
           <button
             type="button"
             onClick={handleNext}
-            className="bg-[#ffeac4] h-[50px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59]"
+            disabled={isSavingModules}
+            aria-busy={isSavingModules}
+            className="bg-[#ffeac4] h-[50px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
-              Próximo
+              {isSavingModules ? "Processando..." : "Próximo"}
             </span>
           </button>
         </div>

@@ -50,6 +50,7 @@ describe("D3 Modal adoption in pages", () => {
       </MemoryRouter>,
     );
 
+    fireEvent.click(screen.getByRole("button", { name: "Adicionar módulo" }));
     fireEvent.click(screen.getByRole("button", { name: "Adicionar aula" }));
 
     expect(document.querySelector('[data-slot="modal"]')).not.toBeNull();
