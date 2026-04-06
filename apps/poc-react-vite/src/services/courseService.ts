@@ -6,9 +6,10 @@ import {
 } from "@ava-poc/types";
 
 type ApiEnvelope<T> = {
-  data: T;
-  message: string;
-  status: number;
+  sucesso: boolean;
+  mensagem: string | null;
+  dados: T;
+  timestamp: string;
 };
 
 export type BackendCourseCreatePayload = {
@@ -107,7 +108,7 @@ export async function createCourseWithBackend(
     formData,
   );
 
-  return response.data.data;
+  return response.data.dados;
 }
 
 /**
