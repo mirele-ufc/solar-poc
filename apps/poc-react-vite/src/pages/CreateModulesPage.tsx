@@ -55,27 +55,30 @@ function AddLessonPopup({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<1 | 2>(1);
   const [lessonName, setLessonName] = useState("");
+  const [lessonContent, setLessonContent] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [generatedContent, setGeneratedContent] = useState("");
   const [error, setError] = useState("");
-  const [aiText, setAiText] = useState("");
 
   const handleStep1 = () => {
     if (!lessonName.trim()) {
       setError("Informe o nome da aula.");
       return;
     }
+
     setError("");
     setStep(2);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (!f) {
+    const file = e.target.files?.[0];
+
+    if (!file) {
       setSelectedFile(null);
       return;
     }
 
-    const parsed = lessonFileSchema.safeParse(f);
+    const parsed = lessonFileSchema.safeParse(file);
     if (!parsed.success) {
       setError(parsed.error.issues[0]?.message ?? "Arquivo inválido");
       setSelectedFile(null);
@@ -83,7 +86,37 @@ function AddLessonPopup({
     }
 
     setError("");
-    setSelectedFile(f);
+    setSelectedFile(file);
+  };
+
+  const handleSaveDraft = () => {
+    if (!lessonContent.trim() && !selectedFile) {
+      setError("Adicione um conteúdo ou arquivo para salvar a aula.");
+      return;
+    }
+
+    setError("");
+  };
+
+  const handleGenerateWithAi = () => {
+    if (!lessonContent.trim()) {
+      setError("Escreva o conteúdo da aula para gerar uma sugestão com IA.");
+      return;
+    }
+
+    setGeneratedContent(
+      `Versão estruturada pela IA:\n\n${lessonContent.trim()}`,
+    );
+    setError("");
+  };
+
+  const handleUseGeneratedContent = () => {
+    if (!generatedContent.trim()) {
+      return;
+    }
+
+    setLessonContent(generatedContent);
+    setError("");
   };
 
   const handleConfirm = () => {
@@ -91,7 +124,7 @@ function AddLessonPopup({
       name: lessonName.trim(),
       file: selectedFile?.name ?? null,
       fileBlob: selectedFile ?? undefined,
-      contentEditor: aiText.trim() || null,
+      contentEditor: lessonContent.trim() || null,
     });
     onClose();
   };
@@ -101,47 +134,61 @@ function AddLessonPopup({
       isOpen
       onClose={onClose}
       aria-label="Adicionar aula"
-      className="w-full max-w-[420px] rounded-[16px] p-0 shadow-2xl"
+      className="w-full max-w-[480px] rounded-[20px] p-0 shadow-2xl"
       overlayClassName="px-[20px]"
     >
-      <div className="p-[24px] flex flex-col gap-[20px]">
-        {/* Header */}
+      <div className="flex flex-col gap-[18px] p-[24px] md:p-[28px]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-[10px]">
-            {step === 2 && (
+            {step === 2 ? (
               <button
                 type="button"
                 aria-label="Voltar"
-                onClick={() => {
-                  setStep(1);
-                  setSelectedFile(null);
-                }}
-                className="size-[44px] flex items-center justify-center hover:bg-[#f5f5f5] rounded focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+                onClick={() => setStep(1)}
+                className="size-[40px] rounded-full flex items-center justify-center text-[#021b59] hover:bg-[#edf2ff] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
               >
-                <span className="text-[#021b59] text-[18px] leading-none">
-                  ‹
-                </span>
+                <span className="text-[28px] leading-none">‹</span>
               </button>
+            ) : (
+              <div className="size-[40px]" aria-hidden="true" />
             )}
-            <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
+            <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px] md:text-[21px]">
               {step === 1 ? "Adicionar Aula" : "Confirmar Aula"}
             </p>
           </div>
-          <div className="size-[44px]" aria-hidden="true" />
+
+          <button
+            type="button"
+            aria-label="Fechar modal"
+            onClick={onClose}
+            className="size-[40px] rounded-full flex items-center justify-center hover:bg-[#f5f5f5] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+          >
+            <svg
+              className="size-[18px]"
+              fill="none"
+              viewBox="0 0 28 28"
+              aria-hidden="true"
+            >
+              <path
+                clipRule="evenodd"
+                d={closeLgPath}
+                fill="#021b59"
+                fillRule="evenodd"
+              />
+            </svg>
+          </button>
         </div>
 
-        {/* Step indicator */}
         <div
           className="flex items-center gap-[8px]"
           aria-label={`Passo ${step} de 2`}
         >
-          <div className="flex-1 h-[4px] rounded-full bg-[#021b59]" />
+          <div className="h-[4px] flex-1 rounded-full bg-[#021b59]" />
           <div
-            className={`flex-1 h-[4px] rounded-full transition-colors ${step === 2 ? "bg-[#021b59]" : "bg-[#e0e0e0]"}`}
+            className={`h-[4px] flex-1 rounded-full ${step === 2 ? "bg-[#021b59]" : "bg-[#d8deeb]"}`}
           />
         </div>
 
-        {/* ── Step 1: Lesson name ── */}
         {step === 1 && (
           <>
             <div className="flex flex-col gap-[6px]">
@@ -151,7 +198,7 @@ function AddLessonPopup({
               >
                 Nome da aula
               </label>
-              <div className="border border-[#8e8e8e] rounded-[12px] h-[50px] relative">
+              <div className="relative h-[50px] rounded-[12px] border border-[#8e8e8e]">
                 <input
                   id="lesson-name"
                   type="text"
@@ -161,37 +208,32 @@ function AddLessonPopup({
                   onKeyDown={(e) => {
                     if (e.key === "Enter") handleStep1();
                   }}
-                  className="w-full h-full px-[16px] font-['Figtree:Regular',sans-serif] text-[16px] text-[#333] placeholder-[#8e8e8e] bg-transparent outline-none rounded-[12px]"
+                  className="h-full w-full rounded-[12px] bg-transparent px-[16px] font-['Figtree:Regular',sans-serif] text-[16px] text-[#333] placeholder-[#8e8e8e] outline-none"
                   autoFocus
-                />
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-0 pointer-events-none focus-within:outline focus-within:outline-[2px] focus-within:outline-[#021b59] rounded-[12px]"
                 />
               </div>
               {error && (
-                <p role="alert" className="text-[#c0392b] text-[13px]">
+                <p role="alert" className="text-[13px] text-[#c0392b]">
                   {error}
                 </p>
               )}
             </div>
+
             <button
               type="button"
               onClick={handleStep1}
-              className="bg-[#ffeac4] h-[46px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+              className="h-[48px] w-full rounded-[26px] bg-[#ffeac4] transition-colors hover:bg-[#ffd9a0] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
             >
-              <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[18px]">
+              <span className="font-['Figtree:Medium',sans-serif] font-medium text-[18px] text-[#333]">
                 Próximo
               </span>
             </button>
           </>
         )}
 
-        {/* ── Step 2: Confirm name + file upload ── */}
         {step === 2 && (
           <>
-            {/* Show saved lesson name as read-only */}
-            <div className="bg-[#c5d6ff] rounded-[12px] px-[16px] py-[12px] flex items-center gap-[10px]">
+            <div className="flex items-center gap-[10px] rounded-[14px] bg-[#c5d6ff] px-[16px] py-[12px]">
               <svg
                 className="size-[22px] shrink-0"
                 fill="none"
@@ -209,17 +251,33 @@ function AddLessonPopup({
                 <p className="font-['Figtree:Regular',sans-serif] text-[12px] text-[#595959]">
                   Nome salvo:
                 </p>
-                <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[17px]">
+                <p className="font-['Figtree:Medium',sans-serif] font-medium text-[18px] text-[#021b59]">
                   {lessonName}
                 </p>
               </div>
             </div>
 
-            {/* File upload */}
             <div className="flex flex-col gap-[6px]">
-              <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[18px]">
+              <label
+                htmlFor="lesson-content"
+                className="font-['Figtree:Medium',sans-serif] font-medium text-[18px] text-[#333]"
+              >
+                Conteúdo da aula
+              </label>
+              <textarea
+                id="lesson-content"
+                rows={5}
+                placeholder="Cole aqui o conteúdo em texto da aula..."
+                value={lessonContent}
+                onChange={(e) => setLessonContent(e.target.value)}
+                className="min-h-[110px] w-full rounded-[14px] border border-[#8e8e8e] bg-transparent px-[14px] py-[12px] font-['Figtree:Regular',sans-serif] text-[14px] text-[#333] placeholder-[#8e8e8e] outline-none resize-none focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+              />
+            </div>
+
+            <div className="flex flex-col gap-[6px]">
+              <p className="font-['Figtree:Medium',sans-serif] font-medium text-[18px] text-[#333]">
                 Arquivo da aula{" "}
-                <span className="text-[#8e8e8e] text-[14px] font-normal">
+                <span className="font-normal text-[14px] text-[#8e8e8e]">
                   (opcional)
                 </span>
               </p>
@@ -227,13 +285,13 @@ function AddLessonPopup({
                 type="button"
                 aria-label="Selecionar arquivo para a aula"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full h-[72px] border border-dashed border-[#8e8e8e] rounded-[12px] flex items-center justify-center hover:bg-[#f5f5f5] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+                className="flex h-[54px] w-full items-center justify-center rounded-[14px] border border-dashed border-[#8e8e8e] bg-white px-[12px] text-center transition-colors hover:bg-[#f8f8f8] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
               >
-                <p className="font-['Figtree:Regular',sans-serif] font-normal text-[#606060] text-[14px] text-center px-[10px]">
+                <span className="font-['Figtree:Regular',sans-serif] text-[14px] text-[#606060]">
                   {selectedFile
                     ? `✓ ${selectedFile.name}`
-                    : "Clique para selecionar um PDF ou documento de texto"}
-                </p>
+                    : "Clique para selecionar um arquivo"}
+                </span>
               </button>
               <input
                 ref={fileInputRef}
@@ -246,81 +304,79 @@ function AddLessonPopup({
               />
             </div>
 
-            {/* AI Quiz generation */}
-            <div className="flex flex-col gap-[6px]">
-              <label
-                htmlFor="ai-quiz-text"
-                className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[18px]"
+            <div className="grid grid-cols-2 gap-[12px]">
+              <button
+                type="button"
+                aria-label="Salvar aula"
+                onClick={handleSaveDraft}
+                className="h-[42px] rounded-[26px] border border-[#021b59] bg-white transition-colors hover:bg-[#eef3ff] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
               >
-                Gerar quiz com IA{" "}
-                <span className="text-[#8e8e8e] text-[14px] font-normal">
-                  (opcional)
+                <span className="font-['Figtree:Medium',sans-serif] font-medium text-[16px] text-[#021b59]">
+                  Salvar aula
                 </span>
-              </label>
-              <p className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[13px] leading-[20px]">
-                Cole um texto abaixo e a IA gerará automaticamente um quiz para
-                a aula.
+              </button>
+              <button
+                type="button"
+                aria-label="Gerar com IA"
+                onClick={handleGenerateWithAi}
+                className="h-[42px] rounded-[26px] bg-[#021b59] transition-colors hover:bg-[#042e99] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+              >
+                <span className="font-['Figtree:Medium',sans-serif] font-medium text-[16px] text-white">
+                  Gerar com IA
+                </span>
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-[12px] rounded-[14px] border border-[#dddddd] bg-[#f8f8f8] p-[14px]">
+              <p className="font-['Figtree:Medium',sans-serif] font-medium text-[16px] text-[#333]">
+                Conteúdo gerado
               </p>
-              <div className="relative border border-[#8e8e8e] rounded-[12px] overflow-hidden focus-within:outline focus-within:outline-[2px] focus-within:outline-[#021b59]">
-                <textarea
-                  id="ai-quiz-text"
-                  rows={5}
-                  placeholder="Cole aqui o conteúdo que será usado para gerar as perguntas…"
-                  value={aiText}
-                  onChange={(e) => setAiText(e.target.value)}
-                  className="w-full px-[14px] py-[12px] font-['Figtree:Regular',sans-serif] text-[14px] text-[#333] placeholder-[#8e8e8e] bg-transparent outline-none resize-none leading-[22px]"
-                />
-                {aiText && (
-                  <div className="flex items-center justify-between px-[14px] py-[8px] bg-[#f5f8ff] border-t border-[#e0e0e0]">
-                    <span className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[12px]">
-                      {aiText.trim().split(/\s+/).length} palavras detectadas
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setAiText("")}
-                      className="font-['Figtree:Regular',sans-serif] text-[#de2e66] text-[12px] hover:underline focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded"
-                      aria-label="Limpar texto colado"
-                    >
-                      Limpar
-                    </button>
-                  </div>
-                )}
-              </div>
-              {aiText.trim().split(/\s+/).length >= 20 && (
+
+              <textarea
+                value={generatedContent}
+                readOnly
+                placeholder="O conteúdo gerado pela IA aparecerá aqui..."
+                className="min-h-[100px] w-full rounded-[12px] border border-[#dddddd] bg-white px-[12px] py-[10px] font-['Figtree:Regular',sans-serif] text-[14px] text-[#606060] placeholder-[#9a9a9a] outline-none resize-none"
+              />
+
+              <div className="grid grid-cols-2 gap-[12px]">
                 <button
                   type="button"
-                  onClick={() => {
-                    /* TODO: integrar com API de IA para geração do quiz */
-                    alert(
-                      "Quiz gerado pela IA com base no texto fornecido. (Funcionalidade em desenvolvimento)",
-                    );
-                  }}
-                  className="flex items-center justify-center gap-[8px] h-[40px] w-full rounded-[26px] bg-[#021b59] hover:bg-[#042e99] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+                  aria-label="Regerar"
+                  onClick={handleGenerateWithAi}
+                  disabled={!lessonContent.trim()}
+                  className="h-[38px] rounded-[24px] border border-[#8a9ac4] bg-white transition-colors hover:bg-[#eef3ff] disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  <svg
-                    className="size-[16px] shrink-0"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M12 2L9.09 8.26L2 9.27L7 14.14L5.82 21.02L12 17.77L18.18 21.02L17 14.14L22 9.27L14.91 8.26L12 2Z"
-                      fill="#ffeac4"
-                    />
-                  </svg>
-                  <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#ffeac4] text-[15px]">
-                    Gerar quiz com IA
+                  <span className="font-['Figtree:Medium',sans-serif] font-medium text-[15px] text-[#6b7ea9]">
+                    Regerar
                   </span>
                 </button>
-              )}
+                <button
+                  type="button"
+                  aria-label="Confirmar conteúdo gerado"
+                  onClick={handleUseGeneratedContent}
+                  disabled={!generatedContent.trim()}
+                  className="h-[38px] rounded-[24px] bg-[#8192bd] transition-colors hover:bg-[#6f82b4] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <span className="font-['Figtree:Medium',sans-serif] font-medium text-[15px] text-white">
+                    Confirmar
+                  </span>
+                </button>
+              </div>
             </div>
+
+            {error && (
+              <p role="alert" className="text-[13px] text-[#c0392b]">
+                {error}
+              </p>
+            )}
 
             <button
               type="button"
               onClick={handleConfirm}
-              className="bg-[#ffeac4] h-[46px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+              className="h-[48px] w-full rounded-[26px] bg-[#f4dfb7] transition-colors hover:bg-[#ecd29f] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
             >
-              <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[18px]">
+              <span className="font-['Figtree:Medium',sans-serif] font-medium text-[18px] text-[#333]">
                 Finalizar
               </span>
             </button>
@@ -369,17 +425,58 @@ export function CreateModulesPage() {
     });
   }, [modules, moduleImageFiles, setValue, showErrors]);
 
-  const addModule = () => {
-    const n = modules.length + 1;
-    setModules((prev) => [
-      ...prev,
-      {
-        id: uid(),
-        name: `Módulo ${String(n).padStart(2, "0")}`,
-        image: null,
-        lessons: [],
-      },
-    ]);
+  const addModule = async () => {
+    if (isSavingModules) {
+      return;
+    }
+
+    if (!courseData.backendCourseId) {
+      setError(
+        "O curso ainda não foi criado no backend. Volte para a etapa anterior e tente novamente.",
+      );
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    const moduleNumber = modules.length + 1;
+    const moduleName = `Módulo ${String(moduleNumber).padStart(2, "0")}`;
+
+    setError("");
+    setIsSavingModules(true);
+
+    try {
+      const createdModule = await createModuleWithBackend(
+        courseData.backendCourseId,
+        {
+          name: moduleName,
+        },
+      );
+
+      setModules((prev) => [
+        ...prev,
+        {
+          id: uid(),
+          backendModuleId: String(createdModule.id),
+          name: createdModule.name || moduleName,
+          image: createdModule.imagePath,
+          lessons: [],
+        },
+      ]);
+    } catch (apiError) {
+      const err = apiError as { message?: string; status?: number };
+      if (err.status === 400 || err.status === 422) {
+        setError("Dados inválidos para criação do módulo. Revise os campos.");
+      } else if (err.status === 404) {
+        setError(
+          "Curso não encontrado no backend. Recrie o curso e tente novamente.",
+        );
+      } else {
+        setError(err.message || "Não foi possível criar o módulo no momento.");
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } finally {
+      setIsSavingModules(false);
+    }
   };
 
   const removeLesson = (modId: string, lessonId: string) => {
@@ -401,26 +498,68 @@ export function CreateModulesPage() {
     });
   };
 
-  const handleAddLesson = (modId: string, lessonDraft: LessonDraft) => {
-    setModules((prev) =>
-      prev.map((m) =>
-        m.id === modId
-          ? {
-              ...m,
-              lessons: [
-                ...m.lessons,
-                {
-                  id: uid(),
-                  name: lessonDraft.name,
-                  file: lessonDraft.file,
-                  fileBlob: lessonDraft.fileBlob,
-                  contentEditor: lessonDraft.contentEditor,
-                },
-              ],
-            }
-          : m,
-      ),
-    );
+  const handleAddLesson = async (modId: string, lessonDraft: LessonDraft) => {
+    const targetModule = modules.find((moduleItem) => moduleItem.id === modId);
+
+    if (!targetModule?.backendModuleId) {
+      setError(
+        "O módulo ainda não foi criado no backend. Tente novamente em instantes.",
+      );
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    setError("");
+    setIsSavingModules(true);
+
+    try {
+      const createdLesson = await createLessonWithBackend(
+        targetModule.backendModuleId,
+        {
+          name: lessonDraft.name.trim(),
+          contentEditor: lessonDraft.contentEditor?.trim() || undefined,
+        },
+        lessonDraft.fileBlob,
+      );
+
+      setModules((prev) =>
+        prev.map((moduleItem) =>
+          moduleItem.id === modId
+            ? {
+                ...moduleItem,
+                lessons: [
+                  ...moduleItem.lessons,
+                  {
+                    id: uid(),
+                    backendLessonId: String(createdLesson.id),
+                    name: lessonDraft.name,
+                    file: lessonDraft.file ?? createdLesson.filePath,
+                    fileBlob: lessonDraft.fileBlob,
+                    contentEditor:
+                      lessonDraft.contentEditor ??
+                      createdLesson.contentEditor ??
+                      null,
+                  },
+                ],
+              }
+            : moduleItem,
+        ),
+      );
+    } catch (apiError) {
+      const err = apiError as { message?: string; status?: number };
+      if (err.status === 400 || err.status === 422) {
+        setError("Dados inválidos para criação da aula. Revise os campos.");
+      } else if (err.status === 404) {
+        setError(
+          "Módulo não encontrado no backend. Recarregue a página e tente novamente.",
+        );
+      } else {
+        setError(err.message || "Não foi possível criar a aula no momento.");
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } finally {
+      setIsSavingModules(false);
+    }
   };
 
   const handleModuleImageChange = (
@@ -468,102 +607,10 @@ export function CreateModulesPage() {
       return;
     }
 
-    if (!courseData.backendCourseId) {
-      setError(
-        "O curso ainda não foi criado no backend. Volte para a etapa anterior e tente novamente.",
-      );
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
-
     setError("");
-    setIsSavingModules(true);
-
-    try {
-      const persistedModules: Module[] = [];
-
-      for (const moduleItem of modules) {
-        let persistedModule = { ...moduleItem };
-
-        if (!persistedModule.backendModuleId) {
-          const createdModule = await createModuleWithBackend(
-            courseData.backendCourseId,
-            {
-              name: moduleItem.name.trim(),
-            },
-            moduleImageFiles[moduleItem.id],
-          );
-
-          persistedModule = {
-            ...persistedModule,
-            backendModuleId: String(createdModule.id),
-            image: moduleItem.image ?? createdModule.imagePath,
-          };
-        }
-
-        const backendModuleId = persistedModule.backendModuleId;
-
-        if (!backendModuleId) {
-          throw new Error(
-            "Não foi possível identificar o módulo criado no backend.",
-          );
-        }
-
-        const persistedLessons: Lesson[] = [];
-
-        for (const lesson of persistedModule.lessons) {
-          if (lesson.backendLessonId) {
-            persistedLessons.push(lesson);
-            continue;
-          }
-
-          const createdLesson = await createLessonWithBackend(
-            backendModuleId,
-            {
-              name: lesson.name.trim(),
-              contentEditor: lesson.contentEditor?.trim() || undefined,
-            },
-            lesson.fileBlob,
-          );
-
-          persistedLessons.push({
-            ...lesson,
-            backendLessonId: String(createdLesson.id),
-            file: lesson.file ?? createdLesson.filePath,
-            contentEditor:
-              lesson.contentEditor ?? createdLesson.contentEditor ?? null,
-          });
-        }
-
-        persistedModule = {
-          ...persistedModule,
-          lessons: persistedLessons,
-        };
-
-        persistedModules.push(persistedModule);
-      }
-
-      setModules(persistedModules);
-      navigate("/create-course/exam", {
-        state: { courseData, modules: persistedModules },
-      });
-    } catch (apiError) {
-      const err = apiError as { message?: string; status?: number };
-      if (err.status === 400 || err.status === 422) {
-        setError("Dados inválidos para criação dos módulos. Revise os campos.");
-      } else if (err.status === 404) {
-        setError(
-          "Curso não encontrado no backend. Recrie o curso e tente novamente.",
-        );
-      } else {
-        setError(
-          err.message || "Não foi possível criar os módulos no momento.",
-        );
-      }
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } finally {
-      setIsSavingModules(false);
-    }
+    navigate("/create-course/exam", {
+      state: { courseData, modules },
+    });
   };
 
   return (
@@ -839,7 +886,9 @@ export function CreateModulesPage() {
         <button
           type="button"
           onClick={addModule}
-          className="h-[50px] w-full border-2 border-[#021b59] rounded-[26px] flex items-center justify-center gap-[8px] cursor-pointer hover:bg-[#021b59]/5 transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+          disabled={isSavingModules}
+          aria-busy={isSavingModules}
+          className="h-[50px] w-full border-2 border-[#021b59] rounded-[26px] flex items-center justify-center gap-[8px] cursor-pointer hover:bg-[#021b59]/5 transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <svg
             className="size-[28px] shrink-0"
