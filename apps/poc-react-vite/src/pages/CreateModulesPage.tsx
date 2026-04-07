@@ -50,7 +50,7 @@ function AddLessonPopup({
   onConfirm,
 }: {
   onClose: () => void;
-  onConfirm: (lesson: LessonDraft) => void;
+  onConfirm: (lesson: LessonDraft) => Promise<void> | void;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<1 | 2>(1);
@@ -59,6 +59,23 @@ function AddLessonPopup({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [generatedContent, setGeneratedContent] = useState("");
   const [error, setError] = useState("");
+  const [isSavingLesson, setIsSavingLesson] = useState(false);
+  const [isLessonSaved, setIsLessonSaved] = useState(false);
+
+  const hasLessonContent = lessonContent.trim().length > 0;
+  const hasSelectedFile = Boolean(selectedFile);
+  const hasGeneratedContent = generatedContent.trim().length > 0;
+  const canSaveLesson =
+    !isSavingLesson && !isLessonSaved && (hasLessonContent || hasSelectedFile);
+  const canGenerateWithAi =
+    isLessonSaved && (hasLessonContent || hasSelectedFile);
+
+  const buildLessonDraft = (): LessonDraft => ({
+    name: lessonName.trim(),
+    file: selectedFile?.name ?? null,
+    fileBlob: selectedFile ?? undefined,
+    contentEditor: lessonContent.trim() || null,
+  });
 
   const handleStep1 = () => {
     if (!lessonName.trim()) {
@@ -87,26 +104,44 @@ function AddLessonPopup({
 
     setError("");
     setSelectedFile(file);
+    setIsLessonSaved(false);
   };
 
-  const handleSaveDraft = () => {
+  const handleSaveDraft = async () => {
+    if (isLessonSaved) {
+      setError("A aula já foi salva. Clique em Finalizar para fechar o modal.");
+      return;
+    }
+
     if (!lessonContent.trim() && !selectedFile) {
       setError("Adicione um conteúdo ou arquivo para salvar a aula.");
       return;
     }
 
-    setError("");
+    setIsSavingLesson(true);
+
+    try {
+      await Promise.resolve(onConfirm(buildLessonDraft()));
+      setError("");
+      setIsLessonSaved(true);
+    } catch {
+      setError("Não foi possível salvar a aula no momento.");
+    } finally {
+      setIsSavingLesson(false);
+    }
   };
 
   const handleGenerateWithAi = () => {
-    if (!lessonContent.trim()) {
-      setError("Escreva o conteúdo da aula para gerar uma sugestão com IA.");
+    if (!isLessonSaved || (!hasLessonContent && !hasSelectedFile)) {
+      setError("Salve a aula com conteúdo ou arquivo antes de gerar com IA.");
       return;
     }
 
-    setGeneratedContent(
-      `Versão estruturada pela IA:\n\n${lessonContent.trim()}`,
-    );
+    const generatedBase = hasLessonContent
+      ? `Versão estruturada pela IA:\n\n${lessonContent.trim()}`
+      : `Versão estruturada pela IA com base no arquivo selecionado: ${selectedFile?.name ?? "arquivo enviado"}.`;
+
+    setGeneratedContent(generatedBase);
     setError("");
   };
 
@@ -116,16 +151,16 @@ function AddLessonPopup({
     }
 
     setLessonContent(generatedContent);
+    setIsLessonSaved(false);
     setError("");
   };
 
   const handleConfirm = () => {
-    onConfirm({
-      name: lessonName.trim(),
-      file: selectedFile?.name ?? null,
-      fileBlob: selectedFile ?? undefined,
-      contentEditor: lessonContent.trim() || null,
-    });
+    if (!isLessonSaved) {
+      setError('Clique em "Salvar aula" para criar a aula antes de finalizar.');
+      return;
+    }
+
     onClose();
   };
 
@@ -204,7 +239,10 @@ function AddLessonPopup({
                   type="text"
                   placeholder="Ex: Aula 01"
                   value={lessonName}
-                  onChange={(e) => setLessonName(e.target.value)}
+                  onChange={(e) => {
+                    setLessonName(e.target.value);
+                    setIsLessonSaved(false);
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") handleStep1();
                   }}
@@ -269,8 +307,12 @@ function AddLessonPopup({
                 rows={5}
                 placeholder="Cole aqui o conteúdo em texto da aula..."
                 value={lessonContent}
-                onChange={(e) => setLessonContent(e.target.value)}
-                className="min-h-[110px] w-full rounded-[14px] border border-[#8e8e8e] bg-transparent px-[14px] py-[12px] font-['Figtree:Regular',sans-serif] text-[14px] text-[#333] placeholder-[#8e8e8e] outline-none resize-none focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+                disabled={hasSelectedFile}
+                onChange={(e) => {
+                  setLessonContent(e.target.value);
+                  setIsLessonSaved(false);
+                }}
+                className="min-h-[110px] w-full rounded-[14px] border border-[#8e8e8e] bg-transparent px-[14px] py-[12px] font-['Figtree:Regular',sans-serif] text-[14px] text-[#333] placeholder-[#8e8e8e] outline-none resize-none focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:cursor-not-allowed disabled:bg-[#f3f4f6] disabled:text-[#8e8e8e]"
               />
             </div>
 
@@ -285,7 +327,8 @@ function AddLessonPopup({
                 type="button"
                 aria-label="Selecionar arquivo para a aula"
                 onClick={() => fileInputRef.current?.click()}
-                className="flex h-[54px] w-full items-center justify-center rounded-[14px] border border-dashed border-[#8e8e8e] bg-white px-[12px] text-center transition-colors hover:bg-[#f8f8f8] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+                disabled={hasLessonContent}
+                className="flex h-[54px] w-full items-center justify-center rounded-[14px] border border-dashed border-[#8e8e8e] bg-white px-[12px] text-center transition-colors hover:bg-[#f8f8f8] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:cursor-not-allowed disabled:bg-[#f3f4f6] disabled:opacity-60"
               >
                 <span className="font-['Figtree:Regular',sans-serif] text-[14px] text-[#606060]">
                   {selectedFile
@@ -297,6 +340,7 @@ function AddLessonPopup({
                 ref={fileInputRef}
                 type="file"
                 accept=".pdf,.txt,.md,.doc,.docx,.odt,text/plain,text/markdown,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.oasis.opendocument.text"
+                disabled={hasLessonContent}
                 className="hidden"
                 aria-hidden="true"
                 tabIndex={-1}
@@ -309,17 +353,23 @@ function AddLessonPopup({
                 type="button"
                 aria-label="Salvar aula"
                 onClick={handleSaveDraft}
-                className="h-[42px] rounded-[26px] border border-[#021b59] bg-white transition-colors hover:bg-[#eef3ff] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+                disabled={!canSaveLesson}
+                className="h-[42px] rounded-[26px] border border-[#021b59] bg-white transition-colors hover:bg-[#eef3ff] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <span className="font-['Figtree:Medium',sans-serif] font-medium text-[16px] text-[#021b59]">
-                  Salvar aula
+                  {isSavingLesson
+                    ? "Salvando..."
+                    : isLessonSaved
+                      ? "Aula salva"
+                      : "Salvar aula"}
                 </span>
               </button>
               <button
                 type="button"
                 aria-label="Gerar com IA"
                 onClick={handleGenerateWithAi}
-                className="h-[42px] rounded-[26px] bg-[#021b59] transition-colors hover:bg-[#042e99] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+                disabled={!canGenerateWithAi}
+                className="h-[42px] rounded-[26px] bg-[#021b59] transition-colors hover:bg-[#042e99] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:cursor-not-allowed disabled:bg-[#94a3c7] disabled:opacity-60"
               >
                 <span className="font-['Figtree:Medium',sans-serif] font-medium text-[16px] text-white">
                   Gerar com IA
@@ -344,7 +394,7 @@ function AddLessonPopup({
                   type="button"
                   aria-label="Regerar"
                   onClick={handleGenerateWithAi}
-                  disabled={!lessonContent.trim()}
+                  disabled={!hasGeneratedContent}
                   className="h-[38px] rounded-[24px] border border-[#8a9ac4] bg-white transition-colors hover:bg-[#eef3ff] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <span className="font-['Figtree:Medium',sans-serif] font-medium text-[15px] text-[#6b7ea9]">
@@ -355,7 +405,7 @@ function AddLessonPopup({
                   type="button"
                   aria-label="Confirmar conteúdo gerado"
                   onClick={handleUseGeneratedContent}
-                  disabled={!generatedContent.trim()}
+                  disabled={!hasGeneratedContent}
                   className="h-[38px] rounded-[24px] bg-[#8192bd] transition-colors hover:bg-[#6f82b4] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <span className="font-['Figtree:Medium',sans-serif] font-medium text-[15px] text-white">

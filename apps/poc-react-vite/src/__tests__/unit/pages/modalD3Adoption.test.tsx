@@ -51,6 +51,7 @@ function buildUser(role: IUserSession["role"]): IUserSession {
 
 describe("D3 Modal adoption in pages", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     useAuthStore.setState({
       currentUser: buildUser("professor"),
       isLoggedIn: true,
