@@ -1017,17 +1017,29 @@ export function CreateExamPage() {
                 ))}
               </div>
 
-              {/* Adicionar prova button — inside card, bottom, rounded */}
+              {/* Ações de prova — dentro do card, lado a lado */}
               <div className="p-[16px]">
-                <button
-                  type="button"
-                  onClick={() => openEditor(mod.id)}
-                  className="bg-[#ffeac4] h-[60px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
-                >
-                  <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
-                    {prova.length > 0 ? "Editar prova" : "Adicionar prova"}
-                  </span>
-                </button>
+                <div className="flex flex-col gap-[12px] sm:flex-row">
+                  <button
+                    type="button"
+                    onClick={() => openEditor(mod.id)}
+                    className="bg-[#ffeac4] h-[60px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+                  >
+                    <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
+                      {prova.length > 0 ? "Editar prova" : "Adicionar prova"}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => openEditor(mod.id)}
+                    className="bg-[#ffeac4] h-[60px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+                  >
+                    <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
+                      Adicionar prova com IA
+                    </span>
+                  </button>
+                </div>
               </div>
             </div>
           );
