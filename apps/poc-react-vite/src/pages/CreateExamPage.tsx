@@ -30,8 +30,88 @@ type Question = {
   points: number;
 };
 
+type AiExamReviewState = {
+  modId: string;
+  moduleName: string;
+  questions: Question[];
+  variantIndex: number;
+};
+
+type AiQuestionTemplate = {
+  text: string;
+  options: string[];
+  correctIndex: number;
+  points?: number;
+};
+
+const AI_EXAM_TEMPLATES: AiQuestionTemplate[][] = [
+  [
+    {
+      text: "Qual é o componente do hardware responsável por executar as instruções e realizar cálculos?",
+      options: [
+        "Processador (CPU)",
+        "Memória RAM",
+        "Disco Rígido (HD)",
+        "Placa-Mãe",
+      ],
+      correctIndex: 0,
+    },
+    {
+      text: "Qual é o tipo de memória que armazena os dados que o processador está utilizando no momento?",
+      options: ["Memória ROM", "Memória RAM", "SSD", "Placa de vídeo"],
+      correctIndex: 1,
+    },
+    {
+      text: "Qual componente é mais indicado para armazenamento permanente de arquivos?",
+      options: [
+        "Cache L1",
+        "Disco rígido / SSD",
+        "Registradores",
+        "Processador",
+      ],
+      correctIndex: 1,
+    },
+  ],
+  [
+    {
+      text: "Qual componente conecta e permite a comunicação entre os diversos dispositivos do computador?",
+      options: ["Fonte de alimentação", "Placa-Mãe", "Memória cache", "Monitor"],
+      correctIndex: 1,
+    },
+    {
+      text: "Qual componente é especializado no processamento gráfico?",
+      options: ["GPU / Placa de vídeo", "Memória ROM", "Teclado", "Cooler"],
+      correctIndex: 0,
+    },
+    {
+      text: "Qual memória perde os dados quando o computador é desligado?",
+      options: ["SSD", "HD", "Memória RAM", "Pen drive"],
+      correctIndex: 2,
+    },
+  ],
+];
+
 let _id = 1;
 const uid = () => String(_id++);
+
+function buildAiGeneratedQuestions(variantIndex = 0): Question[] {
+  const templates = AI_EXAM_TEMPLATES[variantIndex % AI_EXAM_TEMPLATES.length];
+
+  return templates.map((template) => {
+    const mappedOptions = template.options.map((text) => ({
+      id: uid(),
+      text,
+    }));
+
+    return {
+      id: uid(),
+      text: template.text,
+      options: mappedOptions,
+      correctOptionId: mappedOptions[template.correctIndex]?.id ?? "",
+      points: template.points ?? 1,
+    };
+  });
+}
 
 // ── Correct-answer dropdown ───────────────────────────────────────────────────
 function CorrectAnswerDropdown({
@@ -433,6 +513,174 @@ function PerguntasTab({
   );
 }
 
+function AiGeneratedExamReviewModal({
+  isOpen,
+  moduleName,
+  questions,
+  onClose,
+  onRegenerate,
+  onApprove,
+}: {
+  isOpen: boolean;
+  moduleName: string;
+  questions: Question[];
+  onClose: () => void;
+  onRegenerate: () => void;
+  onApprove: () => void;
+}) {
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      aria-labelledby="ai-exam-review-title"
+      aria-describedby="ai-exam-review-description"
+      className="w-full max-w-[900px] rounded-[20px] p-0 shadow-xl overflow-hidden"
+      overlayClassName="px-[20px] bg-black/40"
+    >
+      <Modal.Body className="p-[24px] md:p-[28px]">
+        <div className="flex items-start justify-between gap-[16px]">
+          <div className="min-w-0">
+            <h2
+              id="ai-exam-review-title"
+              className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[24px] leading-[34px]"
+            >
+              Revisão da Prova Gerada por IA
+            </h2>
+            <p
+              id="ai-exam-review-description"
+              className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[16px] leading-[24px] mt-[6px]"
+            >
+              Confira as questões e a indicação de resposta correta antes de aprovar.
+            </p>
+            <p className="font-['Figtree:Medium',sans-serif] text-[#021b59] text-[14px] mt-[8px]">
+              {moduleName}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Fechar revisão da prova gerada por IA"
+            className="shrink-0 size-[28px] rounded-full flex items-center justify-center hover:bg-[#f5f5f5] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+          >
+            <svg
+              className="size-[20px]"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                clipRule="evenodd"
+                d={CLOSE_SM}
+                fill="#801436"
+                fillRule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <div className="my-[20px] h-px bg-[#e0e0e0]" />
+
+        <div className="max-h-[560px] overflow-y-auto pr-[4px]">
+          <div className="flex flex-col gap-[24px]">
+            {questions.map((question, questionIndex) => (
+              <fieldset
+                key={question.id}
+                className="flex flex-col gap-[12px] border-0 p-0 m-0"
+              >
+                <legend className="font-['Figtree:Bold',sans-serif] font-bold text-black text-[18px] leading-[30px] mb-[4px]">
+                  <span className="text-[#021b59]">
+                    Questão {questionIndex + 1} —
+                  </span>{" "}
+                  {question.text}
+                </legend>
+
+                <div className="flex flex-col gap-[10px]">
+                  {question.options.map((option, optionIndex) => {
+                    const isCorrect = question.correctOptionId === option.id;
+
+                    return (
+                      <div
+                        key={option.id}
+                        className={[
+                          "flex items-center gap-[12px] px-[16px] py-[14px] rounded-[12px] border-2 transition-colors",
+                          isCorrect
+                            ? "border-[#173fae] bg-[#eef3ff]"
+                            : "border-[#d8d8d8] bg-white",
+                        ].join(" ")}
+                      >
+                        <div
+                          className={[
+                            "shrink-0 size-[22px] rounded-full border-2 flex items-center justify-center transition-colors",
+                            isCorrect
+                              ? "border-[#173fae] bg-[#173fae]"
+                              : "border-[#a0a0a0] bg-white",
+                          ].join(" ")}
+                          aria-hidden="true"
+                        >
+                          {isCorrect && (
+                            <div className="size-[8px] rounded-full bg-white" />
+                          )}
+                        </div>
+
+                        <span
+                          className={[
+                            "font-['Figtree:Medium',sans-serif] font-medium text-[15px] shrink-0",
+                            isCorrect ? "text-[#173fae]" : "text-[#606060]",
+                          ].join(" ")}
+                        >
+                          {String.fromCharCode(65 + optionIndex)})
+                        </span>
+
+                        <span
+                          className={[
+                            "font-['Figtree:Regular',sans-serif] text-[16px] leading-[24px] flex-1",
+                            isCorrect ? "text-[#173fae]" : "text-[#333]",
+                          ].join(" ")}
+                        >
+                          {option.text}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </fieldset>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-[20px] rounded-[10px] border border-[#53c57d] bg-[#effaf3] px-[16px] py-[12px]">
+          <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#16924d] text-[16px] leading-[24px]">
+            ✓ Prova gerada com sucesso! Revise o conteúdo abaixo.
+          </p>
+        </div>
+
+        <div className="mt-[16px] flex flex-col gap-[12px] sm:flex-row">
+          <button
+            type="button"
+            onClick={onRegenerate}
+            className="h-[50px] flex-1 rounded-[26px] border-2 border-[#173fae] bg-white hover:bg-[#f5f8ff] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+          >
+            <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#173fae] text-[18px]">
+              Regerar questões
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={onApprove}
+            className="h-[50px] flex-1 rounded-[26px] bg-[#021b59] hover:bg-[#042e99] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+          >
+            <span className="font-['Figtree:Medium',sans-serif] font-medium text-white text-[18px]">
+              Aprovar Prova
+            </span>
+          </button>
+        </div>
+      </Modal.Body>
+    </Modal>
+  );
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 export function CreateExamPage() {
   const navigate = useNavigate();
@@ -492,6 +740,9 @@ export function CreateExamPage() {
     fileName?: string;
   } | null>(null);
 
+  const [aiExamReview, setAiExamReview] =
+    useState<AiExamReviewState | null>(null);
+
   // ── Handlers ────────────────────────────────────────────────────────────────
   const removeLesson = (modId: string, lessonId: string) => {
     setModulesList((prev) =>
@@ -530,6 +781,41 @@ export function CreateExamPage() {
       ),
     );
     setEditingLesson(null);
+  };
+
+  const openAiExamReview = (mod: ICourseManageModule) => {
+    const variantIndex = 0;
+
+    setAiExamReview({
+      modId: mod.id,
+      moduleName: mod.name,
+      questions: buildAiGeneratedQuestions(variantIndex),
+      variantIndex,
+    });
+  };
+
+  const regenerateAiExamReview = () => {
+    setAiExamReview((prev) => {
+      if (!prev) return null;
+
+      const nextVariant = prev.variantIndex + 1;
+
+      return {
+        ...prev,
+        variantIndex: nextVariant,
+        questions: buildAiGeneratedQuestions(nextVariant),
+      };
+    });
+  };
+
+  const approveAiExamReview = () => {
+    if (!aiExamReview) return;
+
+    setModuleProvas((prev) => ({
+      ...prev,
+      [aiExamReview.modId]: aiExamReview.questions,
+    }));
+    setAiExamReview(null);
   };
 
   const openEditor = (modId: string) => {
@@ -790,7 +1076,7 @@ export function CreateExamPage() {
 
                   <button
                     type="button"
-                    onClick={() => openEditor(mod.id)}
+                    onClick={() => openAiExamReview(mod)}
                     className="bg-[#ffeac4] h-[60px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
                   >
                     <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
@@ -818,6 +1104,15 @@ export function CreateExamPage() {
           </button>
         </div>
       </div>
+
+      <AiGeneratedExamReviewModal
+        isOpen={Boolean(aiExamReview)}
+        moduleName={aiExamReview?.moduleName ?? ""}
+        questions={aiExamReview?.questions ?? []}
+        onClose={() => setAiExamReview(null)}
+        onRegenerate={regenerateAiExamReview}
+        onApprove={approveAiExamReview}
+      />
 
       {/* ── Edit lesson modal ── */}
       <Modal
