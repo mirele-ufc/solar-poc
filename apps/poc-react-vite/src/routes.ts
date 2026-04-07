@@ -23,7 +23,7 @@ import { MyCoursesPage } from "./pages/MyCoursesPage";
 import { MessagePage } from "./pages/MessagePage";
 import { MessagesPage } from "./pages/MessagesPage";
 import { StudentMessagesPage } from "./pages/StudentMessagesPage";
-// ── Python student-side pages ──────────────────────────────────────────────────
+
 import { PythonDetailPage } from "./pages/PythonDetailPage";
 import { PythonEnrollmentPage } from "./pages/PythonEnrollmentPage";
 import { PythonModulesPage } from "./pages/PythonModulesPage";
@@ -47,6 +47,7 @@ const STUDENT_AND_PROFESSOR_ROLES: ReadonlyArray<UserRole> = [
 const PROFESSOR_ONLY_ROLES: ReadonlyArray<UserRole> = ["professor"];
 const STUDENT_ONLY_ROLES: ReadonlyArray<UserRole> = ["student"];
 
+export const routes = createBrowserRouter([
   { index: true, Component: LoginPage },
   { path: "register", Component: RegisterPage },
   { path: "forgot-password", Component: ForgotPasswordPage },
@@ -60,7 +61,7 @@ const STUDENT_ONLY_ROLES: ReadonlyArray<UserRole> = ["student"];
         Component: AuthLayout,
         children: [
           { index: true, Component: CoursesPage },
-          // ── Power BI ──────────────────────────────────────────────────────────────
+
           { path: "power-bi", Component: CourseDetailPage },
           { path: "power-bi/enrollment", Component: EnrollmentPage },
           { path: "power-bi/modules", Component: ModulesPage },
@@ -68,7 +69,7 @@ const STUDENT_ONLY_ROLES: ReadonlyArray<UserRole> = ["student"];
           { path: "power-bi/exam/instructions", Component: ExamInstructionsPage },
           { path: "power-bi/exam", Component: ExamPage },
           { path: "power-bi/exam/results", Component: ExamResultPage },
-          // ── Python (visão de aluno — disponível para professor com papel de aluno) ─
+          
           { path: "python", Component: PythonDetailPage },
           { path: "python/enrollment", Component: PythonEnrollmentPage },
           { path: "python/modules", Component: PythonModulesPage },
