@@ -264,13 +264,7 @@ describe("authService", () => {
     expect(mockedPatch).toHaveBeenCalledTimes(1);
     expect(patchArgs?.[0]).toBe("/perfil/foto");
     expect(sentFormData).toBeInstanceOf(FormData);
-    expect(patchArgs?.[2]).toEqual(
-      expect.objectContaining({
-        headers: expect.objectContaining({
-          "Content-Type": "multipart/form-data",
-        }),
-      }),
-    );
+    expect(patchArgs?.[2]).toBeUndefined();
     expect(sentFormData.get("foto")).toBe(file);
     expect(result).toEqual({ message: "Foto atualizada" });
   });

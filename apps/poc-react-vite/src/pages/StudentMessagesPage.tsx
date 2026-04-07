@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronDown, ChevronUp, Inbox } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useCourseStore } from "@/store/useCourseStore";

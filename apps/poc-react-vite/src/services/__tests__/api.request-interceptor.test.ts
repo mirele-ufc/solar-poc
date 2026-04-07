@@ -30,8 +30,8 @@ describe("API Request Interceptor", () => {
     };
 
     // Executar o interceptor de request manualmente
-    const requestFulfilled = apiClient.interceptors.request.handlers?.[0]
-      ?.fulfilled;
+    const requestFulfilled =
+      apiClient.interceptors.request.handlers?.[0]?.fulfilled;
     if (requestFulfilled) {
       const result = await requestFulfilled(config);
       expect(result.headers.Authorization).toBe(`Bearer ${mockToken}`);
@@ -49,8 +49,8 @@ describe("API Request Interceptor", () => {
       headers: {} as any,
     };
 
-    const requestFulfilled = apiClient.interceptors.request.handlers?.[0]
-      ?.fulfilled;
+    const requestFulfilled =
+      apiClient.interceptors.request.handlers?.[0]?.fulfilled;
     if (requestFulfilled) {
       const result = await requestFulfilled(config);
       expect(result.headers.Authorization).toBeUndefined();
@@ -68,8 +68,8 @@ describe("API Request Interceptor", () => {
       headers: {} as any,
     };
 
-    const requestFulfilled = apiClient.interceptors.request.handlers?.[0]
-      ?.fulfilled;
+    const requestFulfilled =
+      apiClient.interceptors.request.handlers?.[0]?.fulfilled;
     if (requestFulfilled) {
       const result = await requestFulfilled(config);
       expect(result.headers.Authorization).toBeUndefined();
@@ -91,8 +91,8 @@ describe("API Request Interceptor", () => {
       headers: {} as any,
     };
 
-    const requestFulfilled = apiClient.interceptors.request.handlers?.[0]
-      ?.fulfilled;
+    const requestFulfilled =
+      apiClient.interceptors.request.handlers?.[0]?.fulfilled;
 
     if (requestFulfilled) {
       const result1 = await requestFulfilled(config1);
@@ -111,6 +111,53 @@ describe("API Request Interceptor", () => {
 
       const result2 = await requestFulfilled(config2);
       expect(result2.headers.Authorization).toBe(`Bearer ${secondToken}`);
+    }
+  });
+
+  it("remove Content-Type quando payload é FormData", async () => {
+    vi.mocked(useAuthStore).getState = vi.fn().mockReturnValue({
+      token: null,
+    } as any);
+
+    const formData = new FormData();
+    formData.append("dados", new Blob(["{}"], { type: "application/json" }));
+
+    const config: InternalAxiosRequestConfig = {
+      url: "/courses",
+      method: "post",
+      data: formData,
+      headers: {
+        "Content-Type": "application/json",
+      } as any,
+    };
+
+    const requestFulfilled =
+      apiClient.interceptors.request.handlers?.[0]?.fulfilled;
+
+    if (requestFulfilled) {
+      const result = await requestFulfilled(config);
+      expect(result.headers["Content-Type"]).toBeUndefined();
+    }
+  });
+
+  it("define Content-Type application/json para payload JSON em POST", async () => {
+    vi.mocked(useAuthStore).getState = vi.fn().mockReturnValue({
+      token: null,
+    } as any);
+
+    const config: InternalAxiosRequestConfig = {
+      url: "/courses",
+      method: "post",
+      data: { title: "curso" },
+      headers: {} as any,
+    };
+
+    const requestFulfilled =
+      apiClient.interceptors.request.handlers?.[0]?.fulfilled;
+
+    if (requestFulfilled) {
+      const result = await requestFulfilled(config);
+      expect(result.headers["Content-Type"]).toBe("application/json");
     }
   });
 });

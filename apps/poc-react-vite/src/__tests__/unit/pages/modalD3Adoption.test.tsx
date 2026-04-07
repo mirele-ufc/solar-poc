@@ -1,10 +1,15 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { CreateModulesPage } from "@/pages/CreateModulesPage";
 import { ExamPage } from "@/pages/ExamPage";
+import { createModuleWithBackend } from "@/services/moduleService";
 import { useAuthStore } from "@/store/useAuthStore";
 import type { IUserSession } from "@ava-poc/types";
+
+vi.mock("@/hooks/useEnrollmentGuard", () => ({
+  useEnrollmentGuard: vi.fn(),
+}));
 
 vi.mock("@/services/mocks/examMock", () => ({
   fetchExamQuestions: vi.fn(async () => [
@@ -16,6 +21,20 @@ vi.mock("@/services/mocks/examMock", () => ({
     },
   ]),
   fetchOptionLabels: vi.fn(async () => ["A)", "B)", "C)"]),
+}));
+
+vi.mock("@/services/moduleService", () => ({
+  createModuleWithBackend: vi.fn(
+    async (_courseId: string, payload: { name: string }) => ({
+      id: 1,
+      name: payload.name,
+      orderNum: 1,
+      imagePath: null,
+      courseId: 1,
+      createdAt: "2026-04-06T00:00:00",
+      updatedAt: "2026-04-06T00:00:00",
+    }),
+  ),
 }));
 
 function buildUser(role: IUserSession["role"]): IUserSession {
@@ -32,6 +51,7 @@ function buildUser(role: IUserSession["role"]): IUserSession {
 
 describe("D3 Modal adoption in pages", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     useAuthStore.setState({
       currentUser: buildUser("professor"),
       isLoggedIn: true,
@@ -39,12 +59,32 @@ describe("D3 Modal adoption in pages", () => {
     });
   });
 
-  it("CreateModulesPage abre modal de adicionar aula usando slot modal", () => {
+  it("CreateModulesPage abre modal de adicionar aula usando slot modal", async () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter
+        initialEntries={[
+          {
+            pathname: "/create-course/modules",
+            state: {
+              courseData: {
+                title: "Curso teste",
+                backendCourseId: "1",
+              },
+            },
+          },
+        ]}
+      >
         <CreateModulesPage />
       </MemoryRouter>,
     );
+
+    fireEvent.click(screen.getByRole("button", { name: "Adicionar módulo" }));
+
+    await waitFor(() => {
+      expect(createModuleWithBackend).toHaveBeenCalledWith("1", {
+        name: "Módulo 01",
+      });
+    });
 
     fireEvent.click(screen.getByRole("button", { name: "Adicionar aula" }));
 

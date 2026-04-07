@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter } from "react-router-dom";
 import { createElement } from "react";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
@@ -34,11 +34,11 @@ import { PythonExamResultPage } from "./pages/PythonExamResultPage";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 import type { UserRole } from "./routes/types";
 
-function createRoleGuard(allowedRoles: ReadonlyArray<UserRole>) {
-  return function RoleGuard() {
-    return createElement(ProtectedRoute, { allowedRoles });
-  };
-}
+// function createRoleGuard(allowedRoles: ReadonlyArray<UserRole>) {
+//   return function RoleGuard() {
+//     return createElement(ProtectedRoute, { allowedRoles });
+//   };
+// }
 
 const STUDENT_AND_PROFESSOR_ROLES: ReadonlyArray<UserRole> = [
   "professor",
@@ -54,11 +54,13 @@ export const routes = createBrowserRouter([
   { path: "reset-password", Component: ResetPasswordPage },
   { path: "unauthorized", Component: UnauthorizedPage },
   {
-    Component: createRoleGuard(STUDENT_AND_PROFESSOR_ROLES),
+    element: createElement(ProtectedRoute, {
+      allowedRoles: STUDENT_AND_PROFESSOR_ROLES,
+    }),
     children: [
       {
         path: "courses",
-        Component: AuthLayout,
+        element: <AuthLayout />,
         children: [
           { index: true, Component: CoursesPage },
 
@@ -81,55 +83,59 @@ export const routes = createBrowserRouter([
       },
       {
         path: "profile",
-        Component: AuthLayout,
-        children: [{ index: true, Component: ProfilePage }],
+        element: <AuthLayout />,
+        children: [{ index: true, element: <ProfilePage /> }],
       },
     ],
   },
   {
-    Component: createRoleGuard(STUDENT_ONLY_ROLES),
+    element: createElement(ProtectedRoute, {
+      allowedRoles: STUDENT_ONLY_ROLES,
+    }),
     children: [
       {
         path: "received-messages",
-        Component: AuthLayout,
-        children: [{ index: true, Component: StudentMessagesPage }],
+        element: <AuthLayout />,
+        children: [{ index: true, element: <StudentMessagesPage /> }],
       },
     ],
   },
   {
-    Component: createRoleGuard(PROFESSOR_ONLY_ROLES),
+    element: createElement(ProtectedRoute, {
+      allowedRoles: PROFESSOR_ONLY_ROLES,
+    }),
     children: [
       {
         path: "courses",
-        Component: AuthLayout,
+        element: <AuthLayout />,
         children: [
-          { path: ":id/manage", Component: ManageCoursePage },
-          { path: "power-bi/manage", Component: ManageCoursePage },
+          { path: ":id/manage", element: <ManageCoursePage /> },
+          { path: "power-bi/manage", element: <ManageCoursePage /> },
         ],
       },
       {
         path: "my-courses",
-        Component: AuthLayout,
-        children: [{ index: true, Component: MyCoursesPage }],
+        element: <AuthLayout />,
+        children: [{ index: true, element: <MyCoursesPage /> }],
       },
       {
         path: "create-course",
-        Component: AuthLayout,
+        element: <AuthLayout />,
         children: [
-          { index: true, Component: CreateCoursePage },
-          { path: "modules", Component: CreateModulesPage },
-          { path: "exam", Component: CreateExamPage },
+          { index: true, element: <CreateCoursePage /> },
+          { path: "modules", element: <CreateModulesPage /> },
+          { path: "exam", element: <CreateExamPage /> },
         ],
       },
       {
         path: "message",
-        Component: AuthLayout,
-        children: [{ index: true, Component: MessagePage }],
+        element: <AuthLayout />,
+        children: [{ index: true, element: <MessagePage /> }],
       },
       {
         path: "messages",
-        Component: AuthLayout,
-        children: [{ index: true, Component: MessagesPage }],
+        element: <AuthLayout />,
+        children: [{ index: true, element: <MessagesPage /> }],
       },
     ],
   },

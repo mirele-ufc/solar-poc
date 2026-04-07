@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuthStore } from "@/store/useAuthStore";
-import { authService } from "@/services/authService";
 import { FormContainer } from "@/components/shared/FormContainer";
 import svgPaths from "@/assets/svg-ppphmxjoa5";
 import imgUfcLogo1 from "@/assets/9098abf5bf97a1aac4c76f171ec108cee92cfddb.png";
@@ -16,7 +15,7 @@ export function LoginPage() {
   const [generalError, setGeneralError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { setTokens, setCurrentUser, logout } = useAuthStore();
+  const { login, logout } = useAuthStore();
 
   const {
     watch,
@@ -36,13 +35,11 @@ export function LoginPage() {
   const onSubmitValid = async (values: LoginFormValues) => {
     setIsLoading(true);
     try {
-      const loginResp = await authService.login(
-        values.emailOuUsuario.trim(),
-        values.senha,
-      );
-      setTokens(loginResp.accessToken, loginResp.refreshToken);
-      const profile = await authService.getProfile();
-      setCurrentUser(profile);
+      const authenticated = login(values.emailOuUsuario.trim(), values.senha);
+      if (!authenticated) {
+        throw { status: 401 };
+      }
+
       setGeneralError("");
       setShowErrors(false);
       setIsLoading(false);

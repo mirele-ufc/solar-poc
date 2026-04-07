@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useId } from "react";
 import { getFriendlyErrorMessage } from "../utils/httpErrorMessages";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
 import { authService } from "@/services/authService";
 

@@ -14,11 +14,9 @@ import { authService } from "@/services/authService";
  * Centralizes all API communication with consistent settings and global error handling
  */
 const apiClient: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "/api",
+  // Usa URL explícita do backend local por padrão para evitar 404 em rotas com prefixo /api inexistente.
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080",
   timeout: 10000,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 type RetryableRequestConfig = InternalAxiosRequestConfig & {
@@ -187,6 +185,22 @@ apiClient.interceptors.response.use(
 apiClient.interceptors.request.use(
   (config) => {
     const storeToken = useAuthStore.getState().token;
+    const isFormData = config.data instanceof FormData;
+
+    // For multipart requests, let browser/axios define Content-Type with boundary.
+    if (isFormData && config.headers) {
+      delete config.headers["Content-Type"];
+    }
+
+    // Keep explicit JSON content type for non-GET requests with JSON/object payloads.
+    if (
+      !isFormData &&
+      config.data &&
+      config.method &&
+      !["get", "head", "delete"].includes(config.method.toLowerCase())
+    ) {
+      config.headers["Content-Type"] = "application/json";
+    }
 
     if (storeToken) {
       config.headers.Authorization = `Bearer ${storeToken}`;

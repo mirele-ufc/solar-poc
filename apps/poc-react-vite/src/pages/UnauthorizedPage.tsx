@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 const REDIRECT_DELAY_MS = 5000;
 
@@ -28,7 +28,8 @@ export function UnauthorizedPage() {
         </p>
 
         <p className="font-['Figtree:Regular',sans-serif] text-[#595959] text-[15px] leading-[24px]">
-          Você será redirecionado automaticamente para seus cursos em 5 segundos.
+          Você será redirecionado automaticamente para seus cursos em 5
+          segundos.
         </p>
 
         <button

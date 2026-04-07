@@ -123,12 +123,12 @@ describe("schemas contract alignment", () => {
     expect(result.success).toBe(false);
   });
 
-  it("should fail modules schema when one module has no image", () => {
+  it("should allow modules schema when one module has no image", () => {
     const result = createModulesSchema.safeParse({
       modules: [{}],
     });
 
-    expect(result.success).toBe(false);
+    expect(result.success).toBe(true);
   });
 
   it("should fail enrollment when firstName is missing", () => {

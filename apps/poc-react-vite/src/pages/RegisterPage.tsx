@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormContainer } from "@/components/shared/FormContainer";
-import { authService } from "@/services/authService";
+import { mockAuthService } from "@/services/mockAuthService";
 import { toast } from "sonner";
 import imgUfcLogo1 from "@/assets/9098abf5bf97a1aac4c76f171ec108cee92cfddb.png";
 import imgAtivo224X1 from "@/assets/a17a08a750e97ba9bb12c3ad582c426a8debf0fa.png";
@@ -231,7 +231,7 @@ export function RegisterPage() {
 
     try {
       const perfil = form.perfil === "professor" ? "PROFESSOR" : "ALUNO";
-      await authService.register({
+      await mockAuthService.register({
         nome: form.nome,
         cpf: form.cpf,
         email: form.email,
@@ -243,16 +243,16 @@ export function RegisterPage() {
       navigate("/");
     } catch (error: any) {
       const errorMessage = error.message || "Erro ao cadastrar usuário";
-      
+
       // Tratamento específico de erros
       if (error.status === 409) {
         setGeneralError(
-          "CPF ou email já cadastrados no sistema. Tente outro ou faça login."
+          "CPF ou email já cadastrados no sistema. Tente outro ou faça login.",
         );
       } else {
         setGeneralError(errorMessage);
       }
-      
+
       setShowErrors(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
@@ -327,144 +327,148 @@ export function RegisterPage() {
           aria-label="Formulário de cadastro"
         >
           <FormContainer.Body className="flex flex-col gap-[12px] items-start w-full">
-          <InputField
-            label="Nome"
-            placeholder="Insira seu nome completo"
-            value={form.nome}
-            onChange={(value) =>
-              setValue("nome", value, {
-                shouldDirty: true,
-                shouldValidate: showErrors,
-              })
-            }
-            hasError={showErrors && !!errors.nome}
-            errorMessage={errors.nome?.message}
-          />
-          <InputField
-            label="CPF"
-            placeholder="Formato: 000.000.000-00"
-            value={form.cpf}
-            onChange={(value) =>
-              setValue("cpf", value, {
-                shouldDirty: true,
-                shouldValidate: showErrors,
-              })
-            }
-            hasError={showErrors && !!errors.cpf}
-            errorMessage={errors.cpf?.message}
-          />
-          <InputField
-            label="Email"
-            placeholder="Insira seu email"
-            type="email"
-            value={form.email}
-            onChange={(value) =>
-              setValue("email", value, {
-                shouldDirty: true,
-                shouldValidate: showErrors,
-              })
-            }
-            hasError={showErrors && !!errors.email}
-            errorMessage={errors.email?.message}
-          />
-          <InputField
-            label="Senha"
-            placeholder="Insira sua senha"
-            type="password"
-            value={form.password}
-            onChange={(value) =>
-              setValue("password", value, {
-                shouldDirty: true,
-                shouldValidate: showErrors,
-              })
-            }
-            hasError={showErrors && !!errors.password}
-            errorMessage={errors.password?.message}
-          />
-          <InputField
-            label="Confirme sua senha"
-            placeholder="Repita sua senha"
-            type="password"
-            value={form.confirmPassword}
-            onChange={(value) =>
-              setValue("confirmPassword", value, {
-                shouldDirty: true,
-                shouldValidate: showErrors,
-              })
-            }
-            hasError={showErrors && !!errors.confirmPassword}
-            errorMessage={errors.confirmPassword?.message}
-          />
-          <SelectField
-            label="Perfil"
-            value={form.perfil || ""}
-            onChange={(value) =>
-              setValue("perfil", value as "professor" | "student", {
-                shouldDirty: true,
-                shouldValidate: showErrors,
-              })
-            }
-            options={perfilOptions}
-            hasError={showErrors && !!errors.perfil}
-            errorMessage={errors.perfil?.message}
-          />
+            <InputField
+              label="Nome"
+              placeholder="Insira seu nome completo"
+              value={form.nome}
+              onChange={(value) =>
+                setValue("nome", value, {
+                  shouldDirty: true,
+                  shouldValidate: showErrors,
+                })
+              }
+              hasError={showErrors && !!errors.nome}
+              errorMessage={errors.nome?.message}
+            />
+            <InputField
+              label="CPF"
+              placeholder="Formato: 000.000.000-00"
+              value={form.cpf}
+              onChange={(value) =>
+                setValue("cpf", value, {
+                  shouldDirty: true,
+                  shouldValidate: showErrors,
+                })
+              }
+              hasError={showErrors && !!errors.cpf}
+              errorMessage={errors.cpf?.message}
+            />
+            <InputField
+              label="Email"
+              placeholder="Insira seu email"
+              type="email"
+              value={form.email}
+              onChange={(value) =>
+                setValue("email", value, {
+                  shouldDirty: true,
+                  shouldValidate: showErrors,
+                })
+              }
+              hasError={showErrors && !!errors.email}
+              errorMessage={errors.email?.message}
+            />
+            <InputField
+              label="Senha"
+              placeholder="Insira sua senha"
+              type="password"
+              value={form.password}
+              onChange={(value) =>
+                setValue("password", value, {
+                  shouldDirty: true,
+                  shouldValidate: showErrors,
+                })
+              }
+              hasError={showErrors && !!errors.password}
+              errorMessage={errors.password?.message}
+            />
+            <InputField
+              label="Confirme sua senha"
+              placeholder="Repita sua senha"
+              type="password"
+              value={form.confirmPassword}
+              onChange={(value) =>
+                setValue("confirmPassword", value, {
+                  shouldDirty: true,
+                  shouldValidate: showErrors,
+                })
+              }
+              hasError={showErrors && !!errors.confirmPassword}
+              errorMessage={errors.confirmPassword?.message}
+            />
+            <SelectField
+              label="Perfil"
+              value={form.perfil || ""}
+              onChange={(value) =>
+                setValue("perfil", value as "professor" | "student", {
+                  shouldDirty: true,
+                  shouldValidate: showErrors,
+                })
+              }
+              options={perfilOptions}
+              hasError={showErrors && !!errors.perfil}
+              errorMessage={errors.perfil?.message}
+            />
 
-          {/* Terms — checkbox nativo para semântica e acessibilidade corretas */}
-          <div className="flex items-start gap-[8px] w-full">
-            <div className="relative mt-[2px] shrink-0">
-              <input
-                id="terms"
-                type="checkbox"
-                checked={agreed}
-                onChange={(e) => setAgreed(e.target.checked)}
-                className="sr-only peer"
-              />
-              {/* Indicador visual customizado vinculado ao input nativo */}
+            {/* Terms — checkbox nativo para semântica e acessibilidade corretas */}
+            <div className="flex items-start gap-[8px] w-full">
+              <div className="relative mt-[2px] shrink-0">
+                <input
+                  id="terms"
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                  className="sr-only peer"
+                />
+                {/* Indicador visual customizado vinculado ao input nativo */}
+                <label
+                  htmlFor="terms"
+                  className={`flex items-center justify-center size-[22px] border-2 rounded-[2px] cursor-pointer transition-colors peer-focus-visible:outline peer-focus-visible:outline-[2px] peer-focus-visible:outline-[#ffeac4] peer-focus-visible:outline-offset-[2px] ${agreed ? "bg-[#ffeac4] border-[#ffeac4]" : "bg-transparent border-[#ffeac4]"}`}
+                  aria-hidden="true"
+                >
+                  {agreed && (
+                    <svg
+                      className="size-[14px]"
+                      fill="none"
+                      viewBox="0 0 22 22"
+                    >
+                      <path
+                        clipRule="evenodd"
+                        d="M5 9L3 11L9 17L19 7L17 5L9 13L5 9Z"
+                        fill="#021B59"
+                        fillRule="evenodd"
+                      />
+                    </svg>
+                  )}
+                </label>
+              </div>
               <label
                 htmlFor="terms"
-                className={`flex items-center justify-center size-[22px] border-2 rounded-[2px] cursor-pointer transition-colors peer-focus-visible:outline peer-focus-visible:outline-[2px] peer-focus-visible:outline-[#ffeac4] peer-focus-visible:outline-offset-[2px] ${agreed ? "bg-[#ffeac4] border-[#ffeac4]" : "bg-transparent border-[#ffeac4]"}`}
-                aria-hidden="true"
+                className="font-['Figtree:Regular',sans-serif] font-normal text-[#ffeac4] text-[16px] leading-[24px] cursor-pointer"
               >
-                {agreed && (
-                  <svg className="size-[14px]" fill="none" viewBox="0 0 22 22">
-                    <path
-                      clipRule="evenodd"
-                      d="M5 9L3 11L9 17L19 7L17 5L9 13L5 9Z"
-                      fill="#021B59"
-                      fillRule="evenodd"
-                    />
-                  </svg>
-                )}
+                Concordo com os termos de privacidade e segurança.
               </label>
             </div>
-            <label
-              htmlFor="terms"
-              className="font-['Figtree:Regular',sans-serif] font-normal text-[#ffeac4] text-[16px] leading-[24px] cursor-pointer"
-            >
-              Concordo com os termos de privacidade e segurança.
-            </label>
-          </div>
 
-          <div className="flex flex-col gap-[20px] w-full mt-[8px]">
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="bg-[#ffeac4] h-[50px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-white focus-visible:outline-offset-[2px] disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
-                {isLoading ? "Cadastrando..." : "Cadastrar"}
-              </span>
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate("/")}
-              className="h-[50px] w-full border-2 border-[#ffeac4] rounded-[26px] cursor-pointer hover:bg-white/10 transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#ffeac4] focus-visible:outline-offset-[2px]"
-            >
-              <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#ffeac4] text-[20px]">
-                Já sou usuário
-              </span>
-            </button>
-          </div>
+            <div className="flex flex-col gap-[20px] w-full mt-[8px]">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="bg-[#ffeac4] h-[50px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-white focus-visible:outline-offset-[2px] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
+                  {isLoading ? "Cadastrando..." : "Cadastrar"}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate("/")}
+                className="h-[50px] w-full border-2 border-[#ffeac4] rounded-[26px] cursor-pointer hover:bg-white/10 transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#ffeac4] focus-visible:outline-offset-[2px]"
+              >
+                <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#ffeac4] text-[20px]">
+                  Já sou usuário
+                </span>
+              </button>
+            </div>
           </FormContainer.Body>
         </FormContainer>
 

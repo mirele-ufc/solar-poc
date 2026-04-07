@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 import { CreateCoursePage } from "@/pages/CreateCoursePage";
 import { LoginPage } from "@/pages/LoginPage";

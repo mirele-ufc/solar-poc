@@ -1,30 +1,58 @@
-import { useNavigate, useLocation } from "react-router";
-import { fetchExamQuestions, fetchOptionLabels, type Question } from "@/services/mocks/examMock";
+import { useNavigate, useLocation } from "react-router-dom";
+import {
+  fetchExamQuestions,
+  fetchOptionLabels,
+  type Question,
+} from "@/services/mocks/examMock";
 import { useRef, useState, useEffect } from "react";
 import { useEnrollmentGuard } from "@/hooks/useEnrollmentGuard";
 
 const checkSvg = (color: string) => (
   <svg className="size-[13px]" fill="none" viewBox="0 0 20 16">
-    <path d="M1 7L7 13L19 1" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path
+      d="M1 7L7 13L19 1"
+      stroke={color}
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
 const xSvg = (color: string) => (
   <svg className="size-[11px]" fill="none" viewBox="0 0 14 14">
-    <path d="M1 1L13 13M13 1L1 13" stroke={color} strokeWidth="2.5" strokeLinecap="round" />
+    <path
+      d="M1 1L13 13M13 1L1 13"
+      stroke={color}
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
   </svg>
 );
 
 // ── Tela: TODAS corretas ───────────────────────────────────────────────────────
-function CorrectScreen({ onReturn, questions, optionLabels }: { onReturn: () => void; questions: Question[]; optionLabels: string[] }) {
+function CorrectScreen({
+  onReturn,
+  questions,
+  optionLabels,
+}: {
+  onReturn: () => void;
+  questions: Question[];
+  optionLabels: string[];
+}) {
   return (
     <div className="bg-white min-h-screen pb-[60px]">
       <div className="max-w-[900px] mx-auto flex flex-col items-center gap-[28px] px-[20px] md:px-[40px] pt-[40px]">
-
         {/* Estrelas */}
         <div className="flex items-end gap-[8px]" aria-hidden="true">
           {([18, 26, 18] as number[]).map((s, i) => (
-            <svg key={i} width={s} height={s} viewBox="0 0 24 24" fill="#f5a623">
+            <svg
+              key={i}
+              width={s}
+              height={s}
+              viewBox="0 0 24 24"
+              fill="#f5a623"
+            >
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
             </svg>
           ))}
@@ -37,7 +65,11 @@ function CorrectScreen({ onReturn, questions, optionLabels }: { onReturn: () => 
         >
           <span
             className="font-['Anek_Devanagari:ExtraBold',sans-serif] font-extrabold text-[#ffeac4]"
-            style={{ fontSize: "42px", fontVariationSettings: "'wdth' 100", lineHeight: 1 }}
+            style={{
+              fontSize: "42px",
+              fontVariationSettings: "'wdth' 100",
+              lineHeight: 1,
+            }}
           >
             100%
           </span>
@@ -50,19 +82,26 @@ function CorrectScreen({ onReturn, questions, optionLabels }: { onReturn: () => 
         <div className="flex flex-col items-center gap-[8px] text-center">
           <h1
             className="font-['Anek_Devanagari:ExtraBold',sans-serif] font-extrabold text-[#021b59] leading-tight"
-            style={{ fontSize: "clamp(24px, 5vw, 34px)", fontVariationSettings: "'wdth' 100" }}
+            style={{
+              fontSize: "clamp(24px, 5vw, 34px)",
+              fontVariationSettings: "'wdth' 100",
+            }}
           >
             Parabéns! Prova concluída!
           </h1>
           <p className="font-['Figtree:Regular',sans-serif] text-[#595959] text-[16px] leading-[25px] max-w-[480px]">
-            Você acertou todas as questões da Prova 01 — Power BI Fundamentos. Continue assim!
+            Você acertou todas as questões da Prova 01 — Power BI Fundamentos.
+            Continue assim!
           </p>
         </div>
 
         {/* Gabarito — todas verdes */}
         <div className="flex flex-col gap-[16px] w-full">
           {questions.map((q, qIdx) => (
-            <div key={q.id} className="border border-[#28a745] rounded-[12px] p-[16px] bg-[#f0faf3] flex flex-col gap-[10px]">
+            <div
+              key={q.id}
+              className="border border-[#28a745] rounded-[12px] p-[16px] bg-[#f0faf3] flex flex-col gap-[10px]"
+            >
               <div className="flex items-start justify-between gap-[12px]">
                 <div className="flex-1 min-w-0">
                   <p className="font-['Figtree:Bold',sans-serif] font-bold text-black text-[18px] leading-tight">
@@ -87,12 +126,16 @@ function CorrectScreen({ onReturn, questions, optionLabels }: { onReturn: () => 
                     <div
                       key={idx}
                       className={`flex items-center gap-[10px] py-[10px] px-[12px] rounded-[10px] border-2 ${
-                        isCorrect ? "bg-[#e8f8ee] border-[#28a745]" : "bg-white border-[#e0e0e0]"
+                        isCorrect
+                          ? "bg-[#e8f8ee] border-[#28a745]"
+                          : "bg-white border-[#e0e0e0]"
                       }`}
                     >
                       <div
                         className={`shrink-0 size-[20px] border-2 rounded-[4px] flex items-center justify-center ${
-                          isCorrect ? "bg-[#28a745] border-[#28a745]" : "bg-white border-[#ccc]"
+                          isCorrect
+                            ? "bg-[#28a745] border-[#28a745]"
+                            : "bg-white border-[#ccc]"
                         }`}
                       >
                         {isCorrect && checkSvg("white")}
@@ -100,7 +143,9 @@ function CorrectScreen({ onReturn, questions, optionLabels }: { onReturn: () => 
                       <span className="font-['Figtree:Medium',sans-serif] font-medium text-[15px] text-[#021b59] shrink-0">
                         {optionLabels[idx]})
                       </span>
-                      <span className={`font-['Figtree:Regular',sans-serif] text-[15px] leading-[22px] flex-1 ${isCorrect ? "text-[#155724]" : "text-black"}`}>
+                      <span
+                        className={`font-['Figtree:Regular',sans-serif] text-[15px] leading-[22px] flex-1 ${isCorrect ? "text-[#155724]" : "text-black"}`}
+                      >
                         {opt}
                       </span>
                       {isCorrect && (
@@ -150,10 +195,12 @@ function IncorrectScreen({
   return (
     <div className="bg-white min-h-screen pb-[60px]">
       <div className="max-w-[900px] mx-auto flex flex-col gap-[28px] px-[20px] md:px-[40px] pt-[30px]">
-
         <h1
           className="font-['Anek_Devanagari:ExtraBold',sans-serif] font-extrabold leading-tight text-black"
-          style={{ fontSize: "clamp(22px, 5vw, 34px)", fontVariationSettings: "'wdth' 100" }}
+          style={{
+            fontSize: "clamp(22px, 5vw, 34px)",
+            fontVariationSettings: "'wdth' 100",
+          }}
         >
           Power BI - Fundamentos
         </h1>
@@ -164,7 +211,9 @@ function IncorrectScreen({
 
         {/* Placar */}
         <div className="flex items-center justify-between px-[20px] py-[16px] rounded-[12px] bg-[#801436]">
-          <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#ffeac4] text-[18px]">Resultado</p>
+          <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#ffeac4] text-[18px]">
+            Resultado
+          </p>
           <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#ffeac4] text-[18px]">
             {totalCorrect}/{questions.length} acertos ({percentage}%)
           </p>
@@ -176,7 +225,10 @@ function IncorrectScreen({
           const isCorrect = userIdx === q.correctIndex;
 
           return (
-            <div key={q.id} className="flex flex-col gap-[14px] border-b border-[#e0e0e0] pb-[28px]">
+            <div
+              key={q.id}
+              className="flex flex-col gap-[14px] border-b border-[#e0e0e0] pb-[28px]"
+            >
               {/* Cabeçalho */}
               <div className="flex items-start justify-between gap-[12px] flex-wrap">
                 <div className="flex-1 min-w-0">
@@ -244,13 +296,17 @@ function IncorrectScreen({
                       key={idx}
                       className={`flex items-center gap-[12px] py-[11px] px-[14px] rounded-[12px] border-2 ${rowCls}`}
                     >
-                      <div className={`shrink-0 size-[22px] border-2 rounded-[4px] flex items-center justify-center ${boxCls}`}>
+                      <div
+                        className={`shrink-0 size-[22px] border-2 rounded-[4px] flex items-center justify-center ${boxCls}`}
+                      >
                         {boxContent}
                       </div>
                       <span className="font-['Figtree:Medium',sans-serif] font-medium text-[15px] text-[#021b59] shrink-0">
                         {optionLabels[idx]})
                       </span>
-                      <span className={`font-['Figtree:Regular',sans-serif] text-[15px] leading-[23px] flex-1 ${textCls}`}>
+                      <span
+                        className={`font-['Figtree:Regular',sans-serif] text-[15px] leading-[23px] flex-1 ${textCls}`}
+                      >
                         {opt}
                       </span>
                       {tag}
@@ -262,8 +318,8 @@ function IncorrectScreen({
               {/* Gabarito */}
               <div className="bg-[#f5f5f5] px-[16px] py-[10px] rounded-[8px]">
                 <p className="font-['Figtree:Regular',sans-serif] text-black text-[15px] leading-[24px]">
-                  <strong>Gabarito questão {qIdx + 1}:</strong>{" "}
-                  {q.correctLabel}) {q.options[q.correctIndex]}
+                  <strong>Gabarito questão {qIdx + 1}:</strong> {q.correctLabel}
+                  ) {q.options[q.correctIndex]}
                 </p>
               </div>
             </div>
@@ -346,29 +402,32 @@ export function ExamResultPage() {
     // Garantir que os valores são números inteiros
     const normalized: Record<string, number> = {};
     Object.entries(answers).forEach(([key, value]) => {
-      normalized[key] = typeof value === 'number' ? value : parseInt(String(value), 10);
+      normalized[key] =
+        typeof value === "number" ? value : parseInt(String(value), 10);
     });
 
     const correct = questions.filter(
-      (q) => normalized[q.id] === q.correctIndex
+      (q) => normalized[q.id] === q.correctIndex,
     ).length;
 
     const all = correct === questions.length;
 
     // Debug temporário - REMOVER após verificação
-    console.log('=== DEBUG PROVA RESULTADO (PROCESSAMENTO ÚNICO) ===');
-    console.log('Respostas recebidas:', answers);
-    console.log('Respostas normalizadas:', normalized);
-    console.log('Total de questões:', questions.length);
-    console.log('Total de acertos:', correct);
-    console.log('Todas corretas?', all);
+    console.log("=== DEBUG PROVA RESULTADO (PROCESSAMENTO ÚNICO) ===");
+    console.log("Respostas recebidas:", answers);
+    console.log("Respostas normalizadas:", normalized);
+    console.log("Total de questões:", questions.length);
+    console.log("Total de acertos:", correct);
+    console.log("Todas corretas?", all);
     questions.forEach((q) => {
       const userAnswer = normalized[q.id];
       const correctIdx = q.correctIndex;
       const isCorrect = userAnswer === correctIdx;
-      console.log(`Questão ${q.id}: usuário escolheu ${userAnswer}, correto é ${correctIdx}, acertou? ${isCorrect}`);
+      console.log(
+        `Questão ${q.id}: usuário escolheu ${userAnswer}, correto é ${correctIdx}, acertou? ${isCorrect}`,
+      );
     });
-    console.log('============================');
+    console.log("============================");
 
     processedRef.current = {
       normalizedAnswers: normalized,
@@ -377,11 +436,12 @@ export function ExamResultPage() {
     };
   }
 
-  const { normalizedAnswers, totalCorrect, allCorrect } = processedRef.current ?? {
-    normalizedAnswers: {},
-    totalCorrect: 0,
-    allCorrect: false,
-  };
+  const { normalizedAnswers, totalCorrect, allCorrect } =
+    processedRef.current ?? {
+      normalizedAnswers: {},
+      totalCorrect: 0,
+      allCorrect: false,
+    };
 
   function handleReturn() {
     navigate("/courses/power-bi/modules");
@@ -396,7 +456,13 @@ export function ExamResultPage() {
   }
 
   if (allCorrect) {
-    return <CorrectScreen onReturn={handleReturn} questions={questions} optionLabels={optionLabels} />;
+    return (
+      <CorrectScreen
+        onReturn={handleReturn}
+        questions={questions}
+        optionLabels={optionLabels}
+      />
+    );
   }
 
   return (
