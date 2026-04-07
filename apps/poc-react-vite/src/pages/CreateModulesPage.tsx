@@ -11,7 +11,12 @@ import {
 } from "@/validations/courseSchema";
 import { imageFileSchema, lessonFileSchema } from "@/validations/fileSchema";
 import { createModuleWithBackend } from "@/services/moduleService";
-import { createLessonWithBackend } from "@/services/lessonService";
+import {
+  confirmGeneratedLessonContentWithBackend,
+  createLessonWithBackend,
+  generateLessonContentWithBackend,
+  regenerateLessonContentWithBackend,
+} from "@/services/lessonService";
 
 // ── SVG paths ──────────────────────────────────────────────────────────────────
 const docPath =
@@ -50,7 +55,7 @@ function AddLessonPopup({
   onConfirm,
 }: {
   onClose: () => void;
-  onConfirm: (lesson: LessonDraft) => Promise<void> | void;
+  onConfirm: (lesson: LessonDraft) => Promise<Lesson | void> | Lesson | void;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<1 | 2>(1);
@@ -60,15 +65,30 @@ function AddLessonPopup({
   const [generatedContent, setGeneratedContent] = useState("");
   const [error, setError] = useState("");
   const [isSavingLesson, setIsSavingLesson] = useState(false);
+  const [isGeneratingContent, setIsGeneratingContent] = useState(false);
+  const [isConfirmingGeneratedContent, setIsConfirmingGeneratedContent] =
+    useState(false);
+  const [isGeneratedContentConfirmed, setIsGeneratedContentConfirmed] =
+    useState(false);
   const [isLessonSaved, setIsLessonSaved] = useState(false);
+  const [savedLessonId, setSavedLessonId] = useState<string | null>(null);
 
   const hasLessonContent = lessonContent.trim().length > 0;
   const hasSelectedFile = Boolean(selectedFile);
   const hasGeneratedContent = generatedContent.trim().length > 0;
+  const isModalLocked = isGeneratedContentConfirmed;
   const canSaveLesson =
-    !isSavingLesson && !isLessonSaved && (hasLessonContent || hasSelectedFile);
+    !isModalLocked &&
+    !isSavingLesson &&
+    !isLessonSaved &&
+    (hasLessonContent || hasSelectedFile);
   const canGenerateWithAi =
-    isLessonSaved && (hasLessonContent || hasSelectedFile);
+    !isModalLocked &&
+    !isGeneratingContent &&
+    !isConfirmingGeneratedContent &&
+    isLessonSaved &&
+    Boolean(savedLessonId) &&
+    (hasLessonContent || hasSelectedFile);
 
   const buildLessonDraft = (): LessonDraft => ({
     name: lessonName.trim(),
@@ -104,6 +124,9 @@ function AddLessonPopup({
 
     setError("");
     setSelectedFile(file);
+    setGeneratedContent("");
+    setSavedLessonId(null);
+    setIsGeneratedContentConfirmed(false);
     setIsLessonSaved(false);
   };
 
@@ -121,7 +144,17 @@ function AddLessonPopup({
     setIsSavingLesson(true);
 
     try {
-      await Promise.resolve(onConfirm(buildLessonDraft()));
+      const createdLesson = await Promise.resolve(
+        onConfirm(buildLessonDraft()),
+      );
+
+      if (!createdLesson?.backendLessonId) {
+        throw new Error(
+          "Não foi possível identificar a aula salva no backend.",
+        );
+      }
+
+      setSavedLessonId(createdLesson.backendLessonId);
       setError("");
       setIsLessonSaved(true);
     } catch {
@@ -131,28 +164,57 @@ function AddLessonPopup({
     }
   };
 
-  const handleGenerateWithAi = () => {
-    if (!isLessonSaved || (!hasLessonContent && !hasSelectedFile)) {
+  const handleGenerateWithAi = async () => {
+    if (
+      isModalLocked ||
+      !savedLessonId ||
+      !isLessonSaved ||
+      (!hasLessonContent && !hasSelectedFile)
+    ) {
       setError("Salve a aula com conteúdo ou arquivo antes de gerar com IA.");
       return;
     }
 
-    const generatedBase = hasLessonContent
-      ? `Versão estruturada pela IA:\n\n${lessonContent.trim()}`
-      : `Versão estruturada pela IA com base no arquivo selecionado: ${selectedFile?.name ?? "arquivo enviado"}.`;
+    setIsGeneratingContent(true);
 
-    setGeneratedContent(generatedBase);
-    setError("");
+    try {
+      const generatedBase = hasGeneratedContent
+        ? await regenerateLessonContentWithBackend(savedLessonId)
+        : await generateLessonContentWithBackend(savedLessonId);
+
+      setGeneratedContent(generatedBase);
+      setError("");
+    } catch (apiError) {
+      const err = apiError as { message?: string };
+      setError(
+        err.message || "Não foi possível gerar o conteúdo da aula com IA.",
+      );
+    } finally {
+      setIsGeneratingContent(false);
+    }
   };
 
-  const handleUseGeneratedContent = () => {
-    if (!generatedContent.trim()) {
+  const handleUseGeneratedContent = async () => {
+    if (!savedLessonId || !generatedContent.trim()) {
       return;
     }
 
-    setLessonContent(generatedContent);
-    setIsLessonSaved(false);
-    setError("");
+    setIsConfirmingGeneratedContent(true);
+
+    try {
+      const confirmedLesson =
+        await confirmGeneratedLessonContentWithBackend(savedLessonId);
+
+      setLessonContent(confirmedLesson.contentEditor ?? generatedContent);
+      setError("");
+      setIsLessonSaved(true);
+      setIsGeneratedContentConfirmed(true);
+    } catch (apiError) {
+      const err = apiError as { message?: string };
+      setError(err.message || "Não foi possível confirmar o conteúdo gerado.");
+    } finally {
+      setIsConfirmingGeneratedContent(false);
+    }
   };
 
   const handleConfirm = () => {
@@ -180,7 +242,8 @@ function AddLessonPopup({
                 type="button"
                 aria-label="Voltar"
                 onClick={() => setStep(1)}
-                className="size-[40px] rounded-full flex items-center justify-center text-[#021b59] hover:bg-[#edf2ff] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+                disabled={isModalLocked}
+                className="size-[40px] rounded-full flex items-center justify-center text-[#021b59] hover:bg-[#edf2ff] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <span className="text-[28px] leading-none">‹</span>
               </button>
@@ -196,7 +259,8 @@ function AddLessonPopup({
             type="button"
             aria-label="Fechar modal"
             onClick={onClose}
-            className="size-[40px] rounded-full flex items-center justify-center hover:bg-[#f5f5f5] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+            disabled={isModalLocked}
+            className="size-[40px] rounded-full flex items-center justify-center hover:bg-[#f5f5f5] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <svg
               className="size-[18px]"
@@ -241,12 +305,16 @@ function AddLessonPopup({
                   value={lessonName}
                   onChange={(e) => {
                     setLessonName(e.target.value);
+                    setGeneratedContent("");
+                    setSavedLessonId(null);
+                    setIsGeneratedContentConfirmed(false);
                     setIsLessonSaved(false);
                   }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") handleStep1();
                   }}
-                  className="h-full w-full rounded-[12px] bg-transparent px-[16px] font-['Figtree:Regular',sans-serif] text-[16px] text-[#333] placeholder-[#8e8e8e] outline-none"
+                  disabled={isModalLocked}
+                  className="h-full w-full rounded-[12px] bg-transparent px-[16px] font-['Figtree:Regular',sans-serif] text-[16px] text-[#333] placeholder-[#8e8e8e] outline-none disabled:cursor-not-allowed disabled:bg-[#f3f4f6] disabled:text-[#8e8e8e]"
                   autoFocus
                 />
               </div>
@@ -260,7 +328,8 @@ function AddLessonPopup({
             <button
               type="button"
               onClick={handleStep1}
-              className="h-[48px] w-full rounded-[26px] bg-[#ffeac4] transition-colors hover:bg-[#ffd9a0] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+              disabled={isModalLocked}
+              className="h-[48px] w-full rounded-[26px] bg-[#ffeac4] transition-colors hover:bg-[#ffd9a0] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <span className="font-['Figtree:Medium',sans-serif] font-medium text-[18px] text-[#333]">
                 Próximo
@@ -307,9 +376,12 @@ function AddLessonPopup({
                 rows={5}
                 placeholder="Cole aqui o conteúdo em texto da aula..."
                 value={lessonContent}
-                disabled={hasSelectedFile}
+                disabled={hasSelectedFile || isModalLocked}
                 onChange={(e) => {
                   setLessonContent(e.target.value);
+                  setGeneratedContent("");
+                  setSavedLessonId(null);
+                  setIsGeneratedContentConfirmed(false);
                   setIsLessonSaved(false);
                 }}
                 className="min-h-[110px] w-full rounded-[14px] border border-[#8e8e8e] bg-transparent px-[14px] py-[12px] font-['Figtree:Regular',sans-serif] text-[14px] text-[#333] placeholder-[#8e8e8e] outline-none resize-none focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:cursor-not-allowed disabled:bg-[#f3f4f6] disabled:text-[#8e8e8e]"
@@ -327,7 +399,7 @@ function AddLessonPopup({
                 type="button"
                 aria-label="Selecionar arquivo para a aula"
                 onClick={() => fileInputRef.current?.click()}
-                disabled={hasLessonContent}
+                disabled={hasLessonContent || isModalLocked}
                 className="flex h-[54px] w-full items-center justify-center rounded-[14px] border border-dashed border-[#8e8e8e] bg-white px-[12px] text-center transition-colors hover:bg-[#f8f8f8] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:cursor-not-allowed disabled:bg-[#f3f4f6] disabled:opacity-60"
               >
                 <span className="font-['Figtree:Regular',sans-serif] text-[14px] text-[#606060]">
@@ -340,7 +412,7 @@ function AddLessonPopup({
                 ref={fileInputRef}
                 type="file"
                 accept=".pdf,.txt,.md,.doc,.docx,.odt,text/plain,text/markdown,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.oasis.opendocument.text"
-                disabled={hasLessonContent}
+                disabled={hasLessonContent || isModalLocked}
                 className="hidden"
                 aria-hidden="true"
                 tabIndex={-1}
@@ -372,7 +444,7 @@ function AddLessonPopup({
                 className="h-[42px] rounded-[26px] bg-[#021b59] transition-colors hover:bg-[#042e99] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:cursor-not-allowed disabled:bg-[#94a3c7] disabled:opacity-60"
               >
                 <span className="font-['Figtree:Medium',sans-serif] font-medium text-[16px] text-white">
-                  Gerar com IA
+                  {isGeneratingContent ? "Gerando..." : "Gerar com IA"}
                 </span>
               </button>
             </div>
@@ -394,22 +466,32 @@ function AddLessonPopup({
                   type="button"
                   aria-label="Regerar"
                   onClick={handleGenerateWithAi}
-                  disabled={!hasGeneratedContent}
+                  disabled={
+                    isModalLocked || !hasGeneratedContent || isGeneratingContent
+                  }
                   className="h-[38px] rounded-[24px] border border-[#8a9ac4] bg-white transition-colors hover:bg-[#eef3ff] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <span className="font-['Figtree:Medium',sans-serif] font-medium text-[15px] text-[#6b7ea9]">
-                    Regerar
+                    {isGeneratingContent ? "Regerando..." : "Regerar"}
                   </span>
                 </button>
                 <button
                   type="button"
                   aria-label="Confirmar conteúdo gerado"
                   onClick={handleUseGeneratedContent}
-                  disabled={!hasGeneratedContent}
+                  disabled={
+                    isModalLocked ||
+                    !hasGeneratedContent ||
+                    isConfirmingGeneratedContent
+                  }
                   className="h-[38px] rounded-[24px] bg-[#8192bd] transition-colors hover:bg-[#6f82b4] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <span className="font-['Figtree:Medium',sans-serif] font-medium text-[15px] text-white">
-                    Confirmar
+                    {isGeneratedContentConfirmed
+                      ? "✓ Confirmado"
+                      : isConfirmingGeneratedContent
+                        ? "Confirmando..."
+                        : "Confirmar"}
                   </span>
                 </button>
               </div>
@@ -548,7 +630,10 @@ export function CreateModulesPage() {
     });
   };
 
-  const handleAddLesson = async (modId: string, lessonDraft: LessonDraft) => {
+  const handleAddLesson = async (
+    modId: string,
+    lessonDraft: LessonDraft,
+  ): Promise<Lesson> => {
     const targetModule = modules.find((moduleItem) => moduleItem.id === modId);
 
     if (!targetModule?.backendModuleId) {
@@ -556,7 +641,9 @@ export function CreateModulesPage() {
         "O módulo ainda não foi criado no backend. Tente novamente em instantes.",
       );
       window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
+      throw new Error(
+        "O módulo ainda não foi criado no backend. Tente novamente em instantes.",
+      );
     }
 
     setError("");
@@ -572,29 +659,28 @@ export function CreateModulesPage() {
         lessonDraft.fileBlob,
       );
 
+      const persistedLesson: Lesson = {
+        id: uid(),
+        backendLessonId: String(createdLesson.id),
+        name: lessonDraft.name,
+        file: lessonDraft.file ?? createdLesson.filePath,
+        fileBlob: lessonDraft.fileBlob,
+        contentEditor:
+          lessonDraft.contentEditor ?? createdLesson.contentEditor ?? null,
+      };
+
       setModules((prev) =>
         prev.map((moduleItem) =>
           moduleItem.id === modId
             ? {
                 ...moduleItem,
-                lessons: [
-                  ...moduleItem.lessons,
-                  {
-                    id: uid(),
-                    backendLessonId: String(createdLesson.id),
-                    name: lessonDraft.name,
-                    file: lessonDraft.file ?? createdLesson.filePath,
-                    fileBlob: lessonDraft.fileBlob,
-                    contentEditor:
-                      lessonDraft.contentEditor ??
-                      createdLesson.contentEditor ??
-                      null,
-                  },
-                ],
+                lessons: [...moduleItem.lessons, persistedLesson],
               }
             : moduleItem,
         ),
       );
+
+      return persistedLesson;
     } catch (apiError) {
       const err = apiError as { message?: string; status?: number };
       if (err.status === 400 || err.status === 422) {
@@ -607,6 +693,7 @@ export function CreateModulesPage() {
         setError(err.message || "Não foi possível criar a aula no momento.");
       }
       window.scrollTo({ top: 0, behavior: "smooth" });
+      throw apiError;
     } finally {
       setIsSavingModules(false);
     }

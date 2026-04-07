@@ -25,6 +25,36 @@ export type BackendLessonResponse = {
   updatedAt: string;
 };
 
+export async function generateLessonContentWithBackend(
+  lessonId: string,
+): Promise<string> {
+  const response = await apiClient.post<ApiEnvelope<string>>(
+    `/lessons/${lessonId}/gerar-conteudo`,
+  );
+
+  return response.data.dados;
+}
+
+export async function regenerateLessonContentWithBackend(
+  lessonId: string,
+): Promise<string> {
+  const response = await apiClient.post<ApiEnvelope<string>>(
+    `/lessons/${lessonId}/regerar-conteudo`,
+  );
+
+  return response.data.dados;
+}
+
+export async function confirmGeneratedLessonContentWithBackend(
+  lessonId: string,
+): Promise<BackendLessonResponse> {
+  const response = await apiClient.post<ApiEnvelope<BackendLessonResponse>>(
+    `/lessons/${lessonId}/confirmar-conteudo`,
+  );
+
+  return response.data.dados;
+}
+
 /**
  * Create a lesson using the backend contract for PoC (multipart/form-data).
  * - `dados`: JSON part with lesson name/contentEditor
