@@ -21,7 +21,6 @@ const EDIT_ICON =
   "M3 17.25V21H6.75L17.81 9.94L14.06 6.19L3 17.25ZM20.71 7.04C21.1 6.65 21.1 6.02 20.71 5.63L18.37 3.29C17.98 2.9 17.35 2.9 16.96 3.29L15.13 5.12L18.88 8.87L20.71 7.04Z";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-type Tab = "Perguntas" | "Respostas" | "Configurações";
 type Option = { id: string; text: string };
 type Question = {
   id: string;
@@ -30,62 +29,9 @@ type Question = {
   correctOptionId: string;
   points: number;
 };
-type ConfigSettings = {
-  wrongAnswers: boolean;
-  rightAnswers: boolean;
-  values: boolean;
-};
 
 let _id = 1;
 const uid = () => String(_id++);
-
-// ── Checkbox component (matches Figma design) ─────────────────────────────────
-function FigmaCheckbox({
-  checked,
-  onChange,
-  label,
-  borderColor = "#ffeac4",
-}: {
-  checked: boolean;
-  onChange: () => void;
-  label?: string;
-  borderColor?: string;
-}) {
-  return (
-    <button
-      type="button"
-      role="checkbox"
-      aria-checked={checked}
-      aria-label={label}
-      onClick={onChange}
-      className="flex items-center gap-[10px] text-left focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded-sm"
-    >
-      <div
-        className="size-[22px] rounded-[2px] flex items-center justify-center shrink-0 transition-colors"
-        style={{
-          border: `2px solid ${checked ? "#ffeac4" : borderColor}`,
-          background: checked ? "#ffeac4" : "white",
-        }}
-      >
-        {checked && (
-          <svg
-            className="size-[14px]"
-            fill="none"
-            viewBox="0 0 22 22"
-            aria-hidden="true"
-          >
-            <path
-              clipRule="evenodd"
-              d={CHECK}
-              fill="#021B59"
-              fillRule="evenodd"
-            />
-          </svg>
-        )}
-      </div>
-    </button>
-  );
-}
 
 // ── Correct-answer dropdown ───────────────────────────────────────────────────
 function CorrectAnswerDropdown({
@@ -182,43 +128,6 @@ function CorrectAnswerDropdown({
           </ul>
         </>
       )}
-    </div>
-  );
-}
-
-// ── Tab bar ───────────────────────────────────────────────────────────────────
-const TABS: Tab[] = ["Perguntas", "Respostas", "Configurações"];
-
-function TabBar({
-  active,
-  onChange,
-}: {
-  active: Tab;
-  onChange: (t: Tab) => void;
-}) {
-  return (
-    <div className="flex w-full border-b border-[#e0e0e0] shrink-0">
-      {TABS.map((tab) => {
-        const isActive = tab === active;
-        return (
-          <button
-            key={tab}
-            type="button"
-            onClick={() => onChange(tab)}
-            className={`flex-1 flex flex-col items-center justify-between pt-[8px] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] transition-colors ${isActive ? "" : "justify-center py-[10px]"}`}
-          >
-            <span
-              className="font-['Anek_Devanagari:SemiBold',sans-serif] font-semibold text-[18px] text-black leading-[normal] pb-[8px]"
-              style={{ fontVariationSettings: "'wdth' 100" }}
-            >
-              {tab}
-            </span>
-            {isActive && (
-              <div className="w-full h-[3px] bg-[#efbbdc] shrink-0" />
-            )}
-          </button>
-        );
-      })}
     </div>
   );
 }
@@ -524,134 +433,6 @@ function PerguntasTab({
   );
 }
 
-// ── Respostas tab (analytics view) ────────────────────────────────────────────
-function RespostasTab({ questions }: { questions: Question[] }) {
-  if (questions.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-[40px] gap-[12px]">
-        <p className="font-['Figtree:Regular',sans-serif] text-[#595959] text-[16px] text-center">
-          Nenhuma pergunta adicionada ainda. As estatísticas de respostas dos
-          alunos aparecerão aqui após a publicação.
-        </p>
-      </div>
-    );
-  }
-
-  // Generate mock stats for each question based on number of options
-  const getMockStats = (q: Question) => {
-    const n = q.options.length;
-    if (n === 0) return [];
-    // Create randomish percentages that sum to 100
-    const BASE_PCTS: Record<number, number[]> = {
-      2: [60, 40],
-      3: [45, 35, 20],
-      4: [20, 15, 40, 25],
-      5: [20, 15, 30, 20, 15],
-    };
-    return (BASE_PCTS[n] ?? [Math.round(100 / n)])
-      .slice(0, n)
-      .map((pct, i) => ({
-        label: String.fromCharCode(65 + i),
-        text: q.options[i]?.text ?? `Opção ${String.fromCharCode(65 + i)}`,
-        pct,
-      }));
-  };
-
-  return (
-    <div className="flex flex-col gap-[28px]">
-      {questions.map((q, idx) => {
-        const stats = getMockStats(q);
-        const total = 100; // mock total respondents
-        return (
-          <div key={q.id} className="flex flex-col gap-[10px]">
-            <p className="font-['Figtree:Medium',sans-serif] font-medium text-black text-[20px] leading-[30px]">
-              Questão {String(idx + 1).padStart(2, "0")}
-            </p>
-            {stats.map((s) => (
-              <p
-                key={s.label}
-                className="font-['Figtree:Regular',sans-serif] text-[18px] leading-[28px]"
-              >
-                <span className="text-[#c0396b] font-['Figtree:Medium',sans-serif] font-medium">
-                  {s.pct}%
-                </span>{" "}
-                responderam {s.label}
-              </p>
-            ))}
-            <p className="font-['Figtree:Regular',sans-serif] text-[#333] text-[16px] leading-[24px] mt-[4px]">
-              Total:{" "}
-              <span className="text-[#c0396b] font-['Figtree:Medium',sans-serif] font-medium">
-                {total} pessoas
-              </span>{" "}
-              responderam a questão
-            </p>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-// ── Configurações tab ─────────────────────────────────────────────────────────
-function ConfiguracoesTab({
-  config,
-  setConfig,
-}: {
-  config: ConfigSettings;
-  setConfig: React.Dispatch<React.SetStateAction<ConfigSettings>>;
-}) {
-  const items: { key: keyof ConfigSettings; title: string; desc: string }[] = [
-    {
-      key: "wrongAnswers",
-      title: "Respostas erradas",
-      desc: "Os participantes podem ver as perguntas que foram respondidas incorretamente.",
-    },
-    {
-      key: "rightAnswers",
-      title: "Respostas corretas",
-      desc: "Os participantes podem ver as respostas corretas após a liberação das notas.",
-    },
-    {
-      key: "values",
-      title: "Valores",
-      desc: "Os participantes podem ver a pontuação total e os pontos recebidos para cada pergunta.",
-    },
-  ];
-
-  return (
-    <div className="flex flex-col gap-[24px]">
-      {items.map((item) => (
-        <div key={item.key} className="flex gap-[12px] items-start">
-          <div className="shrink-0 mt-[10px]">
-            <FigmaCheckbox
-              checked={config[item.key]}
-              onChange={() =>
-                setConfig((prev) => ({ ...prev, [item.key]: !prev[item.key] }))
-              }
-              label={item.title}
-              borderColor="#021b59"
-            />
-          </div>
-          <div className="flex flex-col gap-[8px] pt-[8px] flex-1 min-w-0">
-            <p
-              className="font-['Anek_Devanagari:SemiBold',sans-serif] font-semibold text-black leading-[normal] text-[18px]"
-              style={{ fontVariationSettings: "'wdth' 100" }}
-            >
-              {item.title}
-            </p>
-            <p
-              className="font-['Anek_Devanagari:Regular',sans-serif] font-normal text-black leading-[normal] text-[16px]"
-              style={{ fontVariationSettings: "'wdth' 100" }}
-            >
-              {item.desc}
-            </p>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 // ── Main page ─────────────────────────────────────────────────────────────────
 export function CreateExamPage() {
   const navigate = useNavigate();
@@ -679,9 +460,6 @@ export function CreateExamPage() {
   // View state: modules list OR exam editor
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingModId, setEditingModId] = useState<string | null>(null);
-
-  // Tab state (inside editor)
-  const [activeTab, setActiveTab] = useState<Tab>("Perguntas");
 
   // Question form
   const [questionText, setQuestionText] = useState("");
@@ -713,13 +491,6 @@ export function CreateExamPage() {
     replaceFile?: boolean;
     fileName?: string;
   } | null>(null);
-
-  // Config per module
-  const [config, setConfig] = useState<ConfigSettings>({
-    wrongAnswers: false,
-    rightAnswers: false,
-    values: false,
-  });
 
   // ── Handlers ────────────────────────────────────────────────────────────────
   const removeLesson = (modId: string, lessonId: string) => {
@@ -773,7 +544,6 @@ export function CreateExamPage() {
     setCorrectOptionId("");
     setPoints(1);
     setFormError("");
-    setActiveTab("Perguntas");
     setEditorOpen(true);
   };
 
@@ -842,33 +612,21 @@ export function CreateExamPage() {
             {mod?.name ?? "Módulo"} — Adicionar prova
           </p>
 
-          {/* Tab bar */}
-          <TabBar active={activeTab} onChange={setActiveTab} />
-
-          {/* Tab content */}
           <div className="py-[24px]">
-            {activeTab === "Perguntas" && (
-              <PerguntasTab
-                questionText={questionText}
-                setQuestionText={setQuestionText}
-                options={options}
-                setOptions={setOptions}
-                correctOptionId={correctOptionId}
-                setCorrectOptionId={setCorrectOptionId}
-                points={points}
-                setPoints={setPoints}
-                questions={questions}
-                removeQuestion={removeQuestion}
-                onAddQuestion={addQuestion}
-                error={formError}
-              />
-            )}
-            {activeTab === "Respostas" && (
-              <RespostasTab questions={questions} />
-            )}
-            {activeTab === "Configurações" && (
-              <ConfiguracoesTab config={config} setConfig={setConfig} />
-            )}
+            <PerguntasTab
+              questionText={questionText}
+              setQuestionText={setQuestionText}
+              options={options}
+              setOptions={setOptions}
+              correctOptionId={correctOptionId}
+              setCorrectOptionId={setCorrectOptionId}
+              points={points}
+              setPoints={setPoints}
+              questions={questions}
+              removeQuestion={removeQuestion}
+              onAddQuestion={addQuestion}
+              error={formError}
+            />
           </div>
         </div>
 
