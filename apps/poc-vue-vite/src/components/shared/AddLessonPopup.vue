@@ -232,9 +232,7 @@ const handleConfirmQuiz = async () => {
             <p v-if="!generatedContent" class="text-[14px] text-[#8e8e8e] italic">
               O conteúdo gerado pela IA aparecerá aqui...
             </p>
-            <p v-else class="text-[14px] text-[#333] whitespace-pre-wrap leading-relaxed">
-              {{ generatedContent }}
-            </p>
+            <div v-else class="prose prose-sm max-w-none prose-headings:text-[#021b59] prose-p:leading-relaxed" v-html="generatedContent"></div>
           </div>
 
           <div class="flex items-center gap-[12px]">
