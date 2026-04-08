@@ -1,70 +1,45 @@
-import type { CourseInfoData } from '@/views/CreateCourseView.vue';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+import { apiClient } from '@/services/api'
+import type { CourseInfoData } from '@/views/CreateCourseView.vue'
 
 export interface Curso {
-  id: number;
-  title: string;
-  category: string;
-  description: string;
-  imagePath: string;
-  createdAt: string;
-  updatedAt: string;
+  id: number
+  title: string
+  category: string
+  description: string
+  imagePath: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface ApiResponse<T> {
-  sucesso: boolean;
-  mensagem: string;
-  dados: T;
-  timestamp: string;
+  sucesso: boolean
+  mensagem: string
+  dados: T
+  timestamp: string
 }
 
 export const courseService = {
   async getCourses(): Promise<Curso[]> {
-    const response = await fetch(`${API_BASE_URL}/courses`, {
-      method: "GET",
-      headers: {
-        'Accept': 'application/json',
-      }
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || `Erro HTTP ${response.status}`);
-    }
-
-    const data: ApiResponse<Curso[]> = await response.json();
-    return data.dados || [];
+    const response = await apiClient.get<ApiResponse<Curso[]>>('/courses')
+    return response.data.dados || []
   },
 
   async createCourse(courseData: CourseInfoData, file: File | null) {
-    const formData = new FormData();
+    const formData = new FormData()
 
     const dadosJson = JSON.stringify({
       title: courseData.title,
       category: courseData.category,
       description: courseData.description,
-    });
+    })
 
-    formData.append("dados", dadosJson);
+    formData.append('dados', dadosJson)
 
     if (file) {
-      formData.append("imagem", file);
+      formData.append('imagem', file)
     }
 
-    const response = await fetch(`${API_BASE_URL}/courses`, {
-      method: "POST",
-      body: formData,
-      headers: {
-        'Accept': 'application/json',
-      }
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || `Erro HTTP ${response.status}`);
-    }
-
-    return response.json();
-  }
-};
+    const response = await apiClient.post<ApiResponse<Curso>>('/courses', formData)
+    return response.data
+  },
+}

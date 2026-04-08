@@ -1,102 +1,95 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+import { apiClient } from '@/services/api'
 
 export interface Lesson {
-  id: number;
-  name: string;
-  orderNum: number;
-  filePath: string | null;
-  fileType: string | null;
-  contentEditor: string | null;
-  contentGenerated: string | null;
-  moduleId: number;
-  createdAt: string;
-  updatedAt: string;
+  id: number
+  name: string
+  orderNum: number
+  filePath: string | null
+  fileType: string | null
+  contentEditor: string | null
+  contentGenerated: string | null
+  moduleId: number
+  createdAt: string
+  updatedAt: string
 }
 
 export interface ApiResponse<T> {
-  sucesso?: boolean;
-  success?: boolean;
-  mensagem?: string;
-  message?: string;
-  dados?: T;
-  data?: T;
-  timestamp?: string;
+  sucesso?: boolean
+  success?: boolean
+  mensagem?: string
+  message?: string
+  dados?: T
+  data?: T
+  timestamp?: string
 }
 
 export const lessonService = {
-  
-  async createLesson(moduleId: number, name: string, contentText: string, file: File | null) {
-    const formData = new FormData();
+  async createLesson(
+    moduleId: number,
+    name: string,
+    contentText: string,
+    file: File | null
+  ) {
+    const formData = new FormData()
 
     if (file) {
-      const dadosPayload = { name: name };
-      formData.append('dados', JSON.stringify(dadosPayload));
-      formData.append('arquivo', file);
+      const dadosPayload = { name: name }
+      formData.append('dados', JSON.stringify(dadosPayload))
+      formData.append('arquivo', file)
     } else {
-      const dadosPayload = { name: name, contentEditor: contentText };
-      formData.append('dados', JSON.stringify(dadosPayload));
+      const dadosPayload = { name: name, contentEditor: contentText }
+      formData.append('dados', JSON.stringify(dadosPayload))
     }
 
-    try {
-     const response = await fetch(`${API_BASE_URL}/modules/${moduleId}/lessons`, {
-     method: 'POST',
-     body: formData 
-    });
+    const response = await apiClient.post<ApiResponse<Lesson>>(
+      `/modules/${moduleId}/lessons`,
+      formData
+    )
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.mensagem || 'Erro ao criar a aula');
-      }
-
-      const responseData = await response.json();
-      return responseData.dados; 
-    } catch (error) { throw error }
+    return response.data.dados
   },
 
   async generateContent(lessonId: number): Promise<string> {
-    const response = await fetch(`${API_BASE_URL}/lessons/${lessonId}/gerar-conteudo`, {
-      method: "POST",
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      }
-    });
+    const response = await apiClient.post<ApiResponse<string>>(
+      `/lessons/${lessonId}/gerar-conteudo`
+    )
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || `Erro HTTP ${response.status}`);
-    }
-
-    const data: ApiResponse<string> = await response.json();
-    return data.dados || data.data || "";
+    return response.data.dados || response.data.data || ''
   },
 
   async approveContent(lessonId: number, contentGenerated: string) {
-    const response = await fetch(`${API_BASE_URL}/lessons/${lessonId}/aprovar-conteudo`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ contentGenerated })
-    });
+    const response = await apiClient.put<ApiResponse<Lesson>>(
+      `/lessons/${lessonId}/aprovar-conteudo`,
+      { contentGenerated }
+    )
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(errorData?.mensagem || 'Erro ao aprovar o conteúdo da aula.');
-    }
-
-    const data = await response.json();
-    return data.dados;
+    return response.data.dados
   },
 
   async regenerateContent(lessonId: number): Promise<string> {
-    const response = await fetch(`${API_BASE_URL}/lessons/${lessonId}/regerar-conteudo`, {
-      method: "POST",
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      }
-    });
+    const response = await apiClient.post<ApiResponse<string>>(
+      `/lessons/${lessonId}/regerar-conteudo`
+    )
+
+    return response.data.dados || response.data.data || ''
+  },
+
+  async confirmContent(lessonId: number) {
+    const response = await apiClient.post<ApiResponse<Lesson>>(
+      `/lessons/${lessonId}/confirmar-conteudo`
+    )
+
+    return response.data.dados
+  },
+
+  async getLessonsByModule(moduleId: number) {
+    const response = await apiClient.get<ApiResponse<Lesson[]>>(
+      `/modules/${moduleId}/lessons`
+    )
+
+    return response.data.dados || []
+  },
+}
 
     if (!response.ok) {
       const errorText = await response.text();
