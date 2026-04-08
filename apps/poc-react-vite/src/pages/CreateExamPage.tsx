@@ -75,7 +75,12 @@ const AI_EXAM_TEMPLATES: AiQuestionTemplate[][] = [
   [
     {
       text: "Qual componente conecta e permite a comunicação entre os diversos dispositivos do computador?",
-      options: ["Fonte de alimentação", "Placa-Mãe", "Memória cache", "Monitor"],
+      options: [
+        "Fonte de alimentação",
+        "Placa-Mãe",
+        "Memória cache",
+        "Monitor",
+      ],
       correctIndex: 1,
     },
     {
@@ -550,7 +555,8 @@ function AiGeneratedExamReviewModal({
               id="ai-exam-review-description"
               className="font-['Figtree:Regular',sans-serif] text-[#606060] text-[16px] leading-[24px] mt-[6px]"
             >
-              Confira as questões e a indicação de resposta correta antes de aprovar.
+              Confira as questões e a indicação de resposta correta antes de
+              aprovar.
             </p>
             <p className="font-['Figtree:Medium',sans-serif] text-[#021b59] text-[14px] mt-[8px]">
               {moduleName}
@@ -740,8 +746,9 @@ export function CreateExamPage() {
     fileName?: string;
   } | null>(null);
 
-  const [aiExamReview, setAiExamReview] =
-    useState<AiExamReviewState | null>(null);
+  const [aiExamReview, setAiExamReview] = useState<AiExamReviewState | null>(
+    null,
+  );
 
   // ── Handlers ────────────────────────────────────────────────────────────────
   const removeLesson = (modId: string, lessonId: string) => {
