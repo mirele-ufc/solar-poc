@@ -469,9 +469,9 @@ function AddLessonPopup({
                   disabled={
                     isModalLocked || !hasGeneratedContent || isGeneratingContent
                   }
-                  className="h-[38px] rounded-[24px] border border-[#8a9ac4] bg-white transition-colors hover:bg-[#eef3ff] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="h-[38px] rounded-[24px] border border-[#021b59] bg-white transition-colors hover:bg-[#eef3ff] disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  <span className="font-['Figtree:Medium',sans-serif] font-medium text-[15px] text-[#6b7ea9]">
+                  <span className="font-['Figtree:Medium',sans-serif] font-medium text-[15px] text-[#021b59]">
                     {isGeneratingContent ? "Regerando..." : "Regerar"}
                   </span>
                 </button>
@@ -484,7 +484,7 @@ function AddLessonPopup({
                     !hasGeneratedContent ||
                     isConfirmingGeneratedContent
                   }
-                  className="h-[38px] rounded-[24px] bg-[#8192bd] transition-colors hover:bg-[#6f82b4] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="h-[38px] rounded-[24px] bg-[#021b59] transition-colors hover:bg-[#042e99] disabled:cursor-not-allowed disabled:bg-[#94a3c7] disabled:opacity-60"
                 >
                   <span className="font-['Figtree:Medium',sans-serif] font-medium text-[15px] text-white">
                     {isGeneratedContentConfirmed
