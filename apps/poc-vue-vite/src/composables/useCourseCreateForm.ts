@@ -1,7 +1,10 @@
-import { ref, computed } from 'vue';
-import { useForm } from 'vee-validate';
-import { toTypedSchema } from '@vee-validate/zod';
-import { courseCreateFormSchema, type CourseCreateFormValues } from '@/validations/courseSchema';
+import { ref, computed } from "vue";
+import { useForm } from "vee-validate";
+import { toTypedSchema } from "@vee-validate/zod";
+import {
+  courseCreateFormSchema,
+  type CourseCreateFormValues,
+} from "@/validations/courseSchema";
 
 /**
  * Composable para gerenciar formulário de criar curso com vee-validate + Zod
@@ -26,10 +29,10 @@ export function useCourseCreateForm() {
   const { values, errors, handleSubmit, resetForm, setFieldValue } = useForm({
     validationSchema: toTypedSchema(courseCreateFormSchema),
     initialValues: {
-      title: '',
-      description: '',
-      category: '',
-      hours: '',
+      title: "",
+      description: "",
+      category: "",
+      hours: "",
       requiredFields: [],
       coverFile: undefined,
     } as CourseCreateFormValues,
@@ -44,7 +47,7 @@ export function useCourseCreateForm() {
   const handleCourseCreateSubmit = handleSubmit(async (formValues) => {
     isProcessing.value = true;
     try {
-      console.log('Course form submitted with values:', formValues);
+      console.log("Course form submitted with values:", formValues);
       // Backend call seria aqui
       // await courseService.createCourse(formValues)
     } finally {

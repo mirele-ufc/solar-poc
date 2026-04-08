@@ -1,7 +1,10 @@
-import { ref, computed } from 'vue';
-import { useForm } from 'vee-validate';
-import { toTypedSchema } from '@vee-validate/zod';
-import { enrollmentFormSchema, type EnrollmentFormValues } from '@/validations/enrollmentSchema';
+import { ref, computed } from "vue";
+import { useForm } from "vee-validate";
+import { toTypedSchema } from "@vee-validate/zod";
+import {
+  enrollmentFormSchema,
+  type EnrollmentFormValues,
+} from "@/validations/enrollmentSchema";
 
 /**
  * Composable para gerenciar formulário de inscrição com vee-validate + Zod
@@ -26,10 +29,10 @@ export function useEnrollmentForm() {
   const { values, errors, handleSubmit, resetForm, setFieldValue } = useForm({
     validationSchema: toTypedSchema(enrollmentFormSchema),
     initialValues: {
-      firstName: '',
-      lastName: '',
-      city: '',
-      gender: '',
+      firstName: "",
+      lastName: "",
+      city: "",
+      gender: "",
     } as EnrollmentFormValues,
   });
 
@@ -42,7 +45,7 @@ export function useEnrollmentForm() {
   const handleEnrollmentSubmit = handleSubmit(async (formValues) => {
     isProcessing.value = true;
     try {
-      console.log('Form submitted with values:', formValues);
+      console.log("Form submitted with values:", formValues);
       // Backend call seria aqui
       // await enrollmentService.enroll(formValues)
     } finally {
