@@ -6,8 +6,8 @@ import type { CourseInfoData } from "./CreateCoursePage";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Modal } from "@/components/ui/modal";
 import {
-  createModulesSchema,
-  type CreateModulesFormValues,
+  courseModulesFormSchema,
+  type CourseModulesFormValues,
 } from "@/validations/courseSchema";
 import { imageFileSchema, lessonFileSchema } from "@/validations/fileSchema";
 import { createModuleWithBackend } from "@/services/moduleService";
@@ -537,8 +537,8 @@ export function CreateModulesPage() {
     setValue,
     trigger,
     formState: { errors },
-  } = useForm<CreateModulesFormValues>({
-    resolver: zodResolver(createModulesSchema),
+  } = useForm<CourseModulesFormValues>({
+    resolver: zodResolver(courseModulesFormSchema),
     defaultValues: {
       modules: [],
     },

@@ -5,9 +5,9 @@ import {
   registerSchema,
 } from "@/validations/authSchema";
 import {
-  courseCreateSchema,
-  courseUpdateSchema,
-  createModulesSchema,
+  courseCreateRequestSchema,
+  courseUpdateRequestSchema,
+  courseModulesFormSchema,
 } from "@/validations/courseSchema";
 import { enrollmentSchema } from "@/validations/enrollmentSchema";
 import { questionSchema, quizSubmitSchema } from "@/validations/examSchema";
@@ -107,7 +107,7 @@ describe("schemas contract alignment", () => {
   });
 
   it("should fail course create when title is empty", () => {
-    const result = courseCreateSchema.safeParse({
+    const result = courseCreateRequestSchema.safeParse({
       titulo: "",
       descricao: "descricao",
       categoria: "categoria",
@@ -118,13 +118,13 @@ describe("schemas contract alignment", () => {
   });
 
   it("should fail course update when payload is empty", () => {
-    const result = courseUpdateSchema.safeParse({});
+    const result = courseUpdateRequestSchema.safeParse({});
 
     expect(result.success).toBe(false);
   });
 
   it("should allow modules schema when one module has no image", () => {
-    const result = createModulesSchema.safeParse({
+    const result = courseModulesFormSchema.safeParse({
       modules: [{}],
     });
 

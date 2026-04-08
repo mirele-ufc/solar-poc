@@ -5,8 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FormContainer } from "@/components/shared/FormContainer";
 import { PageHeader } from "@/components/shared/PageHeader";
 import {
-  createCourseSchema,
-  type CreateCourseFormValues,
+  courseCreateFormSchema,
+  type CourseCreateFormValues,
 } from "@/validations/courseSchema";
 import { imageFileSchema } from "@/validations/fileSchema";
 import { createCourseWithBackend } from "@/services/courseService";
@@ -80,8 +80,8 @@ export function CreateCoursePage() {
     resetField,
     trigger,
     formState: { errors },
-  } = useForm<CreateCourseFormValues>({
-    resolver: zodResolver(createCourseSchema),
+  } = useForm<CourseCreateFormValues>({
+    resolver: zodResolver(courseCreateFormSchema),
     defaultValues: {
       title: "",
       description: "",
