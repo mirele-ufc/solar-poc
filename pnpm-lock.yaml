@@ -270,6 +270,9 @@ importers:
       '@vee-validate/zod':
         specifier: ^4.15.1
         version: 4.15.1(vue@3.5.31(typescript@5.9.3))(zod@4.3.6)
+      axios:
+        specifier: ^1.7.7
+        version: 1.13.6
       pinia:
         specifier: ^3.0.4
         version: 3.0.4(typescript@5.9.3)(vue@3.5.31(typescript@5.9.3))
