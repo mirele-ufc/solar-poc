@@ -68,15 +68,21 @@ export const routes = createBrowserRouter([
           { path: "power-bi/enrollment", Component: EnrollmentPage },
           { path: "power-bi/modules", Component: ModulesPage },
           { path: "power-bi/modules/:modId", Component: LessonsPage },
-          { path: "power-bi/exam/instructions", Component: ExamInstructionsPage },
+          {
+            path: "power-bi/exam/instructions",
+            Component: ExamInstructionsPage,
+          },
           { path: "power-bi/exam", Component: ExamPage },
           { path: "power-bi/exam/results", Component: ExamResultPage },
-          
+
           { path: "python", Component: PythonDetailPage },
           { path: "python/enrollment", Component: PythonEnrollmentPage },
           { path: "python/modules", Component: PythonModulesPage },
           { path: "python/modules/:modId", Component: PythonLessonsPage },
-          { path: "python/exam/instructions", Component: PythonExamInstructionsPage },
+          {
+            path: "python/exam/instructions",
+            Component: PythonExamInstructionsPage,
+          },
           { path: "python/exam", Component: PythonExamPage },
           { path: "python/exam/results", Component: PythonExamResultPage },
         ],
