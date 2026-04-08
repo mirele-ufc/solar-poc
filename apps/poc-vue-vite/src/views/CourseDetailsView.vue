@@ -1,46 +1,49 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useRouter, useRoute } from 'vue-router'; 
+import { useRouter } from 'vue-router'; 
 import { useCourseStore } from '@/store/useCourseStore';
+import { useCourseFlow } from '@/composables/useCourseFlow';
 import ImageWithFallback from '@/components/shared/ImageWithFallback.vue';
 import PageHeader from '@/components/shared/PageHeader.vue';
 import { toast } from 'vue-sonner';
 
-const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1759661966728-4a02e3c6ed91?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkYXRhJTIwdmlzdWFsaXphdGlvbiUyMGJ1c2luZXNzJTIwaW50ZWxsaWdlbmNlJTIwZGFzaGJvYXJkfGVufDF8fHx8MTc3MzMzNTYxNHww&ixlib=rb-4.1.0&q=80&w=1080";
-
 const WARN_PATH = "M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z";
 
-const bullets = [
-  "Conceitos básicos de Business Intelligence e análise de dados",
-  "Conexão e importação de diferentes fontes de dados",
-  "Transformação e limpeza de dados com o Power Query",
-  "Criação de medidas e cálculos com a linguagem DAX",
-  "Construção de dashboards interativos e relatórios visuais",
-  "Publicação e compartilhamento de relatórios no Power BI Service",
-];
-
 const router = useRouter();
-const route = useRoute(); 
 const courseStore = useCourseStore();
+const { courseId, courseConfig, isValid, navigateTo } = useCourseFlow();
+
+// Validação
+if (!isValid || !courseConfig) {
+  router.push('/courses');
+}
+
+// Dados do curso
+const title = computed(() => courseConfig?.title || '');
+const description = computed(() => courseConfig?.description || '');
+const longDescription = computed(() => courseConfig?.longDescription || '');
+const loading = computed(() => courseConfig?.loading || '');
+const bullets = computed(() => courseConfig?.bullets || []);
+const heroImageUrl = computed(() => courseConfig?.heroImageUrl || '');
+const enrollmentKey = computed(() => courseConfig?.enrollmentKey || '');
+
 const showCancelModal = ref(false);
-const courseId = computed(() => (route.params.id as string) || "power-bi");
-const enrolled = computed(() => courseStore.isEnrolledInCourse(courseId.value));
+const enrolled = computed(() => courseStore.isEnrolledInCourse(enrollmentKey.value));
 
 const handleInscrever = () => {
   if (enrolled.value) {
-    router.push({ name: 'course-modules', params: { id: courseId.value } });
+    navigateTo('modules');
   } else {
-    router.push({ name: 'course-enrollment', params: { id: courseId.value } });
+    navigateTo('enrollment');
   }
 };
 
 const handleConfirmCancel = () => {
-  courseStore.unenrollFromCourse(courseId.value);
+  courseStore.unenrollFromCourse(enrollmentKey.value);
   showCancelModal.value = false;
   
   toast.success("Matrícula cancelada com sucesso.", {
-    description: "Seu acesso ao conteúdo foi removido.",
+    description: `Seu acesso ao conteúdo de ${courseConfig?.name} foi removido.`,
     duration: 5000,
   });
   
@@ -49,31 +52,41 @@ const handleConfirmCancel = () => {
 </script>
 
 <template>
-  <div class="bg-white flex flex-col pb-[100px]">
+  <div v-if="!isValid" class="bg-white flex flex-col pb-[100px] px-[20px] md:px-[40px] pt-[24px]">
+    <p class="text-red-600 text-center">Curso não encontrado.</p>
+    <button
+      @click="router.push('/courses')"
+      class="mt-4 mx-auto px-4 py-2 bg-blue-600 text-white rounded"
+    >
+      Voltar aos cursos
+    </button>
+  </div>
+
+  <div v-else class="bg-white flex flex-col pb-[100px]">
     <div class="w-full h-[218px] md:h-[320px] overflow-hidden">
       <ImageWithFallback
-        alt="Power BI – dashboard interativo"
+        :alt="`${courseConfig?.name} – curso`"
         class="w-full h-full object-cover"
-        :src="HERO_IMAGE"
+        :src="heroImageUrl"
       />
     </div>
 
     <div class="max-w-[900px] mx-auto flex flex-col gap-[24px] px-[20px] md:px-[40px] pt-[24px] w-full">
       <PageHeader
-        title="Power BI - Fundamentos"
+        :title="title"
         backPath="/courses"
         :crumbs="[
           { label: 'Cursos', path: '/courses' },
-          { label: 'Power BI - Fundamentos' },
+          { label: title },
         ]"
       />
       
       <div class="flex flex-col gap-[6px] md:flex-row md:items-baseline md:justify-between">
         <h1 class="font-['Figtree:Bold',sans-serif] font-bold leading-[36px] text-black text-[24px]">
-          Power BI - Fundamentos
+          {{ title }}
         </h1>
         <p class="font-['Figtree:Medium',sans-serif] font-medium leading-[30px] text-[#595959] text-[18px] shrink-0">
-          Carga horária: 30h
+          {{ loading }}
         </p>
       </div>
 
@@ -82,12 +95,7 @@ const handleConfirmCancel = () => {
           Sobre o curso
         </h2>
         <p class="font-['Figtree:Regular',sans-serif] font-normal leading-[26px] text-black text-[16px]">
-          O curso Power BI Fundamentos tem como objetivo introduzir os
-          participantes aos conceitos essenciais de análise de dados e
-          Business Intelligence utilizando o Microsoft Power BI. Ao longo do
-          curso, os alunos aprendem a transformar dados brutos em informações
-          estratégicas por meio da criação de relatórios interativos e
-          dashboards dinâmicos.
+          {{ description }} {{ longDescription }}
         </p>
       </div>
 
