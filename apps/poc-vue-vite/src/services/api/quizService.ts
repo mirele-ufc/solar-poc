@@ -35,5 +35,21 @@ export const quizService = {
     }
     
     return data?.dados || data?.data || "ok";
+  },
+
+  async createQuizWithQuestions(moduleId: string, payload: any) {
+    const response = await fetch(`${API_BASE_URL}/modules/${moduleId}/quiz`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error('Erro ao criar quiz no servidor.');
+    }
+
+    return await response.json();
   }
 };
