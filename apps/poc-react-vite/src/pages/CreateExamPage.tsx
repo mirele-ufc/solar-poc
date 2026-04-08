@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import type { CourseInfoData } from "./CreateCoursePage";
@@ -6,12 +6,14 @@ import type { ICourseManageModule } from "@ava-poc/types";
 import { Modal } from "@/components/ui/modal";
 import {
   confirmQuizForModuleWithBackend,
+  createQuizForModuleWithBackend,
   generateQuizForModuleWithBackend,
   regenerateQuizForModuleWithBackend,
   type BackendGeneratedQuizResponse,
+  type BackendQuizCreatePayload,
 } from "@/services/quizService";
 import { createQuestionSchema } from "@/validations/examSchema";
-import { imageFileSchema, uploadFileSchema } from "@/validations/fileSchema";
+import { uploadFileSchema } from "@/validations/fileSchema";
 
 // ── SVG paths ─────────────────────────────────────────────────────────────────
 const CLOSE_SM =
@@ -20,8 +22,6 @@ const CHECK = "M5 9L3 11L9 17L19 7L17 5L9 13L5 9Z";
 const BLUE_CHECK = "M6 10L4 12L10 18L20 8L18 6L10 14L6 10Z";
 const DOC =
   "M19.6667 5.66667H7.66667V27H23.6667V9.66667H19.6667V5.66667ZM7.66667 3H21L26.3333 8.33333V27C26.3333 27.7072 26.0524 28.3855 25.5523 28.8856C25.0522 29.3857 24.3739 29.6667 23.6667 29.6667H7.66667C6.95942 29.6667 6.28115 29.3857 5.78105 28.8856C5.28095 28.3855 5 27.7072 5 27V5.66667C5 4.95942 5.28095 4.28115 5.78105 3.78105C6.28115 3.28095 6.95942 3 7.66667 3ZM10.3333 15H21V17.6667H10.3333V15ZM10.3333 20.3333H21V23H10.3333V20.3333Z";
-const IMG_ICON =
-  "M19 15H29L33 19V33C33 33.5304 32.7893 34.0391 32.4142 34.4142C32.0391 34.7893 31.5304 35 31 35H19C18.4696 35 17.9609 34.7893 17.5858 34.4142C17.2107 34.0391 17 33.5304 17 33V17C17 16.4696 17.2107 15.9609 17.5858 15.5858C17.9609 15.2107 18.4696 15 19 15ZM28.172 17H19V33H31V19.828H28.172V17ZM28 27C27.7348 27 27.4804 26.8946 27.2929 26.7071C27.1054 26.5196 27 26.2652 27 26C27 25.7348 27.1054 25.4804 27.2929 25.2929C27.4804 25.1054 27.7348 25 28 25C28.2652 25 28.5196 25.1054 28.7071 25.2929C28.8946 25.4804 29 25.7348 29 26C29 26.2652 28.8946 26.5196 28.7071 26.7071C28.5196 26.8946 28.2652 27 28 27ZM21 29L24.07 26L27 29L28 28L29 29V31H21V29Z";
 const ARROW =
   "M1.5275 2L6.5 6.96167L11.4725 2L13 3.5275L6.5 10.0275L0 3.5275L1.5275 2Z";
 const EDIT_ICON =
@@ -91,6 +91,23 @@ function mapBackendGeneratedQuizToQuestions(
       points: question.points ?? 1,
     };
   });
+}
+
+function mapQuestionsToBackendQuizPayload(
+  questions: Question[],
+): BackendQuizCreatePayload {
+  return {
+    questions: questions.map((question) => ({
+      statement: question.text.trim(),
+      points: question.points,
+      alternatives: question.options
+        .filter((option) => option.text.trim())
+        .map((option) => ({
+          text: option.text.trim(),
+          correct: option.id === question.correctOptionId,
+        })),
+    })),
+  };
 }
 
 // ── Correct-answer dropdown ───────────────────────────────────────────────────
@@ -220,9 +237,6 @@ function PerguntasTab({
   onAddQuestion: () => void;
   error: string;
 }) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [imageUploadError, setImageUploadError] = useState("");
-
   const addOption = () =>
     setOptions((prev) => [...prev, { id: uid(), text: "" }]);
   const removeOption = (id: string) => {
@@ -278,69 +292,20 @@ function PerguntasTab({
         </div>
       ))}
 
-      {/* Question text + image button */}
-      <div className="flex gap-[16px] items-end w-full">
-        <div className="flex-1 min-w-0 flex flex-col gap-[4px]">
-          <label
-            htmlFor="q-text"
-            className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px] leading-[30px]"
-          >
-            Texto da pergunta
-          </label>
-          <input
-            id="q-text"
-            type="text"
-            placeholder="Escreva sua pergunta"
-            value={questionText}
-            onChange={(e) => setQuestionText(e.target.value)}
-            className="w-full border border-[#8e8e8e] h-[50px] rounded-[4px] px-[20px] font-['Figtree:Regular',sans-serif] text-[16px] text-[#333] placeholder-[#8e8e8e] bg-white focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
-          />
-        </div>
-        {/* Image upload circle */}
-        <button
-          type="button"
-          aria-label="Adicionar imagem à questão"
-          onClick={() => fileInputRef.current?.click()}
-          className="shrink-0 size-[50px] rounded-full bg-[#ffeac4] flex items-center justify-center hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+      <div className="flex flex-col gap-[4px] w-full">
+        <label
+          htmlFor="q-text"
+          className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px] leading-[30px]"
         >
-          <svg
-            className="size-[32px]"
-            fill="none"
-            viewBox="0 0 50 50"
-            aria-hidden="true"
-          >
-            <path
-              clipRule="evenodd"
-              d={IMG_ICON}
-              fill="black"
-              fillRule="evenodd"
-            />
-          </svg>
-        </button>
+          Texto da pergunta
+        </label>
         <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/jpeg,image/png"
-          className="hidden"
-          aria-hidden="true"
-          tabIndex={-1}
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (!file) {
-              setImageUploadError("");
-              return;
-            }
-
-            const parsed = imageFileSchema.safeParse(file);
-            if (!parsed.success) {
-              setImageUploadError(
-                parsed.error.issues[0]?.message ?? "Arquivo inválido",
-              );
-              return;
-            }
-
-            setImageUploadError("");
-          }}
+          id="q-text"
+          type="text"
+          placeholder="Escreva sua pergunta"
+          value={questionText}
+          onChange={(e) => setQuestionText(e.target.value)}
+          className="w-full border border-[#8e8e8e] h-[50px] rounded-[4px] px-[20px] font-['Figtree:Regular',sans-serif] text-[16px] text-[#333] placeholder-[#8e8e8e] bg-white focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
         />
       </div>
 
@@ -460,14 +425,6 @@ function PerguntasTab({
           className="text-[#c0392b] text-[13px] font-['Figtree:Regular',sans-serif]"
         >
           {error}
-        </p>
-      )}
-      {imageUploadError && (
-        <p
-          role="alert"
-          className="text-[#c0392b] text-[13px] font-['Figtree:Regular',sans-serif]"
-        >
-          {imageUploadError}
         </p>
       )}
 
@@ -696,24 +653,7 @@ export function CreateExamPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const courseData = (location.state?.courseData ?? {}) as CourseInfoData;
-  const modules = (location.state?.modules ?? [
-    {
-      id: "m1",
-      name: "Módulo 01",
-      lessons: [
-        { id: "l1", name: "Aula 01" },
-        { id: "l2", name: "Aula 02" },
-      ],
-    },
-    {
-      id: "m2",
-      name: "Módulo 02",
-      lessons: [
-        { id: "l3", name: "Aula 01" },
-        { id: "l4", name: "Aula 02" },
-      ],
-    },
-  ]) as ModuleWithBackendState[];
+  const modules = (location.state?.modules ?? []) as ModuleWithBackendState[];
 
   // View state: modules list OR exam editor
   const [editorOpen, setEditorOpen] = useState(false);
@@ -731,6 +671,7 @@ export function CreateExamPage() {
 
   // Questions list for current editing session
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [isSavingQuiz, setIsSavingQuiz] = useState(false);
 
   // Saved provas per module
   const [moduleProvas, setModuleProvas] = useState<Record<string, Question[]>>(
@@ -753,6 +694,10 @@ export function CreateExamPage() {
   const [aiExamReview, setAiExamReview] = useState<AiExamReviewState | null>(
     null,
   );
+
+  useEffect(() => {
+    setModulesList(modules);
+  }, [modules]);
 
   // ── Handlers ────────────────────────────────────────────────────────────────
   const removeLesson = (modId: string, lessonId: string) => {
@@ -936,6 +881,15 @@ export function CreateExamPage() {
   };
 
   const openEditor = (modId: string) => {
+    const currentModule = modulesList.find((module) => module.id === modId);
+
+    if (!currentModule?.backendModuleId) {
+      toast.error(
+        "O módulo ainda não foi sincronizado com o backend. Cadastre o módulo antes de adicionar a prova.",
+      );
+      return;
+    }
+
     setEditingModId(modId);
     const existing = moduleProvas[modId] ?? [];
     setQuestions([...existing]);
@@ -989,12 +943,59 @@ export function CreateExamPage() {
   const removeQuestion = (qId: string) =>
     setQuestions((prev) => prev.filter((q) => q.id !== qId));
 
-  const finalizarEditor = () => {
-    if (editingModId) {
-      setModuleProvas((prev) => ({ ...prev, [editingModId]: questions }));
+  const finalizarEditor = async () => {
+    if (!editingModId) {
+      setEditorOpen(false);
+      return;
     }
-    setEditorOpen(false);
-    setEditingModId(null);
+
+    const currentModule = modulesList.find(
+      (module) => module.id === editingModId,
+    );
+
+    if (!currentModule?.backendModuleId) {
+      toast.error("Não foi possível identificar o módulo da prova.");
+      return;
+    }
+
+    if (questions.length === 0) {
+      toast.error("Adicione ao menos uma pergunta antes de finalizar a prova.");
+      return;
+    }
+
+    const alreadyHasQuiz = (moduleProvas[editingModId] ?? []).length > 0;
+
+    if (alreadyHasQuiz) {
+      setModuleProvas((prev) => ({ ...prev, [editingModId]: questions }));
+      setEditorOpen(false);
+      setEditingModId(null);
+      toast.success("Prova atualizada na tela com sucesso.");
+      return;
+    }
+
+    setIsSavingQuiz(true);
+
+    try {
+      const createdQuiz = await createQuizForModuleWithBackend(
+        currentModule.backendModuleId,
+        mapQuestionsToBackendQuizPayload(questions),
+      );
+
+      setModuleProvas((prev) => ({
+        ...prev,
+        [editingModId]: mapBackendGeneratedQuizToQuestions({
+          questions: createdQuiz.questions,
+        }),
+      }));
+      setEditorOpen(false);
+      setEditingModId(null);
+      toast.success("Prova criada com sucesso para o módulo.");
+    } catch (apiError) {
+      const err = apiError as { message?: string };
+      toast.error(err.message || "Não foi possível criar a prova do módulo.");
+    } finally {
+      setIsSavingQuiz(false);
+    }
   };
 
   const removeProva = (modId: string) => {
@@ -1006,7 +1007,7 @@ export function CreateExamPage() {
 
   // ── Editor view ─────────────────────────────────────────────────────────────
   if (editorOpen) {
-    const mod = modules.find((m) => m.id === editingModId);
+    const mod = modulesList.find((m) => m.id === editingModId);
     return (
       <div className="bg-white flex flex-col min-h-[calc(100vh-70px)] pb-[90px]">
         <div className="max-w-[900px] mx-auto w-full px-[20px] md:px-[40px] pt-[20px] flex flex-col">
@@ -1038,11 +1039,12 @@ export function CreateExamPage() {
           <div className="w-full max-w-[900px]">
             <button
               type="button"
-              onClick={finalizarEditor}
-              className="bg-[#ffeac4] h-[50px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59]"
+              onClick={() => void finalizarEditor()}
+              disabled={isSavingQuiz}
+              className="bg-[#ffeac4] h-[50px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
-                Finalizar
+                {isSavingQuiz ? "Salvando prova..." : "Finalizar"}
               </span>
             </button>
           </div>
@@ -1059,103 +1061,34 @@ export function CreateExamPage() {
           {courseData.title || "Novo Curso"} — Provas
         </h1>
 
-        {modulesList.map((mod) => {
-          const prova = moduleProvas[mod.id] ?? [];
-          return (
-            <div
-              key={mod.id}
-              className="border border-black w-full rounded-[4px] overflow-hidden"
-            >
-              <div className="flex flex-col gap-[16px] p-[16px] pb-0">
-                {/* Module header with delete button */}
-                <div className="flex items-center justify-between gap-[8px]">
-                  <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[20px] leading-[30px] flex-1 min-w-0 truncate">
-                    {mod.name}
-                  </p>
-                  <button
-                    type="button"
-                    aria-label={`Remover módulo ${mod.name}`}
-                    onClick={() => removeModule(mod.id)}
-                    className="shrink-0 size-[26px] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded hover:opacity-70 transition-opacity"
-                  >
-                    <svg
-                      className="size-full"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                    >
-                      <path
-                        clipRule="evenodd"
-                        d={CLOSE_SM}
-                        fill="#801436"
-                        fillRule="evenodd"
-                      />
-                    </svg>
-                  </button>
-                </div>
-
-                {/* Lessons */}
-                {mod.lessons.map((l) => (
-                  <div
-                    key={l.id}
-                    className="bg-[#c5d6ff] h-[60px] flex items-center justify-between px-[20px] rounded-[0px]"
-                  >
-                    <p className="font-['Figtree:Medium',sans-serif] font-medium text-black text-[20px] leading-[30px] flex-1 min-w-0 truncate">
-                      {l.name}
-                    </p>
-                    <div className="flex items-center gap-[8px] shrink-0 ml-[8px]">
-                      {/* Edit lesson */}
-                      <button
-                        type="button"
-                        aria-label={`Editar ${l.name}`}
-                        onClick={() => editLesson(mod.id, l.id)}
-                        className="size-[24px] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded hover:opacity-70 transition-opacity"
-                      >
-                        <svg
-                          className="size-full"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          aria-hidden="true"
-                        >
-                          <path d={EDIT_ICON} fill="#021b59" />
-                        </svg>
-                      </button>
-                      {/* Remove lesson */}
-                      <button
-                        type="button"
-                        aria-label={`Remover ${l.name}`}
-                        onClick={() => removeLesson(mod.id, l.id)}
-                        className="size-[24px] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded hover:opacity-70 transition-opacity"
-                      >
-                        <svg
-                          className="size-full"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          aria-hidden="true"
-                        >
-                          <path
-                            clipRule="evenodd"
-                            d={CLOSE_SM}
-                            fill="#801436"
-                            fillRule="evenodd"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                ))}
-
-                {/* Prova do módulo */}
-                {prova.length > 0 && (
-                  <div className="bg-[#c5d6ff] h-[60px] flex items-center justify-between px-[20px]">
-                    <p className="font-['Figtree:Medium',sans-serif] font-medium text-black text-[20px] leading-[30px] flex-1 min-w-0 truncate">
-                      Prova 01
+        {modulesList.length === 0 ? (
+          <div className="w-full rounded-[12px] bg-[#f5f8ff] px-[20px] py-[24px] text-center">
+            <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[16px]">
+              Nenhum módulo disponível para criar prova.
+            </p>
+            <p className="mt-[6px] font-['Figtree:Regular',sans-serif] text-[#595959] text-[14px]">
+              Volte para a etapa anterior e adicione módulos reais ao curso.
+            </p>
+          </div>
+        ) : (
+          modulesList.map((mod) => {
+            const prova = moduleProvas[mod.id] ?? [];
+            return (
+              <div
+                key={mod.id}
+                className="border border-black w-full rounded-[4px] overflow-hidden"
+              >
+                <div className="flex flex-col gap-[16px] p-[16px] pb-0">
+                  {/* Module header with delete button */}
+                  <div className="flex items-center justify-between gap-[8px]">
+                    <p className="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[20px] leading-[30px] flex-1 min-w-0 truncate">
+                      {mod.name}
                     </p>
                     <button
                       type="button"
-                      aria-label={`Remover prova do módulo ${mod.name}`}
-                      onClick={() => removeProva(mod.id)}
-                      className="shrink-0 size-[24px] ml-[8px] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded"
+                      aria-label={`Remover módulo ${mod.name}`}
+                      onClick={() => removeModule(mod.id)}
+                      className="shrink-0 size-[26px] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded hover:opacity-70 transition-opacity"
                     >
                       <svg
                         className="size-full"
@@ -1172,36 +1105,118 @@ export function CreateExamPage() {
                       </svg>
                     </button>
                   </div>
+
+                  {/* Lessons */}
+                  {mod.lessons.map((l) => (
+                    <div
+                      key={l.id}
+                      className="bg-[#c5d6ff] h-[60px] flex items-center justify-between px-[20px] rounded-[0px]"
+                    >
+                      <p className="font-['Figtree:Medium',sans-serif] font-medium text-black text-[20px] leading-[30px] flex-1 min-w-0 truncate">
+                        {l.name}
+                      </p>
+                      <div className="flex items-center gap-[8px] shrink-0 ml-[8px]">
+                        {/* Edit lesson */}
+                        <button
+                          type="button"
+                          aria-label={`Editar ${l.name}`}
+                          onClick={() => editLesson(mod.id, l.id)}
+                          className="size-[24px] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded hover:opacity-70 transition-opacity"
+                        >
+                          <svg
+                            className="size-full"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                          >
+                            <path d={EDIT_ICON} fill="#021b59" />
+                          </svg>
+                        </button>
+                        {/* Remove lesson */}
+                        <button
+                          type="button"
+                          aria-label={`Remover ${l.name}`}
+                          onClick={() => removeLesson(mod.id, l.id)}
+                          className="size-[24px] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded hover:opacity-70 transition-opacity"
+                        >
+                          <svg
+                            className="size-full"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                          >
+                            <path
+                              clipRule="evenodd"
+                              d={CLOSE_SM}
+                              fill="#801436"
+                              fillRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Prova do módulo */}
+                  {prova.length > 0 && (
+                    <div className="bg-[#c5d6ff] h-[60px] flex items-center justify-between px-[20px] mb-[20px]">
+                      <p className="font-['Figtree:Medium',sans-serif] font-medium text-black text-[20px] leading-[30px] flex-1 min-w-0 truncate">
+                        Prova 01
+                      </p>
+                      <button
+                        type="button"
+                        aria-label={`Remover prova do módulo ${mod.name}`}
+                        onClick={() => removeProva(mod.id)}
+                        className="shrink-0 size-[24px] ml-[8px] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded"
+                      >
+                        <svg
+                          className="size-full"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                        >
+                          <path
+                            clipRule="evenodd"
+                            d={CLOSE_SM}
+                            fill="#801436"
+                            fillRule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Ações de prova — dentro do card, lado a lado */}
+                {prova.length === 0 && (
+                  <div className="p-[16px]">
+                    <div className="flex flex-col gap-[12px] sm:flex-row">
+                      <button
+                        type="button"
+                        onClick={() => openEditor(mod.id)}
+                        className="bg-[#ffeac4] h-[60px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+                      >
+                        <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
+                          Adicionar prova
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => openAiExamReview(mod)}
+                        className="bg-[#ffeac4] h-[60px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+                      >
+                        <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
+                          Adicionar prova com IA
+                        </span>
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
-
-              {/* Ações de prova — dentro do card, lado a lado */}
-              <div className="p-[16px]">
-                <div className="flex flex-col gap-[12px] sm:flex-row">
-                  <button
-                    type="button"
-                    onClick={() => openEditor(mod.id)}
-                    className="bg-[#ffeac4] h-[60px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
-                  >
-                    <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
-                      {prova.length > 0 ? "Editar prova" : "Adicionar prova"}
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => openAiExamReview(mod)}
-                    className="bg-[#ffeac4] h-[60px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
-                  >
-                    <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
-                      Adicionar prova com IA
-                    </span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
 
       {/* Sticky Finalizar curso */}

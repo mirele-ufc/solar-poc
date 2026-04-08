@@ -39,6 +39,17 @@ export type BackendConfirmedQuizResponse = {
   questions: BackendQuizQuestion[];
 };
 
+export type BackendQuizCreatePayload = {
+  questions: Array<{
+    statement: string;
+    points: number;
+    alternatives: Array<{
+      text: string;
+      correct: boolean;
+    }>;
+  }>;
+};
+
 /**
  * Fetch a specific quiz by its ID
  * Retrieves all questions and options for the quiz
@@ -57,6 +68,17 @@ export async function fetchQuizById(quizId: string): Promise<IQuiz> {
     console.error(`Failed to fetch quiz with ID ${quizId}:`, error);
     throw error;
   }
+}
+
+export async function createQuizForModuleWithBackend(
+  moduleId: string,
+  payload: BackendQuizCreatePayload,
+): Promise<BackendConfirmedQuizResponse> {
+  const response = await apiClient.post<
+    ApiEnvelope<BackendConfirmedQuizResponse>
+  >(`/modules/${moduleId}/quiz`, payload);
+
+  return response.data.dados;
 }
 
 export async function generateQuizForModuleWithBackend(
