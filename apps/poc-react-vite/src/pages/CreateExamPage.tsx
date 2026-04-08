@@ -1,8 +1,15 @@
 import { useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "sonner";
 import type { CourseInfoData } from "./CreateCoursePage";
 import type { ICourseManageModule } from "@ava-poc/types";
 import { Modal } from "@/components/ui/modal";
+import {
+  confirmQuizForModuleWithBackend,
+  generateQuizForModuleWithBackend,
+  regenerateQuizForModuleWithBackend,
+  type BackendGeneratedQuizResponse,
+} from "@/services/quizService";
 import { createQuestionSchema } from "@/validations/examSchema";
 import { imageFileSchema, uploadFileSchema } from "@/validations/fileSchema";
 
@@ -30,90 +37,58 @@ type Question = {
   points: number;
 };
 
+type ModuleWithBackendState = ICourseManageModule & {
+  backendModuleId?: string;
+};
+
 type AiExamReviewState = {
   modId: string;
+  backendModuleId: string;
   moduleName: string;
   questions: Question[];
-  variantIndex: number;
+  isLoading: boolean;
+  isConfirming: boolean;
+  errorMessage: string | null;
 };
-
-type AiQuestionTemplate = {
-  text: string;
-  options: string[];
-  correctIndex: number;
-  points?: number;
-};
-
-const AI_EXAM_TEMPLATES: AiQuestionTemplate[][] = [
-  [
-    {
-      text: "Qual é o componente do hardware responsável por executar as instruções e realizar cálculos?",
-      options: [
-        "Processador (CPU)",
-        "Memória RAM",
-        "Disco Rígido (HD)",
-        "Placa-Mãe",
-      ],
-      correctIndex: 0,
-    },
-    {
-      text: "Qual é o tipo de memória que armazena os dados que o processador está utilizando no momento?",
-      options: ["Memória ROM", "Memória RAM", "SSD", "Placa de vídeo"],
-      correctIndex: 1,
-    },
-    {
-      text: "Qual componente é mais indicado para armazenamento permanente de arquivos?",
-      options: [
-        "Cache L1",
-        "Disco rígido / SSD",
-        "Registradores",
-        "Processador",
-      ],
-      correctIndex: 1,
-    },
-  ],
-  [
-    {
-      text: "Qual componente conecta e permite a comunicação entre os diversos dispositivos do computador?",
-      options: [
-        "Fonte de alimentação",
-        "Placa-Mãe",
-        "Memória cache",
-        "Monitor",
-      ],
-      correctIndex: 1,
-    },
-    {
-      text: "Qual componente é especializado no processamento gráfico?",
-      options: ["GPU / Placa de vídeo", "Memória ROM", "Teclado", "Cooler"],
-      correctIndex: 0,
-    },
-    {
-      text: "Qual memória perde os dados quando o computador é desligado?",
-      options: ["SSD", "HD", "Memória RAM", "Pen drive"],
-      correctIndex: 2,
-    },
-  ],
-];
 
 let _id = 1;
 const uid = () => String(_id++);
 
-function buildAiGeneratedQuestions(variantIndex = 0): Question[] {
-  const templates = AI_EXAM_TEMPLATES[variantIndex % AI_EXAM_TEMPLATES.length];
+function mapBackendGeneratedQuizToQuestions(
+  quizData: BackendGeneratedQuizResponse,
+): Question[] {
+  const orderedQuestions = [...quizData.questions].sort(
+    (firstQuestion, secondQuestion) =>
+      firstQuestion.orderNum - secondQuestion.orderNum,
+  );
 
-  return templates.map((template) => {
-    const mappedOptions = template.options.map((text) => ({
-      id: uid(),
-      text,
-    }));
+  return orderedQuestions.map((question, questionIndex) => {
+    const mappedOptions = question.alternatives.map(
+      (alternative, optionIndex) => ({
+        id:
+          alternative.id !== null
+            ? String(alternative.id)
+            : `q-${questionIndex}-alt-${optionIndex}-${uid()}`,
+        text: alternative.text,
+      }),
+    );
+
+    const correctOptionIndex = question.alternatives.findIndex(
+      (alternative) => alternative.correct,
+    );
 
     return {
-      id: uid(),
-      text: template.text,
+      id:
+        question.id !== null
+          ? String(question.id)
+          : `question-${questionIndex}-${uid()}`,
+      text: question.statement,
       options: mappedOptions,
-      correctOptionId: mappedOptions[template.correctIndex]?.id ?? "",
-      points: template.points ?? 1,
+      correctOptionId:
+        correctOptionIndex >= 0
+          ? (mappedOptions[correctOptionIndex]?.id ?? "")
+          : "",
+      points: question.points ?? 1,
     };
   });
 }
@@ -522,6 +497,9 @@ function AiGeneratedExamReviewModal({
   isOpen,
   moduleName,
   questions,
+  isLoading,
+  isConfirming,
+  errorMessage,
   onClose,
   onRegenerate,
   onApprove,
@@ -529,6 +507,9 @@ function AiGeneratedExamReviewModal({
   isOpen: boolean;
   moduleName: string;
   questions: Question[];
+  isLoading: boolean;
+  isConfirming: boolean;
+  errorMessage: string | null;
   onClose: () => void;
   onRegenerate: () => void;
   onApprove: () => void;
@@ -588,97 +569,120 @@ function AiGeneratedExamReviewModal({
         <div className="my-[20px] h-px bg-[#e0e0e0]" />
 
         <div className="max-h-[560px] overflow-y-auto pr-[4px]">
-          <div className="flex flex-col gap-[24px]">
-            {questions.map((question, questionIndex) => (
-              <fieldset
-                key={question.id}
-                className="flex flex-col gap-[12px] border-0 p-0 m-0"
-              >
-                <legend className="font-['Figtree:Bold',sans-serif] font-bold text-black text-[18px] leading-[30px] mb-[4px]">
-                  <span className="text-[#021b59]">
-                    Questão {questionIndex + 1} —
-                  </span>{" "}
-                  {question.text}
-                </legend>
+          {isLoading ? (
+            <div className="flex min-h-[320px] items-center justify-center">
+              <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[18px] text-center">
+                Gerando prova com IA...
+              </p>
+            </div>
+          ) : errorMessage ? (
+            <div className="flex min-h-[220px] items-center justify-center">
+              <p className="font-['Figtree:Regular',sans-serif] text-[#c0392b] text-[16px] text-center max-w-[520px]">
+                {errorMessage}
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-[24px]">
+              {questions.map((question, questionIndex) => (
+                <fieldset
+                  key={question.id}
+                  className="flex flex-col gap-[12px] border-0 p-0 m-0"
+                >
+                  <legend className="font-['Figtree:Bold',sans-serif] font-bold text-black text-[18px] leading-[30px] mb-[4px]">
+                    <span className="text-[#021b59]">
+                      Questão {questionIndex + 1} —
+                    </span>{" "}
+                    {question.text}
+                  </legend>
 
-                <div className="flex flex-col gap-[10px]">
-                  {question.options.map((option, optionIndex) => {
-                    const isCorrect = question.correctOptionId === option.id;
+                  <div className="flex flex-col gap-[10px]">
+                    {question.options.map((option, optionIndex) => {
+                      const isCorrect = question.correctOptionId === option.id;
 
-                    return (
-                      <div
-                        key={option.id}
-                        className={[
-                          "flex items-center gap-[12px] px-[16px] py-[14px] rounded-[12px] border-2 transition-colors",
-                          isCorrect
-                            ? "border-[#173fae] bg-[#eef3ff]"
-                            : "border-[#d8d8d8] bg-white",
-                        ].join(" ")}
-                      >
+                      return (
                         <div
+                          key={option.id}
                           className={[
-                            "shrink-0 size-[22px] rounded-full border-2 flex items-center justify-center transition-colors",
+                            "flex items-center gap-[12px] px-[16px] py-[14px] rounded-[12px] border-2 transition-colors",
                             isCorrect
-                              ? "border-[#173fae] bg-[#173fae]"
-                              : "border-[#a0a0a0] bg-white",
+                              ? "border-[#173fae] bg-[#eef3ff]"
+                              : "border-[#d8d8d8] bg-white",
                           ].join(" ")}
-                          aria-hidden="true"
                         >
-                          {isCorrect && (
-                            <div className="size-[8px] rounded-full bg-white" />
-                          )}
+                          <div
+                            className={[
+                              "shrink-0 size-[22px] rounded-full border-2 flex items-center justify-center transition-colors",
+                              isCorrect
+                                ? "border-[#173fae] bg-[#173fae]"
+                                : "border-[#a0a0a0] bg-white",
+                            ].join(" ")}
+                            aria-hidden="true"
+                          >
+                            {isCorrect && (
+                              <div className="size-[8px] rounded-full bg-white" />
+                            )}
+                          </div>
+
+                          <span
+                            className={[
+                              "font-['Figtree:Medium',sans-serif] font-medium text-[15px] shrink-0",
+                              isCorrect ? "text-[#173fae]" : "text-[#606060]",
+                            ].join(" ")}
+                          >
+                            {String.fromCharCode(65 + optionIndex)})
+                          </span>
+
+                          <span
+                            className={[
+                              "font-['Figtree:Regular',sans-serif] text-[16px] leading-[24px] flex-1",
+                              isCorrect ? "text-[#173fae]" : "text-[#333]",
+                            ].join(" ")}
+                          >
+                            {option.text}
+                          </span>
                         </div>
+                      );
+                    })}
+                  </div>
+                </fieldset>
+              ))}
+            </div>
+          )}
+        </div>
 
-                        <span
-                          className={[
-                            "font-['Figtree:Medium',sans-serif] font-medium text-[15px] shrink-0",
-                            isCorrect ? "text-[#173fae]" : "text-[#606060]",
-                          ].join(" ")}
-                        >
-                          {String.fromCharCode(65 + optionIndex)})
-                        </span>
-
-                        <span
-                          className={[
-                            "font-['Figtree:Regular',sans-serif] text-[16px] leading-[24px] flex-1",
-                            isCorrect ? "text-[#173fae]" : "text-[#333]",
-                          ].join(" ")}
-                        >
-                          {option.text}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </fieldset>
-            ))}
+        {!isLoading && !errorMessage && questions.length > 0 && (
+          <div className="mt-[20px] rounded-[10px] border border-[#53c57d] bg-[#effaf3] px-[16px] py-[12px]">
+            <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#16924d] text-[16px] leading-[24px]">
+              ✓ Prova gerada com sucesso! Revise o conteúdo abaixo.
+            </p>
           </div>
-        </div>
-
-        <div className="mt-[20px] rounded-[10px] border border-[#53c57d] bg-[#effaf3] px-[16px] py-[12px]">
-          <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#16924d] text-[16px] leading-[24px]">
-            ✓ Prova gerada com sucesso! Revise o conteúdo abaixo.
-          </p>
-        </div>
+        )}
 
         <div className="mt-[16px] flex flex-col gap-[12px] sm:flex-row">
           <button
             type="button"
             onClick={onRegenerate}
-            className="h-[50px] flex-1 rounded-[26px] border-2 border-[#173fae] bg-white hover:bg-[#f5f8ff] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+            disabled={isLoading}
+            className="h-[50px] flex-1 rounded-[26px] border-2 border-[#173fae] bg-white hover:bg-[#f5f8ff] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#173fae] text-[18px]">
-              Regerar questões
+              {isLoading ? "Gerando..." : "Regerar questões"}
             </span>
           </button>
 
           <button
             type="button"
             onClick={onApprove}
-            className="h-[50px] flex-1 rounded-[26px] bg-[#021b59] hover:bg-[#042e99] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+            disabled={
+              isLoading ||
+              isConfirming ||
+              Boolean(errorMessage) ||
+              questions.length === 0
+            }
+            className="h-[50px] flex-1 rounded-[26px] bg-[#021b59] hover:bg-[#042e99] transition-colors focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span className="font-['Figtree:Medium',sans-serif] font-medium text-white text-[18px]">
-              Aprovar Prova
+              {isConfirming ? "Aprovando..." : "Aprovar Prova"}
             </span>
           </button>
         </div>
@@ -709,7 +713,7 @@ export function CreateExamPage() {
         { id: "l4", name: "Aula 02" },
       ],
     },
-  ]) as ICourseManageModule[];
+  ]) as ModuleWithBackendState[];
 
   // View state: modules list OR exam editor
   const [editorOpen, setEditorOpen] = useState(false);
@@ -735,7 +739,7 @@ export function CreateExamPage() {
 
   // State for modules (to allow removing lessons)
   const [modulesList, setModulesList] =
-    useState<ICourseManageModule[]>(modules);
+    useState<ModuleWithBackendState[]>(modules);
 
   // Inline lesson editing state
   const [editingLesson, setEditingLesson] = useState<{
@@ -790,39 +794,145 @@ export function CreateExamPage() {
     setEditingLesson(null);
   };
 
-  const openAiExamReview = (mod: ICourseManageModule) => {
-    const variantIndex = 0;
+  const openAiExamReview = async (mod: ModuleWithBackendState) => {
+    if (!mod.backendModuleId) {
+      toast.error(
+        "O módulo ainda não foi sincronizado com o backend. Tente novamente em instantes.",
+      );
+      return;
+    }
 
     setAiExamReview({
       modId: mod.id,
+      backendModuleId: mod.backendModuleId,
       moduleName: mod.name,
-      questions: buildAiGeneratedQuestions(variantIndex),
-      variantIndex,
+      questions: [],
+      isLoading: true,
+      isConfirming: false,
+      errorMessage: null,
     });
+
+    try {
+      const generatedQuiz = await generateQuizForModuleWithBackend(
+        mod.backendModuleId,
+      );
+
+      setAiExamReview({
+        modId: mod.id,
+        backendModuleId: mod.backendModuleId,
+        moduleName: mod.name,
+        questions: mapBackendGeneratedQuizToQuestions(generatedQuiz),
+        isLoading: false,
+        isConfirming: false,
+        errorMessage: null,
+      });
+    } catch (apiError) {
+      const err = apiError as { message?: string };
+      const message =
+        err.message || "Não foi possível gerar a prova com IA no momento.";
+
+      setAiExamReview({
+        modId: mod.id,
+        backendModuleId: mod.backendModuleId,
+        moduleName: mod.name,
+        questions: [],
+        isLoading: false,
+        isConfirming: false,
+        errorMessage: message,
+      });
+    }
   };
 
-  const regenerateAiExamReview = () => {
-    setAiExamReview((prev) => {
-      if (!prev) return null;
+  const regenerateAiExamReview = async () => {
+    if (!aiExamReview) {
+      return;
+    }
 
-      const nextVariant = prev.variantIndex + 1;
+    setAiExamReview((prev) =>
+      prev
+        ? {
+            ...prev,
+            isLoading: true,
+            errorMessage: null,
+          }
+        : null,
+    );
 
-      return {
+    try {
+      const generatedQuiz = await regenerateQuizForModuleWithBackend(
+        aiExamReview.backendModuleId,
+      );
+
+      setAiExamReview((prev) =>
+        prev
+          ? {
+              ...prev,
+              questions: mapBackendGeneratedQuizToQuestions(generatedQuiz),
+              isLoading: false,
+              errorMessage: null,
+            }
+          : null,
+      );
+    } catch (apiError) {
+      const err = apiError as { message?: string };
+      const message =
+        err.message || "Não foi possível regerar a prova com IA no momento.";
+
+      setAiExamReview((prev) =>
+        prev
+          ? {
+              ...prev,
+              isLoading: false,
+              errorMessage: message,
+            }
+          : null,
+      );
+    }
+  };
+
+  const approveAiExamReview = async () => {
+    if (!aiExamReview || aiExamReview.questions.length === 0) {
+      toast.error("Nenhuma questão gerada foi encontrada para aprovação.");
+      return;
+    }
+
+    setAiExamReview((prev) =>
+      prev
+        ? {
+            ...prev,
+            isConfirming: true,
+          }
+        : null,
+    );
+
+    try {
+      const confirmedQuiz = await confirmQuizForModuleWithBackend(
+        aiExamReview.backendModuleId,
+      );
+
+      setModuleProvas((prev) => ({
         ...prev,
-        variantIndex: nextVariant,
-        questions: buildAiGeneratedQuestions(nextVariant),
-      };
-    });
-  };
+        [aiExamReview.modId]: mapBackendGeneratedQuizToQuestions({
+          questions: confirmedQuiz.questions,
+        }),
+      }));
+      setAiExamReview(null);
+      toast.success("Prova gerada por IA confirmada e adicionada ao módulo.");
+    } catch (apiError) {
+      const err = apiError as { message?: string };
+      toast.error(
+        err.message || "Não foi possível confirmar a prova gerada por IA.",
+      );
 
-  const approveAiExamReview = () => {
-    if (!aiExamReview) return;
-
-    setModuleProvas((prev) => ({
-      ...prev,
-      [aiExamReview.modId]: aiExamReview.questions,
-    }));
-    setAiExamReview(null);
+      setAiExamReview((prev) =>
+        prev
+          ? {
+              ...prev,
+              isConfirming: false,
+            }
+          : null,
+      );
+    }
   };
 
   const openEditor = (modId: string) => {
@@ -887,10 +997,10 @@ export function CreateExamPage() {
     setEditingModId(null);
   };
 
-  const removeProvaItem = (modId: string, qId: string) => {
+  const removeProva = (modId: string) => {
     setModuleProvas((prev) => ({
       ...prev,
-      [modId]: (prev[modId] ?? []).filter((q) => q.id !== qId),
+      [modId]: [],
     }));
   };
 
@@ -1035,19 +1145,16 @@ export function CreateExamPage() {
                   </div>
                 ))}
 
-                {/* Prova questions */}
-                {prova.map((q, idx) => (
-                  <div
-                    key={q.id}
-                    className="bg-[#c5d6ff] h-[60px] flex items-center justify-between px-[20px]"
-                  >
+                {/* Prova do módulo */}
+                {prova.length > 0 && (
+                  <div className="bg-[#c5d6ff] h-[60px] flex items-center justify-between px-[20px]">
                     <p className="font-['Figtree:Medium',sans-serif] font-medium text-black text-[20px] leading-[30px] flex-1 min-w-0 truncate">
-                      Prova {String(idx + 1).padStart(2, "0")} — {q.text}
+                      Prova 01
                     </p>
                     <button
                       type="button"
-                      aria-label={`Remover questão ${idx + 1}`}
-                      onClick={() => removeProvaItem(mod.id, q.id)}
+                      aria-label={`Remover prova do módulo ${mod.name}`}
+                      onClick={() => removeProva(mod.id)}
                       className="shrink-0 size-[24px] ml-[8px] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded"
                     >
                       <svg
@@ -1065,7 +1172,7 @@ export function CreateExamPage() {
                       </svg>
                     </button>
                   </div>
-                ))}
+                )}
               </div>
 
               {/* Ações de prova — dentro do card, lado a lado */}
@@ -1116,6 +1223,9 @@ export function CreateExamPage() {
         isOpen={Boolean(aiExamReview)}
         moduleName={aiExamReview?.moduleName ?? ""}
         questions={aiExamReview?.questions ?? []}
+        isLoading={aiExamReview?.isLoading ?? false}
+        isConfirming={aiExamReview?.isConfirming ?? false}
+        errorMessage={aiExamReview?.errorMessage ?? null}
         onClose={() => setAiExamReview(null)}
         onRegenerate={regenerateAiExamReview}
         onApprove={approveAiExamReview}
