@@ -60,16 +60,13 @@ export const routes = createBrowserRouter([
           { path: ":id/exam/results", Component: ExamResultPage },
         ],
       },
-
     ],
   },
   {
     element: createElement(ProtectedRoute, {
       allowedRoles: STUDENT_ONLY_ROLES,
     }),
-    children: [
-
-    ],
+    children: [],
   },
   {
     element: createElement(ProtectedRoute, {
@@ -79,10 +76,7 @@ export const routes = createBrowserRouter([
       {
         path: "courses",
         element: <AuthLayout />,
-        children: [
-          { path: ":id/manage", element: <ManageCoursePage /> },
-          { path: "power-bi/manage", element: <ManageCoursePage /> },
-        ],
+        children: [{ path: ":id/manage", element: <ManageCoursePage /> }],
       },
       {
         path: "my-courses",
@@ -98,7 +92,6 @@ export const routes = createBrowserRouter([
           { path: "exam", element: <CreateExamPage /> },
         ],
       },
-
     ],
   },
 ]);
