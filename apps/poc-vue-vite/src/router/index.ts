@@ -21,12 +21,7 @@ const router = createRouter({
       component: () => import('../views/RegisterView.vue'),
       meta: { requiresGuest: true }
     },
-    {
-      path: '/forgot-password',
-      name: 'forgot-password',
-      component: () => import('../views/ForgotPasswordView.vue'),
-      meta: { requiresGuest: true }
-    },
+
 
     // ── ROTAS AUTENTICADAS (AuthLayout) ──────────────────────────────────────
     {
@@ -34,25 +29,11 @@ const router = createRouter({
       component: () => import('../components/shared/AuthLayout.vue'),
       meta: { requiresAuth: true },
       children: [
-        // ── Perfil ──
-        {
-          path: 'profile',
-          name: 'profile',
-          component: () => import('@/views/ProfileView.vue')
-        },
-
         // ── Meus Cursos ──
         {
           path: 'my-courses',
           name: 'my-courses',
           component: () => import('@/views/MyCoursesView.vue')
-        },
-
-        // ── Mensagens ──
-        {
-          path: 'messages',
-          name: 'messages',
-          component: () => import('@/views/MessageView.vue')
         },
 
         // ── Gestão e Criação de Cursos ──
@@ -131,32 +112,7 @@ const router = createRouter({
               component: () => import('../views/ExamResultView.vue')
             },
 
-            // ── Power BI ──
-            {
-              path: 'power-bi',
-              children: [
-                { path: '', component: () => import('../views/CourseDetailsView.vue') },
-                { path: 'enrollment', component: () => import('../views/EnrollmentView.vue') },
-                { path: 'modules/:modId', component: () => import('../views/LessonsView.vue') },
-                { path: 'exam/instructions', component: () => import('../views/ExamInstructionsView.vue') },
-                { path: 'exam', component: () => import('../views/ExamView.vue') },
-                { path: 'exam/results', component: () => import('../views/ExamResultView.vue') },
-              ]
-            },
 
-            // ── Python ──
-            {
-              path: 'python',
-              children: [
-                { path: '', name: 'python-detail', component: () => import('../views/PythonDetailsView.vue') },
-                { path: 'enrollment', name: 'python-enrollment', component: () => import('../views/PythonEnrollmentView.vue') },
-                { path: 'modules', name: 'python-modules', component: () => import('../views/PythonModuleView.vue') },
-                { path: 'modules/:modId', name: 'python-lessons', component: () => import('../views/PythonLessonsView.vue') },
-                { path: 'exam/instructions', name: 'python-exam-instructions', component: () => import('../views/PythonExamInstructionsView.vue') },
-                { path: 'exam', name: 'python-exam', component: () => import('../views/PythonExamView.vue') },
-                { path: 'exam/results', name: 'python-exam-results', component: () => import('../views/PythonExamResultView.vue') },
-              ]
-            }
           ]
         }
       ]
