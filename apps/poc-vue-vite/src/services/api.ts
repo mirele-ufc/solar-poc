@@ -3,10 +3,9 @@
  * Centraliza todas as requisições API com tratamento de erros global e refresh token flow
  */
 
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import type {
   AxiosInstance,
-  AxiosError,
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
@@ -18,6 +17,14 @@ import type { IApiError } from "@ava-poc/types";
  * Base Axios instance configuration
  */
 const apiClient: AxiosInstance = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080",
+  timeout: 10000,
+});
+
+/**
+ * Axios instance para refresh token (sem interceptadores para evitar recursão)
+ */
+const apiClientRefresh: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080",
   timeout: 10000,
 });
@@ -89,11 +96,10 @@ apiClient.interceptors.response.use(
             } as IApiError);
           }
 
-          // Tenta refresh do token
-          const response = await axios.post(
-            `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/auth/refresh`,
-            { refreshToken },
-          );
+          // Tenta refresh do token usando instance sem interceptadores
+          const response = await apiClientRefresh.post("/auth/refresh", {
+            refreshToken,
+          });
 
           const newAccessToken =
             response.data.accessToken || response.data.data?.accessToken;
@@ -208,4 +214,4 @@ apiClient.interceptors.request.use(
   },
 );
 
-export { apiClient };
+export { apiClient, apiClientRefresh };
