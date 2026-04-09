@@ -1,10 +1,33 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { getCourseConfig, isValidCourseId } from "@/config/coursesConfig";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { useEnrollmentGuard } from "@/hooks/useEnrollmentGuard";
 
 export function ExamInstructionsPage() {
+  const { id: courseId } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  useEnrollmentGuard("power-bi");
+
+  // Validar courseId
+  if (!courseId || !isValidCourseId(courseId)) {
+    return (
+      <div className="bg-white flex flex-col pb-[100px] px-[20px] md:px-[40px] pt-[24px]">
+        <p className="text-red-600 text-center">Curso não encontrado.</p>
+        <button
+          onClick={() => navigate("/courses")}
+          className="mt-4 mx-auto px-4 py-2 bg-blue-600 text-white rounded"
+        >
+          Voltar aos cursos
+        </button>
+      </div>
+    );
+  }
+
+  const courseConfig = getCourseConfig(courseId);
+  if (!courseConfig) {
+    return null;
+  }
+
+  useEnrollmentGuard(courseId);
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-70px)] pb-[120px] bg-[#ffffff]">
@@ -12,12 +35,12 @@ export function ExamInstructionsPage() {
         {/* Page header with back + breadcrumb */}
         <PageHeader
           title="Instruções"
-          backPath="/courses/power-bi/modules/1"
+          backPath={`/courses/${courseId}/modules/1`}
           crumbs={[
             { label: "Cursos", path: "/courses" },
-            { label: "Power BI - Fundamentos", path: "/courses/power-bi" },
-            { label: "Módulos", path: "/courses/power-bi/modules" },
-            { label: "Módulo 01", path: "/courses/power-bi/modules/1" },
+            { label: courseConfig.name, path: `/courses/${courseId}` },
+            { label: "Módulos", path: `/courses/${courseId}/modules` },
+            { label: "Módulo 01", path: `/courses/${courseId}/modules/1` },
             { label: "Prova 01" },
           ]}
         />
@@ -36,7 +59,9 @@ export function ExamInstructionsPage() {
 
           <div className="font-['Figtree:Regular',sans-serif] font-normal text-[#333] text-[16px] leading-[24px]">
             <ul className="list-disc mb-0 space-y-[8px]">
-              <li className="ms-[24px]">A prova tem 10 questões;</li>
+              <li className="ms-[24px]">
+                A prova tem {courseConfig.examQuestions.length} questões;
+              </li>
               <li className="ms-[24px]">O tempo total é de 60 minutos;</li>
               <li className="ms-[24px]">
                 O cronômetro começa ao acessar a prova;
@@ -63,7 +88,7 @@ export function ExamInstructionsPage() {
         <div className="w-full max-w-[900px]">
           <button
             type="button"
-            onClick={() => navigate("/courses/power-bi/exam")}
+            onClick={() => navigate(`/courses/${courseId}/exam`)}
             className="bg-[#ffeac4] h-[50px] w-full rounded-[26px] cursor-pointer hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px]"
           >
             <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">

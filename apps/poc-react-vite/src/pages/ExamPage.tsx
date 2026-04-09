@@ -1,10 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  fetchExamQuestions,
-  fetchOptionLabels,
-  type Question,
-} from "@/services/mocks/examMock";
+import { useNavigate, useParams } from "react-router-dom";
+import { getCourseConfig, isValidCourseId } from "@/config/coursesConfig";
+import type { ExamQuestion } from "@/config/coursesConfig";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Modal } from "@/components/ui/modal";
 import { useEnrollmentGuard } from "@/hooks/useEnrollmentGuard";
@@ -23,12 +20,35 @@ function formatTime(s: number) {
   return `${h}:${m}:${sec}`;
 }
 
-export function ExamPage() {
-  const navigate = useNavigate();
-  useEnrollmentGuard("power-bi");
+const OPTION_LABELS = ["A", "B", "C", "D"];
 
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [optionLabels, setOptionLabels] = useState<string[]>([]);
+export function ExamPage() {
+  const { id: courseId } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
+  // Validar courseId
+  if (!courseId || !isValidCourseId(courseId)) {
+    return (
+      <div className="bg-white flex flex-col pb-[100px] px-[20px] md:px-[40px] pt-[24px]">
+        <p className="text-red-600 text-center">Prova não encontrada.</p>
+        <button
+          onClick={() => navigate("/courses")}
+          className="mt-4 mx-auto px-4 py-2 bg-blue-600 text-white rounded"
+        >
+          Voltar aos cursos
+        </button>
+      </div>
+    );
+  }
+
+  const courseConfig = getCourseConfig(courseId);
+  if (!courseConfig) {
+    return null;
+  }
+
+  useEnrollmentGuard(courseId);
+
+  const [questions, setQuestions] = useState<ExamQuestion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [timeLeft, setTimeLeft] = useState(3600);
@@ -37,24 +57,11 @@ export function ExamPage() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Fetch exam data on mount
+  // Carregar questões na montagem
   useEffect(() => {
-    const loadExamData = async () => {
-      try {
-        const [questionsData, labelsData] = await Promise.all([
-          fetchExamQuestions(),
-          fetchOptionLabels(),
-        ]);
-        setQuestions(questionsData);
-        setOptionLabels(labelsData);
-      } catch (error) {
-        console.error("Failed to load exam data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadExamData();
-  }, []);
+    setQuestions(courseConfig.examQuestions);
+    setIsLoading(false);
+  }, [courseConfig]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -75,14 +82,14 @@ export function ExamPage() {
         }
         if (next === 0) {
           clearInterval(timer);
-          navigate("/courses/power-bi/exam/results", { state: { answers } });
+          navigate(`/courses/${courseId}/exam/results`, { state: { answers } });
         }
         return next;
       });
     }, 1000);
     return () => clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [courseId]);
 
   useEffect(() => {
     if (showConfirmModal && confirmButtonRef.current) {
@@ -113,7 +120,7 @@ export function ExamPage() {
   }
 
   function confirmSubmit() {
-    navigate("/courses/power-bi/exam/results", { state: { answers } });
+    navigate(`/courses/${courseId}/exam/results`, { state: { answers } });
   }
 
   function cancelSubmit() {
@@ -134,12 +141,12 @@ export function ExamPage() {
       <div className="max-w-[900px] mx-auto flex flex-col gap-[28px] px-[20px] md:px-[40px] pt-[30px]">
         <PageHeader
           title="Prova 01"
-          backPath="/courses/power-bi/modules/1"
+          backPath={`/courses/${courseId}/modules/1`}
           crumbs={[
             { label: "Cursos", path: "/courses" },
-            { label: "Power BI - Fundamentos", path: "/courses/power-bi" },
-            { label: "Módulos", path: "/courses/power-bi/modules" },
-            { label: "Módulo 01", path: "/courses/power-bi/modules/1" },
+            { label: courseConfig.name, path: `/courses/${courseId}` },
+            { label: "Módulos", path: `/courses/${courseId}/modules` },
+            { label: "Módulo 01", path: `/courses/${courseId}/modules/1` },
             { label: "Prova 01" },
           ]}
         />
@@ -157,7 +164,7 @@ export function ExamPage() {
                 fontVariationSettings: "'wdth' 100",
               }}
             >
-              Power BI - Fundamentos
+              {courseConfig.title}
             </p>
 
             <div className="flex items-center justify-between border-b border-[#e0e0e0] pb-[16px]">
@@ -267,7 +274,7 @@ export function ExamPage() {
                             )}
                           </div>
                           <span className="font-['Figtree:Medium',sans-serif] font-medium text-[15px] text-[#021b59] shrink-0">
-                            {optionLabels[idx]}
+                            {OPTION_LABELS[idx]}
                           </span>
                           <span className="font-['Figtree:Regular',sans-serif] font-normal text-[16px] text-black leading-[24px] flex-1">
                             {opt}
