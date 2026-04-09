@@ -78,8 +78,13 @@ describe("useLogin composable", () => {
     const authStore = useAuthStore();
     vi.spyOn(authStore, "login").mockReturnValue(true);
 
-    const { username, password, handleSubmit, usernameInvalid, passwordInvalid } =
-      useLogin();
+    const {
+      username,
+      password,
+      handleSubmit,
+      usernameInvalid,
+      passwordInvalid,
+    } = useLogin();
 
     username.value = "testuser";
     password.value = "testpass";

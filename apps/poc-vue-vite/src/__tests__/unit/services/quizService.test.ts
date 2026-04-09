@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { apiClient } from "@/services/api";
-import type { ApiResponse, Quiz, SubmitQuizPayload, QuizSubmissionResult } from "@ava-poc/types";
+import type {
+  ApiResponse,
+  Quiz,
+  SubmitQuizPayload,
+  QuizSubmissionResult,
+} from "@ava-poc/types";
 
 vi.mock("@/services/api", () => ({
   apiClient: {
@@ -49,7 +54,9 @@ type ApiEnvelope<T> = {
 // Service functions
 export async function fetchQuizById(quizId: string): Promise<Quiz> {
   try {
-    const response = await apiClient.get<ApiResponse<Quiz>>(`/quizzes/${quizId}`);
+    const response = await apiClient.get<ApiResponse<Quiz>>(
+      `/quizzes/${quizId}`,
+    );
     return response.data.dados || response.data.data;
   } catch (error) {
     console.error(`Failed to fetch quiz with ID ${quizId}:`, error);
@@ -59,39 +66,44 @@ export async function fetchQuizById(quizId: string): Promise<Quiz> {
 
 export async function createQuizForModuleWithBackend(
   moduleId: string,
-  payload: { questions: Array<{ statement: string; points: number; alternatives: Array<{ text: string; correct: boolean }> }> },
+  payload: {
+    questions: Array<{
+      statement: string;
+      points: number;
+      alternatives: Array<{ text: string; correct: boolean }>;
+    }>;
+  },
 ): Promise<BackendConfirmedQuizResponse> {
-  const response = await apiClient.post<ApiResponse<BackendConfirmedQuizResponse>>(
-    `/modules/${moduleId}/quiz`,
-    payload,
-  );
+  const response = await apiClient.post<
+    ApiResponse<BackendConfirmedQuizResponse>
+  >(`/modules/${moduleId}/quiz`, payload);
   return response.data.dados || response.data.data;
 }
 
 export async function generateQuizForModuleWithBackend(
   moduleId: string,
 ): Promise<BackendGeneratedQuizResponse> {
-  const response = await apiClient.post<ApiResponse<BackendGeneratedQuizResponse>>(
-    `/modules/${moduleId}/quiz/gerar`,
-  );
+  const response = await apiClient.post<
+    ApiResponse<BackendGeneratedQuizResponse>
+  >(`/modules/${moduleId}/quiz/gerar`);
   return response.data.dados || response.data.data;
 }
 
 export async function regenerateQuizForModuleWithBackend(
   moduleId: string,
 ): Promise<BackendGeneratedQuizResponse> {
-  const response = await apiClient.post<ApiResponse<BackendGeneratedQuizResponse>>(
-    `/modules/${moduleId}/quiz/regerar`,
-  );
+  const response = await apiClient.post<
+    ApiResponse<BackendGeneratedQuizResponse>
+  >(`/modules/${moduleId}/quiz/regerar`);
   return response.data.dados || response.data.data;
 }
 
 export async function confirmQuizForModuleWithBackend(
   moduleId: string,
 ): Promise<BackendConfirmedQuizResponse> {
-  const response = await apiClient.post<ApiResponse<BackendConfirmedQuizResponse>>(
-    `/modules/${moduleId}/quiz/confirmar`,
-  );
+  const response = await apiClient.post<
+    ApiResponse<BackendConfirmedQuizResponse>
+  >(`/modules/${moduleId}/quiz/confirmar`);
   return response.data.dados || response.data.data;
 }
 
