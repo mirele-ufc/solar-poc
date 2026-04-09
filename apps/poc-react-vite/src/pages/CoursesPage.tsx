@@ -6,15 +6,16 @@ import {
   type BackendCourseResponse,
 } from "@/services/courseService";
 import { selectCanManageCourses, useAuthStore } from "@/store/useAuthStore";
+import fallbackBannerImage from "@/assets/a17a08a750e97ba9bb12c3ad582c426a8debf0fa.png";
 
-const FALLBACK_BANNER =
-  "https://images.unsplash.com/photo-1762330910399-95caa55acf04?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080";
+const FALLBACK_BANNER = fallbackBannerImage;
 
 type ListedCourse = {
   id: string;
   title: string;
   description?: string;
   imageSrc: string;
+  hasImagePath: boolean;
 };
 
 type CourseBadge = {
@@ -58,6 +59,7 @@ function mapCourseToDisplay(course: BackendCourseResponse): ListedCourse {
     description:
       course.description?.trim() || "Curso disponível na plataforma.",
     imageSrc: resolveCourseImage(course.imagePath),
+    hasImagePath: !!course.imagePath?.trim(),
   };
 }
 
@@ -117,6 +119,7 @@ function CourseGrid({
               imageAlt={course.title}
               description={showDescription ? course.description : undefined}
               badge={badge}
+              isImageFallback={!course.hasImagePath}
               onClick={() => onClickCourse(course)}
             />
           </div>
@@ -132,6 +135,7 @@ function CourseGrid({
             imageAlt={course.title}
             description={showDescription ? course.description : undefined}
             badge={badge}
+            isImageFallback={!course.hasImagePath}
             onClick={() => onClickCourse(course)}
           />
         ))}
@@ -171,11 +175,9 @@ export function CoursesPage() {
 
   const listedCourses = useMemo(
     () =>
-      courses.map(mapCourseToDisplay).sort((first, second) =>
-        first.title.localeCompare(second.title, "pt-BR", {
-          sensitivity: "base",
-        }),
-      ),
+      courses
+        .map(mapCourseToDisplay)
+        .sort((first, second) => Number(first.id) - Number(second.id)),
     [courses],
   );
 
