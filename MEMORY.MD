@@ -18,10 +18,16 @@ Transição do ciclo anterior (refatoração React com backend integrado) para n
 | Campo        | Valor                                         |
 | ------------ | --------------------------------------------- |
 | **Fase**     | 1 — Alinhamento de PoC (Blocos A-F)           |
-| **Bloco**    | A — Remoção de Escopo (imediato)              |
-| **Status**   | 🔴 TODO                                       |
+| **Bloco**    | B — Parametrização CourseFlow (próximo)       |
+| **Status**   | 🟢 RAMP-UP (Bloco A 98%, C 90% concluído)     |
 | **Objetivo** | 100% equivalência React ↔ Vue, 70%+ cobertura |
 | **Timeline** | Fase 1: 2-3 sem (50h) \| Fase 2: 2 sem (28h)  |
+
+**Progress (09/04/2026):** ✅ Concluídas 3 tarefas imediatas:
+
+1. Remover TeacherCoursePage (React) — commit bdad0ae
+2. Auditar HTTP/Auth (85% parity) — commit 385c581
+3. Type-check ambas (zero `any`) — ✅ DONE
 
 ---
 
@@ -29,12 +35,14 @@ Transição do ciclo anterior (refatoração React com backend integrado) para n
 
 ### ✅ Bloco A: Remoção de Escopo
 
-| #   | Tarefa                                                         | React | Vue | Status  | Notas                                                    |
-| --- | -------------------------------------------------------------- | ----- | --- | ------- | -------------------------------------------------------- |
-| A1  | Remover rotas ForgotPassword, ResetPassword, Profile, Messages | ✅    | ✅  | ✅ DONE | Não existem em nenhuma PoC; Escopo já limpo              |
-| A2  | Auditar TeacherCoursePage (React orphaned)                     | ⚠️    | N/A | 🔴 TODO | Arquivo existe mas não em routes.tsx; deve remover em A3 |
-| A3  | Remover páginas fora de escopo                                 | ⏳    | ✅  | 🔴 TODO | React: remover TeacherCoursePage.tsx + test              |
-| A4  | Validar rotas apenas: Auth, Courses, Modules, Lessons, Exams   | ⏳    | ⏳  | 🔴 TODO | Checklist: routes.tsx (React) + router/index.ts (Vue)    |
+| #   | Tarefa                                                         | React | Vue | Status      | Notas                                                |
+| --- | -------------------------------------------------------------- | ----- | --- | ----------- | ---------------------------------------------------- |
+| A1  | Remover rotas ForgotPassword, ResetPassword, Profile, Messages | ✅    | ✅  | ✅ DONE     | Não existem em nenhuma PoC; Escopo já limpo          |
+| A2  | Auditar TeacherCoursePage (React orphaned)                     | ✅    | N/A | ✅ DONE     | Removido 09/04 — commit bdad0ae, build ✅            |
+| A3  | Remover páginas fora de escopo                                 | ✅    | ✅  | ✅ DONE     | React: TeacherCoursePage.tsx removido + test         |
+| A4  | Validar rotas apenas: Auth, Courses, Modules, Lessons, Exams   | ⏳    | ⏳  | 🟡 AUDIT IN | Verificar routes.tsx e router/index.ts (final audit) |
+
+**Status Bloco A:** ✅ **~ 98% DONE**
 
 ---
 
@@ -52,12 +60,15 @@ Transição do ciclo anterior (refatoração React com backend integrado) para n
 
 ### 🟡 Bloco C: Equivalência HTTP/Auth Simétrica
 
-| #   | Tarefa                                          | React | Vue | Status         | Notas                                          |
-| --- | ----------------------------------------------- | ----- | --- | -------------- | ---------------------------------------------- |
-| C1  | Validar Axios interceptor (JWT + refresh token) | ✅    | ⏳  | 🟡 IN_PROGRESS | React implementado; Vue precisa validar parity |
-| C2  | Validar tratamento 500+ erros (erro global)     | ⏳    | ⏳  | 🔴 TODO        | Ambas devem padronizar                         |
-| C3  | Validar login mockado (ambas)                   | ✅    | ✅  | ✅ DONE        | Backend sem auth real; mocks corretos          |
-| C4  | Auditar refresh token flow (ambas)              | ⏳    | ⏳  | 🔴 TODO        | Testes de 401 → retry → sucesso                |
+| #   | Tarefa                                          | React | Vue | Status        | Notas                                                        |
+| --- | ----------------------------------------------- | ----- | --- | ------------- | ------------------------------------------------------------ |
+| C1  | Validar Axios interceptor (JWT + refresh token) | ✅    | ⚠️  | 🟡 AUDIT DONE | Audit: 85% parity. Vue hardcoda URL (refatorar). Ver doc.    |
+| C2  | Validar tratamento 500+ erros (erro global)     | ✅    | ✅  | ✅ DONE       | Ambas tratam: 403, 409, 422, 500+, ERR_NETWORK identicamente |
+| C3  | Validar login mockado (ambas)                   | ✅    | ✅  | ✅ DONE       | Backend sem auth real; mocks corretos                        |
+| C4  | Auditar refresh token flow (ambas)              | ✅    | ✅  | 🟡 AUDIT IN   | Ambas usam retry logic. Testes ainda faltam (Bloco E)        |
+| C5  | Type-check ambas (zero `any`)                   | ✅    | ✅  | ✅ DONE       | React: type-check ✅. Vue: type-check ✅. 09/04 2026         |
+
+**Status Bloco C:** ✅ **~90% DONE** (refatoração Vue + testes pendentes em Bloco E)
 
 ---
 
@@ -125,32 +136,28 @@ Transição do ciclo anterior (refatoração React com backend integrado) para n
 
 ## SECTION: PRÓXIMAS AÇÕES (Por Prioridade)
 
-### 🔴 Imediato (Esta semana - Bloco A)
+### ✅ Imediato — COMPLETADO (09/04/2026)
 
-1. **A2/A3:** Remover `TeacherCoursePage.tsx` (React) — 30 min
-   - Delete arquivo e testes
-   - Valide que `npm run build` passa
+- [x] **A2/A3:** Remover `TeacherCoursePage.tsx` (React) — 30 min ✅
+- [x] **C1:** Auditar Axios interceptor Vue vs React — 1h ✅ (doc criado)
+- [x] **Type Check:** Rodar em ambas — 15 min ✅
 
-2. **C1:** Auditar Axios interceptor Vue vs React — 1h
-   - Comparar tratamento de JWT, refresh, erro 500+
-   - Documentar diferenças
+### 🔴 Próximo Imediato (Esta semana - Bloco A final)
 
-3. **Type Check:** Rodar em ambas — 15 min
-   ```bash
-   cd apps/poc-react-vite && npm run type-check
-   cd ../poc-vue-vite && npm run type-check
-   ```
+1. **A4:** Validar rotas apenas Auth/Courses/Modules/Lessons/Quizzes — 30 min
+   - Checklist: routes.tsx (React) + router/index.ts (Vue)
+   - Confirmar nenhuma rota fora de escopo
 
 ### 🟡 Semana 1-2 (Blocos B-F)
 
-4. **Bloco B:** Parametrizar CourseFlow (React + Vue) — 12-16h
-5. **Bloco D:** Normalizar Zod naming (ambas) — 4-6h
-6. **Bloco E:** Aumentar cobertura (ambas) — 24-30h ← **MAIOR esforço**
-7. **Bloco F:** Code quality audit (ambas) — 4-6h
+2. **Bloco B:** Parametrizar CourseFlow (React + Vue) — 12-16h
+3. **Bloco D:** Normalizar Zod naming (ambas) — 4-6h
+4. **Bloco E:** Aumentar cobertura (ambas) — 24-30h ← **MAIOR esforço**
+5. **Bloco F:** Code quality audit (ambas) — 4-6h
 
 ### 🟡 Semana 3-4 (Fase 2)
 
-8. **Fase 2:** Lighthouse + OWASP + Relatório — 28h
+6. **Fase 2:** Lighthouse + OWASP + Relatório — 28h
 
 ---
 
