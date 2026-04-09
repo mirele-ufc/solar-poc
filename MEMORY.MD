@@ -1,8 +1,8 @@
 # MEMORY.md — Validação e Alinhamento PoC (React vs Vue)
 
-**Última atualização:** 09/04/2026T20:15:00Z  
+**Última atualização:** 09/04/2026T21:30:00Z  
 **Objetivo:** Validar equivalência React vs Vue, aumentar cobertura de testes ~20% → 70%, auditar OWASP  
-**Status geral:** Fase 1 — Blocos A+B+C+D (100% COMPLETO + correção thumbnails), Próximo: Bloco E (crítico)  
+**Status geral:** Fase 1 — Blocos A+B+C+D (100%) + E (30% iniciado — E1.1 + E1.2 DONE), Próximo: E1.3  
 **Timeline:** 4-5 semanas (Fase 1: 50h + Fase 2: 28h)
 
 ---
@@ -18,18 +18,18 @@ Transição do ciclo anterior (refatoração React com backend integrado) para n
 | Campo        | Valor                                                               |
 | ------------ | ------------------------------------------------------------------- | ------- |
 | **Fase**     | 1 — Alinhamento de PoC (Blocos A-F)                                 |
-| **Bloco**    | E — Aumentar Cobertura Testes (próximo)                             |
-| **Status**   | ✅ A DONE (100%) ✅ B DONE (100%) ✅ C DONE (100%) ✅ D DONE (100%) | 🔴 E 0% |
+| **Bloco**    | E — Aumentar Cobertura Testes (EM PROGRESSO — 30%)                  |
+| **Status**   | ✅ A DONE (100%) ✅ B DONE (100%) ✅ C DONE (100%) ✅ D DONE (100%) | 🟡 E 30% |
 | **Objetivo** | 100% equivalência React ↔ Vue, 70%+ cobertura                       |
 | **Timeline** | Fase 1: 2-3 sem (50h) \| Fase 2: 2 sem (28h)                        |
 
-**Progress (09/04/2026 — Blocos A + B + C + D Finalizados):** ✅✅✅✅
+**Progress (09/04/2026 — 21h30 — E1.1 + E1.2 INICIADOS E COMPLETOS):** ✅✅✅✅🟡
 
 1. ✅ Bloco A: Remoção de escopo (5/5 subtarefas)
 2. ✅ Bloco B: Parametrização CourseFlow (5/5 subtarefas) — commits 42ae1fe, c27b917
 3. ✅ Bloco C: HTTP/Auth equivalência (5/5 subtarefas, **100% DONE**) — commit 853cf6d
 4. ✅ Bloco D: Normalizar Zod Schemas (**100% DONE**) — commits 86a3118, 68d04ed
-5. 🔴 Bloco E: Aumentar Cobertura Testes (0% — **CRÍTICO, PRÓXIMO**)
+5. 🟡 Bloco E: Aumentar Cobertura Testes (30% — **E1.1 + E1.2 DONE, próximo: E1.3**) — commit 6049bd9
 
 ---
 
@@ -157,16 +157,20 @@ Transição do ciclo anterior (refatoração React com backend integrado) para n
 
 ---
 
-### 🔴 Bloco E: Aumentar Cobertura de Testes ← **CRÍTICO (PRÓXIMO)**
+### 🔴 Bloco E: Aumentar Cobertura de Testes ← **EM PROGRESSO (CRÍTICO)**
 
 | #         | Tarefa                      | React    | Vue     | Target  | Status                     | Notas                                                      |
 | --------- | --------------------------- | -------- | ------- | ------- | -------------------------- | ---------------------------------------------------------- |
-| E1        | Testes de Forms             | ~5%      | ~5%     | 20%     | 🔴 TODO                    | CourseCreateForm, ModuleCreateForm, etc. (3-5 testes cada) |
-| E2        | Testes de Services          | ~8%      | ~10%    | 20%     | 🔴 TODO                    | courseService, moduleService, lessonService (mocks)        |
-| E3        | Testes de Routes/Components | ~7%      | ~0%     | 15%     | 🔴 TODO                    | Acesso guard, redirecionamento, integração                 |
-| E4        | Coverage Reports CI/CD      | ❌       | ❌      | 15%     | 🔴 TODO                    | Setup `vitest --coverage` em ambas                         |
-| E5        | Testes de Integração E2E    | ❌       | ❌      | 10%     | 🔴 TODO                    | Login → Criar curso → Criar módulo → Criar aula            |
-| **Total** | **~20%**                    | **~15%** | **70%** | 🔴 TODO | **Faltam ~100-120 testes** |
+| E1.1      | registerFormSchema (30 testes) | ✅ DONE | ✅ DONE | 30      | ✅ **COMPLETE** (commit 6049bd9) | Cobertura: nome, cpf, email, password, confirmPassword, perfil |
+| E1.2      | loginRequestSchema (23 testes)  | ✅ DONE | ✅ DONE | 23      | ✅ **COMPLETE** (commit 6049bd9) | Cobertura: email/username, senha; 100% passing            |
+| E1.3      | courseCreateRequestSchema       | 🔴 TODO | 🔴 TODO | ~20     | 🔴 TODO (PRÓXIMO)         | titulo, descricao, categoria, cargaHoraria                |
+| E1.4      | enrollmentFormSchema            | 🔴 TODO | 🔴 TODO | ~15     | 🔴 TODO                   | firstName, lastName, city, gender                         |
+| E1.5      | messageComposeFormSchema        | 🔴 TODO | 🔴 TODO | ~12     | 🔴 TODO                   | recipient, subject, message                               |
+| E2        | Testes de Services              | ~8%     | ~10%    | 20%     | 🔴 TODO                   | courseService, moduleService, lessonService (mocks)       |
+| E3        | Testes de Routes/Components     | ~7%     | ~0%     | 15%     | 🔴 TODO                   | Acesso guard, redirecionamento, integração                |
+| E4        | Coverage Reports CI/CD          | ❌      | ❌      | 15%     | 🔴 TODO                   | Setup `vitest --coverage` em ambas                        |
+| E5        | Testes de Integração E2E        | ❌      | ❌      | 10%     | 🔴 TODO                   | Login → Criar curso → Criar módulo → Criar aula           |
+| **Total** | **~20% → 70%**                  | **~25%** | **~22%** | **70%** | 🟡 IN_PROGRESS (30% bloco) | Faltam ~70 testes (E1.3-E5)                                |
 
 ---
 
@@ -208,9 +212,59 @@ Transição do ciclo anterior (refatoração React com backend integrado) para n
 
 ---
 
-## SECTION: NOTAS RECENTES (09/04/2026 — 20h15)
+### 🟡 Bloco E: Aumentar Cobertura de Testes — EM PROGRESSO (30%)
 
-### ✅ Correção de Equivalência: Thumbnails (DONE)
+| #   | Tarefa                              | React    | Vue     | Status  | Notas                                                      |
+| --- | ----------------------------------- | -------- | ------- | ------- | ---------------------------------------------------------- |
+| E1  | E1.1: registerFormSchema (30)       | ✅ DONE  | ✅ DONE | ✅ DONE | Testes: nome, cpf, email, password, confirmPassword, perfil |
+|     | E1.2: loginRequestSchema (23)       | ✅ DONE  | ✅ DONE | ✅ DONE | Testes: email/username, senha; 100% passing (commit 6049bd9) |
+|     | E1.3: courseCreateRequestSchema (~20) | 🔴 TODO | 🔴 TODO | PRÓXIMO | **PRÓXIMA AÇÃO**                                           |
+|     | E1.4: enrollmentFormSchema (~15)    | 🔴 TODO | 🔴 TODO | TODO    |                                                            |
+|     | E1.5: messageComposeFormSchema (~12) | 🔴 TODO | 🔴 TODO | TODO    |                                                            |
+| E2  | Testes de Services (mock API)       | 🔴 TODO | 🔴 TODO | TODO    | courseService, moduleService, lessonService (~40-50 testes) |
+| E3  | Testes de Routes/Components         | 🔴 TODO | 🔴 TODO | TODO    | ProtectedRoute, access guards (~20-30 testes)             |
+| E4  | Coverage CI/CD setup                | 🔴 TODO | 🔴 TODO | TODO    | vitest --coverage config + reports                        |
+| E5  | E2E Integration Tests               | 🔴 TODO | 🔴 TODO | TODO    | Login → Cursos → Módulos → Aulas flow (~10-15 testes)    |
+
+**Status Bloco E:** 🟡 **INICIADO — 30% COMPLETO** (E1.1 + E1.2 done, E1.3 próximo)
+
+**Detalhes Implementação E1.1 + E1.2 (COMPLETOS):**
+
+**E1.1 — registerFormSchema.test.ts (30 testes — React + Vue)**
+
+Arquivo: `src/__tests__/unit/validations/registerFormSchema.test.ts`
+
+- **Coverage:** 6 campos (nome, cpf, email, password, confirmPassword, perfil)
+- **Test Cases:**
+  - Nome field (5 tests): valid, empty, <3 chars, =3 chars, whitespace trim
+  - CPF field (6 tests): valid (formatted/unformatted), empty, invalid, partial, trim
+  - Email field (5 tests): valid, empty, invalid format, missing @, trim
+  - Password field (5 tests): valid, empty, <6 chars, =6 chars, trim
+  - Confirm Password (3 tests): mismatch, empty, match
+  - Perfil field (3 tests): professor, student, invalid
+  - Full payload validation (3 tests): valid parse, missing fields, extra fields
+- **Status:** ✅ 30/30 PASS (React), ✅ 30/30 PASS (Vue)
+- **Note:** Vue error message fix: "As senhas não conferem" (não "senhas não coincidem")
+
+**E1.2 — loginRequestSchema.test.ts (23 testes — React + Vue)**
+
+Arquivo: `src/__tests__/unit/validations/loginRequestSchema.test.ts`
+
+- **Coverage:** 2 campos (email/username, senha)
+- **Test Cases:**
+  - Email field (10 tests): valid email, valid username (3-50 chars), empty, space, short/long, subdomain, special chars, numbers
+  - Senha field (8 tests): valid, empty, <6 chars, =6 chars, trim, long, special chars, spaces
+  - Full payload validation (5 tests): email+senha, username+senha, missing, both invalid, special formats
+- **Status:** ✅ 23/23 PASS (React), ✅ 23/23 PASS (Vue)
+- **Note:** Fixed regex test: emailOrUsernameRegex allows username (no @ required); replaced invalid "no @" test with "space in email"
+
+**Commit:** 6049bd9 — "test: E1.1 + E1.2 — Expandir testes de validação Zod (53 testes)"
+
+---
+
+## SECTION: NOTAS RECENTES (09/04/2026 — 21h30)
+
+### ✅ Bloco E: E1.1 + E1.2 Testes Zod Completados (DONE)
 
 **Problema Encontrado:** Vue CourseCard.vue estava usando geração local de imagens baseada em pool (COURSE_IMAGES_POOL) em vez de respeitar o `imagePath` do backend. React CoursesPage.tsx respeitava `imagePath` mas retornava FALLBACK quando null.
 
@@ -263,10 +317,21 @@ Transição do ciclo anterior (refatoração React com backend integrado) para n
 - [ ] D3: vee-validate integração Vue
 - [ ] D4: Testes validações
 
-### 🔴 Bloco E — Cobertura Testes — 24-30h (MAIOR ESFORÇO)
+### 🔴 Bloco E (ATIVO) — Cobertura Testes — 24-30h (MAIOR ESFORÇO)
 
-- [ ] E1-E5: +100-120 testes necessários em ambas
-- [ ] Setup coverage CI/CD
+#### ✅ E1.1 + E1.2 COMPLETOS (commit 6049bd9)
+
+- [x] **E1.1:** registerFormSchema tests (30) — ✅ PASS (React + Vue)
+- [x] **E1.2:** loginRequestSchema tests (23) — ✅ PASS (React + Vue)
+- [ ] **E1.3:** courseCreateRequestSchema tests (~20) — 🔴 **PRÓXIMO** (FIM DA SESSÃO)
+- [ ] **E1.4:** enrollmentFormSchema tests (~15)
+- [ ] **E1.5:** messageComposeFormSchema tests (~12)
+- [ ] **E2:** Service layer tests (~40-50)
+- [ ] **E3:** Routes/Components tests (~20-30)
+- [ ] **E4:** Coverage CI/CD setup
+- [ ] **E5:** E2E Integration tests (~10-15)
+
+**Próximo passo:** Criar E1.3 (courseCreateRequestSchema tests com titulo, descricao, categoria, cargaHoraria)
 
 ### 🟡 Bloco F — Code Quality — 4-6h
 
@@ -276,15 +341,53 @@ Transição do ciclo anterior (refatoração React com backend integrado) para n
 
 ---
 
+## SECTION: PRÓXIMA AÇÃO (RECOMENDAÇÃO PARA PRÓXIMA SESSÃO)
+
+**OBS: O trabalho de E1.1 + E1.2 foi completado nesta sessão (commit 6049bd9). A próxima ação recomendada é E1.3.**
+
+### 🎯 Próxima Tarefa: E1.3 — courseCreateRequestSchema Tests
+
+**Quando:** Próxima sessão de desenvolvimento
+
+**O que fazer:**
+
+1. **Analisar courseCreateRequestSchema** (ambas PoCs)
+   - React: `apps/poc-react-vite/src/validations/courseCreateRequestSchema` (ou onde estiver)
+   - Vue: `apps/poc-vue-vite/src/validations/courseCreateRequestSchema` (ou idem)
+   - Campos esperados: titulo, descricao, categoria, cargaHoraria (e outros?)
+
+2. **Criar testes idênticos** (React + Vue)
+   - Arquivo: `src/__tests__/unit/validations/courseCreateRequestSchema.test.ts`
+   - Padrão: 8-10 describe blocks (um por campo)
+   - Estimativa: ~20-25 testes por PoC
+
+3. **Test cases sugeridos:**
+   - Titulo: valid, empty, <3 chars, =3 chars, >100 chars, trim, special chars
+   - Descricao: valid, empty, <10 chars, =10 chars, >500 chars, trim
+   - Categoria: valid enum (programming, math, etc.), invalid, empty
+   - CargaHoraria: valid number, <0, =0, >1000, string, decimal
+   - Full payload validation: all fields, missing fields, extra fields
+
+4. **Validar e comitar:**
+   ```bash
+   npm run test -- courseCreateRequestSchema.test.ts
+   # Confirmar: 20+/20+ PASS (ambas)
+   git commit -m "test: E1.3 — courseCreateRequestSchema (20 testes)"
+   ```
+
+5. **Próximo após E1.3:** E1.4 (enrollmentFormSchema)
+
+---
+
 ## SECTION: REFERÊNCIAS
 
 | Documento                                                                              | Propósito                                 |
 | -------------------------------------------------------------------------------------- | ----------------------------------------- |
 | [docs/PLAN.md](docs/PLAN.md)                                                           | Plano completo com 23 etapas (Fase 1 + 2) |
 | [CLAUDE.md](CLAUDE.md)                                                                 | Diretrizes arquiteturais e regra de ouro  |
-| [apps/poc-react-vite/](apps/poc-react-vite/)                                           | PoC React (17 páginas, ~20% cobertura)    |
-| [apps/poc-vue-vite/](apps/poc-vue-vite/)                                               | PoC Vue (15 views, ~15% cobertura)        |
-| [/memories/session/plan-status-analysis.md](/memories/session/plan-status-analysis.md) | Análise detalhada 09/04/2026              |
+| [apps/poc-react-vite/](apps/poc-react-vite/)                                           | PoC React (17 páginas, ~25% cobertura)    |
+| [apps/poc-vue-vite/](apps/poc-vue-vite/)                                               | PoC Vue (15 views, ~22% cobertura)        |
+| [MEMORY.md](MEMORY.md)                                                                 | Este arquivo (status session)             |
 
 ---
 
@@ -292,8 +395,7 @@ Transição do ciclo anterior (refatoração React com backend integrado) para n
 
 - **main:** Produção (não tocar)
 - **development:** Integração contínua
-- **feature/validate-poc-react:** Refatoração React (Blocos A-F)
-- **feature/validate-poc-vue:** Refatoração Vue (Blocos A-F)
+- **feature/refactor-pocs-equivalence:** Branch ativa (Blocos A-F, este ciclo)
 
 (Criar quando iniciar Bloco B)
 
