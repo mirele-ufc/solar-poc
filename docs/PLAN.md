@@ -76,20 +76,88 @@
    - Testes: idem React
    - _Commit:_ `refactor: Integrar vee-validate + normalizar schemas Zod — Vue`
 
-#### **Bloco E: Testes — Aumentar Cobertura** _(Sequencial, React depois Vue)_
+#### **Bloco E: Sincronização de Padrões Críticos** _(Paralelo + Sequencial)_
 
-9. **React:** Aumentar cobertura de ~13% → 70%
-   - Adicionar testes:
-     - Forms: CourseCreateForm, ModuleCreateForm, LessonCreateForm (cada um 3-5 testes)
-     - Services: courseService, moduleService, lessonService (mocks de API)
-     - Routes: verificar acesso guard, redirecionamento
-     - Integration: fluxo completo (login → criar curso → criar módulo → criar aula)
-   - Ferramentas: Vitest + React Testing Library (já em uso)
-   - Coverage command: `npm run test:coverage` (criar se não existe)
-   - Target: ~70% statements, ~60% branches
-   - _Commit:_ `test: Adicionar testes de forms, services, routes — React (70% coverage)`
+9. **React:** Adicionar Zustand store para persistência de dados
+   - Problema atual: módulos/aulas/quizzes perdidas no refresh (useState)
+   - Solução: Criar `useCreationStore` (Zustand) para persistir:
+     - courseData (id, title, description, category, hours, requiredFields)
+     - modules (array com id, name, image, lessons)
+     - currentExam (array de questions)
+   - Implementar em: `src/store/useCreationStore.ts`
+   - Integração:
+     - CreateCoursePage: salvar courseData ao submit
+     - CreateModulesPage: salvar modules ao adicionar/remover
+     - CreateExamPage: salvar questions ao criar
+   - Recuperação: onMount das páginas, carregar do store se disponível
+   - Testes: verify que dados persistem após page refresh
+   - _Commit:_ `refactor: Adicionar Zustand store para persistência em criação — React`
 
-10. **Vue:** Criar testes (atualmente 0%)
+10. **Vue:** Sincronizar response format expectations com React
+    - Problema: React espera `response.data.id`, Vue espera `response.dados.id`
+    - Ação 1: Revisar courseService.createCourse() em ambos
+    - Ação 2: Documentar formato esperado do backend
+    - Ação 3: Se inconsistente, adapter na aplicação (não mude backend)
+    - React: manter `response.data.id` (provável do interceptor)
+    - Vue: manter `response.dados.id` (current implementation)
+    - Validação: ambas rotas fazem POST /courses com sucesso
+    - _Commit:_ `docs: Documentar e alinhar response formats esperados`
+
+11. **React:** Extrair AddLessonPopup inline em componente separado
+    - Problema: 200+ linhas de AddLessonPopup embutidas em CreateModulesPage.tsx
+    - Solução: Criar `src/components/shared/AddLessonPopup.tsx`
+    - Benefício: Parity com Vue (que já tem componente separado)
+    - Implementação: extrair função AddLessonPopup e importar
+    - Props/Emits: onClose, onConfirm (como interface)
+    - Testes: verify que modal ainda funciona após extração
+    - _Commit:_ `refactor: Extrair AddLessonPopup em componente separado — React`
+
+12. **Vue:** Padronizar data loading em CreateModulesView
+    - Problema: Carrega módulos com onMounted, mas CreateCourseView usa store fallback
+    - Solução: Ambas devem tentar store ANTES de fazer API call
+    - Padrão:
+      1. Check se courseData existe em `useCourseCreationStore()`
+      2. Se SIM: usar dados do store
+      3. Se NÃO: fazer API call (fetch modules)
+      4. Salvar resultado no store para próximas llamadas
+    - Benefício: Evita requests redundantes, mais resiliente
+    - _Commit:_ `refactor: Padronizar data loading com store check — Vue`
+
+13. **Ambas:** Sincronizar ManualExamEditor com validações Zod
+    - React: CreateExamPage usa questionCreateFormSchema (Zod)
+    - Vue: CreateExamView → ManualExamEditor
+    - Ação: Ambas devem usar Zod identicamente
+    - Se Vue ainda usa manual: migrar para Zod schema
+    - Schema: `questionCreateFormSchema` idêntico em ambos
+    - Validação de inputs: question text (min 5), options (min 2, max 5), points (1-10)
+    - _Commit:_ `refactor: Sincronizar validações Zod em ManualExamEditor — Vue`
+
+#### **Verificação Intermediatia Bloco E** _(Checklist)_
+
+- [ ] React: Zustand store criado e testado
+- [ ] Vue + React: Response formats documentados e consistentes
+- [ ] React: AddLessonPopup extraído em componente
+- [ ] Vue: Data loading padronizado com store check
+- [ ] Ambas: Validações exam em Zod
+- _Commit:_ `chore: Sincronização Bloco E — ✅`
+
+---
+
+#### **Bloco F: Testes — Aumentar Cobertura** _(Sequencial, React depois Vue)_
+
+14. **React:** Aumentar cobertura de ~13% → 70%
+
+- Adicionar testes:
+  - Forms: CourseCreateForm, ModuleCreateForm, LessonCreateForm (cada um 3-5 testes)
+  - Services: courseService, moduleService, lessonService (mocks de API)
+  - Routes: verificar acesso guard, redirecionamento
+  - Integration: fluxo completo (login → criar curso → criar módulo → criar aula)
+- Ferramentas: Vitest + React Testing Library (já em uso)
+- Coverage command: `npm run test:coverage` (criar se não existe)
+- Target: ~70% statements, ~60% branches
+- _Commit:_ `test: Adicionar testes de forms, services, routes — React (70% coverage)`
+
+15. **Vue:** Criar testes (atualmente 0%)
     - Adicionar testes (mesmos tipos que React):
       - Stores: useAuthStore, useCourseStore (Pinia mock)
       - Composables: useLogin, useCourses
@@ -100,19 +168,19 @@
     - _Dependência:_ Bloco E/9 completo
     - _Commit:_ `test: Criar testes (Vitest + VTU) — Vue (70% coverage)`
 
-#### **Bloco F: Code Quality — Zero `any` + Slots Pattern** _(Paralelo)_
+#### **Bloco G: Code Quality — Zero `any` + Slots Pattern** _(Paralelo)_
 
-11. **React:** TypeScript strict — zero `any`
+16. **React:** TypeScript strict — zero `any`
     - Buscar: grep `any` em LoginPage.tsx e similares
     - Substituir: `any` → `Type | undefined` (union type apropriado)
     - Testes: `npm run type-check` sem erros
     - _Commit:_ `refactor: Replace any com proper TypeScript types — React`
 
-12. **Vue:** TypeScript strict — zero `any`
+17. **Vue:** TypeScript strict — zero `any`
     - Idem React
     - _Commit:_ `refactor: Replace any com proper TypeScript types — Vue`
 
-13. **Componentes Reutilizáveis — Slots Pattern** _(Paralelo, React + Vue)_
+18. **Componentes Reutilizáveis — Slots Pattern** _(Paralelo, React + Vue)_
     - React:
       - Exemplo: `<Card>`: mudar de `<Card title={} body={} />` → `<Card><Card.Header><Card.Title>...</Card.Title></Card.Header><Card.Body>...</Card.Body></Card>`
       - Aplicar em: FormContainer, PageHeader, CourseCard (se aplicável)
@@ -125,7 +193,7 @@
 
 #### **Verificação Final Fase 1** _(Checklist)_
 
-14. Ambas PoC:
+19. Ambas PoC:
     - [ ] `npm run build` sem erros
     - [ ] `npm run type-check` sem erros (zero `any`)
     - [ ] `npm run lint` sem warnings
@@ -142,7 +210,7 @@
 
 #### **A. Performance Baseline (Lighthouse CI)**
 
-15. **Setup Lighthouse CI**
+20. **Setup Lighthouse CI**
     - Instalação: `npm install -g @lhci/cli@latest`
     - Config: `lighthouserc.json` (raiz de cada PoC)
     - Métricas:
@@ -152,7 +220,7 @@
       - **SEO:** ≥85
     - _Commit:_ `chore: Setup Lighthouse CI`
 
-16. **Bundle Size Baseline**
+21. **Bundle Size Baseline**
     - Ferramentas: `npm run build`, `source-map-explorer`, `webpack-bundle-analyzer`
     - Targets:
       - React (gzipped): ≤200KB
@@ -160,7 +228,7 @@
     - Baseline: registrar valores atuais
     - _Commit:_ `docs: Bundle size baseline`
 
-17. **Runtime Performance**
+22. **Runtime Performance**
     - Teste: navegação Courses → Modules → Lessons (3 mudanças de rota)
     - Métrica: Time to Interactive (TTI) < 2s em cada rota
     - Teste: criar curso (form pesado) → verificar FID (First Input Delay) < 100ms
@@ -169,7 +237,7 @@
 
 #### **B. OWASP Core Security Testing**
 
-18. **XSS Prevention (Cross-Site Scripting)**
+23. **XSS Prevention (Cross-Site Scripting)**
     - **Teste 1:** Injetar `<script>alert('XSS')</script>` em course.name
       - Via API: POST /courses com `title: "<script>alert(...)</script>"`
       - Validar no UI: texto é renderizado escapado (não executa)
@@ -181,7 +249,7 @@
       - Exemplo: courseCreateSchema deve rejeitar `title: "<body>x</body>"`
     - _Commit:_ `test: OWASP XSS prevention tests`
 
-19. **CSRF Protection (Cross-Site Request Forgery)**
+24. **CSRF Protection (Cross-Site Request Forgery)**
     - **Pré-requisito:** Backend deve gerar CSRF token
       - Confirmar: .backend retorna `X-CSRF-Token` header em GET /courses (ou similar)
       - Se NÃO tem: backend precisa adicionar (fora escopo PoC-testing, apenas documentar)
@@ -191,7 +259,7 @@
     - **Teste 2:** Mock ataque: POST sem token → esperar 403 Forbidden
     - _Commit:_ `test: OWASP CSRF protection tests`
 
-20. **Autenticação & Sessão**
+25. **Autenticação & Sessão**
     - **Teste 1:** JWT refresh token flow
       - Login: recebe access_token (curta validade) + refresh_token (longa)
       - Após 30min: access_token expira
@@ -207,7 +275,7 @@
       - Acesso com token: idem → 200 com dados
     - _Commit:_ `test: OWASP authentication & session tests`
 
-21. **Input Validation (Frontend + Backend)**
+26. **Input Validation (Frontend + Backend)**
     - **Teste 1:** Course name
       - Max 255 caracteres: enviar 300 caracteres → rejeitado
       - Min 3 caracteres: enviar "ab" → rejeitado (Zod + Backend)
@@ -225,7 +293,7 @@
 
 #### **C. Matriz de Comparação Resultados**
 
-22. **Crear relatório comparativo:**
+27. **Crear relatório comparativo:**
     - **Tabela 1: Funcionalidade vs Tecnologia**
       ```
       | Feature | React | Vue | Parity |
@@ -260,7 +328,7 @@
       ```
     - _Commit:_ `docs: Criar relatório comparativo React vs Vue`
 
-23. **Recomendação final:**
+28. **Recomendação final:**
     - Com base nos dados: qual tecnologia escolher?
     - Critérios: Performance, Segurança, Comunidade, Velocidade de desvs, Curva aprendizado
     - Documento: `RECOMENDACAO_TECH.md`
