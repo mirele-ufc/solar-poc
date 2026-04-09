@@ -8,7 +8,7 @@ import {
 import { selectCanManageCourses, useAuthStore } from "@/store/useAuthStore";
 
 const FALLBACK_BANNER =
-  "https://images.unsplash.com/photo-1762330910399-95caa55acf04?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400";
+  "https://images.unsplash.com/photo-1762330910399-95caa55acf04?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080";
 
 type ListedCourse = {
   id: string;
@@ -24,22 +24,24 @@ type CourseBadge = {
 };
 
 function resolveCourseImage(imagePath: string | null): string {
-  if (!imagePath?.trim()) {
-    return FALLBACK_BANNER;
+  // Se imagePath é fornecido e válido, usar ele
+  if (imagePath?.trim()) {
+    if (/^https?:\/\//i.test(imagePath)) {
+      return imagePath;
+    }
+
+    const apiBaseUrl = (
+      import.meta.env.VITE_API_URL || "http://localhost:8080"
+    ).replace(/\/$/, "");
+    const normalizedPath = imagePath.startsWith("/")
+      ? imagePath
+      : `/${imagePath}`;
+
+    return `${apiBaseUrl}${normalizedPath}`;
   }
 
-  if (/^https?:\/\//i.test(imagePath)) {
-    return imagePath;
-  }
-
-  const apiBaseUrl = (
-    import.meta.env.VITE_API_URL || "http://localhost:8080"
-  ).replace(/\/$/, "");
-  const normalizedPath = imagePath.startsWith("/")
-    ? imagePath
-    : `/${imagePath}`;
-
-  return `${apiBaseUrl}${normalizedPath}`;
+  // Fallback para imagem padrão quando não há imagePath do backend
+  return FALLBACK_BANNER;
 }
 
 function normalizeCourseTitle(value: string): string {
