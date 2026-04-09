@@ -27,7 +27,12 @@ export const moduleService = {
   async createModule(courseId: number, name: string) {
     const formData = new FormData();
     const dadosPayload = { name: name };
-    formData.append("dados", JSON.stringify(dadosPayload));
+
+    // Send dados as Blob with application/json type (matches React implementation)
+    formData.append(
+      "dados",
+      new Blob([JSON.stringify(dadosPayload)], { type: "application/json" }),
+    );
 
     const response = await apiClient.post<ApiResponse<any>>(
       `/courses/${courseId}/modules`,

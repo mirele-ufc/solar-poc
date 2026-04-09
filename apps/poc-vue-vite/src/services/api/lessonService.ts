@@ -34,11 +34,19 @@ export const lessonService = {
 
     if (file) {
       const dadosPayload = { name: name };
-      formData.append("dados", JSON.stringify(dadosPayload));
+      // Send dados as Blob with application/json type (matches React implementation)
+      formData.append(
+        "dados",
+        new Blob([JSON.stringify(dadosPayload)], { type: "application/json" }),
+      );
       formData.append("arquivo", file);
     } else {
       const dadosPayload = { name: name, contentEditor: contentText };
-      formData.append("dados", JSON.stringify(dadosPayload));
+      // Send dados as Blob with application/json type (matches React implementation)
+      formData.append(
+        "dados",
+        new Blob([JSON.stringify(dadosPayload)], { type: "application/json" }),
+      );
     }
 
     const response = await apiClient.post<ApiResponse<Lesson>>(
