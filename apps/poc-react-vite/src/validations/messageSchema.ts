@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const composeMessageSchema = z.object({
+export const messageComposeFormSchema = z.object({
   recipient: z.string().trim().min(1, "Selecione um destinatário"),
   subject: z
     .string()
@@ -30,4 +30,4 @@ export type SendMessageRequest = z.infer<typeof sendMessageRequestSchema>;
 export const toSendMessageRequest = (payload: unknown): SendMessageRequest =>
   sendMessageRequestSchema.parse(payload);
 
-export type ComposeMessageFormValues = z.infer<typeof composeMessageSchema>;
+export type ComposeMessageFormValues = z.infer<typeof messageComposeFormSchema>;

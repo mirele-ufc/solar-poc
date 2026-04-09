@@ -6,7 +6,7 @@ export const questionAnswerSchema = z.object({
   selectedAnswerIndex: z.number().int().min(0),
 }) satisfies z.ZodType<IQuestionAnswer>;
 
-export const quizSubmitSchema = z.object({
+export const quizSubmitRequestSchema = z.object({
   studentId: z.string().trim().min(1, "Aluno é obrigatório"),
   courseId: z.string().trim().min(1, "Curso é obrigatório"),
   answers: z.array(questionAnswerSchema).min(1, "Responda ao menos 1 questão"),
@@ -17,7 +17,7 @@ const questionOptionSchema = z.object({
   text: z.string(),
 });
 
-export const createQuestionSchema = z
+export const questionCreateFormSchema = z
   .object({
     questionText: z.string().trim().min(1, "Escreva o texto da pergunta."),
     options: z.array(questionOptionSchema),
@@ -54,7 +54,7 @@ export const createQuestionSchema = z
     }
   });
 
-export const questionSchema = createQuestionSchema;
+export const questionSchema = questionCreateFormSchema;
 
-export type CreateQuestionFormValues = z.infer<typeof createQuestionSchema>;
-export type QuizSubmitFormValues = z.infer<typeof quizSubmitSchema>;
+export type CreateQuestionFormValues = z.infer<typeof questionCreateFormSchema>;
+export type QuizSubmitFormValues = z.infer<typeof quizSubmitRequestSchema>;

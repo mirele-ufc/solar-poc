@@ -12,7 +12,7 @@ import {
   type BackendGeneratedQuizResponse,
   type BackendQuizCreatePayload,
 } from "@/services/quizService";
-import { createQuestionSchema } from "@/validations/examSchema";
+import { questionCreateFormSchema } from "@/validations/examSchema";
 import { uploadFileSchema } from "@/validations/fileSchema";
 
 // ── SVG paths ─────────────────────────────────────────────────────────────────
@@ -905,7 +905,7 @@ export function CreateExamPage() {
   };
 
   const addQuestion = () => {
-    const parsed = createQuestionSchema.safeParse({
+    const parsed = questionCreateFormSchema.safeParse({
       questionText,
       options,
       correctOptionId,

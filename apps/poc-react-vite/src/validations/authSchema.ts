@@ -47,7 +47,7 @@ export const forgotPasswordRequestSchema = z.object({
     .email("Email inválido"),
 });
 
-export const registerSchema = z
+export const registerFormSchema = z
   .object({
     nome: z
       .string()
@@ -82,7 +82,7 @@ export const registerSchema = z
     message: "As senhas não coincidem",
   });
 
-export type RegisterFormValues = z.infer<typeof registerSchema>;
+export type RegisterFormValues = z.infer<typeof registerFormSchema>;
 
 export const loginSchema = z.object({
   emailOuUsuario: z

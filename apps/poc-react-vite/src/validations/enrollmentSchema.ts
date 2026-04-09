@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const enrollmentSchema = z.object({
+export const enrollmentFormSchema = z.object({
   firstName: z.string().trim().min(1, "Nome não informado"),
   lastName: z.string().trim().min(1, "Sobrenome não informado"),
   city: z.string().trim().min(1, "Cidade não informada"),
@@ -17,4 +17,4 @@ export type EnrollRequest = z.infer<typeof enrollRequestSchema>;
 export const toEnrollRequest = (payload: unknown): EnrollRequest =>
   enrollRequestSchema.parse(payload);
 
-export type EnrollmentFormValues = z.infer<typeof enrollmentSchema>;
+export type EnrollmentFormValues = z.infer<typeof enrollmentFormSchema>;

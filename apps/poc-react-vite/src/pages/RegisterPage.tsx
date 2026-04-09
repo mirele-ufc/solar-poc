@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import imgUfcLogo1 from "@/assets/9098abf5bf97a1aac4c76f171ec108cee92cfddb.png";
 import imgAtivo224X1 from "@/assets/a17a08a750e97ba9bb12c3ad582c426a8debf0fa.png";
 import {
-  registerSchema,
+  registerFormSchema,
   type RegisterFormValues,
 } from "@/validations/authSchema";
 
@@ -205,7 +205,7 @@ export function RegisterPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(registerFormSchema),
     defaultValues: {
       nome: "",
       cpf: "",

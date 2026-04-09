@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useCourseStore } from "@/store/useCourseStore";
 import { PageHeader } from "@/components/shared/PageHeader";
 import {
-  enrollmentSchema,
+  enrollmentFormSchema,
   type EnrollmentFormValues,
 } from "@/validations/enrollmentSchema";
 
@@ -84,7 +84,7 @@ export function EnrollmentPage() {
     trigger,
     formState: { errors },
   } = useForm<EnrollmentFormValues>({
-    resolver: zodResolver(enrollmentSchema),
+    resolver: zodResolver(enrollmentFormSchema),
     defaultValues: {
       firstName: "",
       lastName: "",
