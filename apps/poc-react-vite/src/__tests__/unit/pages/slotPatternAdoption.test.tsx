@@ -30,24 +30,6 @@ describe("Slot Pattern adoption in pages", () => {
     useCourseStore.setState({
       enrolledCourses: ["power-bi"],
       courseStudentRoles: ["power-bi"],
-      courses: [
-        {
-          id: "power-bi",
-          titulo: "Power BI",
-          descricao: "Curso de Power BI",
-          status: "ATIVO",
-          criadoEm: new Date().toISOString(),
-          atualizadoEm: new Date().toISOString(),
-        },
-        {
-          id: "python",
-          titulo: "Python",
-          descricao: "Curso de Python",
-          status: "ATIVO",
-          criadoEm: new Date().toISOString(),
-          atualizadoEm: new Date().toISOString(),
-        },
-      ],
     });
   });
 
