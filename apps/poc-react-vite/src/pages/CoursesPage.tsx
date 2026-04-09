@@ -249,25 +249,8 @@ export function CoursesPage() {
               courses={listedCourses}
               onClickCourse={goToManagedCourse}
               showDescription
-              badge={{ label: "Ativo", bg: "#e6f9ee", text: "#155724" }}
             />
           )}
-        </section>
-
-        <section
-          aria-labelledby="arquivados-heading"
-          className="flex flex-col gap-[20px] w-full"
-        >
-          <h2
-            id="arquivados-heading"
-            className="font-['Figtree:Bold',sans-serif] font-bold leading-[36px] text-[#021b59] text-[24px]"
-          >
-            Cursos arquivados
-          </h2>
-          <FeedbackState
-            title="Nenhum curso arquivado"
-            description="Quando esse status for disponibilizado pelo backend, ele aparecerá aqui automaticamente."
-          />
         </section>
       </div>
     );
