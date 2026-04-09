@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { lessonService } from "@/services/api/lessonService";
+import { validateFileBeforeUpload } from "@/services/validation/fileValidator";
 
 const props = defineProps<{
   moduleId: number;
@@ -39,12 +40,26 @@ const handleStep1 = () => {
   step.value = 2;
 };
 
-const handleFileChange = (e: Event) => {
+const handleFileChange = async (e: Event) => {
   const target = e.target as HTMLInputElement;
-  const f = target.files?.[0];
-  if (f) {
-    file.value = f;
-    aiText.value = ""; // Limpar conteúdo ao selecionar arquivo (exclusividade)
+  const rawFile = target.files?.[0];
+
+  if (rawFile) {
+    const {
+      isValid,
+      errorMessage,
+      file: validatedFile,
+    } = await validateFileBeforeUpload(rawFile, "ANY");
+
+    if (!isValid) {
+      error.value = errorMessage || "Erro de validação";
+      target.value = "";
+      file.value = null;
+      return;
+    }
+
+    error.value = "";
+    file.value = validatedFile;
   }
 };
 
@@ -310,6 +325,7 @@ const handleConfirmQuiz = async () => {
             ref="fileInputRef"
             type="file"
             :disabled="Boolean(aiText.trim())"
+            accept=".pdf,.docx,.jpg,.jpeg,.png,.mp4,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png,video/mp4"
             class="hidden"
             @change="handleFileChange"
           />

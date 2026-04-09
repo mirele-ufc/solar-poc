@@ -1,6 +1,9 @@
 import { apiClient } from "@/services/api";
 import type { CourseInfoData } from "@/views/CreateCourseView.vue";
 
+import { createCourseSchema } from "@/validations/courseSchema";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+
 export interface Curso {
   id: number;
   title: string;
@@ -34,6 +37,15 @@ export const courseService = {
   },
 
   async createCourse(courseData: CourseInfoData, file: File | null) {
+    await createCourseSchema.parseAsync({
+      title: courseData.title,
+      description: courseData.description,
+      category: courseData.category,
+      hours: courseData.hours,
+      requiredFields: courseData.requiredFields,
+      coverFile: file || undefined,
+    });
+
     const formData = new FormData();
 
     // Send dados as Blob with application/json type (matches React implementation)

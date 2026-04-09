@@ -2,8 +2,9 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCourseCreationStore } from '@/store/useCourseCreationStore';
-import PageHeader from "@/components/shared/PageHeader.vue";
 import { courseService } from '@/services/api/courseService';
+import { validateFileBeforeUpload } from '@/services/validation/fileValidator';
+import PageHeader from "@/components/shared/PageHeader.vue";
 
 export type CourseInfoData = {
   image: string | null;
@@ -49,16 +50,29 @@ const toggleRequired = (field: string) => {
   }
 };
 
-const handleImageChange = (e: Event) => {
+const handleImageChange = async (e: Event) => {
   const target = e.target as HTMLInputElement;
-  const file = target.files?.[0];
-  if (file) {
-    imageFile.value = file;
+  const rawFile = target.files?.[0];
+  
+  if (rawFile) {
+    const { isValid, errorMessage, file } = await validateFileBeforeUpload(rawFile, 'IMAGE');
+    
+    if (!isValid) {
+      error.value = errorMessage || "Erro de validação";
+      target.value = ''; 
+      imageFile.value = null;
+      form.value.image = null;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    error.value = ""; 
+    imageFile.value = file; 
     const reader = new FileReader();
     reader.onload = () => {
       form.value.image = reader.result as string;
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(file!); 
   }
 };
 
@@ -146,7 +160,7 @@ const handleNext = async () => {
     <input
       ref="imageInputRef"
       type="file"
-      accept="image/*"
+      accept=".jpg,.jpeg,.png,image/jpeg,image/png"
       class="hidden"
       aria-hidden="true"
       tabindex="-1"
