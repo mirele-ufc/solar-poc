@@ -2,9 +2,9 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
-import CoursesPage from "../../../pages/CoursesPage";
+import { CoursesPage } from "../../../pages/CoursesPage";
 import { useAuthStore } from "../../../store/useAuthStore";
-import * as courseService from "../../../services/courseService";
+import { fetchCourses } from "../../../services/courseService";
 
 // Mock dependencies
 vi.mock("../../../store/useAuthStore");
@@ -40,12 +40,12 @@ describe("CoursesPage", () => {
   });
 
   it("should render courses page with course list", async () => {
-    vi.mocked(courseService.getCursos).mockResolvedValueOnce(mockCourses);
+    vi.mocked(fetchCourses).mockResolvedValueOnce(mockCourses);
 
     render(
       <BrowserRouter>
         <CoursesPage />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     await waitFor(() => {
@@ -56,14 +56,14 @@ describe("CoursesPage", () => {
   });
 
   it("should display loading state while fetching courses", () => {
-    vi.mocked(courseService.getCursos).mockImplementationOnce(
-      () => new Promise(() => {}) // Never resolves
+    vi.mocked(fetchCourses).mockImplementationOnce(
+      () => new Promise(() => {}), // Never resolves
     );
 
     render(
       <BrowserRouter>
         <CoursesPage />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     // Loading indicator should be visible
@@ -72,27 +72,29 @@ describe("CoursesPage", () => {
 
   it("should handle error when fetching courses fails", async () => {
     const mockError = new Error("Failed to fetch courses");
-    vi.mocked(courseService.getCursos).mockRejectedValueOnce(mockError);
+    vi.mocked(fetchCourses).mockRejectedValueOnce(mockError);
 
     render(
       <BrowserRouter>
         <CoursesPage />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     await waitFor(() => {
-      expect(screen.queryByText("Programação em Python")).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Programação em Python"),
+      ).not.toBeInTheDocument();
     });
   });
 
   it("should allow navigation to course details", async () => {
-    vi.mocked(courseService.getCursos).mockResolvedValueOnce(mockCourses);
+    vi.mocked(fetchCourses).mockResolvedValueOnce(mockCourses);
     const user = userEvent.setup();
 
     render(
       <BrowserRouter>
         <CoursesPage />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     await waitFor(() => {
@@ -109,12 +111,12 @@ describe("CoursesPage", () => {
   });
 
   it("should render empty state when no courses available", async () => {
-    vi.mocked(courseService.getCursos).mockResolvedValueOnce([]);
+    vi.mocked(fetchCourses).mockResolvedValueOnce([]);
 
     render(
       <BrowserRouter>
         <CoursesPage />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     await waitFor(() => {

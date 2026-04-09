@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import ProtectedRoute from "../../../components/ProtectedRoute";
+import { ProtectedRoute } from "../../../components/ProtectedRoute";
 import { useAuthStore } from "../../../store/useAuthStore";
 
 // Mock useAuthStore
@@ -40,7 +40,7 @@ describe("ProtectedRoute", () => {
         <ProtectedRoute>
           <TestComponent />
         </ProtectedRoute>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(screen.getByText("Protected Content")).toBeInTheDocument();
@@ -60,7 +60,7 @@ describe("ProtectedRoute", () => {
         <ProtectedRoute>
           <TestComponent />
         </ProtectedRoute>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(mockNavigate).toHaveBeenCalledWith("/unauthorized");
@@ -80,7 +80,7 @@ describe("ProtectedRoute", () => {
         <ProtectedRoute roleRequired="professor">
           <TestComponent />
         </ProtectedRoute>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(mockNavigate).toHaveBeenCalledWith("/unauthorized");
@@ -100,7 +100,7 @@ describe("ProtectedRoute", () => {
         <ProtectedRoute roleRequired="professor">
           <TestComponent />
         </ProtectedRoute>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(screen.getByText("Protected Content")).toBeInTheDocument();
@@ -121,7 +121,7 @@ describe("ProtectedRoute", () => {
         <ProtectedRoute>
           <TestComponent />
         </ProtectedRoute>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(mockNavigate).toHaveBeenCalledWith("/unauthorized");
