@@ -2,13 +2,13 @@
 
 ## Decisões de Arquitetura
 
-| Decisão | Escolha |
-|---|---|
-| Upload de arquivos | Local no servidor (disco) |
+| Decisão             | Escolha                                     |
+| ------------------- | ------------------------------------------- |
+| Upload de arquivos  | Local no servidor (disco)                   |
 | Categorias de curso | Dinâmicas com deduplicação case-insensitive |
-| Prova | Vinculada ao módulo (1:1) |
-| Conteúdo da aula | Arquivo + CKEditor coexistem |
-| Pacote raiz | `br.ufc.llm` |
+| Prova               | Vinculada ao módulo (1:1)                   |
+| Conteúdo da aula    | Arquivo + CKEditor coexistem                |
+| Pacote raiz         | `br.ufc.llm`                                |
 
 ## Entidades e Relacionamentos
 
@@ -105,79 +105,76 @@ CREATE TABLE alternativas (
 
 ## Endpoints REST
 
-### Auth
-| Método | Endpoint | Descrição |
-|---|---|---|
-| POST | `/auth/cadastro` | Cadastrar professor ou aluno |
-| POST | `/auth/login` | Login → access + refresh token |
-| POST | `/auth/refresh` | Renovar access token |
-| POST | `/auth/recuperar-senha` | Solicitar token por e-mail |
-| POST | `/auth/redefinir-senha` | Redefinir senha com token |
+**NOTA IMPORTANTE:** Endpoints em **INGLÊS** (backend Java Spring Boot). Updated 09/04/2026 para refletir implementação real.
 
-**Nota contratual:** nao existe endpoint `POST /auth/logout` nem qualquer endpoint de logout nesta arquitetura. O fluxo de logout no frontend deve ser exclusivamente local, sem chamada de API fora do contrato.
+### Courses
 
-### Perfil
-| Método | Endpoint | Descrição |
-|---|---|---|
-| GET | `/perfil` | Dados do usuário logado |
-| PUT | `/perfil/foto` | Upload de foto de perfil |
-| PUT | `/perfil/senha` | Alterar senha (requer senha atual) |
+| Método | Endpoint                     | Descrição                        | Content-Type        |
+| ------ | ---------------------------- | -------------------------------- | ------------------- |
+| GET    | `/courses`                   | Listar cursos (Professor logado) | application/json    |
+| POST   | `/courses`                   | Criar curso (form-data com JSON) | multipart/form-data |
+| GET    | `/courses/{courseId}`        | Buscar curso por ID              | application/json    |
+| PUT    | `/courses/{courseId}`        | Editar curso                     | multipart/form-data |
+| DELETE | `/courses/{courseId}`        | Excluir curso                    | —                   |
+| PATCH  | `/courses/{courseId}/status` | Alterar status                   | application/json    |
+| GET    | `/courses/search?q=termo`    | Buscar por texto                 | application/json    |
 
-### Admin
-| Método | Endpoint | Descrição |
-|---|---|---|
-| GET | `/admin/usuarios` | Listar todos os usuários |
-| PATCH | `/admin/usuarios/{id}/ativar` | Ativar conta |
-| PATCH | `/admin/usuarios/{id}/desativar` | Desativar conta |
+### Modules
 
-### Cursos
-| Método | Endpoint | Descrição |
-|---|---|---|
-| GET | `/cursos` | Listar cursos do professor (paginado) |
-| POST | `/cursos` | Criar curso |
-| GET | `/cursos/{id}` | Buscar por ID |
-| PUT | `/cursos/{id}` | Editar curso |
-| DELETE | `/cursos/{id}` | Excluir curso |
-| PATCH | `/cursos/{id}/status` | Alterar status |
-| GET | `/cursos/buscar?q=termo` | Buscar por texto |
+| Método | Endpoint                      | Descrição                        | Content-Type        |
+| ------ | ----------------------------- | -------------------------------- | ------------------- |
+| GET    | `/courses/{courseId}/modules` | Listar módulos de um curso       | application/json    |
+| POST   | `/courses/{courseId}/modules` | Criar módulo (form-data)         | multipart/form-data |
+| PUT    | `/modules/{moduleId}`         | Editar módulo                    | multipart/form-data |
+| DELETE | `/modules/{moduleId}`         | Excluir módulo (renumera demais) | —                   |
+| PATCH  | `/modules/{moduleId}/order`   | Reordenar módulo                 | application/json    |
 
-### Módulos
-| Método | Endpoint | Descrição |
-|---|---|---|
-| POST | `/cursos/{cursoId}/modulos` | Adicionar módulo |
-| PUT | `/modulos/{id}` | Editar módulo |
-| DELETE | `/modulos/{id}` | Excluir (renumera os demais) |
-| PATCH | `/modulos/{id}/ordem` | Reordenar |
+### Lessons
 
-### Aulas
-| Método | Endpoint | Descrição |
-|---|---|---|
-| POST | `/modulos/{moduloId}/aulas` | Adicionar aula |
-| PUT | `/aulas/{id}` | Editar aula |
-| DELETE | `/aulas/{id}` | Excluir aula |
-| PATCH | `/aulas/{id}/ordem` | Reordenar |
-| POST | `/aulas/{id}/gerar-conteudo` | Spring AI: gera conteúdo (preview) |
-| POST | `/aulas/{id}/confirmar-conteudo` | Salvar conteúdo gerado pela IA |
+| Método | Endpoint                                         | Descrição                          | Content-Type        |
+| ------ | ------------------------------------------------ | ---------------------------------- | ------------------- |
+| GET    | `/courses/{courseId}/modules/{moduleId}/lessons` | Listar aulas                       | application/json    |
+| POST   | `/modules/{moduleId}/lessons`                    | Criar aula (form-data)             | multipart/form-data |
+| PUT    | `/lessons/{lessonId}`                            | Editar aula                        | multipart/form-data |
+| DELETE | `/lessons/{lessonId}`                            | Excluir aula                       | —                   |
+| PATCH  | `/lessons/{lessonId}/order`                      | Reordenar aula                     | application/json    |
+| POST   | `/lessons/{lessonId}/generate-content`           | Spring AI: gera conteúdo (preview) | application/json    |
+| POST   | `/lessons/{lessonId}/confirm-content`            | Salvar conteúdo gerado pela IA     | application/json    |
 
-### Provas
-| Método | Endpoint | Descrição |
-|---|---|---|
-| POST | `/modulos/{moduloId}/prova` | Criar prova |
-| GET | `/modulos/{moduloId}/prova` | Buscar prova |
-| PUT | `/provas/{id}` | Editar configurações |
-| DELETE | `/provas/{id}` | Excluir prova |
-| POST | `/modulos/{moduloId}/prova/gerar-quiz-ia` | Spring AI: gera quiz (não salva) |
+### Quizzes
 
-### Perguntas
-| Método | Endpoint | Descrição |
-|---|---|---|
-| POST | `/provas/{provaId}/perguntas` | Adicionar pergunta |
-| PUT | `/perguntas/{id}` | Editar |
-| DELETE | `/perguntas/{id}` | Excluir |
+| Método | Endpoint                                    | Descrição                                 | Content-Type        |
+| ------ | ------------------------------------------- | ----------------------------------------- | ------------------- |
+| GET    | `/modules/{moduleId}/quiz`                  | Buscar quiz do módulo                     | application/json    |
+| POST   | `/modules/{moduleId}/quiz`                  | Criar quiz                                | multipart/form-data |
+| PUT    | `/quizzes/{quizId}`                         | Editar configurações                      | application/json    |
+| DELETE | `/quizzes/{quizId}`                         | Excluir quiz                              | —                   |
+| POST   | `/modules/{moduleId}/quiz/generate-quiz-ia` | Spring AI: gera quiz (preview, não salva) | application/json    |
 
-### Alternativas
-| Método | Endpoint | Descrição |
-|---|---|---|
-| POST | `/perguntas/{perguntaId}/alternativas` | Adicionar alternativa |
-| PUT | `/alternativas/{id}` | Editar |
-| DELETE | `/alternativas/{id}` | Excluir |
+### Questions
+
+| Método | Endpoint                      | Descrição          | Content-Type     |
+| ------ | ----------------------------- | ------------------ | ---------------- |
+| GET    | `/quizzes/{quizId}/questions` | Listar perguntas   | application/json |
+| POST   | `/quizzes/{quizId}/questions` | Adicionar pergunta | application/json |
+| PUT    | `/questions/{questionId}`     | Editar pergunta    | application/json |
+| DELETE | `/questions/{questionId}`     | Excluir pergunta   | —                |
+
+### Alternatives
+
+| Método | Endpoint                               | Descrição             | Content-Type     |
+| ------ | -------------------------------------- | --------------------- | ---------------- |
+| GET    | `/questions/{questionId}/alternatives` | Listar alternativas   | application/json |
+| POST   | `/questions/{questionId}/alternatives` | Adicionar alternativa | application/json |
+| PUT    | `/alternatives/{alternativeId}`        | Editar alternativa    | application/json |
+| DELETE | `/alternatives/{alternativeId}`        | Excluir alternativa   | —                |
+
+### Auth (Se aplicável)
+
+| Método | Endpoint         | Descrição         |
+| ------ | ---------------- | ----------------- |
+| POST   | `/auth/login`    | Login → JWT token |
+| POST   | `/auth/refresh`  | Renovar token     |
+| POST   | `/auth/register` | Registrar usuário |
+
+**Nota contratual:** Nenhum endpoint de logout documentado. Logout é exclusivamente local (limpar state + storage).
