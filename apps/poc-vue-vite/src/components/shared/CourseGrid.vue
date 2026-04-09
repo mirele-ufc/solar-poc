@@ -7,12 +7,18 @@ interface Course {
   hours?: string;
   imagePath?: string | null;
   description?: string;
-  isActive?: boolean;
+}
+
+interface Badge {
+  label: string;
+  bg: string;
+  text: string;
 }
 
 defineProps<{
   courses: Course[];
   showHours?: boolean;
+  badge?: Badge;
 }>();
 
 defineEmits<{
@@ -32,7 +38,7 @@ defineEmits<{
           :hours="showHours ? c.hours : undefined"
           :description="c.description"
           :imagePath="c.imagePath"
-          :is-active="c.isActive"
+          :badge="badge"
           @click="$emit('click-course', c.id)"
         />
       </div>
@@ -46,7 +52,7 @@ defineEmits<{
         :hours="showHours ? c.hours : undefined"
         :description="c.description"
         :imagePath="c.imagePath"
-        :is-active="c.isActive"
+        :badge="badge"
         @click="$emit('click-course', c.id)"
       />
     </div>

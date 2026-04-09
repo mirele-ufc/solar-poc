@@ -11,7 +11,11 @@ const props = defineProps<{
   hours?: string;
   description?: string;
   imagePath?: string | null;
-  isActive?: boolean;
+  badge?: {
+    label: string;
+    bg: string;
+    text: string;
+  };
 }>();
 
 const isFallback = computed(() => !props.imagePath?.trim());
@@ -71,10 +75,11 @@ defineEmits<{
         />
       </template>
       <span
-        v-if="isActive"
-        class="absolute top-[8px] right-[8px] bg-[#e6f9ee] text-[#155724] text-[11px] font-['Figtree:Medium',sans-serif] font-medium px-[8px] py-[2px] rounded-full"
+        v-if="badge"
+        class="absolute top-[8px] right-[8px] text-[11px] font-['Figtree:Medium',sans-serif] font-medium px-[8px] py-[2px] rounded-full"
+        :style="{ backgroundColor: badge.bg, color: badge.text }"
       >
-        Ativo
+        {{ badge.label }}
       </span>
     </div>
     <div class="flex flex-col gap-[2px]">

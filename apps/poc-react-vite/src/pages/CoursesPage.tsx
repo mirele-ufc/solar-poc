@@ -249,6 +249,7 @@ export function CoursesPage() {
               courses={listedCourses}
               onClickCourse={goToManagedCourse}
               showDescription
+              badge={{ label: "Ativo", bg: "#e6f9ee", text: "#155724" }}
             />
           )}
         </section>
