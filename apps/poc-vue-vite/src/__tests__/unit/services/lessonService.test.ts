@@ -116,7 +116,7 @@ describe("Vue lessonService", () => {
       const result = await lessonService.generateContent(lessonId);
 
       expect(mockedPost).toHaveBeenCalledWith(
-        `/lessons/${lessonId}/gerar-conteudo`,
+        `/lessons/${lessonId}/generate-content`,
       );
       expect(result).toBe(generatedContent);
       expect(result).toContain("Conteúdo Gerado");
