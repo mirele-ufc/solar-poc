@@ -3,7 +3,8 @@
  * Centraliza todas as requisições API com tratamento de erros global e refresh token flow
  */
 
-import axios, {
+import axios from "axios";
+import type {
   AxiosInstance,
   AxiosError,
   AxiosResponse,
