@@ -29,16 +29,17 @@ export type BackendCourseResponse = {
 };
 
 /**
- * Fetch all courses from the back-end
- * Returns a list of all available courses
+ * Fetch all courses from the back-end.
+ * The API returns the standard envelope `{ sucesso, mensagem, dados, timestamp }`.
  *
- * @returns Promise<ICourse[]> - Array of course objects
+ * @returns Promise<BackendCourseResponse[]> - Array of course objects from the backend contract
  * @throws IApiError - If the request fails
  */
-export async function fetchCourses(): Promise<ICourse[]> {
+export async function fetchCourses(): Promise<BackendCourseResponse[]> {
   try {
-    const response = await apiClient.get<ICourse[]>("/courses");
-    return response.data;
+    const response =
+      await apiClient.get<ApiEnvelope<BackendCourseResponse[]>>("/courses");
+    return response.data.dados;
   } catch (error) {
     console.error("Failed to fetch courses:", error);
     throw error;
@@ -46,17 +47,21 @@ export async function fetchCourses(): Promise<ICourse[]> {
 }
 
 /**
- * Fetch a specific course by its ID
- * Retrieves detailed information about a single course including modules and lessons
+ * Fetch a specific course by its ID.
+ * The API returns the standard envelope `{ sucesso, mensagem, dados, timestamp }`.
  *
  * @param courseId - Unique identifier of the course
- * @returns Promise<ICourse> - Course object with full details
+ * @returns Promise<BackendCourseResponse> - Course object with full details from the backend contract
  * @throws IApiError - If the request fails or course is not found
  */
-export async function fetchCourseById(courseId: string): Promise<ICourse> {
+export async function fetchCourseById(
+  courseId: string,
+): Promise<BackendCourseResponse> {
   try {
-    const response = await apiClient.get<ICourse>(`/courses/${courseId}`);
-    return response.data;
+    const response = await apiClient.get<ApiEnvelope<BackendCourseResponse>>(
+      `/courses/${courseId}`,
+    );
+    return response.data.dados;
   } catch (error) {
     console.error(`Failed to fetch course with ID ${courseId}:`, error);
     throw error;

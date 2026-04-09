@@ -1,100 +1,136 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { selectCanManageCourses, useAuthStore } from "@/store/useAuthStore";
 import { CourseCard } from "@/components/shared/CourseCard";
+import {
+  fetchCourses,
+  type BackendCourseResponse,
+} from "@/services/courseService";
+import { selectCanManageCourses, useAuthStore } from "@/store/useAuthStore";
 
-// ── Course thumbnail map ──────────────────────────────────────────────────────
-const COURSE_IMAGES: Record<string, string> = {
-  "power-bi":
-    "https://images.unsplash.com/photo-1759661966728-4a02e3c6ed91?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkYXRhJTIwdmlzdWFsaXphdGlvbiUyMGJ1c2luZXNzJTIwaW50ZWxsaWdlbmNlJTIwZGFzaGJvYXJkfGVufDF8fHx8MTc3MzMzNTYxNHww&ixlib=rb-4.1.0&q=80&w=1080",
-  python:
-    "https://images.unsplash.com/photo-1624953587687-daf255b6b80a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxweXRob24lMjBwcm9ncmFtbWluZyUyMGNvZGUlMjBjb21wdXRlcnxlbnwxfHx8fDE3NzMzMzU2MTd8MA&ixlib=rb-4.1.0&q=80&w=1080",
-  matematica:
-    "https://images.unsplash.com/photo-1747654804155-ffd62d5dfb51?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYXRoZW1hdGljcyUyMGdlb21ldHJ5JTIwYWJzdHJhY3R8ZW58MXx8fHwxNzczMzI3ODYwfDA&ixlib=rb-4.1.0&q=80&w=1080",
-  "historia-design":
-    "https://images.unsplash.com/photo-1762330910399-95caa55acf04?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvbmxpbmUlMjBsZWFybmluZyUyMGNvdXJzZSUyMGVkdWNhdGlvbiUyMGxhcHRvcHxlbnwxfHx8fDE3NzMzMzU2MTR8MA&ixlib=rb-4.1.0&q=80&w=1080",
-  "design-grafico":
-    "https://images.unsplash.com/photo-1663000806489-08f132cf3032?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxncmFwaGljJTIwZGVzaWduJTIwdHlwb2dyYXBoeSUyMGNyZWF0aXZlfGVufDF8fHx8MTc3MzMzNTYxOHww&ixlib=rb-4.1.0&q=80&w=1080",
-  "design-interfaces":
-    "https://images.unsplash.com/photo-1602576666092-bf6447a729fc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxVSSUyMFVYJTIwaW50ZXJmYWNlJTIwZGVzaWduJTIwc2NyZWVufGVufDF8fHx8MTc3MzMzNTYxOHww&ixlib=rb-4.1.0&q=80&w=1080",
-};
-
-const FALLBACK =
+const FALLBACK_BANNER =
   "https://images.unsplash.com/photo-1762330910399-95caa55acf04?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400";
 
-// ── Course data ───────────────────────────────────────────────────────────────
-const computacaoCourses = [
-  {
-    id: "power-bi",
-    title: "Power Bi - Fundamentos",
-    hours: "Carga horária: 30h",
-  },
-  { id: "python", title: "Python Iniciante", hours: "Carga horária: 24h" },
-  { id: "matematica", title: "Matemática básica", hours: "Carga horária: 36h" },
-];
-const designCourses = [
-  {
-    id: "historia-design",
-    title: "História do Design",
-    hours: "Carga horária: 64h",
-  },
-  {
-    id: "design-grafico",
-    title: "Design Gráfico - Iniciante",
-    hours: "Carga horária: 40h",
-  },
-  {
-    id: "design-interfaces",
-    title: "Design de Interfaces Gráficas",
-    hours: "Carga horária: 48h",
-  },
-];
-const activeCourses = [
-  { id: "power-bi", title: "Power Bi - Fundamentos" },
-  { id: "python", title: "Python Iniciante" },
-  { id: "matematica", title: "Matemática básica" },
-];
-const archivedCourses = [
-  { id: "historia-design", title: "História do Design" },
-  { id: "design-grafico", title: "Design Gráfico - Iniciante" },
-  { id: "design-interfaces", title: "Design de Interfaces Gráficas" },
-];
+type ListedCourse = {
+  id: string;
+  title: string;
+  description?: string;
+  imageSrc: string;
+};
 
-// ── Grid / Row helper ─────────────────────────────────────────────────────────
+type CourseBadge = {
+  label: string;
+  bg: string;
+  text: string;
+};
+
+function resolveCourseImage(imagePath: string | null): string {
+  if (!imagePath?.trim()) {
+    return FALLBACK_BANNER;
+  }
+
+  if (/^https?:\/\//i.test(imagePath)) {
+    return imagePath;
+  }
+
+  const apiBaseUrl = (
+    import.meta.env.VITE_API_URL || "http://localhost:8080"
+  ).replace(/\/$/, "");
+  const normalizedPath = imagePath.startsWith("/")
+    ? imagePath
+    : `/${imagePath}`;
+
+  return `${apiBaseUrl}${normalizedPath}`;
+}
+
+function normalizeCourseTitle(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+function mapCourseToDisplay(course: BackendCourseResponse): ListedCourse {
+  return {
+    id: String(course.id),
+    title: course.title?.trim() || "Curso sem título",
+    description:
+      course.description?.trim() || "Curso disponível na plataforma.",
+    imageSrc: resolveCourseImage(course.imagePath),
+  };
+}
+
+function FeedbackState({
+  title,
+  description,
+  actionLabel,
+  onAction,
+}: {
+  title: string;
+  description: string;
+  actionLabel?: string;
+  onAction?: () => void;
+}) {
+  return (
+    <div className="w-full rounded-[12px] border border-[#dbe5ff] bg-[#f5f8ff] px-[20px] py-[24px] text-center">
+      <p className="font-['Figtree:Medium',sans-serif] font-medium text-[#021b59] text-[18px]">
+        {title}
+      </p>
+      <p className="mt-[6px] font-['Figtree:Regular',sans-serif] text-[#595959] text-[14px]">
+        {description}
+      </p>
+      {actionLabel && onAction ? (
+        <button
+          type="button"
+          onClick={onAction}
+          className="mt-[16px] bg-[#ffeac4] h-[42px] px-[20px] rounded-[24px] hover:bg-[#ffd9a0] transition-colors focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px]"
+        >
+          <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[15px]">
+            {actionLabel}
+          </span>
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
 function CourseGrid({
   courses,
   onClickCourse,
-  showHours = false,
+  showDescription = false,
+  badge,
 }: {
-  courses: { id: string; title: string; hours?: string }[];
-  onClickCourse: (id: string) => void;
-  showHours?: boolean;
+  courses: ListedCourse[];
+  onClickCourse: (course: ListedCourse) => void;
+  showDescription?: boolean;
+  badge?: CourseBadge;
 }) {
   return (
     <div className="w-full">
-      {/* Mobile: horizontal scroll */}
       <div className="no-scrollbar flex gap-[16px] overflow-x-auto pb-[8px] md:hidden">
-        {courses.map((c) => (
-          <div key={c.id} className="shrink-0 w-[200px]">
+        {courses.map((course) => (
+          <div key={course.id} className="shrink-0 w-[200px]">
             <CourseCard
-              title={c.title}
-              imageSrc={COURSE_IMAGES[c.id] ?? FALLBACK}
-              imageAlt={c.title}
-              description={showHours ? c.hours : undefined}
-              onClick={() => onClickCourse(c.id)}
+              title={course.title}
+              imageSrc={course.imageSrc}
+              imageAlt={course.title}
+              description={showDescription ? course.description : undefined}
+              badge={badge}
+              onClick={() => onClickCourse(course)}
             />
           </div>
         ))}
       </div>
-      {/* Desktop: grid */}
+
       <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 gap-[20px]">
-        {courses.map((c) => (
+        {courses.map((course) => (
           <CourseCard
-            key={c.id}
-            title={c.title}
-            imageSrc={COURSE_IMAGES[c.id] ?? FALLBACK}
-            imageAlt={c.title}
-            description={showHours ? c.hours : undefined}
-            onClick={() => onClickCourse(c.id)}
+            key={course.id}
+            title={course.title}
+            imageSrc={course.imageSrc}
+            imageAlt={course.title}
+            description={showDescription ? course.description : undefined}
+            badge={badge}
+            onClick={() => onClickCourse(course)}
           />
         ))}
       </div>
@@ -102,14 +138,60 @@ function CourseGrid({
   );
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
 export function CoursesPage() {
   const navigate = useNavigate();
   const canManageCourses = useAuthStore(selectCanManageCourses);
+  const [courses, setCourses] = useState<BackendCourseResponse[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const goToCourse = (id: string) => {
-    if (id === "power-bi") navigate("/courses/power-bi");
-    else if (id === "python") navigate("/courses/python");
+  const loadCourses = useCallback(async () => {
+    setIsLoading(true);
+    setErrorMessage(null);
+
+    try {
+      const response = await fetchCourses();
+      setCourses(response);
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível carregar os cursos no momento.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadCourses();
+  }, [loadCourses]);
+
+  const listedCourses = useMemo(
+    () =>
+      courses.map(mapCourseToDisplay).sort((first, second) =>
+        first.title.localeCompare(second.title, "pt-BR", {
+          sensitivity: "base",
+        }),
+      ),
+    [courses],
+  );
+
+  const goToStudentCourse = (course: ListedCourse) => {
+    const normalizedTitle = normalizeCourseTitle(course.title);
+
+    if (normalizedTitle.includes("power bi")) {
+      navigate("/courses/power-bi");
+      return;
+    }
+
+    if (normalizedTitle.includes("python")) {
+      navigate("/courses/python");
+    }
+  };
+
+  const goToManagedCourse = (course: ListedCourse) => {
+    navigate(`/courses/${course.id}/manage`);
   };
 
   if (canManageCourses) {
@@ -122,7 +204,7 @@ export function CoursesPage() {
           <button
             type="button"
             onClick={() => navigate("/create-course")}
-            className="bg-[#ffeac4] cursor-pointer h-[48px] w-full rounded-[26px] hover:bg-[#ffd9a0] transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px]"
+            className="bg-[#ffeac4] cursor-pointer h-[48px] w-full rounded-[26px] hover:bg-[#ffd9a0] transition-colors focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px]"
           >
             <span className="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[20px]">
               Criar curso
@@ -140,43 +222,32 @@ export function CoursesPage() {
           >
             Cursos ativos
           </h2>
-          <div className="w-full">
-            <div className="no-scrollbar flex gap-[16px] overflow-x-auto pb-[8px] md:hidden">
-              {activeCourses.map((c) => (
-                <div key={c.id} className="shrink-0 w-[200px]">
-                  {/* Python → visão de aluno; demais → gerenciar */}
-                  <CourseCard
-                    key={c.id}
-                    title={c.title}
-                    imageSrc={COURSE_IMAGES[c.id] ?? FALLBACK}
-                    imageAlt={c.title}
-                    badge={{ label: "Ativo", bg: "#e6f9ee", text: "#155724" }}
-                    onClick={() =>
-                      c.id === "python"
-                        ? navigate("/courses/python")
-                        : navigate(`/courses/${c.id}/manage`)
-                    }
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 gap-[20px]">
-              {activeCourses.map((c) => (
-                <CourseCard
-                  key={c.id}
-                  title={c.title}
-                  imageSrc={COURSE_IMAGES[c.id] ?? FALLBACK}
-                  imageAlt={c.title}
-                  badge={{ label: "Ativo", bg: "#e6f9ee", text: "#155724" }}
-                  onClick={() =>
-                    c.id === "python"
-                      ? navigate("/courses/python")
-                      : navigate(`/courses/${c.id}/manage`)
-                  }
-                />
-              ))}
-            </div>
-          </div>
+
+          {isLoading ? (
+            <FeedbackState
+              title="Carregando cursos..."
+              description="Buscando a lista atualizada no backend."
+            />
+          ) : errorMessage ? (
+            <FeedbackState
+              title="Não foi possível carregar os cursos"
+              description={errorMessage}
+              actionLabel="Tentar novamente"
+              onAction={() => void loadCourses()}
+            />
+          ) : listedCourses.length === 0 ? (
+            <FeedbackState
+              title="Nenhum curso cadastrado"
+              description="Crie um novo curso para começar a exibição nesta página."
+            />
+          ) : (
+            <CourseGrid
+              courses={listedCourses}
+              onClickCourse={goToManagedCourse}
+              showDescription
+              badge={{ label: "Ativo", bg: "#e6f9ee", text: "#155724" }}
+            />
+          )}
         </section>
 
         <section
@@ -189,52 +260,56 @@ export function CoursesPage() {
           >
             Cursos arquivados
           </h2>
-          <CourseGrid courses={archivedCourses} onClickCourse={() => {}} />
+          <FeedbackState
+            title="Nenhum curso arquivado"
+            description="Quando esse status for disponibilizado pelo backend, ele aparecerá aqui automaticamente."
+          />
         </section>
       </div>
     );
   }
 
-  // Student view
   return (
     <div className="bg-white flex flex-col gap-[30px] items-start pt-[30px] px-[20px] md:px-[40px] pb-[60px]">
       <h1 className="font-['Figtree:Bold',sans-serif] font-bold leading-[40px] text-[#021b59] text-[28px] w-full">
         Conheça nossos cursos!
       </h1>
 
-      <section
-        aria-labelledby="comp-heading"
-        className="flex flex-col gap-[20px] w-full"
-      >
-        <h2
-          id="comp-heading"
-          className="font-['Figtree:Bold',sans-serif] font-bold leading-[36px] text-[#021b59] text-[24px]"
-        >
-          Computação
-        </h2>
-        <CourseGrid
-          courses={computacaoCourses}
-          onClickCourse={goToCourse}
-          showHours
+      {isLoading ? (
+        <FeedbackState
+          title="Carregando cursos..."
+          description="Buscando a lista de cursos disponíveis."
         />
-      </section>
-
-      <section
-        aria-labelledby="design-heading"
-        className="flex flex-col gap-[20px] w-full"
-      >
-        <h2
-          id="design-heading"
-          className="font-['Figtree:Bold',sans-serif] font-bold leading-[36px] text-[#021b59] text-[24px]"
-        >
-          Design
-        </h2>
-        <CourseGrid
-          courses={designCourses}
-          onClickCourse={() => {}}
-          showHours
+      ) : errorMessage ? (
+        <FeedbackState
+          title="Não foi possível carregar os cursos"
+          description={errorMessage}
+          actionLabel="Tentar novamente"
+          onAction={() => void loadCourses()}
         />
-      </section>
+      ) : listedCourses.length === 0 ? (
+        <FeedbackState
+          title="Nenhum curso disponível"
+          description="Assim que novos cursos forem cadastrados, eles serão exibidos aqui."
+        />
+      ) : (
+        <section
+          aria-labelledby="courses-available-heading"
+          className="flex flex-col gap-[20px] w-full"
+        >
+          <h2
+            id="courses-available-heading"
+            className="font-['Figtree:Bold',sans-serif] font-bold leading-[36px] text-[#021b59] text-[24px]"
+          >
+            Cursos disponíveis
+          </h2>
+          <CourseGrid
+            courses={listedCourses}
+            onClickCourse={goToStudentCourse}
+            showDescription
+          />
+        </section>
+      )}
     </div>
   );
 }

@@ -5,6 +5,51 @@ import {
   IQuizSubmissionResult,
 } from "@ava-poc/types";
 
+type ApiEnvelope<T> = {
+  sucesso: boolean;
+  mensagem: string | null;
+  dados: T;
+  timestamp: string;
+};
+
+export type BackendQuizAlternative = {
+  id: number | null;
+  text: string;
+  correct: boolean;
+};
+
+export type BackendQuizQuestion = {
+  id: number | null;
+  statement: string;
+  points: number;
+  orderNum: number;
+  alternatives: BackendQuizAlternative[];
+};
+
+export type BackendGeneratedQuizResponse = {
+  questions: BackendQuizQuestion[];
+};
+
+export type BackendConfirmedQuizResponse = {
+  id: number;
+  moduleId: number;
+  showWrongAnswers: boolean;
+  showCorrectAnswers: boolean;
+  showPoints: boolean;
+  questions: BackendQuizQuestion[];
+};
+
+export type BackendQuizCreatePayload = {
+  questions: Array<{
+    statement: string;
+    points: number;
+    alternatives: Array<{
+      text: string;
+      correct: boolean;
+    }>;
+  }>;
+};
+
 /**
  * Fetch a specific quiz by its ID
  * Retrieves all questions and options for the quiz
@@ -23,6 +68,47 @@ export async function fetchQuizById(quizId: string): Promise<IQuiz> {
     console.error(`Failed to fetch quiz with ID ${quizId}:`, error);
     throw error;
   }
+}
+
+export async function createQuizForModuleWithBackend(
+  moduleId: string,
+  payload: BackendQuizCreatePayload,
+): Promise<BackendConfirmedQuizResponse> {
+  const response = await apiClient.post<
+    ApiEnvelope<BackendConfirmedQuizResponse>
+  >(`/modules/${moduleId}/quiz`, payload);
+
+  return response.data.dados;
+}
+
+export async function generateQuizForModuleWithBackend(
+  moduleId: string,
+): Promise<BackendGeneratedQuizResponse> {
+  const response = await apiClient.post<
+    ApiEnvelope<BackendGeneratedQuizResponse>
+  >(`/modules/${moduleId}/quiz/gerar`);
+
+  return response.data.dados;
+}
+
+export async function regenerateQuizForModuleWithBackend(
+  moduleId: string,
+): Promise<BackendGeneratedQuizResponse> {
+  const response = await apiClient.post<
+    ApiEnvelope<BackendGeneratedQuizResponse>
+  >(`/modules/${moduleId}/quiz/regerar`);
+
+  return response.data.dados;
+}
+
+export async function confirmQuizForModuleWithBackend(
+  moduleId: string,
+): Promise<BackendConfirmedQuizResponse> {
+  const response = await apiClient.post<
+    ApiEnvelope<BackendConfirmedQuizResponse>
+  >(`/modules/${moduleId}/quiz/confirmar`);
+
+  return response.data.dados;
 }
 
 /**
