@@ -196,25 +196,56 @@ Transição do ciclo anterior (refatoração React com backend integrado) para n
 
 ---
 
-### 🔄 Bloco F3: Naming Semântico Audit — TODO
+### 🔄 Bloco F3: Code Quality (Naming + Clean Code) — TODO
 
-| #   | Tarefa                                 | Status | Notas |
-| --- | -------------------------------------- | ------ | ----- |
-| F3  | Audit funções, variáveis, states       | 🔴     | TODO  |
-| F3b | Refatorar naming não-semântico (React) | 🔴     | TODO  |
-| F3c | Refatorar naming não-semântico (Vue)   | 🔴     | TODO  |
+| #   | Tarefa                                          | Status | Notas                                                |
+| --- | ----------------------------------------------- | ------ | ---------------------------------------------------- |
+| F3  | Audit naming semântico (variáveis, funções)     | 🔴     | Nomes expressam intenção de negócio                  |
+| F3b | Refatorar naming não-semântico (React)          | 🔴     | Exemplo: `handleX()` → `submitFormData()`            |
+| F3c | Refatorar naming não-semântico (Vue)            | 🔴     | Idem React                                           |
+| F3d | Clean Code Audit (funções pequenas, SRP)        | 🔴     | Funções <30 linhas, responsabilidade única           |
+| F3e | SOLID Principles check (componentes + services) | 🔴     | Single Responsibility, Open/Closed, Liskov, etc      |
+| F3f | Linting + Formatting validation                 | 🔴     | `npm run lint`, `npm run format`, ESLint strict mode |
+| F3g | Cyclomatic Complexity review (React)            | 🔴     | Identificar funções muito complexas (>10 paths)      |
+| F3h | Cyclomatic Complexity review (Vue)              | 🔴     | Idem React                                           |
+
+**Métricas Clean Code a validar:**
+
+- ✅ Funções com até 30 linhas (exceto componentes)
+- ✅ Single Responsibility Principle em cada módulo
+- ✅ Baixo acoplamento (imports de max 3-5 dependências)
+- ✅ Cohesão alta (dados + métodos relacionados juntos)
+- ✅ Sem commented code (cleanup)
+- ✅ Sem magic numbers (constantes nomeadas)
+- ✅ No `any` type (TypeScript strict)
+- ✅ Consistent naming conventions
 
 ---
 
 ### ✅ Verificação Final Fase 1
 
+**TypeScript & Build:**
+
+- [x] `npm run type-check` sem erros (ambas) ✅ COMPLETO
 - [ ] `npm run build` sem erros (ambas)
-- [ ] `npm run type-check` sem erros (ambas)
 - [ ] `npm run lint` sem warnings (ambas)
 - [ ] `npm run test` — cobertura ≥70% (ambas)
+
+**Arquitetura & Equivalência:**
+
 - [ ] Rotas: apenas Auth, Courses, Modules, Lessons, Quizzes (ambas)
 - [ ] HTTP: ambas com interceptador + tratamento centralizado
 - [ ] CourseFlow parametrizado (sem duplicação)
+- [ ] Schemas Zod com naming normalizado (ambas)
+
+**Clean Code & Qualidade:**
+
+- [ ] Funções com até 30 linhas (exceto componentes)
+- [ ] Single Responsibility Principle em cada módulo
+- [ ] Zero `any` em TypeScript (strict mode)
+- [ ] Naming semântico: funções/variáveis expressam intenção
+- [ ] Sem código comentado ou magic numbers
+- [ ] Linting + Prettier formatting validado
 
 ---
 
