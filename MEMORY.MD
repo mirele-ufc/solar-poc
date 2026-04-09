@@ -16,7 +16,7 @@ Transição do ciclo anterior (refatoração React com backend integrado) para n
 ## SECTION: GLOBAL PROGRESS
 
 | Campo        | Valor                                                               |
-| ------------ | ------------------------------------------------------------------- | ------- |
+| ------------ | ------------------------------------------------------------------- | -------- |
 | **Fase**     | 1 — Alinhamento de PoC (Blocos A-F)                                 |
 | **Bloco**    | E — Aumentar Cobertura Testes (EM PROGRESSO — 30%)                  |
 | **Status**   | ✅ A DONE (100%) ✅ B DONE (100%) ✅ C DONE (100%) ✅ D DONE (100%) | 🟡 E 30% |
@@ -159,18 +159,18 @@ Transição do ciclo anterior (refatoração React com backend integrado) para n
 
 ### 🔴 Bloco E: Aumentar Cobertura de Testes ← **EM PROGRESSO (CRÍTICO)**
 
-| #         | Tarefa                      | React    | Vue     | Target  | Status                     | Notas                                                      |
-| --------- | --------------------------- | -------- | ------- | ------- | -------------------------- | ---------------------------------------------------------- |
-| E1.1      | registerFormSchema (30 testes) | ✅ DONE | ✅ DONE | 30      | ✅ **COMPLETE** (commit 6049bd9) | Cobertura: nome, cpf, email, password, confirmPassword, perfil |
-| E1.2      | loginRequestSchema (23 testes)  | ✅ DONE | ✅ DONE | 23      | ✅ **COMPLETE** (commit 6049bd9) | Cobertura: email/username, senha; 100% passing            |
-| E1.3      | courseCreateRequestSchema       | 🔴 TODO | 🔴 TODO | ~20     | 🔴 TODO (PRÓXIMO)         | titulo, descricao, categoria, cargaHoraria                |
-| E1.4      | enrollmentFormSchema            | 🔴 TODO | 🔴 TODO | ~15     | 🔴 TODO                   | firstName, lastName, city, gender                         |
-| E1.5      | messageComposeFormSchema        | 🔴 TODO | 🔴 TODO | ~12     | 🔴 TODO                   | recipient, subject, message                               |
-| E2        | Testes de Services              | ~8%     | ~10%    | 20%     | 🔴 TODO                   | courseService, moduleService, lessonService (mocks)       |
-| E3        | Testes de Routes/Components     | ~7%     | ~0%     | 15%     | 🔴 TODO                   | Acesso guard, redirecionamento, integração                |
-| E4        | Coverage Reports CI/CD          | ❌      | ❌      | 15%     | 🔴 TODO                   | Setup `vitest --coverage` em ambas                        |
-| E5        | Testes de Integração E2E        | ❌      | ❌      | 10%     | 🔴 TODO                   | Login → Criar curso → Criar módulo → Criar aula           |
-| **Total** | **~20% → 70%**                  | **~25%** | **~22%** | **70%** | 🟡 IN_PROGRESS (30% bloco) | Faltam ~70 testes (E1.3-E5)                                |
+| #         | Tarefa                         | React    | Vue      | Target  | Status                           | Notas                                                          |
+| --------- | ------------------------------ | -------- | -------- | ------- | -------------------------------- | -------------------------------------------------------------- |
+| E1.1      | registerFormSchema (30 testes) | ✅ DONE  | ✅ DONE  | 30      | ✅ **COMPLETE** (commit 6049bd9) | Cobertura: nome, cpf, email, password, confirmPassword, perfil |
+| E1.2      | loginRequestSchema (23 testes) | ✅ DONE  | ✅ DONE  | 23      | ✅ **COMPLETE** (commit 6049bd9) | Cobertura: email/username, senha; 100% passing                 |
+| E1.3      | courseCreateRequestSchema      | 🔴 TODO  | 🔴 TODO  | ~20     | 🔴 TODO (PRÓXIMO)                | titulo, descricao, categoria, cargaHoraria                     |
+| E1.4      | enrollmentFormSchema           | 🔴 TODO  | 🔴 TODO  | ~15     | 🔴 TODO                          | firstName, lastName, city, gender                              |
+| E1.5      | messageComposeFormSchema       | 🔴 TODO  | 🔴 TODO  | ~12     | 🔴 TODO                          | recipient, subject, message                                    |
+| E2        | Testes de Services             | ~8%      | ~10%     | 20%     | 🔴 TODO                          | courseService, moduleService, lessonService (mocks)            |
+| E3        | Testes de Routes/Components    | ~7%      | ~0%      | 15%     | 🔴 TODO                          | Acesso guard, redirecionamento, integração                     |
+| E4        | Coverage Reports CI/CD         | ❌       | ❌       | 15%     | 🔴 TODO                          | Setup `vitest --coverage` em ambas                             |
+| E5        | Testes de Integração E2E       | ❌       | ❌       | 10%     | 🔴 TODO                          | Login → Criar curso → Criar módulo → Criar aula                |
+| **Total** | **~20% → 70%**                 | **~25%** | **~22%** | **70%** | 🟡 IN_PROGRESS (30% bloco)       | Faltam ~70 testes (E1.3-E5)                                    |
 
 ---
 
@@ -214,17 +214,17 @@ Transição do ciclo anterior (refatoração React com backend integrado) para n
 
 ### 🟡 Bloco E: Aumentar Cobertura de Testes — EM PROGRESSO (30%)
 
-| #   | Tarefa                              | React    | Vue     | Status  | Notas                                                      |
-| --- | ----------------------------------- | -------- | ------- | ------- | ---------------------------------------------------------- |
-| E1  | E1.1: registerFormSchema (30)       | ✅ DONE  | ✅ DONE | ✅ DONE | Testes: nome, cpf, email, password, confirmPassword, perfil |
-|     | E1.2: loginRequestSchema (23)       | ✅ DONE  | ✅ DONE | ✅ DONE | Testes: email/username, senha; 100% passing (commit 6049bd9) |
-|     | E1.3: courseCreateRequestSchema (~20) | 🔴 TODO | 🔴 TODO | PRÓXIMO | **PRÓXIMA AÇÃO**                                           |
-|     | E1.4: enrollmentFormSchema (~15)    | 🔴 TODO | 🔴 TODO | TODO    |                                                            |
-|     | E1.5: messageComposeFormSchema (~12) | 🔴 TODO | 🔴 TODO | TODO    |                                                            |
-| E2  | Testes de Services (mock API)       | 🔴 TODO | 🔴 TODO | TODO    | courseService, moduleService, lessonService (~40-50 testes) |
-| E3  | Testes de Routes/Components         | 🔴 TODO | 🔴 TODO | TODO    | ProtectedRoute, access guards (~20-30 testes)             |
-| E4  | Coverage CI/CD setup                | 🔴 TODO | 🔴 TODO | TODO    | vitest --coverage config + reports                        |
-| E5  | E2E Integration Tests               | 🔴 TODO | 🔴 TODO | TODO    | Login → Cursos → Módulos → Aulas flow (~10-15 testes)    |
+| #   | Tarefa                                | React   | Vue     | Status  | Notas                                                        |
+| --- | ------------------------------------- | ------- | ------- | ------- | ------------------------------------------------------------ |
+| E1  | E1.1: registerFormSchema (30)         | ✅ DONE | ✅ DONE | ✅ DONE | Testes: nome, cpf, email, password, confirmPassword, perfil  |
+|     | E1.2: loginRequestSchema (23)         | ✅ DONE | ✅ DONE | ✅ DONE | Testes: email/username, senha; 100% passing (commit 6049bd9) |
+|     | E1.3: courseCreateRequestSchema (~20) | 🔴 TODO | 🔴 TODO | PRÓXIMO | **PRÓXIMA AÇÃO**                                             |
+|     | E1.4: enrollmentFormSchema (~15)      | 🔴 TODO | 🔴 TODO | TODO    |                                                              |
+|     | E1.5: messageComposeFormSchema (~12)  | 🔴 TODO | 🔴 TODO | TODO    |                                                              |
+| E2  | Testes de Services (mock API)         | 🔴 TODO | 🔴 TODO | TODO    | courseService, moduleService, lessonService (~40-50 testes)  |
+| E3  | Testes de Routes/Components           | 🔴 TODO | 🔴 TODO | TODO    | ProtectedRoute, access guards (~20-30 testes)                |
+| E4  | Coverage CI/CD setup                  | 🔴 TODO | 🔴 TODO | TODO    | vitest --coverage config + reports                           |
+| E5  | E2E Integration Tests                 | 🔴 TODO | 🔴 TODO | TODO    | Login → Cursos → Módulos → Aulas flow (~10-15 testes)        |
 
 **Status Bloco E:** 🟡 **INICIADO — 30% COMPLETO** (E1.1 + E1.2 done, E1.3 próximo)
 
@@ -369,6 +369,7 @@ Arquivo: `src/__tests__/unit/validations/loginRequestSchema.test.ts`
    - Full payload validation: all fields, missing fields, extra fields
 
 4. **Validar e comitar:**
+
    ```bash
    npm run test -- courseCreateRequestSchema.test.ts
    # Confirmar: 20+/20+ PASS (ambas)
@@ -381,13 +382,13 @@ Arquivo: `src/__tests__/unit/validations/loginRequestSchema.test.ts`
 
 ## SECTION: REFERÊNCIAS
 
-| Documento                                                                              | Propósito                                 |
-| -------------------------------------------------------------------------------------- | ----------------------------------------- |
-| [docs/PLAN.md](docs/PLAN.md)                                                           | Plano completo com 23 etapas (Fase 1 + 2) |
-| [CLAUDE.md](CLAUDE.md)                                                                 | Diretrizes arquiteturais e regra de ouro  |
-| [apps/poc-react-vite/](apps/poc-react-vite/)                                           | PoC React (17 páginas, ~25% cobertura)    |
-| [apps/poc-vue-vite/](apps/poc-vue-vite/)                                               | PoC Vue (15 views, ~22% cobertura)        |
-| [MEMORY.md](MEMORY.md)                                                                 | Este arquivo (status session)             |
+| Documento                                    | Propósito                                 |
+| -------------------------------------------- | ----------------------------------------- |
+| [docs/PLAN.md](docs/PLAN.md)                 | Plano completo com 23 etapas (Fase 1 + 2) |
+| [CLAUDE.md](CLAUDE.md)                       | Diretrizes arquiteturais e regra de ouro  |
+| [apps/poc-react-vite/](apps/poc-react-vite/) | PoC React (17 páginas, ~25% cobertura)    |
+| [apps/poc-vue-vite/](apps/poc-vue-vite/)     | PoC Vue (15 views, ~22% cobertura)        |
+| [MEMORY.md](MEMORY.md)                       | Este arquivo (status session)             |
 
 ---
 

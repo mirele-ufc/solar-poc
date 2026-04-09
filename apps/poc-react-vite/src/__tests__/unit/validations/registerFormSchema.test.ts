@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { registerFormSchema, type RegisterFormValues } from "@/validations/authSchema";
+import {
+  registerFormSchema,
+  type RegisterFormValues,
+} from "@/validations/authSchema";
 
 describe("registerFormSchema — Comprehensive Validation", () => {
   describe("Nome field", () => {
