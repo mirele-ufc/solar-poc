@@ -42,7 +42,7 @@ describe("lessonService", () => {
       const result = await generateLessonContentWithBackend(lessonId);
 
       expect(mockedPost).toHaveBeenCalledWith(
-        `/lessons/${lessonId}/gerar-conteudo`,
+        `/lessons/${lessonId}/generate-content`,
       );
       expect(result).toBe(generatedContent);
       expect(result).toContain("Introdução");
@@ -75,7 +75,7 @@ describe("lessonService", () => {
       const result = await regenerateLessonContentWithBackend(lessonId);
 
       expect(mockedPost).toHaveBeenCalledWith(
-        `/lessons/${lessonId}/regerar-conteudo`,
+        `/lessons/${lessonId}/regenerate-content`,
       );
       expect(result).toBe(newContent);
     });
@@ -94,9 +94,9 @@ describe("lessonService", () => {
 
       await regenerateLessonContentWithBackend(lessonId);
 
-      // Verifica que usa 'regerar' (mesmo sendo typo do backend)
+      // Verifica que usa endpoint correto
       expect(mockedPost).toHaveBeenCalledWith(
-        `/lessons/${lessonId}/regerar-conteudo`,
+        `/lessons/${lessonId}/regenerate-content`,
       );
     });
   });
@@ -129,7 +129,7 @@ describe("lessonService", () => {
       const result = await confirmGeneratedLessonContentWithBackend(lessonId);
 
       expect(mockedPost).toHaveBeenCalledWith(
-        `/lessons/${lessonId}/confirmar-conteudo`,
+        `/lessons/${lessonId}/confirm-content`,
       );
       expect(result).toEqual(responseData);
       expect(result.contentGenerated).toBe("# Conteúdo Confirmado");
@@ -185,7 +185,6 @@ describe("lessonService", () => {
       const moduleId = "2";
       const payload = {
         name: "Aula com PDF",
-        contentEditor: null,
       };
 
       const pdfFile = new File(["pdf content"], "lesson.pdf", {

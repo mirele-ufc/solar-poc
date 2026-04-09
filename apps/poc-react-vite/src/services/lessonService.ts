@@ -29,7 +29,7 @@ export async function generateLessonContentWithBackend(
   lessonId: string,
 ): Promise<string> {
   const response = await apiClient.post<ApiEnvelope<string>>(
-    `/lessons/${lessonId}/gerar-conteudo`,
+    `/lessons/${lessonId}/generate-content`,
   );
 
   return response.data.dados;
@@ -39,7 +39,7 @@ export async function regenerateLessonContentWithBackend(
   lessonId: string,
 ): Promise<string> {
   const response = await apiClient.post<ApiEnvelope<string>>(
-    `/lessons/${lessonId}/regerar-conteudo`,
+    `/lessons/${lessonId}/regenerate-content`,
   );
 
   return response.data.dados;
@@ -49,7 +49,7 @@ export async function confirmGeneratedLessonContentWithBackend(
   lessonId: string,
 ): Promise<BackendLessonResponse> {
   const response = await apiClient.post<ApiEnvelope<BackendLessonResponse>>(
-    `/lessons/${lessonId}/confirmar-conteudo`,
+    `/lessons/${lessonId}/confirm-content`,
   );
 
   return response.data.dados;

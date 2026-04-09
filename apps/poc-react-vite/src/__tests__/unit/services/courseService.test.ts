@@ -10,6 +10,7 @@ import {
 import { apiClient } from "@/services/api";
 import type {
   ICreateCoursePayload,
+  ICourse,
   IUpdateCoursePayload,
 } from "@ava-poc/types";
 
@@ -146,10 +147,21 @@ describe("courseService", () => {
       const payload: ICreateCoursePayload = {
         titulo: "Novo Curso",
         descricao: "Descrição do novo curso",
-        thumbnailUrl: "/images/thumb.png",
+        categoria: "Tecnologia",
+        cargaHoraria: "40h",
       };
 
-      const createdCourse: ICreateCoursePayload = payload;
+      const createdCourse: ICourse = {
+        id: "1",
+        titulo: payload.titulo,
+        descricao: payload.descricao,
+        categoria: payload.categoria,
+        cargaHoraria: payload.cargaHoraria,
+        thumbnail: "/images/thumb.png",
+        status: "RASCUNHO",
+        professorId: "prof-1",
+        modulos: [],
+      };
 
       mockedPost.mockResolvedValueOnce({
         data: createdCourse,
@@ -165,7 +177,8 @@ describe("courseService", () => {
       const payload: ICreateCoursePayload = {
         titulo: "Novo Curso",
         descricao: "Descrição",
-        thumbnailUrl: "/images/thumb.png",
+        categoria: "Tecnologia",
+        cargaHoraria: "40h",
       };
 
       const error = new Error("Duplicate course title");

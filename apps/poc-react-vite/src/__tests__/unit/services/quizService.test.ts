@@ -10,7 +10,7 @@ import {
   type BackendQuizCreatePayload,
 } from "@/services/quizService";
 import { apiClient } from "@/services/api";
-import type { IQuizSubmissionResult } from "@ava-poc/types";
+import type { IQuizSubmissionResult, ISubmitQuizPayload } from "@ava-poc/types";
 
 vi.mock("@/services/api", () => ({
   apiClient: {
@@ -220,18 +220,23 @@ describe("quizService", () => {
   describe("submitQuiz", () => {
     it("submete respostas e retorna resultado", async () => {
       const quizId = "1";
-      const payload = {
+      const payload: ISubmitQuizPayload = {
+        studentId: "student-1",
+        courseId: "course-1",
         answers: [
-          { questionId: 1, selectedAlternativeId: 2 },
-          { questionId: 2, selectedAlternativeId: 4 },
+          { questionId: "1", selectedAnswerIndex: 1 },
+          { questionId: "2", selectedAnswerIndex: 3 },
         ],
       };
 
       const result: IQuizSubmissionResult = {
+        quizId: "1",
         score: 85,
-        totalPoints: 100,
-        passed: true,
+        totalQuestions: 2,
+        correctAnswers: 2,
         feedback: "Excelente desempenho!",
+        passedThreshold: true,
+        timestamp: new Date().toISOString(),
       };
 
       mockedPost.mockResolvedValueOnce({
@@ -245,20 +250,25 @@ describe("quizService", () => {
         payload,
       );
       expect(response).toEqual(result);
-      expect(response.passed).toBe(true);
+      expect(response.passedThreshold).toBe(true);
     });
 
     it("retorna falha quando pontuação insuficiente", async () => {
       const quizId = "2";
-      const payload = {
-        answers: [{ questionId: 1, selectedAlternativeId: 1 }],
+      const payload: ISubmitQuizPayload = {
+        studentId: "student-2",
+        courseId: "course-1",
+        answers: [{ questionId: "1", selectedAnswerIndex: 0 }],
       };
 
       const result: IQuizSubmissionResult = {
+        quizId: "2",
         score: 40,
-        totalPoints: 100,
-        passed: false,
+        totalQuestions: 2,
+        correctAnswers: 0,
         feedback: "Você precisa melhorar. Tente novamente.",
+        passedThreshold: false,
+        timestamp: new Date().toISOString(),
       };
 
       mockedPost.mockResolvedValueOnce({
@@ -267,7 +277,7 @@ describe("quizService", () => {
 
       const response = await submitQuiz(quizId, payload);
 
-      expect(response.passed).toBe(false);
+      expect(response.passedThreshold).toBe(false);
       expect(response.score).toBe(40);
     });
 
@@ -275,7 +285,13 @@ describe("quizService", () => {
       const error = new Error("Quiz already submitted");
       mockedPost.mockRejectedValueOnce(error);
 
-      await expect(submitQuiz("1", { answers: [] })).rejects.toThrow(
+      const payload: ISubmitQuizPayload = {
+        studentId: "student-1",
+        courseId: "course-1",
+        answers: [],
+      };
+
+      await expect(submitQuiz("1", payload)).rejects.toThrow(
         "Quiz already submitted",
       );
     });
@@ -311,7 +327,7 @@ describe("quizService", () => {
       const result = await generateQuizForModuleWithBackend(moduleId);
 
       expect(mockedPost).toHaveBeenCalledWith(
-        `/modules/${moduleId}/quiz/gerar`,
+        `/modules/${moduleId}/quiz/generate-quiz-ia`,
       );
       expect(result.questions).toHaveLength(1);
     });
@@ -347,7 +363,7 @@ describe("quizService", () => {
       const result = await regenerateQuizForModuleWithBackend(moduleId);
 
       expect(mockedPost).toHaveBeenCalledWith(
-        `/modules/${moduleId}/quiz/regerar`,
+        `/modules/${moduleId}/quiz/generate-quiz-ia`,
       );
       expect(result.questions).toHaveLength(1);
     });
@@ -387,9 +403,7 @@ describe("quizService", () => {
 
       const result = await confirmQuizForModuleWithBackend(moduleId);
 
-      expect(mockedPost).toHaveBeenCalledWith(
-        `/modules/${moduleId}/quiz/confirmar`,
-      );
+      expect(mockedPost).toHaveBeenCalledWith(`/modules/${moduleId}/quiz`);
       expect(result.id).toBe(3);
       expect(result.questions[0].id).toBe(1);
     });
