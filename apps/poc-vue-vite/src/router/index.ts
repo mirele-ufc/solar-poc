@@ -21,6 +21,11 @@ const router = createRouter({
       component: () => import("../views/RegisterView.vue"),
       meta: { requiresGuest: true },
     },
+    {
+      path: "/unauthorized",
+      name: "unauthorized",
+      component: () => import("../views/UnauthorizedView.vue"),
+    },
 
     // ── ROTAS AUTENTICADAS (AuthLayout) ──────────────────────────────────────
     {
