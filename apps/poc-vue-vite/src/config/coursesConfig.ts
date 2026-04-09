@@ -3,6 +3,14 @@
  * Mapeia courseId para metadados do curso — IDÊNTICO ao React
  */
 
+export interface ExamQuestion {
+  id: string;
+  text: string;
+  options: string[];
+  correctIndex: number;
+  correctLabel: string;
+}
+
 export interface CourseConfig {
   id: string;
   name: string;
@@ -13,6 +21,7 @@ export interface CourseConfig {
   bullets: string[];
   heroImageUrl: string;
   enrollmentKey: string;
+  examQuestions: ExamQuestion[]; // questões da prova consolidadas
 }
 
 export const coursesConfig: Record<string, CourseConfig> = {
@@ -36,6 +45,27 @@ export const coursesConfig: Record<string, CourseConfig> = {
     heroImageUrl:
       "https://images.unsplash.com/photo-1759661966728-4a02e3c6ed91?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkYXRhJTIwdmlzdWFsaXphdGlvbiUyMGJ1c2luZXNzJTIwaW50ZWxsaWdlbmNlJTIwZGFzaGJvYXJkfGVufDF8fHx8MTc3MzMzNTYxNHww&ixlib=rb-4.1.0&q=80&w=1080",
     enrollmentKey: "power-bi",
+    examQuestions: [
+      {
+        id: "q1",
+        text: "No Microsoft Power BI, qual é a principal função do Power Query?",
+        options: [
+          "Criar dashboards interativos para apresentação final",
+          "Realizar tratamento, limpeza e transformação de dados antes da análise",
+          "Publicar relatórios na nuvem",
+          "Criar gráficos avançados com animações",
+        ],
+        correctIndex: 1,
+        correctLabel: "B",
+      },
+      {
+        id: "q2",
+        text: "Qual linguagem é utilizada no Power BI para criação de medidas e cálculos personalizados?",
+        options: ["SQL", "Python", "DAX", "VBA"],
+        correctIndex: 2,
+        correctLabel: "C",
+      },
+    ],
   },
   python: {
     id: "python",
@@ -57,6 +87,39 @@ export const coursesConfig: Record<string, CourseConfig> = {
     heroImageUrl:
       "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxweXRob24lMjBwcm9ncmFtbWluZ3xlbnwxfHx8fDE3NzMzMzU3MDR8MA&ixlib=rb-4.1.0&q=80&w=1080",
     enrollmentKey: "python",
+    examQuestions: [
+      {
+        id: "pyq1",
+        text: "Qual das alternativas abaixo representa um tipo de dado primitivo em Python?",
+        options: [
+          "Lista (list)",
+          "Dicionário (dict)",
+          "Inteiro (int)",
+          "Tupla (tuple)",
+        ],
+        correctIndex: 2,
+        correctLabel: "C",
+      },
+      {
+        id: "pyq2",
+        text: "Qual é a forma correta de exibir texto na saída padrão em Python?",
+        options: [
+          "echo('Olá, mundo!')",
+          "print('Olá, mundo!')",
+          "System.out.println('Olá, mundo!')",
+          "console.log('Olá, mundo!')",
+        ],
+        correctIndex: 1,
+        correctLabel: "B",
+      },
+      {
+        id: "pyq3",
+        text: "Em Python, qual palavra-chave é usada para definir uma função?",
+        options: ["function", "func", "def", "fn"],
+        correctIndex: 2,
+        correctLabel: "C",
+      },
+    ],
   },
 };
 
