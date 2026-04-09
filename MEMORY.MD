@@ -1,8 +1,8 @@
 # MEMORY.md — Validação e Alinhamento PoC (React vs Vue)
 
-**Última atualização:** 09/04/2026T15:45:00Z  
+**Última atualização:** 09/04/2026T18:15:00Z  
 **Objetivo:** Validar equivalência React vs Vue, aumentar cobertura de testes ~20% → 70%, auditar OWASP  
-**Status geral:** Fase 1 — Bloco B (100% COMPLETO), Bloco C próximo  
+**Status geral:** Fase 1 — Blocos A+B+C (100% COMPLETO), Próximo: Bloco D  
 **Timeline:** 4-5 semanas (Fase 1: 50h + Fase 2: 28h)
 
 ---
@@ -15,19 +15,20 @@ Transição do ciclo anterior (refatoração React com backend integrado) para n
 
 ## SECTION: GLOBAL PROGRESS
 
-| Campo        | Valor                                         |
-| ------------ | --------------------------------------------- | -------- |
-| **Fase**     | 1 — Alinhamento de PoC (Blocos A-F)           |
-| **Bloco**    | C — Equivalência HTTP/Auth (próximo)          |
-| **Status**   | ✅ A DONE (100%) ✅ B DONE (100%)             | 🟡 C 90% |
-| **Objetivo** | 100% equivalência React ↔ Vue, 70%+ cobertura |
-| **Timeline** | Fase 1: 2-3 sem (50h) \| Fase 2: 2 sem (28h)  |
+| Campo        | Valor                                              |
+| ------------ | -------------------------------------------------- | ------- |
+| **Fase**     | 1 — Alinhamento de PoC (Blocos A-F)                |
+| **Bloco**    | D — Normalizar Zod Schemas (próximo)               |
+| **Status**   | ✅ A DONE (100%) ✅ B DONE (100%) ✅ C DONE (100%) | 🔴 D 0% |
+| **Objetivo** | 100% equivalência React ↔ Vue, 70%+ cobertura      |
+| **Timeline** | Fase 1: 2-3 sem (50h) \| Fase 2: 2 sem (28h)       |
 
-**Progress (09/04/2026 — Blocos A + B Finalizados):** ✅✅
+**Progress (09/04/2026 — Blocos A + B + C Finalizados):** ✅✅✅
 
 1. ✅ Bloco A: Remoção de escopo (5/5 subtarefas)
 2. ✅ Bloco B: Parametrização CourseFlow (5/5 subtarefas) — commits 42ae1fe, c27b917
-3. 🟡 Bloco C: HTTP/Auth equivalência (5/5 subtarefas, 90% done) — pendente refactor Vue API
+3. ✅ Bloco C: HTTP/Auth equivalência (5/5 subtarefas, **100% DONE**) — commit 853cf6d
+4. 🔴 Bloco D: Normalizar Zod Schemas (0% — próximo)
 
 ---
 
@@ -71,17 +72,38 @@ Transição do ciclo anterior (refatoração React com backend integrado) para n
 
 ---
 
-### 🟡 Bloco C: Equivalência HTTP/Auth Simétrica
+### 🟡 Bloco C: Equivalência HTTP/Auth Simétrica — ✅ 100% COMPLETO
 
-| #   | Tarefa                                          | React | Vue | Status        | Notas                                                        |
-| --- | ----------------------------------------------- | ----- | --- | ------------- | ------------------------------------------------------------ |
-| C1  | Validar Axios interceptor (JWT + refresh token) | ✅    | ⚠️  | 🟡 AUDIT DONE | Audit: 85% parity. Vue hardcoda URL (refatorar). Ver doc.    |
-| C2  | Validar tratamento 500+ erros (erro global)     | ✅    | ✅  | ✅ DONE       | Ambas tratam: 403, 409, 422, 500+, ERR_NETWORK identicamente |
-| C3  | Validar login mockado (ambas)                   | ✅    | ✅  | ✅ DONE       | Backend sem auth real; mocks corretos                        |
-| C4  | Auditar refresh token flow (ambas)              | ✅    | ✅  | 🟡 AUDIT IN   | Ambas usam retry logic. Testes ainda faltam (Bloco E)        |
-| C5  | Type-check ambas (zero `any`)                   | ✅    | ✅  | ✅ DONE       | React: type-check ✅. Vue: type-check ✅. 09/04 2026         |
+| #   | Tarefa                                          | React | Vue | Status  | Notas                                                                  |
+| --- | ----------------------------------------------- | ----- | --- | ------- | ---------------------------------------------------------------------- |
+| C1  | Validar Axios interceptor (JWT + refresh token) | ✅    | ✅  | ✅ DONE | Refatorado: authService.ts + api.ts (apiClientRefresh). Commit 853cf6d |
+| C2  | Validar tratamento 500+ erros (erro global)     | ✅    | ✅  | ✅ DONE | Ambas tratam: 403, 409, 422, 500+, ERR_NETWORK identicamente           |
+| C3  | Validar login mockado (ambas)                   | ✅    | ✅  | ✅ DONE | Backend sem auth real; mocks corretos                                  |
+| C4  | Auditar refresh token flow (ambas)              | ✅    | ✅  | ✅ DONE | Ambas usam retry logic com apiClientRefresh. Testes em E               |
+| C5  | Type-check ambas (zero `any`)                   | ✅    | ✅  | ✅ DONE | React: type-check ✅. Vue: type-check ✅. 09/04 2026                   |
 
-**Status Bloco C:** ✅ **~90% DONE** (refatoração Vue + testes pendentes em Bloco E)
+**Status Bloco C:** ✅ **100% COMPLETO** (C1-C5 todos concluídos)
+
+**Detalhes Implementação C1 (Vue API Refactoring):**
+
+- Criar `src/services/authService.ts` (127 linhas) — idêntico React, centraliza auth logic
+- Criar `src/services/types/authService.types.ts` — tipos reutilizáveis (IRegisterPayload, IChangePasswordPayload, IMessageResponse, IRefreshResponse)
+- Refatorar `src/services/api.ts`:
+  - Adicionar `apiClientRefresh` instance (sem interceptadores) para prevenir recursão em refresh
+  - Remover hardcoded URL `axios.post('${VITE_API_URL}/auth/refresh'...)` → usar `apiClientRefresh.post('/auth/refresh'...)`
+  - Usar `authService.refreshAccessToken(refreshToken)` abstração no interceptador
+- Estender `useAuthStore`:
+  - Adicionar `token` e `refreshToken` properties (inicializado como null)
+  - Adicionar `setTokens(newToken, newRefreshToken?)` action
+  - Atualizar `logout()` para limpar tokens
+- Corrigir import: `AxiosError` como valor (não `import type`)
+- Exportar ambos `apiClient` e `apiClientRefresh` de api.ts
+
+**Validação C1:**
+
+- Type-check Vue: ✅ (zero erros)
+- Type-check React: ✅ (zero erros)
+- Paridade HTTP/Auth 100%: ✅ (ambas PoCs agora com arquitetura simétrica)
 
 ---
 
