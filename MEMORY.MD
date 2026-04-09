@@ -184,15 +184,15 @@ Transição do ciclo anterior (refatoração React com backend integrado) para n
 
 ## **Status Bloco F1:** ✅ **100% COMPLETO** — Type-check validado em React + Vue
 
-### 🟢 Bloco F2: Slots Pattern em Componentes — ✅ 100% IMPLEMENTADO
+### 🟢 Bloco F2: Slots Pattern em Componentes — ✅ 100% COMPLETO
 
 | #   | Tarefa                  | React | Vue | Status  | Notas                                           |
 | --- | ----------------------- | ----- | --- | ------- | ----------------------------------------------- |
-| F2  | Modal com slots         | ✅    | ~   | ✅ DONE | Header, Body, Footer, Overlay — data-slot attrs |
-| F2b | Card com slots          | ✅    | ~   | ✅ DONE | Header, Title, Body, Footer — data-slot attrs   |
-| F2c | FormContainer com slots | ~     | ~   | 🔄 TODO | Para LoginPage, RegisterPage                    |
+| F2  | Modal com slots         | ✅    | ✅  | ✅ DONE | Header, Body, Footer, Overlay — data-slot attrs |
+| F2b | Card com slots          | ✅    | ✅  | ✅ DONE | Header, Title, Body, Footer — data-slot attrs   |
+| F2c | FormContainer com slots | ✅    | ✅  | ✅ DONE | Integrado LoginPage, registerPage (React+Vue)   |
 
-**Status Bloco F2:** 🟢 **Modal + Card IMPLEMENTADOS** — FormContainer pendente
+**Status Bloco F2:** ✅ **100% COMPLETO** — Modal + Card + FormContainer (React ✅ + Vue ✅)
 
 ---
 
