@@ -27,13 +27,20 @@ export const courseService = {
   async createCourse(courseData: CourseInfoData, file: File | null) {
     const formData = new FormData();
 
-    const dadosJson = JSON.stringify({
-      title: courseData.title,
-      category: courseData.category,
-      description: courseData.description,
-    });
-
-    formData.append("dados", dadosJson);
+    // Send dados as Blob with application/json type (matches React implementation)
+    formData.append(
+      "dados",
+      new Blob(
+        [
+          JSON.stringify({
+            title: courseData.title,
+            category: courseData.category,
+            description: courseData.description,
+          }),
+        ],
+        { type: "application/json" },
+      ),
+    );
 
     if (file) {
       formData.append("imagem", file);

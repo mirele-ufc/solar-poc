@@ -89,12 +89,46 @@ const INITIAL_STATE: Pick<
 };
 
 /**
- * Zustand authentication store
- * Manages user profile, authentication state, and messages
- *
- * Usage:
- * const { currentUser, login, logout } = useAuthStore();
+ * Load authentication state from localStorage
+ * Restores user session across page reloads
  */
+const loadAuthFromStorage = (): Pick<
+  AuthStore,
+  "currentUser" | "isLoggedIn"
+> => {
+  try {
+    const stored = localStorage.getItem("auth-state");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return {
+        currentUser: parsed.currentUser || null,
+        isLoggedIn: parsed.isLoggedIn || false,
+      };
+    }
+  } catch (error) {
+    console.warn("Failed to load auth from localStorage:", error);
+  }
+  return { currentUser: null, isLoggedIn: false };
+};
+
+/**
+ * Save authentication state to localStorage
+ * Persists user session across page reloads
+ */
+const saveAuthToStorage = (
+  isLoggedIn: boolean,
+  currentUser: IUserSession | null,
+) => {
+  try {
+    localStorage.setItem(
+      "auth-state",
+      JSON.stringify({ isLoggedIn, currentUser }),
+    );
+  } catch (error) {
+    console.warn("Failed to save auth to localStorage:", error);
+  }
+};
+
 /**
  * Zustand authentication store
  * Manages user profile, authentication state, and messages
@@ -102,103 +136,121 @@ const INITIAL_STATE: Pick<
  * Usage:
  * const { currentUser, login, logout } = useAuthStore();
  */
-export const useAuthStore = create<AuthStore>((set) => ({
-  ...INITIAL_STATE,
+export const useAuthStore = create<AuthStore>((set) => {
+  // Load persisted auth state on store initialization
+  const persistedAuth = loadAuthFromStorage();
 
-  /**
-   * Authenticate user with username and password
-   * For prototype: validates against hardcoded credentials
-   * In production: should be a backend API call via secure channel
-   *
-   * @param username - Username key to look up in credentials
-   * @param password - Password to validate
-   * @returns true if login successful, false otherwise
-   */
-  login: (username: string, password: string): boolean => {
-    const normalizedIdentifier = username.trim().toLowerCase();
-    const entry = MOCK_USERS.find(
-      (user) =>
-        user.identifiers.includes(normalizedIdentifier) &&
-        user.password === password,
-    );
+  return {
+    ...INITIAL_STATE,
+    ...persistedAuth,
 
-    if (entry) {
+    /**
+     * Authenticate user with username and password
+     * For prototype: validates against hardcoded credentials
+     * In production: should be a backend API call via secure channel
+     *
+     * @param username - Username key to look up in credentials
+     * @param password - Password to validate
+     * @returns true if login successful, false otherwise
+     */
+    login: (username: string, password: string): boolean => {
+      const normalizedIdentifier = username.trim().toLowerCase();
+      const entry = MOCK_USERS.find(
+        (user) =>
+          user.identifiers.includes(normalizedIdentifier) &&
+          user.password === password,
+      );
+
+      if (entry) {
+        const newUser = { ...entry.profile };
+        set((state) => ({
+          ...state,
+          currentUser: newUser,
+          isLoggedIn: true,
+        }));
+        // Persist login to localStorage
+        saveAuthToStorage(true, newUser);
+        return true;
+      }
+      return false;
+    },
+
+    /**
+     * Logout current user
+     * Clears authentication state completely
+     * - Sets currentUser to null
+     * - Sets isLoggedIn to false
+     * - Clears sentMessages array
+     * - Clears localStorage
+     */
+    logout: () => {
+      set({
+        ...INITIAL_STATE,
+      });
+      saveAuthToStorage(false, null);
+      // Nunca força navegação. O componente decide o redirect se necessário.
+    },
+
+    setCurrentUser: (user: IUserSession | null) => {
+      set({
+        currentUser: user,
+        isLoggedIn: Boolean(user),
+      });
+    },
+
+    /**
+     * Update current user profile with partial data
+     * Persists changes to localStorage
+     *
+     * @param partial - Partial user profile to merge with current user
+     */
+    updateCurrentUser: (partial: Partial<IUserSession>) => {
+      set((state) => {
+        const updated = state.currentUser
+          ? { ...state.currentUser, ...partial }
+          : null;
+        if (state.isLoggedIn && updated) {
+          saveAuthToStorage(true, updated);
+        }
+        return {
+          currentUser: updated,
+        };
+      });
+    },
+
+    /**
+     * Set JWT tokens for authenticated requests
+     * Stores access token and optional refresh token in state
+     *
+     * @param token - JWT access token from backend
+     * @param refreshToken - Optional refresh token for token renewal
+     */
+    setTokens: (token: string | null, refreshToken?: string | null) => {
+      set({
+        token,
+        refreshToken: refreshToken ?? null,
+      });
+    },
+
+    /**
+     * Send a message to recipients
+     * Creates a new message with timestamp and unique ID
+     *
+     * @param msg - Message data without id and sentAt
+     */
+    sendMessage: (msg: Omit<SentMessage, "id" | "sentAt">) => {
+      const newMessage: SentMessage = {
+        ...msg,
+        id: `msg-${Date.now()}`,
+        sentAt: new Date().toISOString(),
+      };
+
       set((state) => ({
-        ...state,
-        currentUser: { ...entry.profile },
-        isLoggedIn: true,
+        sentMessages: [newMessage, ...state.sentMessages],
       }));
-      return true;
-    }
-    return false;
-  },
-
-  /**
-   * Logout current user
-   * Clears authentication state completely
-   * - Sets currentUser to null
-   * - Sets isLoggedIn to false
-   * - Clears sentMessages array
-   */
-  logout: () => {
-    set({
-      ...INITIAL_STATE,
-    });
-    // Nunca força navegação. O componente decide o redirect se necessário.
-  },
-
-  setCurrentUser: (user: IUserSession | null) => {
-    set({
-      currentUser: user,
-      isLoggedIn: Boolean(user),
-    });
-  },
-
-  /**
-   * Update current user profile with partial data
-   *
-   * @param partial - Partial user profile to merge with current user
-   */
-  updateCurrentUser: (partial: Partial<IUserSession>) => {
-    set((state) => ({
-      currentUser: state.currentUser
-        ? { ...state.currentUser, ...partial }
-        : null,
-    }));
-  },
-
-  /**
-   * Set JWT tokens for authenticated requests
-   * Stores access token and optional refresh token in state
-   *
-   * @param token - JWT access token from backend
-   * @param refreshToken - Optional refresh token for token renewal
-   */
-  setTokens: (token: string | null, refreshToken?: string | null) => {
-    set({
-      token,
-      refreshToken: refreshToken ?? null,
-    });
-  },
-
-  /**
-   * Send a message to recipients
-   * Creates a new message with timestamp and unique ID
-   *
-   * @param msg - Message data without id and sentAt
-   */
-  sendMessage: (msg: Omit<SentMessage, "id" | "sentAt">) => {
-    const newMessage: SentMessage = {
-      ...msg,
-      id: `msg-${Date.now()}`,
-      sentAt: new Date().toISOString(),
-    };
-
-    set((state) => ({
-      sentMessages: [newMessage, ...state.sentMessages],
-    }));
-  },
-}));
+    },
+  };
+});
 
 export function selectCanManageCourses(state: AuthStoreSnapshot): boolean {
   return state.currentUser?.role === "professor" || false;
