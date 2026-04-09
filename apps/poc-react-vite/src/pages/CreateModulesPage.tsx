@@ -17,6 +17,7 @@ import {
   generateLessonContentWithBackend,
   regenerateLessonContentWithBackend,
 } from "@/services/lessonService";
+import { useCreationStore } from "@/store/useCreationStore";
 
 // ── SVG paths ──────────────────────────────────────────────────────────────────
 const docPath =
@@ -510,9 +511,20 @@ function AddLessonPopup({
 export function CreateModulesPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const courseData = (location.state?.courseData ?? {}) as CourseInfoData;
 
-  const [modules, setModules] = useState<Module[]>([]);
+  // Get store access
+  const {
+    courseData: storedCourseData,
+    modules: storedModules,
+    setModules,
+  } = useCreationStore();
+
+  // Try to get courseData from store first, then location state
+  const courseData = (storedCourseData ||
+    location.state?.courseData ||
+    {}) as CourseInfoData;
+
+  const [modules, setModulesState] = useState<Module[]>(storedModules || []);
   const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [showErrors, setShowErrors] = useState(false);
@@ -533,6 +545,11 @@ export function CreateModulesPage() {
 
   // per-module image input refs
   const imgRefs = useRef<Record<string, HTMLInputElement | null>>({});
+
+  // Sync modules with store whenever they change
+  useEffect(() => {
+    setModules(modules);
+  }, [modules, setModules]);
 
   useEffect(() => {
     const moduleValues = modules.map((moduleItem) => ({
@@ -571,7 +588,7 @@ export function CreateModulesPage() {
         },
       );
 
-      setModules((prev) => [
+      setModulesState((prev) => [
         ...prev,
         {
           id: uid(),
@@ -599,7 +616,7 @@ export function CreateModulesPage() {
   };
 
   const removeLesson = (modId: string, lessonId: string) => {
-    setModules((prev) =>
+    setModulesState((prev) =>
       prev.map((m) =>
         m.id === modId
           ? { ...m, lessons: m.lessons.filter((l) => l.id !== lessonId) }
@@ -609,7 +626,7 @@ export function CreateModulesPage() {
   };
 
   const removeModule = (modId: string) => {
-    setModules((prev) => prev.filter((m) => m.id !== modId));
+    setModulesState((prev) => prev.filter((m) => m.id !== modId));
     setModuleImageFiles((prev) => {
       const next = { ...prev };
       delete next[modId];
@@ -656,7 +673,7 @@ export function CreateModulesPage() {
           lessonDraft.contentEditor ?? createdLesson.contentEditor ?? null,
       };
 
-      setModules((prev) =>
+      setModulesState((prev) =>
         prev.map((moduleItem) =>
           moduleItem.id === modId
             ? {
@@ -702,7 +719,7 @@ export function CreateModulesPage() {
 
     const reader = new FileReader();
     reader.onload = () => {
-      setModules((prev) =>
+      setModulesState((prev) =>
         prev.map((m) =>
           m.id === modId ? { ...m, image: reader.result as string } : m,
         ),
@@ -732,6 +749,8 @@ export function CreateModulesPage() {
     }
 
     setError("");
+    // Save modules to store before navigating
+    setModules(modules);
     navigate("/create-course/exam", {
       state: { courseData, modules },
     });
@@ -914,7 +933,7 @@ export function CreateModulesPage() {
                                 setShowErrors(true);
                                 return;
                               }
-                              setModules((prev) =>
+                              setModulesState((prev) =>
                                 prev.map((m) =>
                                   m.id === mod.id
                                     ? {

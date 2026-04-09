@@ -14,6 +14,7 @@ import {
 } from "@/services/quizService";
 import { questionCreateFormSchema } from "@/validations/examSchema";
 import { uploadFileSchema } from "@/validations/fileSchema";
+import { useCreationStore } from "@/store/useCreationStore";
 
 // ── SVG paths ─────────────────────────────────────────────────────────────────
 const CLOSE_SM =
@@ -652,8 +653,21 @@ function AiGeneratedExamReviewModal({
 export function CreateExamPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const courseData = (location.state?.courseData ?? {}) as CourseInfoData;
-  const modules = (location.state?.modules ?? []) as ModuleWithBackendState[];
+
+  // Get store access
+  const {
+    courseData: storedCourseData,
+    modules: storedModules,
+    setExam: saveExamToStore,
+  } = useCreationStore();
+
+  // Try to get data from store first, then location state
+  const courseData = (storedCourseData ||
+    location.state?.courseData ||
+    {}) as CourseInfoData;
+  const modules = (storedModules ||
+    location.state?.modules ||
+    []) as ModuleWithBackendState[];
 
   // View state: modules list OR exam editor
   const [editorOpen, setEditorOpen] = useState(false);
@@ -967,6 +981,22 @@ export function CreateExamPage() {
 
     if (alreadyHasQuiz) {
       setModuleProvas((prev) => ({ ...prev, [editingModId]: questions }));
+
+      // Save exam to store
+      saveExamToStore({
+        questions: questions.map((q) => ({
+          id: q.id,
+          text: q.text,
+          type: "multiple" as const,
+          correctAnswer: q.correctOptionId,
+          alternatives: q.options.map((o) => ({
+            id: o.id,
+            text: o.text,
+          })),
+          points: q.points,
+        })),
+      });
+
       setEditorOpen(false);
       setEditingModId(null);
       toast.success("Prova atualizada na tela com sucesso.");
@@ -981,12 +1011,30 @@ export function CreateExamPage() {
         mapQuestionsToBackendQuizPayload(questions),
       );
 
+      const mappedQuestions = mapBackendGeneratedQuizToQuestions({
+        questions: createdQuiz.questions,
+      });
+
       setModuleProvas((prev) => ({
         ...prev,
-        [editingModId]: mapBackendGeneratedQuizToQuestions({
-          questions: createdQuiz.questions,
-        }),
+        [editingModId]: mappedQuestions,
       }));
+
+      // Save exam to store
+      saveExamToStore({
+        questions: mappedQuestions.map((q) => ({
+          id: q.id,
+          text: q.text,
+          type: "multiple" as const,
+          correctAnswer: q.correctOptionId,
+          alternatives: q.options.map((o) => ({
+            id: o.id,
+            text: o.text,
+          })),
+          points: q.points,
+        })),
+      });
+
       setEditorOpen(false);
       setEditingModId(null);
       toast.success("Prova criada com sucesso para o módulo.");
