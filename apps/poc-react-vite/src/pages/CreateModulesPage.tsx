@@ -76,14 +76,12 @@ function AddLessonPopup({
   const hasLessonContent = lessonContent.trim().length > 0;
   const hasSelectedFile = Boolean(selectedFile);
   const hasGeneratedContent = generatedContent.trim().length > 0;
-  const isModalLocked = isGeneratedContentConfirmed;
   const canSaveLesson =
-    !isModalLocked &&
     !isSavingLesson &&
     !isLessonSaved &&
-    (hasLessonContent || hasSelectedFile);
+    (hasLessonContent || hasSelectedFile) &&
+    !(hasLessonContent && hasSelectedFile); // Exclusividade: não pode ter ambos
   const canGenerateWithAi =
-    !isModalLocked &&
     !isGeneratingContent &&
     !isConfirmingGeneratedContent &&
     isLessonSaved &&
@@ -124,9 +122,9 @@ function AddLessonPopup({
 
     setError("");
     setSelectedFile(file);
+    setLessonContent(""); // Limpar conteúdo ao selecionar arquivo (exclusividade)
     setGeneratedContent("");
     setSavedLessonId(null);
-    setIsGeneratedContentConfirmed(false);
     setIsLessonSaved(false);
   };
 
@@ -166,7 +164,6 @@ function AddLessonPopup({
 
   const handleGenerateWithAi = async () => {
     if (
-      isModalLocked ||
       !savedLessonId ||
       !isLessonSaved ||
       (!hasLessonContent && !hasSelectedFile)
@@ -242,8 +239,7 @@ function AddLessonPopup({
                 type="button"
                 aria-label="Voltar"
                 onClick={() => setStep(1)}
-                disabled={isModalLocked}
-                className="size-[40px] rounded-full flex items-center justify-center text-[#021b59] hover:bg-[#edf2ff] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:cursor-not-allowed disabled:opacity-50"
+                className="size-[40px] rounded-full flex items-center justify-center text-[#021b59] hover:bg-[#edf2ff] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
               >
                 <span className="text-[28px] leading-none">‹</span>
               </button>
@@ -259,8 +255,7 @@ function AddLessonPopup({
             type="button"
             aria-label="Fechar modal"
             onClick={onClose}
-            disabled={isModalLocked}
-            className="size-[40px] rounded-full flex items-center justify-center hover:bg-[#f5f5f5] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:cursor-not-allowed disabled:opacity-50"
+            className="size-[40px] rounded-full flex items-center justify-center hover:bg-[#f5f5f5] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
           >
             <svg
               className="size-[18px]"
@@ -307,13 +302,11 @@ function AddLessonPopup({
                     setLessonName(e.target.value);
                     setGeneratedContent("");
                     setSavedLessonId(null);
-                    setIsGeneratedContentConfirmed(false);
                     setIsLessonSaved(false);
                   }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") handleStep1();
                   }}
-                  disabled={isModalLocked}
                   className="h-full w-full rounded-[12px] bg-transparent px-[16px] font-['Figtree:Regular',sans-serif] text-[16px] text-[#333] placeholder-[#8e8e8e] outline-none disabled:cursor-not-allowed disabled:bg-[#f3f4f6] disabled:text-[#8e8e8e]"
                   autoFocus
                 />
@@ -328,8 +321,7 @@ function AddLessonPopup({
             <button
               type="button"
               onClick={handleStep1}
-              disabled={isModalLocked}
-              className="h-[48px] w-full rounded-[26px] bg-[#ffeac4] transition-colors hover:bg-[#ffd9a0] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:cursor-not-allowed disabled:opacity-60"
+              className="h-[48px] w-full rounded-[26px] bg-[#ffeac4] transition-colors hover:bg-[#ffd9a0] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
             >
               <span className="font-['Figtree:Medium',sans-serif] font-medium text-[18px] text-[#333]">
                 Próximo
@@ -376,12 +368,11 @@ function AddLessonPopup({
                 rows={5}
                 placeholder="Cole aqui o conteúdo em texto da aula..."
                 value={lessonContent}
-                disabled={hasSelectedFile || isModalLocked}
+                disabled={hasSelectedFile}
                 onChange={(e) => {
                   setLessonContent(e.target.value);
                   setGeneratedContent("");
                   setSavedLessonId(null);
-                  setIsGeneratedContentConfirmed(false);
                   setIsLessonSaved(false);
                 }}
                 className="min-h-[110px] w-full rounded-[14px] border border-[#8e8e8e] bg-transparent px-[14px] py-[12px] font-['Figtree:Regular',sans-serif] text-[14px] text-[#333] placeholder-[#8e8e8e] outline-none resize-none focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:cursor-not-allowed disabled:bg-[#f3f4f6] disabled:text-[#8e8e8e]"
@@ -399,7 +390,7 @@ function AddLessonPopup({
                 type="button"
                 aria-label="Selecionar arquivo para a aula"
                 onClick={() => fileInputRef.current?.click()}
-                disabled={hasLessonContent || isModalLocked}
+                disabled={hasLessonContent}
                 className="flex h-[54px] w-full items-center justify-center rounded-[14px] border border-dashed border-[#8e8e8e] bg-white px-[12px] text-center transition-colors hover:bg-[#f8f8f8] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] disabled:cursor-not-allowed disabled:bg-[#f3f4f6] disabled:opacity-60"
               >
                 <span className="font-['Figtree:Regular',sans-serif] text-[14px] text-[#606060]">
@@ -412,7 +403,7 @@ function AddLessonPopup({
                 ref={fileInputRef}
                 type="file"
                 accept=".pdf,.txt,.md,.doc,.docx,.odt,text/plain,text/markdown,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.oasis.opendocument.text"
-                disabled={hasLessonContent || isModalLocked}
+                disabled={hasLessonContent}
                 className="hidden"
                 aria-hidden="true"
                 tabIndex={-1}
@@ -420,7 +411,7 @@ function AddLessonPopup({
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-[12px]">
+            <div className="flex flex-col gap-[12px]">
               <button
                 type="button"
                 aria-label="Salvar aula"
@@ -432,7 +423,7 @@ function AddLessonPopup({
                   {isSavingLesson
                     ? "Salvando..."
                     : isLessonSaved
-                      ? "Aula salva"
+                      ? "✓ Aula salva"
                       : "Salvar aula"}
                 </span>
               </button>
@@ -461,14 +452,12 @@ function AddLessonPopup({
                 className="min-h-[100px] w-full rounded-[12px] border border-[#dddddd] bg-white px-[12px] py-[10px] font-['Figtree:Regular',sans-serif] text-[14px] text-[#606060] placeholder-[#9a9a9a] outline-none resize-none"
               />
 
-              <div className="grid grid-cols-2 gap-[12px]">
+              <div className="flex flex-col gap-[12px]">
                 <button
                   type="button"
                   aria-label="Regerar"
                   onClick={handleGenerateWithAi}
-                  disabled={
-                    isModalLocked || !hasGeneratedContent || isGeneratingContent
-                  }
+                  disabled={!hasGeneratedContent || isGeneratingContent}
                   className="h-[38px] rounded-[24px] border border-[#021b59] bg-white transition-colors hover:bg-[#eef3ff] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <span className="font-['Figtree:Medium',sans-serif] font-medium text-[15px] text-[#021b59]">
@@ -480,9 +469,7 @@ function AddLessonPopup({
                   aria-label="Confirmar conteúdo gerado"
                   onClick={handleUseGeneratedContent}
                   disabled={
-                    isModalLocked ||
-                    !hasGeneratedContent ||
-                    isConfirmingGeneratedContent
+                    !hasGeneratedContent || isConfirmingGeneratedContent
                   }
                   className="h-[38px] rounded-[24px] bg-[#021b59] transition-colors hover:bg-[#042e99] disabled:cursor-not-allowed disabled:bg-[#94a3c7] disabled:opacity-60"
                 >
