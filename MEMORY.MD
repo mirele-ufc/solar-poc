@@ -1,8 +1,8 @@
 # MEMORY.md — Validação e Alinhamento PoC (React vs Vue)
 
-**Última atualização:** 09/04/2026T19:45:00Z  
+**Última atualização:** 09/04/2026T20:15:00Z  
 **Objetivo:** Validar equivalência React vs Vue, aumentar cobertura de testes ~20% → 70%, auditar OWASP  
-**Status geral:** Fase 1 — Blocos A+B+C+D (100% COMPLETO), Próximo: Bloco E (crítico)  
+**Status geral:** Fase 1 — Blocos A+B+C+D (100% COMPLETO + correção thumbnails), Próximo: Bloco E (crítico)  
 **Timeline:** 4-5 semanas (Fase 1: 50h + Fase 2: 28h)
 
 ---
@@ -205,6 +205,25 @@ Transição do ciclo anterior (refatoração React com backend integrado) para n
 | S4  | Input Validation Tests | ❌ TODO | 4 scenarios              | Size, ext, MIME, special chars                        |
 | R1  | Relatório Comparativo  | ❌ TODO | Tabela                   | React vs Vue (funcionalidade, performance, segurança) |
 | R2  | Recomendação Final     | ❌ TODO | Documento                | Qual tecnologia escolher e por quê?                   |
+
+---
+
+## SECTION: NOTAS RECENTES (09/04/2026 — 20h15)
+
+### ✅ Correção de Equivalência: Thumbnails (DONE)
+
+**Problema Encontrado:** Vue CourseCard.vue estava usando geração local de imagens baseada em pool (COURSE_IMAGES_POOL) em vez de respeitar o `imagePath` do backend. React CoursesPage.tsx respeitava `imagePath` mas retornava FALLBACK quando null.
+
+**Solução Implementada:**
+
+- Vue CourseCard.vue: Remover COURSE_IMAGES_POOL, implementar verificação de props.imagePath
+- React CoursesPage.tsx: Sincronizar URL FALLBACK_BANNER (w=1080) com Vue
+- Ambas PoCs: Quando backend retorna null/empty imagePath, mostrar FALLBACK_BANNER idêntico
+- Suporte para URLs absolutas e relativas (com resolução via apiBaseUrl) em ambas
+
+**Validação:** ✅ type-check ambas = PASS, commit 67dcaaf
+
+**Resultado:** 100% equivalência React ↔ Vue em behavior de thumbnails, bloqueador visual resolvido
 
 ---
 
