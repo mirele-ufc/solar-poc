@@ -65,7 +65,9 @@ describe("useCourseFlow composable", () => {
 
     navigateTo("exam-instructions");
 
-    expect(router.push).toHaveBeenCalledWith("/courses/python/exam/instructions");
+    expect(router.push).toHaveBeenCalledWith(
+      "/courses/python/exam/instructions",
+    );
   });
 
   it("navega para exam", () => {

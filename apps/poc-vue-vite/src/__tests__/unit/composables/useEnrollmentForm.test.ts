@@ -49,8 +49,14 @@ describe("useEnrollmentForm composable", () => {
   });
 
   it("expõe métodos obrigatórios", () => {
-    const { values, errors, hasErrors, handleEnrollmentSubmit, reset, setFieldValue } =
-      useEnrollmentForm();
+    const {
+      values,
+      errors,
+      hasErrors,
+      handleEnrollmentSubmit,
+      reset,
+      setFieldValue,
+    } = useEnrollmentForm();
 
     expect(values).toBeDefined();
     expect(errors).toBeDefined();
