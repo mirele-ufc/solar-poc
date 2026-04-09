@@ -1,8 +1,8 @@
 # MEMORY.md — Validação e Alinhamento PoC (React vs Vue)
 
-**Última atualização:** 09/04/2026T10:00:00Z  
+**Última atualização:** 09/04/2026T15:45:00Z  
 **Objetivo:** Validar equivalência React vs Vue, aumentar cobertura de testes ~20% → 70%, auditar OWASP  
-**Status geral:** Fase 1 — Bloco A (imediato)  
+**Status geral:** Fase 1 — Bloco B (100% COMPLETO), Bloco C próximo  
 **Timeline:** 4-5 semanas (Fase 1: 50h + Fase 2: 28h)
 
 ---
@@ -16,20 +16,18 @@ Transição do ciclo anterior (refatoração React com backend integrado) para n
 ## SECTION: GLOBAL PROGRESS
 
 | Campo        | Valor                                         |
-| ------------ | --------------------------------------------- | -------------- |
+| ------------ | --------------------------------------------- | -------- |
 | **Fase**     | 1 — Alinhamento de PoC (Blocos A-F)           |
-| **Bloco**    | B — Parametrização CourseFlow (próximo)       |
-| **Status**   | ✅ A DONE (100%)                              | 🔴 B TODO (0%) |
+| **Bloco**    | C — Equivalência HTTP/Auth (próximo)          |
+| **Status**   | ✅ A DONE (100%) ✅ B DONE (100%)             | 🟡 C 90% |
 | **Objetivo** | 100% equivalência React ↔ Vue, 70%+ cobertura |
 | **Timeline** | Fase 1: 2-3 sem (50h) \| Fase 2: 2 sem (28h)  |
 
-**Progress (09/04/2026 — Bloco A Finalizado):** ✅
+**Progress (09/04/2026 — Blocos A + B Finalizados):** ✅✅
 
-1. Remover TeacherCoursePage (React) — commit bdad0ae
-2. Auditar HTTP/Auth (85% parity) — commit 385c581
-3. Type-check ambas (zero `any`) — ✅
-4. Audit rotas A1-A5 + /unauthorized Vue — commits 9d1d9e6, 0be6d02
-5. **Bloco A 100% ✅ — 16 rotas por PoC, equivalência 100%**
+1. ✅ Bloco A: Remoção de escopo (5/5 subtarefas)
+2. ✅ Bloco B: Parametrização CourseFlow (5/5 subtarefas) — commits 42ae1fe, c27b917
+3. 🟡 Bloco C: HTTP/Auth equivalência (5/5 subtarefas, 90% done) — pendente refactor Vue API
 
 ---
 
@@ -49,15 +47,27 @@ Transição do ciclo anterior (refatoração React com backend integrado) para n
 
 ---
 
-### 🟡 Bloco B: Eliminar Duplicação Python/Power-BI
+### 🟡 Bloco B: Eliminar Duplicação Python/Power-BI — ✅ 100% COMPLETO
 
-| #   | Tarefa                                                | React | Vue | Status  | Notas                                                   |
-| --- | ----------------------------------------------------- | ----- | --- | ------- | ------------------------------------------------------- |
-| B1  | Criar CourseFlow parametrizado com `courseId` (React) | ❌    | N/A | 🔴 TODO | Refatorar CourseDetailPage → dinâmico via route params  |
-| B2  | Criar CourseFlow parametrizado com `courseId` (Vue)   | N/A   | ❌  | 🔴 TODO | Refatorar CourseDetailsView → dinâmico via route params |
-| B3  | Consolidar provaData.ts + pythonProvaData.ts (React)  | ❌    | ❌  | 🔴 TODO | Unificar em courseConfig.ts com courseId dinâmico       |
-| B4  | Consolidar mock data (Vue)                            | N/A   | ❌  | 🔴 TODO | Idem React                                              |
-| B5  | Remover PythonDetailPage (se existir)                 | ✅    | ✅  | ✅ DONE | Não encontrado em nenhuma PoC                           |
+| #   | Tarefa                                                | React | Vue | Status  | Notas                                                       |
+| --- | ----------------------------------------------------- | ----- | --- | ------- | ----------------------------------------------------------- |
+| B1  | Criar CourseFlow parametrizado com `courseId` (React) | ✅    | N/A | ✅ DONE | Refatorado ExamPage + ExamInstructionsPage — commit 42ae1fe |
+| B2  | Criar CourseFlow parametrizado com `courseId` (Vue)   | N/A   | ✅  | ✅ DONE | Refatorado ExamView + ExamInstructionsView — commit c27b917 |
+| B3  | Consolidar provaData.ts + pythonProvaData.ts (React)  | ✅    | ✅  | ✅ DONE | Integrado em coursesConfig.ts (ambas PoCs)                  |
+| B4  | Consolidar mock data (Vue)                            | N/A   | ✅  | ✅ DONE | Idem React                                                  |
+| B5  | Remover PythonDetailPage (se existir)                 | ✅    | ✅  | ✅ DONE | Não encontrado em nenhuma PoC                               |
+
+**Status Bloco B:** ✅ **100% COMPLETO** (todos B1-B5 concluídos)
+
+**Detalhes Implementação:**
+
+- React: coursesConfig.ts expandido com ExamQuestion[] para cada curso
+- React: ExamPage.tsx parametrizado com route params :id → courseId dinâmico
+- React: ExamInstructionsPage.tsx parametrizado
+- Vue: coursesConfig.ts expandido idêntico ao React
+- Vue: ExamView.vue parametrizado com route params :id → courseId dinâmico
+- Vue: ExamInstructionsView.vue parametrizado
+- Ambas: breadcrumbs, navegações e número de questões agora dinâmicos
 
 ---
 
