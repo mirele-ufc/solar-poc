@@ -89,6 +89,13 @@ export const coursesConfig: Record<string, CourseConfig> = {
     enrollmentKey: "python",
     examQuestions: [
       {
+        id: "pyq_hybrid",
+        text: "Pergunta híbrida",
+        options: ["Alternativa A", "Alternativa B", "Alternativa C"],
+        correctIndex: 0,
+        correctLabel: "A",
+      },
+      {
         id: "pyq1",
         text: "Qual das alternativas abaixo representa um tipo de dado primitivo em Python?",
         options: [
