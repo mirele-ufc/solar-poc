@@ -11,8 +11,8 @@ Este documento serve como fonte de contexto para agentes de IA e para alinhament
 
 - Fonte de verdade contratual: `CLAUDE.md` + `.claude/commands/doc/arquitetura.md` (com RF/RN/RNF como apoio normativo).
 - Frontend deve preservar layout e UX atuais durante a integracao.
-- Neste ciclo, o foco principal e refatoracao de codigo frontend com integracao FE-BE.
-- A documentacao deve orientar e acompanhar a implementacao da refatoracao.
+- Neste ciclo, o foco principal e validação e alinhamento de duas PoC (React vs Vue) com aumento de cobertura de testes e auditoria de segurança.
+- A documentação deve orientar e acompanhar a implementacao do plano de validação em `docs/PLAN.md`.
 
 ## Perfis de Usuario
 
@@ -71,16 +71,27 @@ Usuario (1) -> (N) TokenRecuperacaoSenha
 
 ## Estado Atual do Projeto
 
-Fase 1 ativa no backend: autenticacao, perfil, cursos, modulos, aulas, provas e integracao com IA.
-Fase 2 (aluno) permanece fora do escopo de implementacao do backend atual.
-No frontend, o escopo atual inclui refatoracao incremental de codigo mantendo layout e UX.
+**Ciclo Atual:** Validação e Alinhamento de PoC (React vs Vue)
+
+- **Backend:** Fase 1 ativa — autenticacao, perfil, cursos, modulos, aulas, provas e integracao com IA.
+- **Frontend (Ciclo Anterior):** Refatoracao React com integracao backend (44% concluído, pausado).
+- **Frontend (Ciclo Novo - ATIVO):** Validação de equivalência React ↔ Vue + aumento de cobertura de testes + auditoria OWASP.
+- **Fase 2 (Aluno):** Permanece fora do escopo de implementacao do backend atual.
+
+**Objetivo deste ciclo:** Duas PoCs avançadas (90% funcionalidade equivalente) com cobertura de testes baixa (~20%). Necessário:
+
+1. Aumentar cobertura ~20% → 70% em ambas (maior esforço)
+2. Validar paridade de arquitetura HTTP/Auth
+3. Auditar segurança (OWASP: XSS, CSRF, Auth, Input Validation)
+4. Gerar relatório comparativo + recomendação de tecnologia
 
 ## Alinhamento Frontend x Backend
 
-- O frontend atual possui fluxos visuais abrangentes com uso de mocks em varios dominios.
-- A integracao deve migrar os fluxos para endpoints reais sem mudar navegacao e layout.
-- Toda divergencia de payload, status e regra de nego cio deve ser resolvida na documentacao antes da codificacao.
-- Quando nao houver endpoint backend documentado em `.claude/commands/doc/arquitetura.md`, o fluxo/rota deve ser removido do escopo e da implementacao frontend ate formalizacao contratual.
+- O frontend atual possui duas PoCs com funcionalidade abrangente mas com graves lacunas em cobertura de testes (~20%).
+- A validacao atual deve garantir 100% equivalencia funcional entre React e Vue, com cobertura ≥70% em ambas.
+- Ambas as PoCs devem ser auditadas contra OWASP Core (XSS, CSRF, Auth, Input Validation).
+- Apos validacao e aumento de cobertura, sera gerado um relatorio comparativo com recomendação de tecnologia.
+- Toda divergencia de payload, status e regra de nego cio ja foi resolvida em ciclo anterior; este ciclo e de auditoria e qualidade.
 
 ### Fonte de Verdade Contratual (Obrigatoria)
 
@@ -89,11 +100,19 @@ No frontend, o escopo atual inclui refatoracao incremental de codigo mantendo la
 - Endpoint nao documentado em `arquitetura.md` nao deve permanecer no plano de implementacao ativo.
 - Em caso de conflito entre `CLAUDE.md` e `arquitetura.md`, interromper a execucao, confirmar com o usuario o caminho oficial, e registrar a decisao nos documentos afetados antes de codificar.
 
-## Diretrizes de Engenharia Frontend (Implementacao Neste Ciclo)
+## Diretrizes de Engenharia Frontend (Implementacao Neste Ciclo - Validação)
 
-As diretrizes abaixo sao obrigatorias na refatoracao de codigo deste ciclo.
+As diretrizes abaixo sao obrigatorias na validacao e aumento de cobertura de testes neste ciclo.
 
-### Qualidade de Codigo
+### Validação de Equivalência React vs Vue
+
+- Ambas PoCs devem ter as mesmas funcionalidades implementadas: Auth, Courses, Modules, Lessons, Quizzes
+- Ambas devem usar Axios com interceptador identico (JWT, refresh token, erro handling)
+- Ambas devem usar Zod para validacoes (naming normalizado)
+- Ambas devem ter zero `any` em TypeScript strict mode
+- Ambas devem usar Slots Pattern em componentes reutilizaveis
+
+### Qualidade de Codigo (aplicavel a ambas PoCs)
 
 - Clean Code: funcoes pequenas, responsabilidade unica, baixo acoplamento, sem duplicacao.
 - SOLID em componentes: separar apresentacao, orquestracao de fluxo e acesso a dados.

@@ -1,338 +1,240 @@
-# Rastreamento de Progresso Contínuo
+# MEMORY.md — Validação e Alinhamento PoC (React vs Vue)
 
-> **Fonte de verdade única** para progresso do refactoring UFC LMS React.  
-> Atualizado automaticamente pelo agente **IMPLEMENT-AND-COMMIT** após cada subtarefa.  
-> Lido pelo agente **STATUS-REFACTORING** para gerar dashboard.
-
----
-
-## MEMORY.md — Refatoração UFC LMS (Sessão Ativa)
-
-**Última atualização:** 30/03/2026 (Fase 2 ✅ concluída, 20/43, pronto para Fase 3)
-**Sprint ativo:** Fase 3 — Gestão de Cursos (próxima)
-**Status geral:** 47% (20/43 subtarefas concluídas)
+**Última atualização:** 09/04/2026T10:00:00Z  
+**Objetivo:** Validar equivalência React vs Vue, aumentar cobertura de testes ~20% → 70%, auditar OWASP  
+**Status geral:** Fase 1 — Bloco A (imediato)  
+**Timeline:** 4-5 semanas (Fase 1: 50h + Fase 2: 28h)
 
 ---
 
-## UPDATE — 30/03/2026 (Fase 2 concluída)
+## 🎯 CONTEXTO
 
-- **Auditoria:** Checklist da Fase 2 integralmente cumprido (ver docs/REFACTORING_PLAN_GRANULAR_V2.md § Fase 2)
-- **Status:** Todos os fluxos de autenticação, registro, refresh, perfil e recuperação de senha integrados ao backend e validados.
-- **Merge e testes end-to-end:** Fora do escopo deste ciclo, conforme contrato.
-- **Fases consolidadas:** Fase 0, Fase 1 e Fase 2 (100%)
-- **Subtarefas concluídas na Fase 2:** 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7
-- **Próxima etapa planejada:** 3.1 — Criar courseService.ts com endpoints de cursos
+Transição do ciclo anterior (refatoração React com backend integrado) para novo ciclo (validação PoC em paralelo React + Vue). Ambas PoCs têm ~75% funcionalidade equivalente (90% em React, 85% em Vue) mas com graves lacunas em cobertura de testes (~20% vs 70% target).
 
 ---
 
 ## SECTION: GLOBAL PROGRESS
 
-| Campo      | Valor                                     |
-| ---------- | ----------------------------------------- |
-| **Fase**   | 2 — Autenticação com Backend              |
-| **Módulo** | 2.7 — ForgotPassword + ResetPassword      |
-| **Story**  | 2.7 — Recuperação e redefinição de senha  |
-| **Status** | ✅ COMPLETA                               |
-| **Branch** | feature/refactor-auth-request-interceptor |
-
-**Status:** Fases 0 e 1 concluídas. Fase 2 em progresso — 2.1 a 2.6 concluídas e 2.7 pronta para iniciar.
-
-### ✅ Completes
-
-| Sub | Title                                                                    | Status | Date       | Commit                                                    | PR  |
-| --- | ------------------------------------------------------------------------ | ------ | ---------- | --------------------------------------------------------- | --- |
-| 0.1 | Criar ProtectedRoute com validação de role                               | ✅     | 25/03      | ce2df32                                                   | —   |
-| 0.2 | Integrar ProtectedRoute em routes.ts                                     | ✅     | 25/03/2026 | 028ba89                                                   | —   |
-| 0.3 | Remover hardcodes de role em páginas                                     | ✅     | 25/03/2026 | 41a3b29                                                   | —   |
-| 0.4 | Implementar logout seguro local                                          | ✅     | 26/03/2026 | 7689a26 + cd395ac                                         | —   |
-| 0.5 | Implementar Unauthorized page                                            | ✅     | 26/03/2026 | 8fa0cd3 + 00d9fe6                                         | —   |
-| 0.6 | Validar rotas públicas sem guard incorreto                               | ✅     | 26/03/2026 | 189c57f                                                   | —   |
-| 0.7 | HTTP error interceptor + loading + empty states                          | ✅     | 26/03/2026 | 1aac552 + 3edb2fc + 41cb179 + 4390f75                     | —   |
-| 1.1 | Auditar e consolidar tipos em @ava-poc/types                             | ✅     | 26/03/2026 | 9bb4021 + 910841e                                         | —   |
-| 1.2 | Migrar useAuthStore para tipos globais                                   | ✅     | 26/03/2026 | 6dfa8ae + 146efd2 + 99f8ba3 + 6a664e6 + d285b57           | —   |
-| 1.3 | Centralizar e alinhar schemas Zod                                        | ✅     | 26/03/2026 | 088d981 + 3b25f55 + 39c4cbe                               | —   |
-| 1.4 | Remover tipos locais duplicados de pages                                 | ✅     | 26/03/2026 | f0e773e                                                   | —   |
-| 1.5 | Validar zero `any` em TypeScript                                         | ✅     | 26/03/2026 | 324708d + 7822e32                                         | —   |
-| 1.6 | Refatorar componentes com Slots Pattern                                  | ✅     | 27/03/2026 | `0080137` + `9090c6a` + `4ecc3d7` + `b24fbb4` + `32558a8` | —   |
-| 2.1 | authService endpoints (Auth/Perfil)                                      | ✅     | 27/03/2026 | `3ece624` + `a2ec8eb` + `877540a`                         | —   |
-| 2.2 | Implementar Request Interceptor em api.ts                                | ✅     | 27/03/2026 | `0ae5cf1` + `cb93963` + `2279807`                         | —   |
-| 2.3 | Integrar LoginPage com POST /auth/login                                  | ✅     | 28/03/2026 | `0db7f21`                                                 | —   |
-| 2.4 | Integrar RegisterPage com POST /auth/cadastro                            | ✅     | 28/03/2026 | (commits git manuais + testes 9/9 PASS)                   | —   |
-| 2.5 | Implementar refresh token flow automático                                | ✅     | 30/03/2026 | `deb0d06`                                                 | —   |
-| 2.6 | Integrar ProfilePage com GET /perfil, PUT /perfil/senha e upload de foto | ✅     | 30/03/2026 | 5e03bbf1d87c0a9b46ba081175a7518f77cbd1b5                  | —   |
-| 2.7 | ForgotPassword + ResetPassword integrados                                | ✅     | 30/03/2026 | dd81196                                                   | —   |
-
-### 📊 By-Phase Metrics
-
-| Phase     | Complete | Total  | %       | Status             | Start Date | Est. End |
-| --------- | -------- | ------ | ------- | ------------------ | ---------- | -------- |
-| 0         | 7        | 7      | 100%    | ✅ COMPLETA        | 25/03      | 26/03    |
-| 1         | 6        | 6      | 100%    | ✅ COMPLETA        | 26/03      | 27/03    |
-| 2         | 6        | 7      | 86%     | 🔄 IN_PROGRESS     | 27/03      | —        |
-| 3         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
-| 4         | 0        | 7      | 0%      | ⏳ FUTURE          | —          | —        |
-| 5         | 0        | 4      | 0%      | ⏳ FUTURE          | —          | —        |
-| 6         | 0        | 6      | 0%      | ⏳ FUTURE          | —          | —        |
-| **TOTAL** | **19**   | **43** | **44%** | **🟢 IN PROGRESS** | 25/03      | —        |
-
-### ⏳ Next Ready (First 3)
-
-1. **3.1 — Criar courseService.ts com endpoints de cursos**
-   - Duração: 1-1.5 dia
-   - Dependências: Fase 2 concluída
-   - Status: ✅ **READY NOW**
-   - Detalhes: `docs/REFACTORING_PLAN_GRANULAR_V2.md` § 2.7
-
-2. **3.1 — Criar courseService.ts com endpoints de cursos**
-   - Duração: 1-1.5 dia
-   - Dependências: Fase 2 concluída
-   - Status: ⏳ NEXT
-
-3. **3.2 — Integrar CoursesPage com GET /cursos**
-   - Duração: 1-2 dias
-   - Dependências: 3.1
-   - Status: ⏳ FUTURE
-
-### ⛔ Blockers
-
-✅ **Nenhum blocker detectado.**
-
-- ✅ Backend: aguardando ambiente local completo (Docker em instalação)
-- ✅ Tests: Vitest pronto para usar
-- ✅ Git: Branch `feature/refactor-auth-request-interceptor` ativa
-- ✅ Documentação: Todas docs em `/docs/` presentes
+| Campo        | Valor                                         |
+| ------------ | --------------------------------------------- |
+| **Fase**     | 1 — Alinhamento de PoC (Blocos A-F)           |
+| **Bloco**    | A — Remoção de Escopo (imediato)              |
+| **Status**   | 🔴 TODO                                       |
+| **Objetivo** | 100% equivalência React ↔ Vue, 70%+ cobertura |
+| **Timeline** | Fase 1: 2-3 sem (50h) \| Fase 2: 2 sem (28h)  |
 
 ---
 
-## SECTION: SESSION CONTEXT
+## SECTION: FASE 1 — Alinhamento de PoC
 
-| #   | Story | Status  | Commits      | Testes | Evidencia de teste criado                                                                             | Evidencia RED inicial                                    | Notas                                                                                                 |
-| --- | ----- | ------- | ------------ | ------ | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| 1   | 0.1.1 | ✅ DONE | 1/1          | 2/2    | src/**tests**/unit/routes/ProtectedRoute.test.tsx                                                     | RED inicial registrado no ciclo da story                 | Guard global aplicado no roteamento + commit realizado                                                |
-| 2   | 0.2.1 | ✅ DONE | 1/1          | 3/3    | src/**tests**/unit/routes/ProtectedRoute.test.tsx                                                     | RED registrado na suite de rotas                         | routes.ts segmentado por role (professor/student e professor only) + commit realizado                 |
-| 3   | 0.3.1 | ✅ DONE | 1/1          | 3/3    | src/**tests**/unit/pages/roleCleanup.test.tsx                                                         | Suite de regressão criada no ciclo                       | Role cleanup concluído em pages; mensageria protegida por rota; commits 41a3b29 + 1d0cccb publicados  |
-| 4   | 0.4.1 | ✅ DONE | 2/2          | 3/3    | src/**tests**/unit/store/authLogout.test.ts, src/**tests**/unit/components/AuthLayout.logout.test.tsx | RED validado (1 falha funcional)                         | Logout local aplicado no AuthLayout sem endpoint backend                                              |
-| 5   | 0.5.1 | ✅ DONE | 2/2          | 3/3    | src/**tests**/unit/pages/UnauthorizedPage.test.tsx                                                    | RED validado (import da página ausente)                  | UnauthorizedPage criada com botão de retorno e redirecionamento automático para /courses              |
-| 6   | 0.6.1 | ✅ DONE | 1/1          | 4/4    | src/**tests**/unit/routes/publicRoutes.test.tsx                                                       | RED estrutural (testes antes de rodar)                   | Suite valida que /, /register, /forgot-password e /unauthorized são acessíveis sem autenticação       |
-| 7   | 1.1.1 | ✅ DONE | 2/2          | 27/27  | Type-check OK; Vitest: 27/27 testes passando                                                          | Draft: tipos consolidados em @ava-poc/types              | Consolidação de tipos em v1.0 + resolução de role (professor/student/admin) + imports bem-definidos   |
-| 8   | 2.4.1 | ✅ DONE | (git manual) | 9/9    | src/**tests**/RegisterPage.test.tsx                                                                   | RED escrito (9 testes antes da implementação)            | Integração RegisterPage com POST /auth/cadastro; mapeamento perfil professor↔PROFESSOR, student↔ALUNO |
-| 9   | 2.5.1 | ✅ DONE | `deb0d06`    | 4/4    | src/**tests**/unit/services/api.refresh-interceptor.test.ts                                           | RED validado via testes do fluxo 401                     | Refresh automático com retry seguro; fallback de logout sem loop infinito                             |
-| 10  | 2.6.1 | ✅ DONE | (sem commit) | 4/4    | src/**tests**/ProfilePage.test.tsx                                                                    | RED validado (falha inicial de render na regra de hooks) | ProfilePage integrada com GET /perfil, PUT /perfil/senha e upload de foto validado                    |
+### ✅ Bloco A: Remoção de Escopo
 
-**Resumo:** Fases 0 e 1 concluídas e auditadas (100%). Fase 2 em progresso: 2.1, 2.2, 2.3, 2.4, 2.5 e 2.6 concluídas. Próxima: 2.7 (Forgot/Reset password).
+| #   | Tarefa                                                         | React | Vue | Status  | Notas                                                    |
+| --- | -------------------------------------------------------------- | ----- | --- | ------- | -------------------------------------------------------- |
+| A1  | Remover rotas ForgotPassword, ResetPassword, Profile, Messages | ✅    | ✅  | ✅ DONE | Não existem em nenhuma PoC; Escopo já limpo              |
+| A2  | Auditar TeacherCoursePage (React orphaned)                     | ⚠️    | N/A | 🔴 TODO | Arquivo existe mas não em routes.tsx; deve remover em A3 |
+| A3  | Remover páginas fora de escopo                                 | ⏳    | ✅  | 🔴 TODO | React: remover TeacherCoursePage.tsx + test              |
+| A4  | Validar rotas apenas: Auth, Courses, Modules, Lessons, Exams   | ⏳    | ⏳  | 🔴 TODO | Checklist: routes.tsx (React) + router/index.ts (Vue)    |
 
-**Atualização 2.1 (fora da tabela por limite de largura):**
+---
 
-- Story: 2.1.1
-- Status: ✅ DONE
-- Commits: 3/3 (`3ece624`, `a2ec8eb`, `877540a`)
-- Testes: 19/19
-- Evidência: `src/__tests__/unit/services/authService.test.ts` e `src/__tests__/unit/services/api.interceptor.test.ts`
+### 🟡 Bloco B: Eliminar Duplicação Python/Power-BI
 
-### Observações Contratuais
+| #   | Tarefa                                                | React | Vue | Status  | Notas                                                   |
+| --- | ----------------------------------------------------- | ----- | --- | ------- | ------------------------------------------------------- |
+| B1  | Criar CourseFlow parametrizado com `courseId` (React) | ❌    | N/A | 🔴 TODO | Refatorar CourseDetailPage → dinâmico via route params  |
+| B2  | Criar CourseFlow parametrizado com `courseId` (Vue)   | N/A   | ❌  | 🔴 TODO | Refatorar CourseDetailsView → dinâmico via route params |
+| B3  | Consolidar provaData.ts + pythonProvaData.ts (React)  | ❌    | ❌  | 🔴 TODO | Unificar em courseConfig.ts com courseId dinâmico       |
+| B4  | Consolidar mock data (Vue)                            | N/A   | ❌  | 🔴 TODO | Idem React                                              |
+| B5  | Remover PythonDetailPage (se existir)                 | ✅    | ✅  | ✅ DONE | Não encontrado em nenhuma PoC                           |
 
-- A rota `/admin/usuarios` não existe no roteador atual (`src/routes.ts`); registrado para implementação posterior quando a rota/página admin estiver no escopo ativo.
-- Task 2.4 implementada com validações Zod (nome, cpf, email, senha, perfil) e integração com POST /auth/cadastro
+---
 
-**UPDATE 30/03/2026 — Subtarefa 2.6 concluída (sem commit/push):**
+### 🟡 Bloco C: Equivalência HTTP/Auth Simétrica
 
-- Arquivos alterados: `src/pages/ProfilePage.tsx` e `src/__tests__/ProfilePage.test.tsx`
-- Testes executados: 4/4 (ProfilePage) + 4/4 (refresh interceptor)
-- Type-check: ✅ sem erros
-- Próxima implementação definida em 2.7
-- Métricas recalculadas: 19/43 (44%) e Fase 2 em 6/7 (86%)
+| #   | Tarefa                                          | React | Vue | Status         | Notas                                          |
+| --- | ----------------------------------------------- | ----- | --- | -------------- | ---------------------------------------------- |
+| C1  | Validar Axios interceptor (JWT + refresh token) | ✅    | ⏳  | 🟡 IN_PROGRESS | React implementado; Vue precisa validar parity |
+| C2  | Validar tratamento 500+ erros (erro global)     | ⏳    | ⏳  | 🔴 TODO        | Ambas devem padronizar                         |
+| C3  | Validar login mockado (ambas)                   | ✅    | ✅  | ✅ DONE        | Backend sem auth real; mocks corretos          |
+| C4  | Auditar refresh token flow (ambas)              | ⏳    | ⏳  | 🔴 TODO        | Testes de 401 → retry → sucesso                |
 
-### For Next Session
+---
 
-Quando você voltar para continuar:
+### 🟡 Bloco D: Normalizar Zod Schemas
+
+| #   | Tarefa                               | React | Vue | Status  | Notas                                              |
+| --- | ------------------------------------ | ----- | --- | ------- | -------------------------------------------------- |
+| D1  | Normalizar naming Zod (React)        | ⏳    | N/A | 🔴 TODO | Padrão: `{Entity}{Operation}RequestSchema`         |
+| D2  | Normalizar naming Zod (Vue)          | N/A   | ⏳  | 🔴 TODO | Idem React                                         |
+| D3  | Integrar vee-validate completo (Vue) | N/A   | ⏳  | 🔴 TODO | Remover manual validation; usar vee-validate + Zod |
+| D4  | Testar validações (ambas)            | ⏳    | ⏳  | 🔴 TODO | Verificar schemas rejeitam dados inválidos         |
+
+---
+
+### 🔴 Bloco E: Aumentar Cobertura de Testes ← **CRÍTICO**
+
+| #         | Tarefa                      | React    | Vue     | Target  | Status                     | Notas                                                      |
+| --------- | --------------------------- | -------- | ------- | ------- | -------------------------- | ---------------------------------------------------------- |
+| E1        | Testes de Forms             | ~5%      | ~5%     | 20%     | 🔴 TODO                    | CourseCreateForm, ModuleCreateForm, etc. (3-5 testes cada) |
+| E2        | Testes de Services          | ~8%      | ~10%    | 20%     | 🔴 TODO                    | courseService, moduleService, lessonService (mocks)        |
+| E3        | Testes de Routes/Components | ~7%      | ~0%     | 15%     | 🔴 TODO                    | Acesso guard, redirecionamento, integração                 |
+| E4        | Coverage Reports CI/CD      | ❌       | ❌      | 15%     | 🔴 TODO                    | Setup `vitest --coverage` em ambas                         |
+| E5        | Testes de Integração E2E    | ❌       | ❌      | 10%     | 🔴 TODO                    | Login → Criar curso → Criar módulo → Criar aula            |
+| **Total** | **~20%**                    | **~15%** | **70%** | 🔴 TODO | **Faltam ~100-120 testes** |
+
+---
+
+### 🟡 Bloco F: Code Quality — Zero `any` + Slots Pattern
+
+| #   | Tarefa                         | React | Vue | Status   | Notas                                          |
+| --- | ------------------------------ | ----- | --- | -------- | ---------------------------------------------- |
+| F1  | TypeScript strict (zero `any`) | ✅    | ✅  | 🟡 AUDIT | Validar `npm run type-check` sem erros         |
+| F2  | Slots Pattern em componentes   | ⏳    | ⏳  | 🔴 TODO  | Card, FormContainer, PageHeader (ambas)        |
+| F3  | Naming semântico auditado      | ⏳    | ⏳  | 🔴 TODO  | Funções, variáveis, estados expressam intenção |
+
+---
+
+### ✅ Verificação Final Fase 1
+
+- [ ] `npm run build` sem erros (ambas)
+- [ ] `npm run type-check` sem erros (ambas)
+- [ ] `npm run lint` sem warnings (ambas)
+- [ ] `npm run test` — cobertura ≥70% (ambas)
+- [ ] Rotas: apenas Auth, Courses, Modules, Lessons, Quizzes (ambas)
+- [ ] HTTP: ambas com interceptador + tratamento centralizado
+- [ ] CourseFlow parametrizado (sem duplicação)
+
+---
+
+## SECTION: FASE 2 — Performance + Segurança
+
+| #   | Etapa                  | Status  | Target                   | Notas                                                 |
+| --- | ---------------------- | ------- | ------------------------ | ----------------------------------------------------- |
+| P1  | Lighthouse CI Setup    | ❌ TODO | N/A                      | `@lhci/cli`, `lighthouserc.json`                      |
+| P2  | Performance Score      | ❌ TODO | ≥85                      | FCP, LCP, CLS, TTI                                    |
+| P3  | Bundle Size            | ❌ TODO | React ≤200KB, Vue ≤180KB | gzipped                                               |
+| S1  | XSS Prevention Tests   | ❌ TODO | 3 scenarios              | Script injection, img onerror, sanitização            |
+| S2  | CSRF Protection Tests  | ❌ TODO | 2 scenarios              | Token + ataque mock                                   |
+| S3  | Auth & Session Tests   | ❌ TODO | 3 scenarios              | Refresh, logout, rotas protegidas                     |
+| S4  | Input Validation Tests | ❌ TODO | 4 scenarios              | Size, ext, MIME, special chars                        |
+| R1  | Relatório Comparativo  | ❌ TODO | Tabela                   | React vs Vue (funcionalidade, performance, segurança) |
+| R2  | Recomendação Final     | ❌ TODO | Documento                | Qual tecnologia escolher e por quê?                   |
+
+---
+
+## SECTION: PRÓXIMAS AÇÕES (Por Prioridade)
+
+### 🔴 Imediato (Esta semana - Bloco A)
+
+1. **A2/A3:** Remover `TeacherCoursePage.tsx` (React) — 30 min
+   - Delete arquivo e testes
+   - Valide que `npm run build` passa
+
+2. **C1:** Auditar Axios interceptor Vue vs React — 1h
+   - Comparar tratamento de JWT, refresh, erro 500+
+   - Documentar diferenças
+
+3. **Type Check:** Rodar em ambas — 15 min
+   ```bash
+   cd apps/poc-react-vite && npm run type-check
+   cd ../poc-vue-vite && npm run type-check
+   ```
+
+### 🟡 Semana 1-2 (Blocos B-F)
+
+4. **Bloco B:** Parametrizar CourseFlow (React + Vue) — 12-16h
+5. **Bloco D:** Normalizar Zod naming (ambas) — 4-6h
+6. **Bloco E:** Aumentar cobertura (ambas) — 24-30h ← **MAIOR esforço**
+7. **Bloco F:** Code quality audit (ambas) — 4-6h
+
+### 🟡 Semana 3-4 (Fase 2)
+
+8. **Fase 2:** Lighthouse + OWASP + Relatório — 28h
+
+---
+
+## SECTION: REFERÊNCIAS
+
+| Documento                                                                              | Propósito                                 |
+| -------------------------------------------------------------------------------------- | ----------------------------------------- |
+| [docs/PLAN.md](docs/PLAN.md)                                                           | Plano completo com 23 etapas (Fase 1 + 2) |
+| [CLAUDE.md](CLAUDE.md)                                                                 | Diretrizes arquiteturais e regra de ouro  |
+| [apps/poc-react-vite/](apps/poc-react-vite/)                                           | PoC React (17 páginas, ~20% cobertura)    |
+| [apps/poc-vue-vite/](apps/poc-vue-vite/)                                               | PoC Vue (15 views, ~15% cobertura)        |
+| [/memories/session/plan-status-analysis.md](/memories/session/plan-status-analysis.md) | Análise detalhada 09/04/2026              |
+
+---
+
+## SECTION: ESTRUTURA DE BRANCHES
+
+- **main:** Produção (não tocar)
+- **development:** Integração contínua
+- **feature/validate-poc-react:** Refatoração React (Blocos A-F)
+- **feature/validate-poc-vue:** Refatoração Vue (Blocos A-F)
+
+(Criar quando iniciar Bloco B)
+
+---
+
+## SECTION: COMANDOS RÁPIDOS
 
 ```bash
-# 1. Antes de tudo, validar contexto
-/status-refactoring
+# Status das PoCs
+cd apps/poc-react-vite && npm run test
+cd apps/poc-vue-vite && npm run test
 
-# 2. Começar Fase 2.7 (Forgot + Reset password)
-Implemente 2.7 (Integrar ForgotPasswordPage e ResetPasswordPage)
+# Type check (ambas)
+cd apps/poc-react-vite && npm run type-check
+cd apps/poc-vue-vite && npm run type-check
 
-# OU se preferir planejamento antes:
-/start-implementation
-```
+# Build (ambas)
+cd apps/poc-react-vite && npm run build
+cd apps/poc-vue-vite && npm run build
 
-### Important Notes
-
-- 📖 **Primeira vez?** Leia: `docs/COMO_COMECAR.md` (setup + TDD walkthrough)
-- 🚀 **Pronto para codificar?** Siga: `docs/REFACTORING_QUICK_REFERENCE.md` (10 min overview)
-- 📋 **Detalhes de cada subtarefa?** Consulte: `docs/REFACTORING_PLAN_GRANULAR_V2.md`
-- 🎯 **Entendeu o workflow?** Comande: `Implemente 0.7 (Tratamento HTTP padronizado + loading states)`
-
-### Velocity & Timeline
-
-- **Velocidade esperada:** 1-2 subtarefas/dia (durante ramp-up da Fase 0)
-- **Timeline total:** 11-17 semanas (43 subtarefas)
-- **Estimativa final:** Meados de maio de 2026
-
-_Será atualizada conforme velocidade real for estabelecida._
-
----
-
-## SECTION: MAINTENANCE
-
-**Story:** 0.1.2  
-**Título:** Política central de role  
-**Etapa:** RED (escrever teste antes da implementação)  
-**Arquivo:** src/routes/types.ts + src/routes + src/**tests**/unit/routes  
-**Estimativa:** 60-90 min
-
-### How to Update This File
-
-**Quando o agente IMPLEMENT-AND-COMMIT completa uma subtarefa:**
-
-1. Adicione nova linha em tabela `✅ Completes`:
-
-   ```
-   | 0.1 | Criar ProtectedRoute com validação de role | ✅ | 24/03 | abc1234 | #125 |
-   ```
-
-2. Atualize `Fase 0` em tabela `By-Phase Metrics`:
-
-   ```
-   | 0 | 1 | 7 | 14% | 🟢 IN PROGRESS | 24/03 | — |
-   ```
-
-3. Atualize linha de status inicial:
-
-   ```
-   Status: Fase 0 — Segurança, 1/7 complete, 1/43 total (2%), next: 0.2
-   ```
-
-4. Mova próximas ready (remova blocker, adicione nova):
-
-   ```
-   ⏳ Next Ready
-   1. 0.2 — Integrar ProtectedRoute (1.5 dias) ✅ READY NOW
-   2. 0.3 — Cleanup rotas (0.5 dias) ⏳ BLOCKED on 0.2
-   3. 0.4 — Logout Seguro (1 dia) ⏳ BLOCKED on 0.2, 0.3
-   ```
-
-5. Atualize SESSION CONTEXT:
-   ```
-   Last Action:
-   - Date: 24/03/2026 14:30
-   - Machine: [seu-pc]
-   - What: Merged PR#125 (0.1 ProtectedRoute)
-   - Status: Tudo commitado
-   ```
-
-**Automatização:** O agente IMPLEMENT-AND-COMMIT faz isso automaticamente. Você não precisa editar manual (mas pode se precisar corrigir).
-
-### File Locations
-
-- **Este arquivo:** Raiz do projeto → `./MEMORY.md`
-- **Lido por:** `/status-refactoring` agente
-- **Atualizado por:** `/implement-and-commit` agente
-- **Backup:** Commit history em git (cada atualização é um commit)
-
-### Git Strategy
-
-- Cada atualização de MEMORY.md vem com commit `docs: Atualizar MEMORY.md com subtarefa X.Y completa`
-- History é preservado em git → Sempre possível rolar back se necessário
-- MEMORY.md é versionado no git (não local-only)
-
----
-
-## QUICK REFERENCE
-
-| Ação                            | Comando                                |
-| ------------------------------- | -------------------------------------- |
-| Ver status atual                | `/status-refactoring`                  |
-| Começar implementação           | `Implemente 2.7`                       |
-| Ver contexto                    | Ler este arquivo: **MEMORY.md**        |
-| Consultar detalhes da subtarefa | `docs/REFACTORING_PLAN_GRANULAR_V2.md` |
-| Validar contexto todo           | `/start-implementation`                |
-| Ler guia completo               | `docs/COMO_COMECAR.md`                 |
-
----
-
-**Criado:** 24/03/2026  
-**Status:** ✅ Pronto para primeira subtarefa  
-**Próxima ação:** Rodar `/start-implementation` para validar tudo
-
-```
-1. [Ação A]
-2. [Ação B]
-3. [Ação C]
+# Lint (se disponível)
+npm run lint
 ```
 
 ---
 
-## 📝 Arquivos em Edição
+## ⛔ BLOCKERS
 
-- [x] `apps/poc-react-vite/src/__tests__/unit/services/authService.test.ts` (committed)
-- [x] `apps/poc-react-vite/src/services/authService.ts` (committed)
-- [x] `apps/poc-react-vite/src/services/types/authService.types.ts` (committed)
-- [ ] `MEMORY.MD` (atualização desta sessão, não commitada)
-- [ ] `backend/` (untracked, fora do escopo)
+✅ **Nenhum blocker técnico inicial.**
 
----
-
-## 🚦 Bloqueadores
-
-Nenhum blocker técnico para continuar 2.7 no frontend.
+- ✅ Ambas PoCs em estado funcionável
+- ✅ Vitest disponível em ambas
+- ✅ Documentação: `docs/PLAN.md` ✅
+- ⚠️ Cobertura baixa (~20%) — será abordado em Bloco E
 
 ---
 
-## 💡 Notas Rápidas
+## 📝 COMO USAR ESTE MEMORY.md
 
-- **Config Zustand:** Middleware persist resolvido em Story 0.2.1
-- **MSW mock:** API mocking funciona corretamente, não precisa ajuste
-- **TypeScript:** strict mode — validar interface de store
-- **Padrão TDD:** Aprovado, seguir AAA (Arrange, Act, Assert)
-- **Commits:** 2.1 concluída com sequência granular test → feat → refactor
-- **Próximo foco:** 2.7 recuperação e redefinição de senha com tokens
-
----
-
-## 📋 Checklist de Pronto (DoD)
-
-Quando finalizar story, verificar:
-
-- [ ] Testes unitários: 100% passando
-- [ ] Testes de integração: passando
-- [ ] `npm run type-check`: sem erros
-- [ ] `npm run lint`: sem warnings
-- [ ] `npm run build`: sucesso
-- [ ] Commit automático feito com convenção correta
-- [ ] Branch está atualizada com development (se necessário)
-- [ ] Não quebrou outras stories/páginas
+1. **Iniciar sessão:** Leia "SECTION: GLOBAL PROGRESS"
+2. **Próxima ação:** Consulte "SECTION: PRÓXIMAS AÇÕES"
+3. **Fazer tarefa:** Escolha um Bloco/Tarefa e mude status
+4. **Comitar:** Com referência a Bloco/Tarefa completada
+5. **Atualizar:** Mude status de ❌ para ✅ em tabelas relevantes
 
 ---
 
-## 🔗 Links de Referência
+## 📊 ESTIMATIVA DE ESFORÇO
 
-| Link                                   | Propósito                                  |
-| -------------------------------------- | ------------------------------------------ |
-| `docs/REFACTORING_PLAN_GRANULAR_V2.md` | Plano mestre de execução das 43 subtarefas |
-| `docs/REFACTORING_QUICK_REFERENCE.md`  | Resumo operacional do fluxo de refatoração |
-| `docs/COMO_COMECAR.md`                 | Setup e workflow de trabalho               |
-| `CLAUDE.md`                            | Diretrizes de código, contrato e escopo    |
-
-## 🛑 Pausar / Retomar
-
-**Se tokens esgotar ou precisar pausar:**
-
-1. ✅ Garantir que MEMORY.md está 100% atualizado
-2. ✅ Fazer commit final: `chore: Atualizar MEMORY.md — sessão pausada`
-3. ✅ Feature branch fica em estado de trabalho-em-progresso (tudo staged/committed)
-4. ✅ Próximo agente lê MEMORY.md para entender contexto
-
-**Para retomar:**
-
-1. Ler `MEMORY.md` inteiro
-2. Ler seção "Próxima Ação"
-3. Rodar `git status` para verificar estado da branch
-4. Continuar do ponto exato onde parou
+| Fase                             | Horas   | Timeline        | Prioridade   |
+| -------------------------------- | ------- | --------------- | ------------ |
+| **Fase 1** (A-F)                 | 50h     | 2-3 semanas     | 🔴 CRÍTICO   |
+| **Bloco E** sozinho              | 24-30h  | 1-2 semanas     | 🔴 **MAIOR** |
+| **Fase 2** (Performance + OWASP) | 28h     | 2 semanas       | 🟡 ALTO      |
+| **TOTAL**                        | **78h** | **4-5 semanas** | —            |
 
 ---
 
-**Última atualização:** 30/03/2026  
-**Status:** Fase 2.6 concluída, 2.7 ready  
-**Sessão ativa:** SIM
+## ✅ CHECKLIST DE INÍCIO
+
+- [ ] Leu `docs/PLAN.md` inteiro
+- [ ] Leu CLAUDE.md (diretrizes)
+- [ ] Verificou git status (limpo em development)
+- [ ] Confirmou: `npm run type-check` em React (SEM ERROS)
+- [ ] Confirmou: `npm run type-check` em Vue (SEM ERROS)
+- [ ] Pronto para Bloco A/Tarefa A3 (remover TeacherCoursePage React)
