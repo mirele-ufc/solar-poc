@@ -102,9 +102,9 @@ describe("moduleService", () => {
       const error = new Error("Course not found");
       mockedPost.mockRejectedValueOnce(error);
 
-      await expect(
-        createModuleWithBackend(courseId, payload),
-      ).rejects.toThrow("Course not found");
+      await expect(createModuleWithBackend(courseId, payload)).rejects.toThrow(
+        "Course not found",
+      );
     });
 
     it("trata nomes longos corretamente", async () => {

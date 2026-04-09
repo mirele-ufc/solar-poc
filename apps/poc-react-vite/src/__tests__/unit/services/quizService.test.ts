@@ -275,9 +275,9 @@ describe("quizService", () => {
       const error = new Error("Quiz already submitted");
       mockedPost.mockRejectedValueOnce(error);
 
-      await expect(
-        submitQuiz("1", { answers: [] }),
-      ).rejects.toThrow("Quiz already submitted");
+      await expect(submitQuiz("1", { answers: [] })).rejects.toThrow(
+        "Quiz already submitted",
+      );
     });
   });
 
@@ -310,7 +310,9 @@ describe("quizService", () => {
 
       const result = await generateQuizForModuleWithBackend(moduleId);
 
-      expect(mockedPost).toHaveBeenCalledWith(`/modules/${moduleId}/quiz/gerar`);
+      expect(mockedPost).toHaveBeenCalledWith(
+        `/modules/${moduleId}/quiz/gerar`,
+      );
       expect(result.questions).toHaveLength(1);
     });
   });
