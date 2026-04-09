@@ -1,5 +1,6 @@
 import type { CourseInfoData } from '@/views/CreateCourseView.vue';
 
+import { createCourseSchema } from '@/validations/courseSchema';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 export interface Curso {
@@ -38,6 +39,16 @@ export const courseService = {
   },
 
   async createCourse(courseData: CourseInfoData, file: File | null) {
+    
+    await createCourseSchema.parseAsync({
+      title: courseData.title,
+      description: courseData.description,
+      category: courseData.category,
+      hours: courseData.hours,
+      requiredFields: courseData.requiredFields,
+      coverFile: file || undefined, 
+    });
+
     const formData = new FormData();
 
     const dadosJson = JSON.stringify({

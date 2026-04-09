@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { lessonService } from '@/services/api/lessonService';
+import { validateFileBeforeUpload } from '@/services/validation/fileValidator';
 
 const props = defineProps<{
   moduleId: number;
@@ -37,10 +38,23 @@ const handleStep1 = () => {
   step.value = 2;
 };
 
-const handleFileChange = (e: Event) => {
+const handleFileChange = async (e: Event) => {
   const target = e.target as HTMLInputElement;
-  const f = target.files?.[0];
-  if (f) file.value = f;
+  const rawFile = target.files?.[0];
+  
+  if (rawFile) {
+    const { isValid, errorMessage, file: validatedFile } = await validateFileBeforeUpload(rawFile, 'ANY');
+    
+    if (!isValid) {
+      error.value = errorMessage || "Erro de validação";
+      target.value = ''; 
+      file.value = null;
+      return;
+    }
+
+    error.value = "";
+    file.value = validatedFile;
+  }
 };
 
 const handleSaveLesson = async () => {
@@ -205,7 +219,13 @@ const handleConfirmQuiz = async () => {
           <button @click="fileInputRef?.click()" type="button" class="w-full h-[54px] border border-dashed border-[#8e8e8e] rounded-[12px] flex items-center justify-center hover:bg-[#f5f5f5] transition-colors">
             <p class="text-[14px] text-[#606060] font-['Figtree:Regular',sans-serif]">{{ file ? `✓ ${file.name}` : "Clique para selecionar um arquivo" }}</p>
           </button>
-          <input ref="fileInputRef" type="file" class="hidden" @change="handleFileChange" />
+          <input 
+            ref="fileInputRef" 
+            type="file" 
+            accept=".pdf,.docx,.jpg,.jpeg,.png,.mp4,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png,video/mp4"
+            class="hidden" 
+            @change="handleFileChange" 
+          />
         </div>
 
         <div class="flex items-center gap-[12px] pt-[4px]">
