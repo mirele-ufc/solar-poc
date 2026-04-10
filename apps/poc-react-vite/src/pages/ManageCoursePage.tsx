@@ -1,8 +1,8 @@
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import type { ICourseManageModule } from "@ava-poc/types";
 import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
+import { DonutChart } from "@/components/shared/DonutChart";
 import { Modal } from "@/components/ui/modal";
 import { LessonContentModal } from "@/components/LessonContentModal";
 import { toast } from "sonner";
@@ -843,35 +843,16 @@ function CourseDashboard({
       </div>
 
       {/* Pie chart */}
-      <div className="w-full h-[240px]" aria-hidden="true">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={pieData}
-              cx="50%"
-              cy="50%"
-              innerRadius={60}
-              outerRadius={90}
-              paddingAngle={3}
-              dataKey="value"
-            >
-              {pieData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Pie>
-            <Tooltip
-              formatter={(value: number, name: string) => [
-                `${value} aluno${value !== 1 ? "s" : ""} (${Math.round((value / totalStudents) * 100)}%)`,
-                name,
-              ]}
-              contentStyle={{
-                borderRadius: "8px",
-                border: "1px solid #e0e0e0",
-                fontSize: "13px",
-              }}
-            />
-          </PieChart>
-        </ResponsiveContainer>
+      <div className="w-full flex justify-center" aria-hidden="true">
+        <DonutChart
+          data={pieData}
+          innerRadius={60}
+          outerRadius={90}
+          paddingAngle={3}
+          formatTooltip={(value, name) =>
+            `${name}: ${value} aluno${value !== 1 ? "s" : ""} (${Math.round((value / totalStudents) * 100)}%)`
+          }
+        />
       </div>
 
       {/* Average score */}
