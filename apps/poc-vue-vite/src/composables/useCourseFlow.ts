@@ -7,7 +7,7 @@ import { ref, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
   getCourseById,
-  BackendCourseResponse,
+  type BackendCourseResponse,
 } from "@/services/api/courseService";
 
 export function useCourseFlow() {
