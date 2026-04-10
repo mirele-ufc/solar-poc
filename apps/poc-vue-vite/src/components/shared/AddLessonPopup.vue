@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { lessonService } from "@/services/api/lessonService";
 import { validateFileBeforeUpload } from "@/services/validation/fileValidator";
+import { sanitizeHtml } from "@/utils/sanitize";
 
 const props = defineProps<{
   moduleId: number;
@@ -400,7 +401,7 @@ const handleConfirmQuiz = async () => {
             <div
               v-else
               class="prose prose-sm max-w-none prose-headings:text-[#021b59] prose-p:leading-relaxed"
-              v-html="generatedContent"
+              v-html="sanitizeHtml(generatedContent)"
             ></div>
           </div>
 
