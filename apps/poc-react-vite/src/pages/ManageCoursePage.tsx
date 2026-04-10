@@ -1,9 +1,10 @@
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import type { ICourseManageModule } from "@ava-poc/types";
 import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
+import { DonutChart } from "@/components/shared/DonutChart";
 import { Modal } from "@/components/ui/modal";
+import { LessonContentModal } from "@/components/LessonContentModal";
 import { toast } from "sonner";
 
 // ── SVG paths ─────────────────────────────────────────────────────────────────
@@ -842,35 +843,16 @@ function CourseDashboard({
       </div>
 
       {/* Pie chart */}
-      <div className="w-full h-[240px]" aria-hidden="true">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={pieData}
-              cx="50%"
-              cy="50%"
-              innerRadius={60}
-              outerRadius={90}
-              paddingAngle={3}
-              dataKey="value"
-            >
-              {pieData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Pie>
-            <Tooltip
-              formatter={(value: number, name: string) => [
-                `${value} aluno${value !== 1 ? "s" : ""} (${Math.round((value / totalStudents) * 100)}%)`,
-                name,
-              ]}
-              contentStyle={{
-                borderRadius: "8px",
-                border: "1px solid #e0e0e0",
-                fontSize: "13px",
-              }}
-            />
-          </PieChart>
-        </ResponsiveContainer>
+      <div className="w-full flex justify-center" aria-hidden="true">
+        <DonutChart
+          data={pieData}
+          innerRadius={60}
+          outerRadius={90}
+          paddingAngle={3}
+          formatTooltip={(value, name) =>
+            `${name}: ${value} aluno${value !== 1 ? "s" : ""} (${Math.round((value / totalStudents) * 100)}%)`
+          }
+        />
       </div>
 
       {/* Average score */}
@@ -943,6 +925,7 @@ export function ManageCoursePage() {
     modId: string;
     lessonId: string;
   } | null>(null);
+  const [viewingLesson, setViewingLesson] = useState<string | null>(null);
   const [showParticipants, setShowParticipants] = useState(false);
   const [provaModId, setProvaModId] = useState<string | null>(null);
   const [generatingPDF, setGeneratingPDF] = useState(false);
@@ -967,6 +950,10 @@ export function ManageCoursePage() {
 
   const openEditLesson = (modId: string, lessonId: string) => {
     setEditingLesson({ modId, lessonId });
+  };
+
+  const openViewingLesson = (lessonName: string) => {
+    setViewingLesson(lessonName);
   };
 
   const saveLesson = (name: string) => {
@@ -1240,9 +1227,13 @@ export function ManageCoursePage() {
                       key={l.id}
                       className="bg-[#c5d6ff] flex items-center justify-between px-[16px] py-[14px] gap-[8px]"
                     >
-                      <p className="font-['Figtree:Medium',sans-serif] font-medium text-black text-[16px] flex-1 min-w-0 truncate">
+                      <button
+                        type="button"
+                        onClick={() => openViewingLesson(l.name)}
+                        className="flex-1 text-left font-['Figtree:Medium',sans-serif] font-medium text-black text-[16px] min-w-0 truncate hover:underline focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+                      >
                         {l.name}
-                      </p>
+                      </button>
                       <div className="flex items-center gap-[10px] shrink-0">
                         <button
                           type="button"
@@ -1295,6 +1286,13 @@ export function ManageCoursePage() {
           lessonName={getEditingLesson()!.name}
           onSave={(name) => saveLesson(name)}
           onClose={() => setEditingLesson(null)}
+        />
+      )}
+
+      {viewingLesson && (
+        <LessonContentModal
+          lessonName={viewingLesson}
+          onClose={() => setViewingLesson(null)}
         />
       )}
 

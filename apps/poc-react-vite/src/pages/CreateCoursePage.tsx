@@ -1,15 +1,16 @@
-import { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRef, useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormContainer } from "@/components/shared/FormContainer";
 import { PageHeader } from "@/components/shared/PageHeader";
 import {
-  createCourseSchema,
-  type CreateCourseFormValues,
+  courseCreateFormSchema,
+  type CourseCreateFormValues,
 } from "@/validations/courseSchema";
 import { imageFileSchema } from "@/validations/fileSchema";
 import { createCourseWithBackend } from "@/services/courseService";
+import { useCreationStore } from "@/store/useCreationStore";
 
 const fileImagePath =
   "M19.5 6.5H52L65 19.5V65C65 66.7239 64.3152 68.3772 63.0962 69.5962C61.8772 70.8152 60.2239 71.5 58.5 71.5H19.5C17.7761 71.5 16.1228 70.8152 14.9038 69.5962C13.6848 68.3772 13 66.7239 13 65V13C13 11.2761 13.6848 9.62279 14.9038 8.40381C16.1228 7.18482 17.7761 6.5 19.5 6.5ZM49.309 13H19.5V65H58.5V22.191H49.309V13ZM48.75 45.5C47.888 45.5 47.0614 45.1576 46.4519 44.5481C45.8424 43.9386 45.5 43.112 45.5 42.25C45.5 41.388 45.8424 40.5614 46.4519 39.9519C47.0614 39.3424 47.888 39 48.75 39C49.612 39 50.4386 39.3424 51.0481 39.9519C51.6576 40.5614 52 41.388 52 42.25C52 43.112 51.6576 43.9386 51.0481 44.5481C50.4386 45.1576 49.612 45.5 48.75 45.5ZM26 52L35.9775 42.25L45.5 52L48.75 48.75L52 52V58.5H26V52Z";
@@ -72,29 +73,64 @@ function FieldInput({
 
 export function CreateCoursePage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  // Get store access
+  const {
+    courseData: savedCourseData,
+    setCourseData,
+    clearAllCreationData,
+  } = useCreationStore();
+
+  // Clear stale creation data when entering fresh (not navigating back from modules)
+  const isFreshEntry = !location.state?.preserveDraft;
+  const hasCleared = useRef(false);
+  if (!hasCleared.current && isFreshEntry) {
+    hasCleared.current = true;
+    clearAllCreationData();
+  }
+
+  // After clearing, don't use stale store data for defaults
+  const initialData = isFreshEntry ? null : savedCourseData;
+
   const {
     watch,
     setValue,
     resetField,
     trigger,
     formState: { errors },
-  } = useForm<CreateCourseFormValues>({
-    resolver: zodResolver(createCourseSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      category: "",
-      hours: "",
-      requiredFields: [],
-    },
+  } = useForm<CourseCreateFormValues>({
+    resolver: zodResolver(courseCreateFormSchema),
+    defaultValues: initialData
+      ? {
+          title: initialData.title,
+          description: initialData.description,
+          category: initialData.category,
+          hours: initialData.hours,
+          requiredFields: initialData.requiredFields,
+        }
+      : {
+          title: "",
+          description: "",
+          category: "",
+          hours: "",
+          requiredFields: [],
+        },
   });
 
   const form = watch();
   const [error, setError] = useState("");
   const [showFieldErrors, setShowFieldErrors] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Restore image preview if navigating back with preserved draft
+  useEffect(() => {
+    if (!isFreshEntry && savedCourseData?.image) {
+      setImagePreview(savedCourseData.image);
+    }
+  }, [isFreshEntry, savedCourseData?.image]);
 
   const setField = (
     key: "title" | "description" | "category" | "hours",
@@ -172,6 +208,10 @@ export function CreateCoursePage() {
         hours: form.hours,
         requiredFields: form.requiredFields,
       };
+
+      // Save to store for persistence across page reloads
+      setCourseData(courseData);
+
       navigate("/create-course/modules", { state: { courseData } });
     } catch (apiError) {
       const err = apiError as { message?: string; status?: number };

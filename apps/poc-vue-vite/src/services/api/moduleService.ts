@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+import { apiClient } from "@/services/api";
 
 export interface Lesson {
   id: number;
@@ -24,37 +24,29 @@ export interface ApiResponse<T> {
 }
 
 export const moduleService = {
-    async createModule(courseId: number, name: string) {
-      const formData = new FormData();
-      const dadosPayload = { name: name };
+  async createModule(courseId: number, name: string) {
+    const formData = new FormData();
+    const dadosPayload = { name: name };
 
-       formData.append('dados', JSON.stringify(dadosPayload));
+    // Send dados as Blob with application/json type (matches React implementation)
+    formData.append(
+      "dados",
+      new Blob([JSON.stringify(dadosPayload)], { type: "application/json" }),
+    );
 
-      const response = await fetch(`${API_BASE_URL}/courses/${courseId}/modules`, {
-        method: 'POST',
-        body: formData
-      });
+    const response = await apiClient.post<ApiResponse<unknown>>(
+      `/courses/${courseId}/modules`,
+      formData,
+    );
 
-      if (!response.ok) {
-        const err = await response.json().catch(() => null);
-        throw new Error(err?.mensagem || 'Erro ao criar módulo');
-      }
-
-      const data = await response.json();
-      return data.dados; 
-  }, 
+    return response.data.dados;
+  },
 
   async getModulesByCourse(courseId: number) {
-    const response = await fetch(`${API_BASE_URL}/courses/${courseId}/modules`, {
-      method: 'GET',
-      headers: { 'Accept': 'application/json' }
-    });
+    const response = await apiClient.get<ApiResponse<Lesson[]>>(
+      `/courses/${courseId}/modules`,
+    );
 
-    if (!response.ok) {
-      throw new Error(`Erro HTTP ${response.status} ao buscar módulos`);
-    }
-
-    const data = await response.json();
-    return data.dados || []; 
+    return response.data.dados || [];
   },
 };

@@ -6,15 +6,16 @@ import {
   type BackendCourseResponse,
 } from "@/services/courseService";
 import { selectCanManageCourses, useAuthStore } from "@/store/useAuthStore";
+import fallbackBannerImage from "@/assets/a17a08a750e97ba9bb12c3ad582c426a8debf0fa.png";
 
-const FALLBACK_BANNER =
-  "https://images.unsplash.com/photo-1762330910399-95caa55acf04?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400";
+const FALLBACK_BANNER = fallbackBannerImage;
 
 type ListedCourse = {
   id: string;
   title: string;
   description?: string;
   imageSrc: string;
+  hasImagePath: boolean;
 };
 
 type CourseBadge = {
@@ -24,22 +25,24 @@ type CourseBadge = {
 };
 
 function resolveCourseImage(imagePath: string | null): string {
-  if (!imagePath?.trim()) {
-    return FALLBACK_BANNER;
+  // Se imagePath é fornecido e válido, usar ele
+  if (imagePath?.trim()) {
+    if (/^https?:\/\//i.test(imagePath)) {
+      return imagePath;
+    }
+
+    const apiBaseUrl = (
+      import.meta.env.VITE_API_URL || "http://localhost:8080"
+    ).replace(/\/$/, "");
+    const normalizedPath = imagePath.startsWith("/")
+      ? imagePath
+      : `/${imagePath}`;
+
+    return `${apiBaseUrl}${normalizedPath}`;
   }
 
-  if (/^https?:\/\//i.test(imagePath)) {
-    return imagePath;
-  }
-
-  const apiBaseUrl = (
-    import.meta.env.VITE_API_URL || "http://localhost:8080"
-  ).replace(/\/$/, "");
-  const normalizedPath = imagePath.startsWith("/")
-    ? imagePath
-    : `/${imagePath}`;
-
-  return `${apiBaseUrl}${normalizedPath}`;
+  // Fallback para imagem padrão quando não há imagePath do backend
+  return FALLBACK_BANNER;
 }
 
 function normalizeCourseTitle(value: string): string {
@@ -56,6 +59,7 @@ function mapCourseToDisplay(course: BackendCourseResponse): ListedCourse {
     description:
       course.description?.trim() || "Curso disponível na plataforma.",
     imageSrc: resolveCourseImage(course.imagePath),
+    hasImagePath: !!course.imagePath?.trim(),
   };
 }
 
@@ -115,6 +119,7 @@ function CourseGrid({
               imageAlt={course.title}
               description={showDescription ? course.description : undefined}
               badge={badge}
+              isImageFallback={!course.hasImagePath}
               onClick={() => onClickCourse(course)}
             />
           </div>
@@ -130,6 +135,7 @@ function CourseGrid({
             imageAlt={course.title}
             description={showDescription ? course.description : undefined}
             badge={badge}
+            isImageFallback={!course.hasImagePath}
             onClick={() => onClickCourse(course)}
           />
         ))}
@@ -169,11 +175,9 @@ export function CoursesPage() {
 
   const listedCourses = useMemo(
     () =>
-      courses.map(mapCourseToDisplay).sort((first, second) =>
-        first.title.localeCompare(second.title, "pt-BR", {
-          sensitivity: "base",
-        }),
-      ),
+      courses
+        .map(mapCourseToDisplay)
+        .sort((first, second) => Number(first.id) - Number(second.id)),
     [courses],
   );
 
@@ -248,22 +252,6 @@ export function CoursesPage() {
               badge={{ label: "Ativo", bg: "#e6f9ee", text: "#155724" }}
             />
           )}
-        </section>
-
-        <section
-          aria-labelledby="arquivados-heading"
-          className="flex flex-col gap-[20px] w-full"
-        >
-          <h2
-            id="arquivados-heading"
-            className="font-['Figtree:Bold',sans-serif] font-bold leading-[36px] text-[#021b59] text-[24px]"
-          >
-            Cursos arquivados
-          </h2>
-          <FeedbackState
-            title="Nenhum curso arquivado"
-            description="Quando esse status for disponibilizado pelo backend, ele aparecerá aqui automaticamente."
-          />
         </section>
       </div>
     );

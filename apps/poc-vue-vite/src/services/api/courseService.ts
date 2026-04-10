@@ -1,7 +1,9 @@
-import type { CourseInfoData } from '@/views/CreateCourseView.vue';
+import { apiClient } from "@/services/api";
+import type { CourseInfoData } from "@/views/CreateCourseView.vue";
+// STRESS TEST: descomentar para gerar 1000 cursos mock (scroll/rendering)
+// import { generateMockCourses } from "@/utils/generateMockCourses";
 
-import { createCourseSchema } from '@/validations/courseSchema';
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+import { courseCreateFormSchema } from "@/validations/courseSchema";
 
 export interface Curso {
   id: number;
@@ -13,6 +15,8 @@ export interface Curso {
   updatedAt: string;
 }
 
+export type BackendCourseResponse = Curso;
+
 export interface ApiResponse<T> {
   sucesso: boolean;
   mensagem: string;
@@ -22,60 +26,57 @@ export interface ApiResponse<T> {
 
 export const courseService = {
   async getCourses(): Promise<Curso[]> {
-    const response = await fetch(`${API_BASE_URL}/courses`, {
-      method: "GET",
-      headers: {
-        'Accept': 'application/json',
-      }
-    });
+    // STRESS TEST: descomentar a linha abaixo e comentar as duas seguintes
+    // return generateMockCourses(1000);
+    const response = await apiClient.get<ApiResponse<Curso[]>>("/courses");
+    return response.data.dados || [];
+  },
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || `Erro HTTP ${response.status}`);
-    }
-
-    const data: ApiResponse<Curso[]> = await response.json();
-    return data.dados || [];
+  async getCourseById(courseId: string): Promise<BackendCourseResponse> {
+    const response = await apiClient.get<ApiResponse<BackendCourseResponse>>(
+      `/courses/${courseId}`,
+    );
+    return response.data.dados;
   },
 
   async createCourse(courseData: CourseInfoData, file: File | null) {
-    
-    await createCourseSchema.parseAsync({
+    await courseCreateFormSchema.parseAsync({
       title: courseData.title,
       description: courseData.description,
       category: courseData.category,
       hours: courseData.hours,
       requiredFields: courseData.requiredFields,
-      coverFile: file || undefined, 
+      coverFile: file || undefined,
     });
 
     const formData = new FormData();
 
-    const dadosJson = JSON.stringify({
-      title: courseData.title,
-      category: courseData.category,
-      description: courseData.description,
-    });
-
-    formData.append("dados", dadosJson);
+    // Send dados as Blob with application/json type (matches React implementation)
+    formData.append(
+      "dados",
+      new Blob(
+        [
+          JSON.stringify({
+            title: courseData.title,
+            category: courseData.category,
+            description: courseData.description,
+          }),
+        ],
+        { type: "application/json" },
+      ),
+    );
 
     if (file) {
       formData.append("imagem", file);
     }
 
-    const response = await fetch(`${API_BASE_URL}/courses`, {
-      method: "POST",
-      body: formData,
-      headers: {
-        'Accept': 'application/json',
-      }
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || `Erro HTTP ${response.status}`);
-    }
-
-    return response.json();
-  }
+    const response = await apiClient.post<ApiResponse<Curso>>(
+      "/courses",
+      formData,
+    );
+    return response.data;
+  },
 };
+
+// Export função getCourseById seperadamente para compatibilidade com composables
+export const getCourseById = courseService.getCourseById;

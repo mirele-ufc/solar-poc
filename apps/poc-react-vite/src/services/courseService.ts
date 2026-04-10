@@ -4,6 +4,8 @@ import {
   ICreateCoursePayload,
   IUpdateCoursePayload,
 } from "@ava-poc/types";
+// STRESS TEST: descomentar para gerar 1000 cursos mock (scroll/rendering)
+// import { generateMockCourses } from "@/utils/generateMockCourses";
 
 type ApiEnvelope<T> = {
   sucesso: boolean;
@@ -36,6 +38,8 @@ export type BackendCourseResponse = {
  * @throws IApiError - If the request fails
  */
 export async function fetchCourses(): Promise<BackendCourseResponse[]> {
+  // STRESS TEST: descomentar a linha abaixo e comentar o try/catch
+  // return generateMockCourses(1000);
   try {
     const response =
       await apiClient.get<ApiEnvelope<BackendCourseResponse[]>>("/courses");

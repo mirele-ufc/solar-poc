@@ -1,55 +1,56 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+import { apiClient } from "@/services/api";
+
+export interface ApiResponse<T> {
+  sucesso?: boolean;
+  success?: boolean;
+  mensagem?: string;
+  message?: string;
+  dados?: T;
+  data?: T;
+  timestamp?: string;
+}
+
+export interface QuizQuestionPayload {
+  statement: string;
+  points: number;
+  alternatives: { text: string; correct: boolean }[];
+}
+
+export interface CreateQuizPayload {
+  questions: QuizQuestionPayload[];
+}
 
 export const quizService = {
   async generateAIQuiz(moduleId: string) {
-    const response = await fetch(`${API_BASE_URL}/modules/${moduleId}/quiz/gerar`, { method: 'POST' });
-    
-    const data = await response.json().catch(() => null);
+    const response = await apiClient.post<ApiResponse<unknown>>(
+      `/modules/${moduleId}/quiz/gerar?quantidade=5`,
+    );
 
-    if (!response.ok || (data && data.sucesso === false)) {
-      throw new Error(data?.mensagem || 'Erro ao gerar a prova com IA.');
-    }
-    
-    return data?.dados || data?.data || ""; 
+    return response.data.dados || response.data.data || "";
   },
 
   async regenerateAIQuiz(moduleId: string) {
-    const response = await fetch(`${API_BASE_URL}/modules/${moduleId}/quiz/regerar`, { method: 'POST' });
-    
-    const data = await response.json().catch(() => null);
+    const response = await apiClient.post<ApiResponse<unknown>>(
+      `/modules/${moduleId}/quiz/regerar?quantidade=5`,
+    );
 
-    if (!response.ok || (data && data.sucesso === false)) {
-      throw new Error(data?.mensagem || 'Erro ao regerar a prova com IA.');
-    }
-    
-    return data?.dados || data?.data || "";
+    return response.data.dados || response.data.data || "";
   },
 
   async confirmAIQuiz(moduleId: string) {
-    const response = await fetch(`${API_BASE_URL}/modules/${moduleId}/quiz/confirmar`, { method: 'POST' });
-    
-    const data = await response.json().catch(() => null);
+    const response = await apiClient.post<ApiResponse<unknown>>(
+      `/modules/${moduleId}/quiz/confirmar`,
+    );
 
-    if (!response.ok || (data && data.sucesso === false)) {
-      throw new Error(data?.mensagem || 'Erro ao confirmar a prova.');
-    }
-    
-    return data?.dados || data?.data || "ok";
+    return response.data.dados || response.data.data || "ok";
   },
 
-  async createQuizWithQuestions(moduleId: string, payload: any) {
-    const response = await fetch(`${API_BASE_URL}/modules/${moduleId}/quiz`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
+  async createQuizWithQuestions(moduleId: string, payload: CreateQuizPayload) {
+    const response = await apiClient.post<ApiResponse<unknown>>(
+      `/modules/${moduleId}/quiz`,
+      payload,
+    );
 
-    if (!response.ok) {
-      throw new Error('Erro ao criar quiz no servidor.');
-    }
-
-    return await response.json();
-  }
+    return response.data;
+  },
 };

@@ -15,6 +15,7 @@ type CourseCardProps = {
   onClick: () => void;
   description?: string;
   badge?: CourseCardBadge;
+  isImageFallback?: boolean;
 };
 
 export function CourseCard({
@@ -24,6 +25,7 @@ export function CourseCard({
   onClick,
   description,
   badge,
+  isImageFallback = false,
 }: CourseCardProps) {
   return (
     <button
@@ -34,12 +36,24 @@ export function CourseCard({
       <Card className="w-full gap-[10px] border-0 shadow-none rounded-[8px] bg-transparent">
         <Card.Header className="w-full p-0">
           <Card.Content className="w-full p-0">
-            <div className="w-full aspect-[16/10] overflow-hidden rounded-[8px] bg-[#e0e0e0] relative">
-              <ImageWithFallback
-                alt={imageAlt}
-                src={imageSrc}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-              />
+            <div
+              className={`w-full aspect-[16/10] overflow-hidden rounded-[8px] relative flex items-center justify-center ${
+                isImageFallback ? "bg-[#021b59]" : "bg-[#e0e0e0]"
+              }`}
+            >
+              {isImageFallback ? (
+                <ImageWithFallback
+                  alt={imageAlt}
+                  src={imageSrc}
+                  className="h-[80px] w-auto group-hover:scale-105 transition-transform duration-200"
+                />
+              ) : (
+                <ImageWithFallback
+                  alt={imageAlt}
+                  src={imageSrc}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                />
+              )}
               {badge && (
                 <span
                   className="absolute top-[8px] right-[8px] text-[11px] font-['Figtree:Medium',sans-serif] font-medium px-[8px] py-[2px] rounded-full"

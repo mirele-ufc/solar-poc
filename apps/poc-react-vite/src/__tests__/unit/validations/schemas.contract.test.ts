@@ -1,16 +1,19 @@
 import { describe, expect, it } from "vitest";
 import {
-  forgotPasswordSchema,
+  forgotPasswordRequestSchema,
   loginRequestSchema,
-  registerSchema,
+  registerFormSchema,
 } from "@/validations/authSchema";
 import {
-  courseCreateSchema,
-  courseUpdateSchema,
-  createModulesSchema,
+  courseCreateRequestSchema,
+  courseUpdateRequestSchema,
+  courseModulesFormSchema,
 } from "@/validations/courseSchema";
-import { enrollmentSchema } from "@/validations/enrollmentSchema";
-import { questionSchema, quizSubmitSchema } from "@/validations/examSchema";
+import { enrollmentFormSchema } from "@/validations/enrollmentSchema";
+import {
+  questionSchema,
+  quizSubmitRequestSchema,
+} from "@/validations/examSchema";
 import {
   imageFileSchema,
   optionalUploadFileSchema,
@@ -19,7 +22,7 @@ import {
   uploadFileSchema,
   videoFileSchema,
 } from "@/validations/fileSchema";
-import { composeMessageSchema } from "@/validations/messageSchema";
+import { messageComposeFormSchema } from "@/validations/messageSchema";
 
 const createFile = (sizeInBytes: number, type: string, name = "file.bin") =>
   new File([new Uint8Array(sizeInBytes)], name, { type });
@@ -35,7 +38,7 @@ describe("schemas contract alignment", () => {
   });
 
   it("should pass register with valid CPF", () => {
-    const result = registerSchema.safeParse({
+    const result = registerFormSchema.safeParse({
       nome: "João Silva",
       cpf: "12345678901",
       email: "valid@ufc.br",
@@ -75,7 +78,7 @@ describe("schemas contract alignment", () => {
   });
 
   it("should fail register when CPF is invalid", () => {
-    const result = registerSchema.safeParse({
+    const result = registerFormSchema.safeParse({
       cpf: "123",
       email: "valid@ufc.br",
       password: "123456",
@@ -87,7 +90,7 @@ describe("schemas contract alignment", () => {
   });
 
   it("should fail register when passwords do not match", () => {
-    const result = registerSchema.safeParse({
+    const result = registerFormSchema.safeParse({
       cpf: "12345678901",
       email: "valid@ufc.br",
       password: "123456",
@@ -99,7 +102,7 @@ describe("schemas contract alignment", () => {
   });
 
   it("should fail forgot password when email is invalid", () => {
-    const result = forgotPasswordSchema.safeParse({
+    const result = forgotPasswordRequestSchema.safeParse({
       email: "invalid-email",
     });
 
@@ -107,7 +110,7 @@ describe("schemas contract alignment", () => {
   });
 
   it("should fail course create when title is empty", () => {
-    const result = courseCreateSchema.safeParse({
+    const result = courseCreateRequestSchema.safeParse({
       titulo: "",
       descricao: "descricao",
       categoria: "categoria",
@@ -118,13 +121,13 @@ describe("schemas contract alignment", () => {
   });
 
   it("should fail course update when payload is empty", () => {
-    const result = courseUpdateSchema.safeParse({});
+    const result = courseUpdateRequestSchema.safeParse({});
 
     expect(result.success).toBe(false);
   });
 
   it("should allow modules schema when one module has no image", () => {
-    const result = createModulesSchema.safeParse({
+    const result = courseModulesFormSchema.safeParse({
       modules: [{}],
     });
 
@@ -132,7 +135,7 @@ describe("schemas contract alignment", () => {
   });
 
   it("should fail enrollment when firstName is missing", () => {
-    const result = enrollmentSchema.safeParse({
+    const result = enrollmentFormSchema.safeParse({
       firstName: "",
       lastName: "Silva",
       city: "Fortaleza",
@@ -171,7 +174,7 @@ describe("schemas contract alignment", () => {
   });
 
   it("should fail quiz submit when answers are empty", () => {
-    const result = quizSubmitSchema.safeParse({
+    const result = quizSubmitRequestSchema.safeParse({
       studentId: "student-id",
       courseId: "course-id",
       answers: [],
@@ -227,7 +230,7 @@ describe("schemas contract alignment", () => {
   });
 
   it("should fail compose message schema when subject is too long", () => {
-    const result = composeMessageSchema.safeParse({
+    const result = messageComposeFormSchema.safeParse({
       recipient: "usuario",
       subject: "a".repeat(201),
       message: "Mensagem válida",

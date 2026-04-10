@@ -1,38 +1,82 @@
 import { createBrowserRouter } from "react-router-dom";
-import { createElement } from "react";
+import { createElement, lazy, Suspense } from "react";
 import { LoginPage } from "./pages/LoginPage";
-import { RegisterPage } from "./pages/RegisterPage";
-import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
-import { ResetPasswordPage } from "./pages/ResetPasswordPage";
-import { UnauthorizedPage } from "./pages/UnauthorizedPage";
-import { AuthLayout } from "./components/shared/AuthLayout";
-import { CoursesPage } from "./pages/CoursesPage";
-import { CourseDetailPage } from "./pages/CourseDetailPage";
-import { EnrollmentPage } from "./pages/EnrollmentPage";
-import { ModulesPage } from "./pages/ModulesPage";
-import { LessonsPage } from "./pages/LessonsPage";
-import { ExamInstructionsPage } from "./pages/ExamInstructionsPage";
-import { ExamPage } from "./pages/ExamPage";
-import { ExamResultPage } from "./pages/ExamResultPage";
-import { ProfilePage } from "./pages/ProfilePage";
-import { CreateCoursePage } from "./pages/CreateCoursePage";
-import { CreateModulesPage } from "./pages/CreateModulesPage";
-import { CreateExamPage } from "./pages/CreateExamPage";
-import { ManageCoursePage } from "./pages/ManageCoursePage";
-import { MyCoursesPage } from "./pages/MyCoursesPage";
-import { MessagePage } from "./pages/MessagePage";
-import { MessagesPage } from "./pages/MessagesPage";
-import { StudentMessagesPage } from "./pages/StudentMessagesPage";
-
-import { PythonDetailPage } from "./pages/PythonDetailPage";
-import { PythonEnrollmentPage } from "./pages/PythonEnrollmentPage";
-import { PythonModulesPage } from "./pages/PythonModulesPage";
-import { PythonLessonsPage } from "./pages/PythonLessonsPage";
-import { PythonExamInstructionsPage } from "./pages/PythonExamInstructionsPage";
-import { PythonExamPage } from "./pages/PythonExamPage";
-import { PythonExamResultPage } from "./pages/PythonExamResultPage";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 import type { UserRole } from "./routes/types";
+
+// Lazy-loaded pages (code-split por rota)
+const RegisterPage = lazy(() =>
+  import("./pages/RegisterPage").then((m) => ({ default: m.RegisterPage })),
+);
+const UnauthorizedPage = lazy(() =>
+  import("./pages/UnauthorizedPage").then((m) => ({
+    default: m.UnauthorizedPage,
+  })),
+);
+const AuthLayout = lazy(() =>
+  import("./components/shared/AuthLayout").then((m) => ({
+    default: m.AuthLayout,
+  })),
+);
+const CoursesPage = lazy(() =>
+  import("./pages/CoursesPage").then((m) => ({ default: m.CoursesPage })),
+);
+const CourseDetailPage = lazy(() =>
+  import("./pages/CourseDetailPage").then((m) => ({
+    default: m.CourseDetailPage,
+  })),
+);
+const EnrollmentPage = lazy(() =>
+  import("./pages/EnrollmentPage").then((m) => ({
+    default: m.EnrollmentPage,
+  })),
+);
+const ModulesPage = lazy(() =>
+  import("./pages/ModulesPage").then((m) => ({ default: m.ModulesPage })),
+);
+const LessonsPage = lazy(() =>
+  import("./pages/LessonsPage").then((m) => ({ default: m.LessonsPage })),
+);
+const ExamInstructionsPage = lazy(() =>
+  import("./pages/ExamInstructionsPage").then((m) => ({
+    default: m.ExamInstructionsPage,
+  })),
+);
+const ExamPage = lazy(() =>
+  import("./pages/ExamPage").then((m) => ({ default: m.ExamPage })),
+);
+const ExamResultPage = lazy(() =>
+  import("./pages/ExamResultPage").then((m) => ({
+    default: m.ExamResultPage,
+  })),
+);
+const CreateCoursePage = lazy(() =>
+  import("./pages/CreateCoursePage").then((m) => ({
+    default: m.CreateCoursePage,
+  })),
+);
+const CreateModulesPage = lazy(() =>
+  import("./pages/CreateModulesPage").then((m) => ({
+    default: m.CreateModulesPage,
+  })),
+);
+const CreateExamPage = lazy(() =>
+  import("./pages/CreateExamPage").then((m) => ({
+    default: m.CreateExamPage,
+  })),
+);
+const ManageCoursePage = lazy(() =>
+  import("./pages/ManageCoursePage").then((m) => ({
+    default: m.ManageCoursePage,
+  })),
+);
+const MyCoursesPage = lazy(() =>
+  import("./pages/MyCoursesPage").then((m) => ({ default: m.MyCoursesPage })),
+);
+
+function SuspenseWrapper({ children }: { children: React.ReactNode }) {
+  return <Suspense fallback={null}>{children}</Suspense>;
+}
 
 // function createRoleGuard(allowedRoles: ReadonlyArray<UserRole>) {
 //   return function RoleGuard() {
@@ -49,10 +93,22 @@ const STUDENT_ONLY_ROLES: ReadonlyArray<UserRole> = ["student"];
 
 export const routes = createBrowserRouter([
   { index: true, Component: LoginPage },
-  { path: "register", Component: RegisterPage },
-  { path: "forgot-password", Component: ForgotPasswordPage },
-  { path: "reset-password", Component: ResetPasswordPage },
-  { path: "unauthorized", Component: UnauthorizedPage },
+  {
+    path: "register",
+    element: (
+      <SuspenseWrapper>
+        <RegisterPage />
+      </SuspenseWrapper>
+    ),
+  },
+  {
+    path: "unauthorized",
+    element: (
+      <SuspenseWrapper>
+        <UnauthorizedPage />
+      </SuspenseWrapper>
+    ),
+  },
   {
     element: createElement(ProtectedRoute, {
       allowedRoles: STUDENT_AND_PROFESSOR_ROLES,
@@ -60,37 +116,77 @@ export const routes = createBrowserRouter([
     children: [
       {
         path: "courses",
-        element: <AuthLayout />,
+        element: (
+          <SuspenseWrapper>
+            <AuthLayout />
+          </SuspenseWrapper>
+        ),
         children: [
-          { index: true, Component: CoursesPage },
-
-          { path: "power-bi", Component: CourseDetailPage },
-          { path: "power-bi/enrollment", Component: EnrollmentPage },
-          { path: "power-bi/modules", Component: ModulesPage },
-          { path: "power-bi/modules/:modId", Component: LessonsPage },
           {
-            path: "power-bi/exam/instructions",
-            Component: ExamInstructionsPage,
+            index: true,
+            element: (
+              <SuspenseWrapper>
+                <CoursesPage />
+              </SuspenseWrapper>
+            ),
           },
-          { path: "power-bi/exam", Component: ExamPage },
-          { path: "power-bi/exam/results", Component: ExamResultPage },
-
-          { path: "python", Component: PythonDetailPage },
-          { path: "python/enrollment", Component: PythonEnrollmentPage },
-          { path: "python/modules", Component: PythonModulesPage },
-          { path: "python/modules/:modId", Component: PythonLessonsPage },
           {
-            path: "python/exam/instructions",
-            Component: PythonExamInstructionsPage,
+            path: ":id",
+            element: (
+              <SuspenseWrapper>
+                <CourseDetailPage />
+              </SuspenseWrapper>
+            ),
           },
-          { path: "python/exam", Component: PythonExamPage },
-          { path: "python/exam/results", Component: PythonExamResultPage },
+          {
+            path: ":id/enrollment",
+            element: (
+              <SuspenseWrapper>
+                <EnrollmentPage />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: ":id/modules",
+            element: (
+              <SuspenseWrapper>
+                <ModulesPage />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: ":id/modules/:modId",
+            element: (
+              <SuspenseWrapper>
+                <LessonsPage />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: ":id/exam/instructions",
+            element: (
+              <SuspenseWrapper>
+                <ExamInstructionsPage />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: ":id/exam",
+            element: (
+              <SuspenseWrapper>
+                <ExamPage />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: ":id/exam/results",
+            element: (
+              <SuspenseWrapper>
+                <ExamResultPage />
+              </SuspenseWrapper>
+            ),
+          },
         ],
-      },
-      {
-        path: "profile",
-        element: <AuthLayout />,
-        children: [{ index: true, element: <ProfilePage /> }],
       },
     ],
   },
@@ -98,13 +194,7 @@ export const routes = createBrowserRouter([
     element: createElement(ProtectedRoute, {
       allowedRoles: STUDENT_ONLY_ROLES,
     }),
-    children: [
-      {
-        path: "received-messages",
-        element: <AuthLayout />,
-        children: [{ index: true, element: <StudentMessagesPage /> }],
-      },
-    ],
+    children: [],
   },
   {
     element: createElement(ProtectedRoute, {
@@ -113,35 +203,73 @@ export const routes = createBrowserRouter([
     children: [
       {
         path: "courses",
-        element: <AuthLayout />,
+        element: (
+          <SuspenseWrapper>
+            <AuthLayout />
+          </SuspenseWrapper>
+        ),
         children: [
-          { path: ":id/manage", element: <ManageCoursePage /> },
-          { path: "power-bi/manage", element: <ManageCoursePage /> },
+          {
+            path: ":id/manage",
+            element: (
+              <SuspenseWrapper>
+                <ManageCoursePage />
+              </SuspenseWrapper>
+            ),
+          },
         ],
       },
       {
         path: "my-courses",
-        element: <AuthLayout />,
-        children: [{ index: true, element: <MyCoursesPage /> }],
-      },
-      {
-        path: "create-course",
-        element: <AuthLayout />,
+        element: (
+          <SuspenseWrapper>
+            <AuthLayout />
+          </SuspenseWrapper>
+        ),
         children: [
-          { index: true, element: <CreateCoursePage /> },
-          { path: "modules", element: <CreateModulesPage /> },
-          { path: "exam", element: <CreateExamPage /> },
+          {
+            index: true,
+            element: (
+              <SuspenseWrapper>
+                <MyCoursesPage />
+              </SuspenseWrapper>
+            ),
+          },
         ],
       },
       {
-        path: "message",
-        element: <AuthLayout />,
-        children: [{ index: true, element: <MessagePage /> }],
-      },
-      {
-        path: "messages",
-        element: <AuthLayout />,
-        children: [{ index: true, element: <MessagesPage /> }],
+        path: "create-course",
+        element: (
+          <SuspenseWrapper>
+            <AuthLayout />
+          </SuspenseWrapper>
+        ),
+        children: [
+          {
+            index: true,
+            element: (
+              <SuspenseWrapper>
+                <CreateCoursePage />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: "modules",
+            element: (
+              <SuspenseWrapper>
+                <CreateModulesPage />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: "exam",
+            element: (
+              <SuspenseWrapper>
+                <CreateExamPage />
+              </SuspenseWrapper>
+            ),
+          },
+        ],
       },
     ],
   },

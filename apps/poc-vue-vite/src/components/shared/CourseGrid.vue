@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CourseCard from './CourseCard.vue';
+import CourseCard from "./CourseCard.vue";
 
 interface Course {
   id: string | number;
@@ -7,28 +7,38 @@ interface Course {
   hours?: string;
   imagePath?: string | null;
   description?: string;
-  isActive?: boolean;
+}
+
+interface Badge {
+  label: string;
+  bg: string;
+  text: string;
 }
 
 defineProps<{
   courses: Course[];
   showHours?: boolean;
+  badge?: Badge;
 }>();
 
 defineEmits<{
-  (e: 'click-course', id: string | number): void;
+  (e: "click-course", id: string | number): void;
 }>();
 </script>
 
 <template>
   <div class="w-full">
-    <div class="no-scrollbar flex gap-[16px] overflow-x-auto pb-[8px] md:hidden">
+    <div
+      class="no-scrollbar flex gap-[16px] overflow-x-auto pb-[8px] md:hidden"
+    >
       <div v-for="c in courses" :key="c.id" class="shrink-0 w-[200px]">
         <CourseCard
           :id="c.id"
           :title="c.title"
           :hours="showHours ? c.hours : undefined"
-          :is-active="c.isActive"
+          :description="c.description"
+          :imagePath="c.imagePath"
+          :badge="badge"
           @click="$emit('click-course', c.id)"
         />
       </div>
@@ -40,7 +50,9 @@ defineEmits<{
         :id="c.id"
         :title="c.title"
         :hours="showHours ? c.hours : undefined"
-        :is-active="c.isActive"
+        :description="c.description"
+        :imagePath="c.imagePath"
+        :badge="badge"
         @click="$emit('click-course', c.id)"
       />
     </div>

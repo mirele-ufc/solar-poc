@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import imgUfcLogo1 from "@/assets/9098abf5bf97a1aac4c76f171ec108cee92cfddb.png";
 import imgAtivo224X1 from "@/assets/a17a08a750e97ba9bb12c3ad582c426a8debf0fa.png";
 import {
-  registerSchema,
+  registerFormSchema,
   type RegisterFormValues,
 } from "@/validations/authSchema";
 
@@ -205,14 +205,14 @@ export function RegisterPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(registerFormSchema),
     defaultValues: {
       nome: "",
       cpf: "",
       email: "",
       password: "",
       confirmPassword: "",
-      perfil: undefined as any,
+      perfil: undefined as unknown as "professor" | "student",
     },
   });
 
@@ -241,11 +241,12 @@ export function RegisterPage() {
 
       toast.success("Conta pendente de ativação. Verifique seu email.");
       navigate("/");
-    } catch (error: any) {
-      const errorMessage = error.message || "Erro ao cadastrar usuário";
+    } catch (error: unknown) {
+      const err = error as { message?: string; status?: number };
+      const errorMessage = err.message || "Erro ao cadastrar usuário";
 
       // Tratamento específico de erros
-      if (error.status === 409) {
+      if (err.status === 409) {
         setGeneralError(
           "CPF ou email já cadastrados no sistema. Tente outro ou faça login.",
         );

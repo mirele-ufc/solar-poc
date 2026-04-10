@@ -1,5 +1,5 @@
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { defineStore } from "pinia";
+import { ref } from "vue";
 
 export interface UserProfile {
   name: string;
@@ -19,28 +19,29 @@ export interface SentMessage {
   sentAt: string;
 }
 
-const CREDENTIALS: Record<string, { password: string; profile: UserProfile }> = {
-  professor: {
-    password: "professor",
-    profile: {
-      name: "Prof. Eduardo Silva",
-      cpf: "98765432100",
-      email: "professor@ufc.br",
-      photoUrl: null,
-      role: "professor",
+const CREDENTIALS: Record<string, { password: string; profile: UserProfile }> =
+  {
+    professor: {
+      password: "professor",
+      profile: {
+        name: "Prof. Eduardo Silva",
+        cpf: "98765432100",
+        email: "professor@ufc.br",
+        photoUrl: null,
+        role: "professor",
+      },
     },
-  },
-  estudante: {
-    password: "estudante",
-    profile: {
-      name: "Mario Marinho",
-      cpf: "12345678901",
-      email: "eduardo.marinho@ufc.br",
-      photoUrl: null,
-      role: "student",
+    estudante: {
+      password: "estudante",
+      profile: {
+        name: "Mario Marinho",
+        cpf: "12345678901",
+        email: "eduardo.marinho@ufc.br",
+        photoUrl: null,
+        role: "student",
+      },
     },
-  },
-};
+  };
 
 const DEFAULT_USER: UserProfile = CREDENTIALS.estudante.profile;
 
@@ -57,8 +58,11 @@ const MOCK_MESSAGES: SentMessage[] = [
 ];
 
 // Funções auxiliares para persistência
-const loadAuthFromStorage = (): { isAuthenticated: boolean; user: UserProfile } => {
-  const stored = localStorage.getItem('auth-state');
+const loadAuthFromStorage = (): {
+  isAuthenticated: boolean;
+  user: UserProfile;
+} => {
+  const stored = localStorage.getItem("auth-state");
   if (stored) {
     try {
       const parsed = JSON.parse(stored);
@@ -74,15 +78,17 @@ const loadAuthFromStorage = (): { isAuthenticated: boolean; user: UserProfile } 
 };
 
 const saveAuthToStorage = (isAuthenticated: boolean, user: UserProfile) => {
-  localStorage.setItem('auth-state', JSON.stringify({ isAuthenticated, user }));
+  localStorage.setItem("auth-state", JSON.stringify({ isAuthenticated, user }));
 };
 
 // useAuthStore.ts
-export const useAuthStore = defineStore('auth', () => {
+export const useAuthStore = defineStore("auth", () => {
   const storedAuth = loadAuthFromStorage();
   const currentUser = ref<UserProfile>(storedAuth.user);
   const sentMessages = ref<SentMessage[]>(MOCK_MESSAGES);
   const isAuthenticated = ref(storedAuth.isAuthenticated);
+  const token = ref<string | null>(null);
+  const refreshToken = ref<string | null>(null);
 
   function login(username: string, password: string): boolean {
     const entry = CREDENTIALS[username.toLowerCase()];
@@ -98,6 +104,8 @@ export const useAuthStore = defineStore('auth', () => {
   function logout() {
     currentUser.value = DEFAULT_USER;
     isAuthenticated.value = false;
+    token.value = null;
+    refreshToken.value = null;
     sentMessages.value = [...MOCK_MESSAGES];
     saveAuthToStorage(false, DEFAULT_USER);
   }
@@ -110,7 +118,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  function sendMessage(message: Omit<SentMessage, 'id' | 'sentAt'>) {
+  function sendMessage(message: Omit<SentMessage, "id" | "sentAt">) {
     const newMessage: SentMessage = {
       ...message,
       id: `msg-${Date.now()}`,
@@ -119,13 +127,21 @@ export const useAuthStore = defineStore('auth', () => {
     sentMessages.value.push(newMessage);
   }
 
-  return { 
-    currentUser, 
-    sentMessages, 
-    isAuthenticated, // Exportando com o nome correto
-    login, 
-    logout, 
-    updateCurrentUser, 
-    sendMessage 
+  function setTokens(newToken: string | null, newRefreshToken?: string | null) {
+    token.value = newToken;
+    refreshToken.value = newRefreshToken ?? null;
+  }
+
+  return {
+    currentUser,
+    sentMessages,
+    isAuthenticated,
+    token,
+    refreshToken,
+    login,
+    logout,
+    setTokens,
+    updateCurrentUser,
+    sendMessage,
   };
 });
