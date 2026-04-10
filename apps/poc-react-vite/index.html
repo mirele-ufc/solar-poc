@@ -1,16 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- CSP: Restringe origens de scripts, estilos e conexões (OWASP A03) -->
+    <!-- Em produção, o backend deve enviar CSP via header HTTP (sem 'unsafe-inline' em script-src) -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline';
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+        font-src 'self' https://fonts.gstatic.com;
+        img-src 'self' data: https:;
+        connect-src 'self' http://localhost:8080;
+        frame-ancestors 'none';
+        base-uri 'self';
+        form-action 'self';
+      "
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Anek+Devanagari:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <title>Solar 3.0 - Devs</title>
+  </head>
 
-  <!DOCTYPE html>
-  <html lang="en">
-    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Anek+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-      <title>Solar 3.0 - Devs</title>
-    </head>
-
-    <body>
-      <div id="root"></div>
-      <script type="module" src="/src/main.tsx"></script>
-    </body>
-  </html>
-  
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

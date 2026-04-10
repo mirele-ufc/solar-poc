@@ -203,6 +203,10 @@ apiClient.interceptors.request.use(
       config.headers["Content-Type"] = "application/json";
     }
 
+    // CSRF mitigation: identifica requisições AJAX (OWASP A05)
+    // Backend deve validar este header em mutações (POST/PUT/DELETE)
+    config.headers["X-Requested-With"] = "XMLHttpRequest";
+
     if (storeToken) {
       config.headers.Authorization = `Bearer ${storeToken}`;
     }
