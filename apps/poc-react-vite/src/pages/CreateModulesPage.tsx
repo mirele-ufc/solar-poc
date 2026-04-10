@@ -18,6 +18,7 @@ import {
   regenerateLessonContentWithBackend,
 } from "@/services/lessonService";
 import { useCreationStore } from "@/store/useCreationStore";
+import { sanitizeHtml } from "@/utils/sanitize";
 
 // ── SVG paths ──────────────────────────────────────────────────────────────────
 const docPath =
@@ -446,12 +447,20 @@ function AddLessonPopup({
                 Conteúdo gerado
               </p>
 
-              <textarea
-                value={generatedContent}
-                readOnly
-                placeholder="O conteúdo gerado pela IA aparecerá aqui..."
-                className="min-h-[100px] w-full rounded-[12px] border border-[#dddddd] bg-white px-[12px] py-[10px] font-['Figtree:Regular',sans-serif] text-[14px] text-[#606060] placeholder-[#9a9a9a] outline-none resize-none"
-              />
+              <div className="min-h-[100px] max-h-[150px] w-full overflow-y-auto rounded-[12px] border border-[#dddddd] bg-white px-[12px] py-[10px]">
+                {generatedContent ? (
+                  <div
+                    className="prose prose-sm max-w-none prose-headings:text-[#021b59] prose-p:leading-relaxed font-['Figtree:Regular',sans-serif] text-[14px] text-[#606060]"
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeHtml(generatedContent),
+                    }}
+                  />
+                ) : (
+                  <p className="font-['Figtree:Regular',sans-serif] text-[14px] text-[#9a9a9a] italic">
+                    O conteúdo gerado pela IA aparecerá aqui...
+                  </p>
+                )}
+              </div>
 
               <div className="flex flex-col gap-[12px]">
                 <button
