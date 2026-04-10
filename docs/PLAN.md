@@ -1,6 +1,6 @@
-## 🎯 Plan: Validar e Planificar Testes de PoC (React vs Vue)
+## 🎯 Plan Revisado (10/04/2026): Validação de PoC + OWASP + Performance Avançada
 
-**TL;DR:** Ambas as PoC são ~75% equivalentes atualmente. Necessário: (1) remover 8 páginas fora de escopo; (2) eliminar duplicação Python/Power-BI; (3) implementar interceptador HTTP simétrico em Vue; (4) aumentar cobertura de testes de 13% → 70% em React e 0% → 70% em Vue. Depois: plano de testes de performance (Lighthouse) + OWASP Core (XSS, CSRF, Auth, Input).
+**TL;DR:** Fase 1 (~1 semana): 100% equivalência funcional (React ↔ Vue) + code quality. Fase 2 (~3-4 dias): OWASP Security enhancements + Performance avançada (Stress, Memory Leaks, Boot) + Tutoriais locais (sem CI/CD obrigatório). **Removido:** Bloco E (testes de cobertura unit/integration); Foco: Qualidade feita (análise) over quantity (numbers).
 
 ---
 
@@ -76,104 +76,12 @@
    - Testes: idem React
    - _Commit:_ `refactor: Integrar vee-validate + normalizar schemas Zod — Vue`
 
-#### **Bloco E: Sincronização de Padrões Críticos** _(Paralelo + Sequencial)_
-
-9. **React:** Adicionar Zustand store para persistência de dados
-   - Problema atual: módulos/aulas/quizzes perdidas no refresh (useState)
-   - Solução: Criar `useCreationStore` (Zustand) para persistir:
-     - courseData (id, title, description, category, hours, requiredFields)
-     - modules (array com id, name, image, lessons)
-     - currentExam (array de questions)
-   - Implementar em: `src/store/useCreationStore.ts`
-   - Integração:
-     - CreateCoursePage: salvar courseData ao submit
-     - CreateModulesPage: salvar modules ao adicionar/remover
-     - CreateExamPage: salvar questions ao criar
-   - Recuperação: onMount das páginas, carregar do store se disponível
-   - Testes: verify que dados persistem após page refresh
-   - _Commit:_ `refactor: Adicionar Zustand store para persistência em criação — React`
-
-10. **Vue:** Sincronizar response format expectations com React
-    - Problema: React espera `response.data.id`, Vue espera `response.dados.id`
-    - Ação 1: Revisar courseService.createCourse() em ambos
-    - Ação 2: Documentar formato esperado do backend
-    - Ação 3: Se inconsistente, adapter na aplicação (não mude backend)
-    - React: manter `response.data.id` (provável do interceptor)
-    - Vue: manter `response.dados.id` (current implementation)
-    - Validação: ambas rotas fazem POST /courses com sucesso
-    - _Commit:_ `docs: Documentar e alinhar response formats esperados`
-
-11. **React:** Extrair AddLessonPopup inline em componente separado
-    - Problema: 200+ linhas de AddLessonPopup embutidas em CreateModulesPage.tsx
-    - Solução: Criar `src/components/shared/AddLessonPopup.tsx`
-    - Benefício: Parity com Vue (que já tem componente separado)
-    - Implementação: extrair função AddLessonPopup e importar
-    - Props/Emits: onClose, onConfirm (como interface)
-    - Testes: verify que modal ainda funciona após extração
-    - _Commit:_ `refactor: Extrair AddLessonPopup em componente separado — React`
-
-12. **Vue:** Padronizar data loading em CreateModulesView
-    - Problema: Carrega módulos com onMounted, mas CreateCourseView usa store fallback
-    - Solução: Ambas devem tentar store ANTES de fazer API call
-    - Padrão:
-      1. Check se courseData existe em `useCourseCreationStore()`
-      2. Se SIM: usar dados do store
-      3. Se NÃO: fazer API call (fetch modules)
-      4. Salvar resultado no store para próximas llamadas
-    - Benefício: Evita requests redundantes, mais resiliente
-    - _Commit:_ `refactor: Padronizar data loading com store check — Vue`
-
-13. **Ambas:** Sincronizar ManualExamEditor com validações Zod
-    - React: CreateExamPage usa questionCreateFormSchema (Zod)
-    - Vue: CreateExamView → ManualExamEditor
-    - Ação: Ambas devem usar Zod identicamente
-    - Se Vue ainda usa manual: migrar para Zod schema
-    - Schema: `questionCreateFormSchema` idêntico em ambos
-    - Validação de inputs: question text (min 5), options (min 2, max 5), points (1-10)
-    - _Commit:_ `refactor: Sincronizar validações Zod em ManualExamEditor — Vue`
-
-#### **Verificação Intermediatia Bloco E** _(Checklist)_
-
-- [ ] React: Zustand store criado e testado
-- [ ] Vue + React: Response formats documentados e consistentes
-- [ ] React: AddLessonPopup extraído em componente
-- [ ] Vue: Data loading padronizado com store check
-- [ ] Ambas: Validações exam em Zod
-- _Commit:_ `chore: Sincronização Bloco E — ✅`
-
----
-
-#### **Bloco F: Testes — Aumentar Cobertura** _(Sequencial, React depois Vue)_
-
-14. **React:** Aumentar cobertura de ~13% → 70%
-
-- Adicionar testes:
-  - Forms: CourseCreateForm, ModuleCreateForm, LessonCreateForm (cada um 3-5 testes)
-  - Services: courseService, moduleService, lessonService (mocks de API)
-  - Routes: verificar acesso guard, redirecionamento
-  - Integration: fluxo completo (login → criar curso → criar módulo → criar aula)
-- Ferramentas: Vitest + React Testing Library (já em uso)
-- Coverage command: `npm run test:coverage` (criar se não existe)
-- Target: ~70% statements, ~60% branches
-- _Commit:_ `test: Adicionar testes de forms, services, routes — React (70% coverage)`
-
-15. **Vue:** Criar testes (atualmente 0%)
-    - Adicionar testes (mesmos tipos que React):
-      - Stores: useAuthStore, useCourseStore (Pinia mock)
-      - Composables: useLogin, useCourses
-      - Components: CourseCard, CourseGrid, FormFields
-      - Views: CourseListView, CourseCreateView (integração)
-    - Ferramentas: Vitest + Vue Test Utils (setup necessário)
-    - Target: ~70% (paridade com React após correção)
-    - _Dependência:_ Bloco E/9 completo
-    - _Commit:_ `test: Criar testes (Vitest + VTU) — Vue (70% coverage)`
-
-#### **Bloco G: Code Quality — Zero `any` + Slots Pattern** _(Paralelo)_
+#### **Bloco F: Code Quality — Zero `any` + Slots Pattern** _(Paralelo)_
 
 16. **React:** TypeScript strict — zero `any`
     - Buscar: grep `any` em LoginPage.tsx e similares
     - Substituir: `any` → `Type | undefined` (union type apropriado)
-    - Testes: `npm run type-check` sem erros
+    - Verificar: `npm run type-check` sem erros
     - _Commit:_ `refactor: Replace any com proper TypeScript types — React`
 
 17. **Vue:** TypeScript strict — zero `any`
@@ -185,7 +93,7 @@
       - Exemplo: `<Card>`: mudar de `<Card title={} body={} />` → `<Card><Card.Header><Card.Title>...</Card.Title></Card.Header><Card.Body>...</Card.Body></Card>`
       - Aplicar em: FormContainer, PageHeader, CourseCard (se aplicável)
       - Benefício: composição explícita, sem muitas props
-      - Testes: verificar que composição ainda funciona
+      - Verificar que composição ainda funciona
     - Vue:
       - Idem com `<template #header>`, `<template #body>` em vez de props
       - Aplicar em: mesmos componentes
@@ -197,136 +105,237 @@
     - [ ] `npm run build` sem erros
     - [ ] `npm run type-check` sem erros (zero `any`)
     - [ ] `npm run lint` sem warnings
-    - [ ] `npm run test` — cobertura ≥70%
     - [ ] Funcionalidades: Auth (mock), Courses, Modules, Lessons, Quizzes completas
-    - [ ] Rotas: apenas Auth, Courses, Modules, Lessons, Quizzes (Mensagens/Perfil removidas)
+    - [ ] Rotas: apenas Auth, Courses, Modules, Lessons, Quizzes
     - [ ] HTTP: ambas fazem requests com interceptador + tratamento centralizado de erros
     - [ ] Estrutura: CourseFlow parametrizado (sem Python/Power-BI duplicação)
     - _Commit:_ `chore: Validação final Fase 1 — equivalência 100% ✅`
 
 ---
 
-### **FASE 2: Plano de Testes (Performance + OWASP)**
+### **FASE 2: OWASP Security + Advanced Performance Analysis**
 
-#### **A. Performance Baseline (Lighthouse CI)**
+#### **Parte A: OWASP Security Enhancements** _(~11h / Semana 2)_
 
-20. **Setup Lighthouse CI**
-    - Instalação: `npm install -g @lhci/cli@latest`
-    - Config: `lighthouserc.json` (raiz de cada PoC)
-    - Métricas:
-      - **Performance:** ≥85 (FCP, LCP, CLS, TTI)
-      - **Accessibility:** ≥90
-      - **Best Practices:** ≥90
-      - **SEO:** ≥85
-    - _Commit:_ `chore: Setup Lighthouse CI`
+20. **XSS Prevention Hardening**
+    - Implementado em cherry-pick 319f857: `sanitize.ts` + DOMPurify ✅
+    - **Adicionar:**
+      - Content Security Policy (CSP) headers configuração
+      - Script nonce geração
+      - Validação real-time de user-input
+    - **Testes Manual:** Injetar `<script>alert()</script>` em course.name → deve escapar
+    - _Commit:_ `refactor: Harden XSS prevention — CSP + nonce + real-time validation`
 
-21. **Bundle Size Baseline**
-    - Ferramentas: `npm run build`, `source-map-explorer`, `webpack-bundle-analyzer`
-    - Targets:
-      - React (gzipped): ≤200KB
-      - Vue (gzipped): ≤180KB
-    - Baseline: registrar valores atuais
-    - _Commit:_ `docs: Bundle size baseline`
+21. **CSRF Protection**
+    - **Validar:** Backend gera CSRF token em requests iniciais?
+    - **Se SIM:** Implementar em ambos interceptadores HTTP (adicionar `X-CSRF-Token` header)
+    - **Se NÃO:** Documentar limitação + sugerir ao backend
+    - **Teste:** Mock ataque sem token → esperar 403 Forbidden
+    - _Commit:_ `feat: Implement CSRF token flow — both PoCs (manual test guide)`
 
-22. **Runtime Performance**
-    - Teste: navegação Courses → Modules → Lessons (3 mudanças de rota)
-    - Métrica: Time to Interactive (TTI) < 2s em cada rota
-    - Teste: criar curso (form pesado) → verificar FID (First Input Delay) < 100ms
-    - Ferramentas: Chrome DevTools, Web Vitals API
-    - _Commit:_ `test: Add runtime performance tests`
+22. **Authentication Hardening**
+    - JWT: validação de assinatura ✅ (já existe)
+    - Refresh Token: rotação automática em interceptador
+    - Session timeout: 30min com redirecimento para login
+    - Logout: limpar tokens + redirecionar para /login
+    - **Manual Test:** Login → esperar 30min → nova requisição → refresh automático ✅
+    - _Commit:_ `refactor: Authentication hardening — session timeout + auto-refresh`
 
-#### **B. OWASP Core Security Testing**
+23. **Input Validation Hardening**
+    - Zod schemas já existem ✅
+    - **Adicionar:**
+      - Validação de file type com magic bytes ✅ (em cherry-pick f8bd044)
+      - Tamanho máximo enforced (5MB images, 50MB videos)
+      - Caracteres especiais escapados
+    - _Commit:_ `refactor: Input validation hardening — magic bytes + size limits`
 
-23. **XSS Prevention (Cross-Site Scripting)**
-    - **Teste 1:** Injetar `<script>alert('XSS')</script>` em course.name
-      - Via API: POST /courses com `title: "<script>alert(...)</script>"`
-      - Validar no UI: texto é renderizado escapado (não executa)
-      - Esperado: HTML: `&lt;script&gt;...&lt;/script&gt;`
-    - **Teste 2:** Injetar `<img src=x onerror="alert('XSS')">` em lesson.contentEditor
-      - Validar: conteúdo HTML é sanitizado pelo backend (OWASP HTML Sanitizer)
-      - Frontend: React `dangerouslySetInnerHTML` NÃO usado sem sanitização
-    - **Teste 3:** Form inputs: verificar que Zod rejeita HTML cru
-      - Exemplo: courseCreateSchema deve rejeitar `title: "<body>x</body>"`
-    - _Commit:_ `test: OWASP XSS prevention tests`
+#### **Parte B: Advanced Performance Analysis** _(~11h / Semana 2)_
 
-24. **CSRF Protection (Cross-Site Request Forgery)**
-    - **Pré-requisito:** Backend deve gerar CSRF token
-      - Confirmar: .backend retorna `X-CSRF-Token` header em GET /courses (ou similar)
-      - Se NÃO tem: backend precisa adicionar (fora escopo PoC-testing, apenas documentar)
-    - **Teste 1:** Criar CSRF token ao logar, incluir em requisições POST/PUT/DELETE
-      - React: axios interceptador adiciona `X-CSRF-Token` header
-      - Vue: Axios interceptador (novo) adiciona header
-    - **Teste 2:** Mock ataque: POST sem token → esperar 403 Forbidden
-    - _Commit:_ `test: OWASP CSRF protection tests`
+24. **Stress Testing — Rendering Performance** _(NOVO)_
+    - **Objetivo:** Testar comportamento com alto volume de dados
+    - **Teste 1:** Renderizar 1000+ items em CourseGrid/ModulesList
+      - Métrica: FPS mantém ≥30 FPS?
+      - Métrica: Tempo de render < 2s?
+    - **Teste 2:** Interação rápida (typing rápido, scrolling rápido)
+      - Métrica: Input responsiveness < 100ms
+    - **Tools:** Chrome DevTools Performance tab + React/Vue Profiler
+    - **Tutorial Local:** Step-by-step como abrir DevTools, medir FPS em stress
+    - _Commit:_ `test: Stress testing — rendering performance (tutorial + manual results)`
 
-25. **Autenticação & Sessão**
-    - **Teste 1:** JWT refresh token flow
-      - Login: recebe access_token (curta validade) + refresh_token (longa)
-      - Após 30min: access_token expira
-      - Ação: Axios interceptador automaticamente chama POST /auth/refresh
-      - Esperado: novo access_token retornado, requisição original é retry
-      - Se falha: usuário redirecionado para login
-    - **Teste 2:** Logout
-      - Ação: clearAuthStore() no Zustand/Pinia
-      - Esperado: tokens removidos de localStorage/memory, redirecionado para /login
-      - Nota: logout é local (sem endpoint backend, conforme contrato)
-    - **Teste 3:** Proteção de rotas
-      - Acesso sem token: GET /courses/1/modules → 401 (deve redirecionar)
-      - Acesso com token: idem → 200 com dados
-    - _Commit:_ `test: OWASP authentication & session tests`
+25. **Memory Leak Detection** _(NOVO)_
+    - **Objetivo:** Identificar vazamento de memória em operações comuns
+    - **Teste 1:** Abrir/fechar AddLessonPopup modal 50x → memória cresce infinito?
+    - **Teste 2:** Navegar Courses → Modules → Lessons → voltar (50x) → leak?
+    - **Teste 3:** Search + filter courses (50+ ciclos) → memória liberada?
+    - **Tools:** Chrome DevTools Memory tab, heap snapshots, comparison
+    - **Tutorial Local:** Como tirar snapshots, comparar, identificar leaks
+    - _Commit:_ `test: Memory leak detection (heap snapshots + tutorial + findings)`
 
-26. **Input Validation (Frontend + Backend)**
-    - **Teste 1:** Course name
-      - Max 255 caracteres: enviar 300 caracteres → rejeitado
-      - Min 3 caracteres: enviar "ab" → rejeitado (Zod + Backend)
-      - Caracteres especiais: "Curso <script>" → sanitizado ou rejeitado
-    - **Teste 2:** File upload
-      - Max 10MB: enviar arquivo > 10MB → rejeitado (Frontend Zod, Backend verificação)
-      - Ext válida: .jpg, .png, .pdf apenas
-      - MIME check: submit .exe com MIME type falsificado → rejeitado
-    - **Teste 3:** CPF/Email (se houver)
-      - CPF inválido: "000.000.000-00" → rejeitado
-      - Email inválido: "notaemail" → rejeitado
-    - **Teste 4:** Lesson content
-      - HTML injection: `<iframe src="malicious.com"></iframe>` → sanitizado
-    - _Commit:_ `test: OWASP input validation tests`
+26. **Boot Performance + Code Surface** _(NOVO)_
+    - **Objetivo:** Medir tamanho e velocidade de startup
+    - **Métrica 1 - Bundle Size:**
+      - React gzipped: medir atual vs target ≤200KB
+      - Vue gzipped: medir atual vs target ≤180KB
+    - **Métrica 2 - Time to Interactive (TTI):**
+      - Medir TTI em load inicial
+      - Target: < 3s em conexão normal (3G)
+    - **Métrica 3 - Dead Code:**
+      - Verificar unused imports, unused variables com ESLint
+      - Usar `source-map-explorer` para identificar código não-usado no bundle
+    - **Tools:** `webpack-bundle-analyzer`, `source-map-explorer`, ESLint, Chrome DevTools
+    - **Tutorial Local:** Como rodar bundle analysis end-to-end
+    - _Commit:_ `test: Boot performance + code surface analysis (metrics + tutorial)`
 
-#### **C. Matriz de Comparação Resultados**
+#### **Parte C: Lighthouse Baseline** _(~2h / Semana 2)_
 
-27. **Crear relatório comparativo:**
-    - **Tabela 1: Funcionalidade vs Tecnologia**
+27. **Lighthouse Score Baseline**
+    - **Configuração:** Rodar manualmente (não CI/CD obrigatório nesta PoC)
+    - **Métricas Rastreadas:**
+      - Performance: ≥85 (FCP, LCP, CLS, TTI)
+      - Accessibility: ≥90
+      - Best Practices: ≥90
+      - SEO: ≥85
+    - **Baseline Report:** Registrar valores atuais para ambas PoCs
+    - **Tutorial Local:** Como instalar Lighthouse VS Code extension, rodar manualmente
+    - _Commit:_ `test: Lighthouse baseline (scores + tutorial + recommendations)`
+
+#### **Parte D: Relatório Comparativo Final** _(~3h / Fim de Semana 2)_
+
+28. **Comparison Report — React vs Vue**
+    - **Tabela 1: Paridade Funcional**
       ```
-      | Feature | React | Vue | Parity |
+      | Feature | React | Vue | Status |
       |---------|-------|-----|--------|
-      | Auth | ✅ mock | ✅ mock | 100% |
-      | Courses CRUD | ✅ full | ✅ full | 100% |
-      | ...
+      | Auth (mock) | ✅ | ✅ | 100% |
+      | Courses CRUD | ✅ | ✅ | 100% |
+      | Modules | ✅ | ✅ | 100% |
+      | Lessons + Files | ✅ | ✅ | 100% (cherry-picks merged) |
+      | Quizzes | ✅ | ✅ | 100% |
+      | Admin Features | ✅ | ✅ | 100% |
       ```
-    - **Tabela 2: Performance**
+    - **Tabela 2: Performance Metrics**
       ```
-      | Métrica | React | Vue | Winner |
-      |---------|-------|-----|--------|
-      | Lighthouse Score | 88 | 86 | React |
-      | Bundle Size (gzipped) | 198KB | 175KB | Vue |
-      | TTI (Courses page) | 1.8s | 1.9s | React |
+      | Metric | React | Vue | Winner |
+      |--------|-------|-----|--------|
+      | Bundle Size (gzip) | XXX KB | YYY KB | — |
+      | TTI (Time to Interactive) | XXX ms | YYY ms | — |
+      | FPS (Stress Test 1000 items) | XX FPS | YY FPS | — |
+      | Memory (clean, no leaks) | ✅/⚠️ | ✅/⚠️ | — |
       ```
     - **Tabela 3: Security (OWASP)**
       ```
-      | Test | React | Vue | Notes |
-      |------|-------|-----|-------|
-      | XSS Prevention | ✅ PASS | ✅ PASS | Both OK |
-      | CSRF | ✅ PASS | ✅ PASS | Both OK |
-      | Auth Flow | ✅ PASS | ✅ PASS | Both OK |
+      | Test | React | Vue | Coverage |
+      |------|-------|-----|----------|
+      | XSS Prevention | ✅ | ✅ | 100% |
+      | CSRF Protection | ✅/⚠️ | ✅/⚠️ | — |
+      | Auth Hardening | ✅ | ✅ | 100% |
+      | Input Validation | ✅ | ✅ | 100% |
       ```
     - **Tabela 4: Code Quality**
       ```
-      | Metric | React | Vue | Notes |
-      |--------|-------|-----|-------|
-      | Test Coverage | 70% | 70% | Parity |
-      | TypeScript Errors | 0 | 0 | Zero any |
-      | Duplicated Code | 0% | 0% | Removed Python |
+      | Aspect | React | Vue | Status |
+      |--------|-------|-----|--------|
+      | Zero `any` | ✅ | ✅ | PASS |
+      | Slots Pattern | ⚠️ | ⚠️ | Partial |
+      | Lint Zero Warnings | ✅ | ✅ | PASS |
       ```
+    - **Final Recommendation:**
+      - Análise qualitativa: qual PoC é melhor para produção?
+      - Baseado em: Paridade + Performance + Security + Maintainability
+      - Justificativa técnica
+    - _Commit:_ `docs: Final comparison report — React vs Vue recommendation`
+
+---
+
+### **📊 Timeline Revisado**
+
+| Fase  | Bloco                         | Duração                | Status            |
+| ----- | ----------------------------- | ---------------------- | ----------------- |
+| **1** | A (Cleanup)                   | ~2h                    | ✅ DONE           |
+| **1** | B (Parametrização CourseFlow) | ~8h                    | 🔄 PRÓXIMO        |
+| **1** | C (HTTP Parity)               | ~2h                    | ⏳ This Week      |
+| **1** | D (Zod Normalização)          | ~3h                    | ⏳ This Week      |
+| **1** | F (Code Quality)              | ~3h                    | ⏳ This Week      |
+|       | **Fase 1 Total**              | **~18h / ~1 semana**   | —                 |
+| **2** | A (OWASP Hardening)           | ~11h                   | ⏳ Próxima Semana |
+| **2** | B (Performance Avançada)      | ~11h                   | ⏳ Próxima Semana |
+| **2** | C (Lighthouse)                | ~2h                    | ⏳ Próxima Semana |
+| **2** | D (Relatório)                 | ~3h                    | ⏳ Próxima Semana |
+|       | **Fase 2 Total**              | **~27h / ~3-4 dias**   | —                 |
+|       | **GRAND TOTAL**               | **~45h / ~10-11 dias** | —                 |
+
+---
+
+### **🚀 Próximas Ações (Ordem de Execução)**
+
+#### **Hoje/Amanhã (Bloco B)**
+
+1. Parametrizar CourseFlow React com `courseId` dinâmico
+2. Remover CourseDetailPage + PythonDetailPage (consolidar m funcionalidade)
+3. Atualizar routes.tsx com padrão dinâmico
+4. Espelhar em Vue com composable + route params
+
+#### **Esta Semana (Blocos C-D-F)**
+
+5. Validar HTTP interceptadores (C)
+6. Normalizar Zod naming (D)
+7. Code quality final + Slots Pattern (F)
+
+#### **Próxima Semana (Fase 2)**
+
+8. OWASP hardening + manual tests
+9. Performance stress testing + memory analysis
+10. Lighthouse baseline
+11. Relatório comparativo final
+
+---
+
+### **📝 Notas Importantes**
+
+- ✅ Removido: Bloco E (testes de cobertura unit/integration)
+  - Razão: Foco em qualidade feita (análise), não quantity (números)
+  - Cobertura será implícita nas análises de OWASP + performance
+- ✅ Adicionado: Tutoriais locais para cada teste avançado
+  - Não CI/CD obrigatório (opcional para pipeline futuro)
+  - Foco em "como rodar manualmente" e "o que procurar"
+
+- ✅ Cherry-picks já aplicados:
+  - `f8bd044`: File uploads + fileValidator ✅
+  - `319f857`: XSS protection + sanitize.ts ✅
+
+- ⏳ Próximas ações:
+  - Bloco B: CourseFlow parametrizado
+  - Branch: feature/refactor-pocs-equivalence (4 commits ahead)
+    | Auth | ✅ mock | ✅ mock | 100% |
+    | Courses CRUD | ✅ full | ✅ full | 100% |
+    | ...
+    ```
+    - **Tabela 2: Performance**
+    ```
+    | Métrica               | React | Vue   | Winner |
+    | --------------------- | ----- | ----- | ------ |
+    | Lighthouse Score      | 88    | 86    | React  |
+    | Bundle Size (gzipped) | 198KB | 175KB | Vue    |
+    | TTI (Courses page)    | 1.8s  | 1.9s  | React  |
+    ```
+    - **Tabela 3: Security (OWASP)**
+    ```
+    | Test           | React   | Vue     | Notes   |
+    | -------------- | ------- | ------- | ------- |
+    | XSS Prevention | ✅ PASS | ✅ PASS | Both OK |
+    | CSRF           | ✅ PASS | ✅ PASS | Both OK |
+    | Auth Flow      | ✅ PASS | ✅ PASS | Both OK |
+    ```
+    - **Tabela 4: Code Quality**
+    ```
+    | Metric            | React | Vue | Notes          |
+    | ----------------- | ----- | --- | -------------- |
+    | Test Coverage     | 70%   | 70% | Parity         |
+    | TypeScript Errors | 0     | 0   | Zero any       |
+    | Duplicated Code   | 0%    | 0%  | Removed Python |
+    ```
     - _Commit:_ `docs: Criar relatório comparativo React vs Vue`
+    ```
 
 28. **Recomendação final:**
     - Com base nos dados: qual tecnologia escolher?

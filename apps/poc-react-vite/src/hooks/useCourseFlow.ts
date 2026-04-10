@@ -1,17 +1,46 @@
 /**
- * Hook customizado para gerenciar dados do fluxo de curso (courseId)
- * Retorna courseConfig e helpers para navegação e validação
+ * Hook customizado para gerenciar dados do fluxo de curso com API dinâmica
+ * Substitui abordagem estática (coursesConfig) por chamadas API (parity com Vue)
  */
 
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getCourseConfig, isValidCourseId } from "@/config/coursesConfig";
+import {
+  fetchCourseById,
+  BackendCourseResponse,
+} from "@/services/courseService";
 
 export function useCourseFlow() {
   const { id: courseId } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const isValid = courseId && isValidCourseId(courseId);
-  const courseConfig = isValid ? getCourseConfig(courseId!) : null;
+  const [course, setCourse] = useState<BackendCourseResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Carregar curso via API (similar ao Vue)
+  useEffect(() => {
+    if (!courseId) return;
+
+    const loadCourse = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const data = await fetchCourseById(courseId);
+        setCourse(data);
+      } catch (err) {
+        setError("Falha ao carregar curso. Tente novamente mais tarde.");
+        console.error("Erro ao buscar curso:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadCourse();
+  }, [courseId]);
+
+  const isValid = !!course;
+  const courseConfig = course;
 
   const navigateTo = (
     path:
@@ -35,6 +64,8 @@ export function useCourseFlow() {
     courseId: courseId || "",
     courseConfig,
     isValid,
+    isLoading,
+    error,
     navigate,
     navigateTo,
   };

@@ -1,47 +1,27 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCourseStore } from "@/store/useCourseStore";
+import { useCourseFlow } from "@/hooks/useCourseFlow";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Modal } from "@/components/ui/modal";
 import { toast } from "sonner";
-import {
-  fetchCourseById,
-  BackendCourseResponse,
-} from "@/services/courseService";
 
 const WARN_PATH = "M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z";
 const FALLBACK_IMAGE = "https://via.placeholder.com/800x300?text=Curso";
 
 export function CourseDetailPage() {
-  const { id: courseId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isEnrolledInCourse, unenrollFromCourse } = useCourseStore();
+  const {
+    courseId,
+    courseConfig: course,
+    isValid,
+    isLoading,
+    error,
+    navigateTo,
+  } = useCourseFlow();
 
-  const [course, setCourse] = useState<BackendCourseResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
-
-  // Carregar curso via API
-  useEffect(() => {
-    if (!courseId) return;
-
-    const loadCourse = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const data = await fetchCourseById(courseId);
-        setCourse(data);
-      } catch (err) {
-        setError("Falha ao carregar curso. Tente novamente mais tarde.");
-        console.error("Erro ao buscar curso:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadCourse();
-  }, [courseId]);
 
   if (isLoading) {
     return (
@@ -51,7 +31,7 @@ export function CourseDetailPage() {
     );
   }
 
-  if (error || !course) {
+  if (error || !isValid) {
     return (
       <div className="bg-white flex flex-col pb-[100px] px-[20px] md:px-[40px] pt-[24px]">
         <p className="text-red-600 text-center">
@@ -67,19 +47,19 @@ export function CourseDetailPage() {
     );
   }
 
-  const { title, description } = course;
-  const enrolled = isEnrolledInCourse(courseId || "");
+  const { title, description } = course!;
+  const enrolled = isEnrolledInCourse(courseId);
 
   const handleInscrever = () => {
-    if (enrolled) navigate(`/courses/${courseId}/modules`);
-    else navigate(`/courses/${courseId}/enrollment`);
+    if (enrolled) navigateTo("modules");
+    else navigateTo("enrollment");
   };
 
   const handleConfirmCancel = () => {
-    unenrollFromCourse(courseId || "");
+    unenrollFromCourse(courseId);
     setShowCancelModal(false);
     toast.success("Matrícula cancelada com sucesso.", {
-      description: `Seu acesso ao conteúdo de ${course?.title} foi removido.`,
+      description: `Seu acesso ao conteúdo de ${course!.title} foi removido.`,
       duration: 5000,
     });
     navigate("/courses");
@@ -92,7 +72,7 @@ export function CourseDetailPage() {
         <img
           alt={`${title} – curso`}
           className="w-full h-full object-cover"
-          src={course?.imagePath || FALLBACK_IMAGE}
+          src={course!.imagePath || FALLBACK_IMAGE}
           onError={(e) => {
             e.currentTarget.src = FALLBACK_IMAGE;
           }}
@@ -111,7 +91,7 @@ export function CourseDetailPage() {
             {title}
           </h1>
           <p className="font-['Figtree:Medium',sans-serif] font-medium leading-[30px] text-[#595959] text-[18px] shrink-0">
-            Categoría: {course?.category || "N/A"}
+            Categoría: {course!.category || "N/A"}
           </p>
         </div>
 
