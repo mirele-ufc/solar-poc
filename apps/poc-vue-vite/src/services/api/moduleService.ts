@@ -34,7 +34,7 @@ export const moduleService = {
       new Blob([JSON.stringify(dadosPayload)], { type: "application/json" }),
     );
 
-    const response = await apiClient.post<ApiResponse<any>>(
+    const response = await apiClient.post<ApiResponse<unknown>>(
       `/courses/${courseId}/modules`,
       formData,
     );

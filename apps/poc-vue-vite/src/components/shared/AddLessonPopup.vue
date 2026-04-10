@@ -136,8 +136,10 @@ const handleRegenerateQuiz = async () => {
     );
     generatedContent.value = newContent;
     successMessage.value = "Conteúdo regerado com sucesso";
-  } catch (err: any) {
-    error.value = err.message || "Erro ao tentar regerar o conteúdo.";
+  } catch (err: unknown) {
+    error.value =
+      (err instanceof Error ? err.message : null) ||
+      "Erro ao tentar regerar o conteúdo.";
   } finally {
     isGenerating.value = false;
   }
@@ -153,8 +155,10 @@ const handleConfirmQuiz = async () => {
   try {
     await lessonService.confirmContent(savedLessonId.value);
     successMessage.value = "Conteúdo confirmado com sucesso";
-  } catch (err: any) {
-    error.value = err.message || "Erro ao tentar confirmar o conteúdo.";
+  } catch (err: unknown) {
+    error.value =
+      (err instanceof Error ? err.message : null) ||
+      "Erro ao tentar confirmar o conteúdo.";
   } finally {
     isGenerating.value = false;
   }

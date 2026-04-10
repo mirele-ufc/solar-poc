@@ -79,8 +79,8 @@ const handleConfirmCancel = () => {
         class="w-full h-full object-cover"
         :src="imageUrl"
         @error="
-          (e: any) => {
-            e.target.src = FALLBACK_IMAGE;
+          (e: Event) => {
+            (e.target as HTMLImageElement).src = FALLBACK_IMAGE;
           }
         "
       />

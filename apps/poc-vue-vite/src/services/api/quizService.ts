@@ -10,9 +10,19 @@ export interface ApiResponse<T> {
   timestamp?: string;
 }
 
+export interface QuizQuestionPayload {
+  statement: string;
+  points: number;
+  alternatives: { text: string; correct: boolean }[];
+}
+
+export interface CreateQuizPayload {
+  questions: QuizQuestionPayload[];
+}
+
 export const quizService = {
   async generateAIQuiz(moduleId: string) {
-    const response = await apiClient.post<ApiResponse<any>>(
+    const response = await apiClient.post<ApiResponse<unknown>>(
       `/modules/${moduleId}/quiz/gerar?quantidade=5`,
     );
 
@@ -20,7 +30,7 @@ export const quizService = {
   },
 
   async regenerateAIQuiz(moduleId: string) {
-    const response = await apiClient.post<ApiResponse<any>>(
+    const response = await apiClient.post<ApiResponse<unknown>>(
       `/modules/${moduleId}/quiz/regerar?quantidade=5`,
     );
 
@@ -28,15 +38,15 @@ export const quizService = {
   },
 
   async confirmAIQuiz(moduleId: string) {
-    const response = await apiClient.post<ApiResponse<any>>(
+    const response = await apiClient.post<ApiResponse<unknown>>(
       `/modules/${moduleId}/quiz/confirmar`,
     );
 
     return response.data.dados || response.data.data || "ok";
   },
 
-  async createQuizWithQuestions(moduleId: string, payload: any) {
-    const response = await apiClient.post<ApiResponse<any>>(
+  async createQuizWithQuestions(moduleId: string, payload: CreateQuizPayload) {
+    const response = await apiClient.post<ApiResponse<unknown>>(
       `/modules/${moduleId}/quiz`,
       payload,
     );

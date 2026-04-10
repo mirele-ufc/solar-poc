@@ -7,6 +7,7 @@ import {
   type ExamQuestion,
 } from "@/config/coursesConfig";
 import PageHeader from "@/components/shared/PageHeader.vue";
+import Modal from "@/components/ui/Modal.vue";
 import { useEnrollmentGuard } from "@/hooks/useEnrollmentGuard";
 
 // --- Constantes ---
@@ -323,31 +324,25 @@ watch(showConfirmModal, async (isOpen) => {
       </div>
     </div>
 
-    <div
-      v-if="showConfirmModal"
-      class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/40 px-[20px]"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="confirm-title"
-      aria-describedby="confirm-description"
-      @click.self="cancelSubmit"
-    >
-      <div
-        class="bg-white rounded-[12px] w-full max-w-[460px] p-[28px] shadow-xl"
-      >
+    <Modal :is-open="showConfirmModal" :on-close="cancelSubmit">
+      <template #header>
         <h2
           id="confirm-title"
-          class="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[24px] leading-[36px] mb-[12px]"
+          class="font-['Figtree:Bold',sans-serif] font-bold text-[#021b59] text-[24px] leading-[36px]"
         >
           Deseja finalizar a prova e enviar?
         </h2>
+      </template>
+      <template #body>
         <p
           id="confirm-description"
-          class="font-['Figtree:Regular',sans-serif] font-normal text-[#333] text-[16px] leading-[24px] mb-[24px]"
+          class="font-['Figtree:Regular',sans-serif] font-normal text-[#333] text-[16px] leading-[24px]"
         >
           Ao confirmar o envio, você não poderá alterar as respostas.
         </p>
-        <div class="flex flex-col sm:flex-row gap-[12px] sm:gap-[16px]">
+      </template>
+      <template #footer>
+        <div class="flex flex-col sm:flex-row gap-[12px] sm:gap-[16px] w-full">
           <button
             type="button"
             @click="cancelSubmit"
@@ -372,7 +367,7 @@ watch(showConfirmModal, async (isOpen) => {
             </span>
           </button>
         </div>
-      </div>
-    </div>
+      </template>
+    </Modal>
   </div>
 </template>

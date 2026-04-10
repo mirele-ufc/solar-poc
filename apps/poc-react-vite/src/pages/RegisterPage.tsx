@@ -212,7 +212,7 @@ export function RegisterPage() {
       email: "",
       password: "",
       confirmPassword: "",
-      perfil: undefined as any,
+      perfil: undefined as unknown as "professor" | "student",
     },
   });
 
@@ -241,11 +241,12 @@ export function RegisterPage() {
 
       toast.success("Conta pendente de ativação. Verifique seu email.");
       navigate("/");
-    } catch (error: any) {
-      const errorMessage = error.message || "Erro ao cadastrar usuário";
+    } catch (error: unknown) {
+      const err = error as { message?: string; status?: number };
+      const errorMessage = err.message || "Erro ao cadastrar usuário";
 
       // Tratamento específico de erros
-      if (error.status === 409) {
+      if (err.status === 409) {
         setGeneralError(
           "CPF ou email já cadastrados no sistema. Tente outro ou faça login.",
         );
