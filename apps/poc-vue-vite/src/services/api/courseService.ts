@@ -1,5 +1,7 @@
 import { apiClient } from "@/services/api";
 import type { CourseInfoData } from "@/views/CreateCourseView.vue";
+// STRESS TEST: descomentar para gerar 1000 cursos mock (scroll/rendering)
+// import { generateMockCourses } from "@/utils/generateMockCourses";
 
 import { courseCreateFormSchema } from "@/validations/courseSchema";
 
@@ -24,6 +26,8 @@ export interface ApiResponse<T> {
 
 export const courseService = {
   async getCourses(): Promise<Curso[]> {
+    // STRESS TEST: descomentar a linha abaixo e comentar as duas seguintes
+    // return generateMockCourses(1000);
     const response = await apiClient.get<ApiResponse<Curso[]>>("/courses");
     return response.data.dados || [];
   },
