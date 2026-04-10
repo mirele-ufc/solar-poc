@@ -98,16 +98,26 @@ function mapQuestionsToBackendQuizPayload(
   questions: Question[],
 ): BackendQuizCreatePayload {
   return {
-    questions: questions.map((question) => ({
-      statement: question.text.trim(),
-      points: question.points,
-      alternatives: question.options
+    questions: questions.map((question) => {
+      const alternatives = question.options
         .filter((option) => option.text.trim())
         .map((option) => ({
           text: option.text.trim(),
           correct: option.id === question.correctOptionId,
-        })),
-    })),
+        }));
+
+      // Ensure at least one alternative is marked correct
+      const hasCorrect = alternatives.some((alt) => alt.correct);
+      if (!hasCorrect && alternatives.length > 0) {
+        alternatives[0].correct = true;
+      }
+
+      return {
+        statement: question.text.trim(),
+        points: question.points,
+        alternatives,
+      };
+    }),
   };
 }
 
@@ -974,6 +984,17 @@ export function CreateExamPage() {
 
     if (questions.length === 0) {
       toast.error("Adicione ao menos uma pergunta antes de finalizar a prova.");
+      return;
+    }
+
+    // Validate that every question has at least 2 filled alternatives
+    const invalidQuestion = questions.find(
+      (q) => q.options.filter((o) => o.text.trim()).length < 2,
+    );
+    if (invalidQuestion) {
+      toast.error(
+        `A questão "${invalidQuestion.text.substring(0, 40)}..." precisa de ao menos 2 alternativas preenchidas.`,
+      );
       return;
     }
 

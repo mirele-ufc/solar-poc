@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormContainer } from "@/components/shared/FormContainer";
@@ -73,11 +73,27 @@ function FieldInput({
 
 export function CreateCoursePage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Get store access
-  const { courseData: savedCourseData, setCourseData } = useCreationStore();
+  const {
+    courseData: savedCourseData,
+    setCourseData,
+    clearAllCreationData,
+  } = useCreationStore();
+
+  // Clear stale creation data when entering fresh (not navigating back from modules)
+  const isFreshEntry = !location.state?.preserveDraft;
+  const hasCleared = useRef(false);
+  if (!hasCleared.current && isFreshEntry) {
+    hasCleared.current = true;
+    clearAllCreationData();
+  }
+
+  // After clearing, don't use stale store data for defaults
+  const initialData = isFreshEntry ? null : savedCourseData;
 
   const {
     watch,
@@ -87,13 +103,13 @@ export function CreateCoursePage() {
     formState: { errors },
   } = useForm<CourseCreateFormValues>({
     resolver: zodResolver(courseCreateFormSchema),
-    defaultValues: savedCourseData
+    defaultValues: initialData
       ? {
-          title: savedCourseData.title,
-          description: savedCourseData.description,
-          category: savedCourseData.category,
-          hours: savedCourseData.hours,
-          requiredFields: savedCourseData.requiredFields,
+          title: initialData.title,
+          description: initialData.description,
+          category: initialData.category,
+          hours: initialData.hours,
+          requiredFields: initialData.requiredFields,
         }
       : {
           title: "",
@@ -109,12 +125,12 @@ export function CreateCoursePage() {
   const [showFieldErrors, setShowFieldErrors] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Restore image preview if course data exists
+  // Restore image preview if navigating back with preserved draft
   useEffect(() => {
-    if (savedCourseData?.image) {
+    if (!isFreshEntry && savedCourseData?.image) {
       setImagePreview(savedCourseData.image);
     }
-  }, [savedCourseData?.image]);
+  }, [isFreshEntry, savedCourseData?.image]);
 
   const setField = (
     key: "title" | "description" | "category" | "hours",
