@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import type { ICourseManageModule } from "@ava-poc/types";
 import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
 import { Modal } from "@/components/ui/modal";
+import { LessonContentModal } from "@/components/LessonContentModal";
 import { toast } from "sonner";
 
 // ── SVG paths ─────────────────────────────────────────────────────────────────
@@ -943,6 +944,7 @@ export function ManageCoursePage() {
     modId: string;
     lessonId: string;
   } | null>(null);
+  const [viewingLesson, setViewingLesson] = useState<string | null>(null);
   const [showParticipants, setShowParticipants] = useState(false);
   const [provaModId, setProvaModId] = useState<string | null>(null);
   const [generatingPDF, setGeneratingPDF] = useState(false);
@@ -967,6 +969,10 @@ export function ManageCoursePage() {
 
   const openEditLesson = (modId: string, lessonId: string) => {
     setEditingLesson({ modId, lessonId });
+  };
+
+  const openViewingLesson = (lessonName: string) => {
+    setViewingLesson(lessonName);
   };
 
   const saveLesson = (name: string) => {
@@ -1240,9 +1246,13 @@ export function ManageCoursePage() {
                       key={l.id}
                       className="bg-[#c5d6ff] flex items-center justify-between px-[16px] py-[14px] gap-[8px]"
                     >
-                      <p className="font-['Figtree:Medium',sans-serif] font-medium text-black text-[16px] flex-1 min-w-0 truncate">
+                      <button
+                        type="button"
+                        onClick={() => openViewingLesson(l.name)}
+                        className="flex-1 text-left font-['Figtree:Medium',sans-serif] font-medium text-black text-[16px] min-w-0 truncate hover:underline focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+                      >
                         {l.name}
-                      </p>
+                      </button>
                       <div className="flex items-center gap-[10px] shrink-0">
                         <button
                           type="button"
@@ -1295,6 +1305,13 @@ export function ManageCoursePage() {
           lessonName={getEditingLesson()!.name}
           onSave={(name) => saveLesson(name)}
           onClose={() => setEditingLesson(null)}
+        />
+      )}
+
+      {viewingLesson && (
+        <LessonContentModal
+          lessonName={viewingLesson}
+          onClose={() => setViewingLesson(null)}
         />
       )}
 

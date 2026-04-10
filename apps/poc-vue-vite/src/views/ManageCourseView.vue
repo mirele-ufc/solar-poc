@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue';
-import { useRouter, useRoute } from 'vue-router'; //
+import { useRouter, useRoute } from 'vue-router';
+import LessonContentModal from '@/components/LessonContentModal.vue'; //
 
 // ── SVG paths ─────────────────────────────────────────────────────────────────
 const EDIT_PATH = "M3 17.25V21H6.75L17.81 9.94L14.06 6.19L3 17.25ZM20.71 7.04C21.1 6.65 21.1 6.02 20.71 5.63L18.37 3.29C17.98 2.9 17.35 2.9 16.96 3.29L15.13 5.12L18.88 8.87L20.71 7.04Z";
@@ -22,6 +23,17 @@ interface Student {
   stoppedAt?: string;
 }
 
+interface Lesson {
+  id: string;
+  name: string;
+}
+
+interface Module {
+  id: string;
+  name: string;
+  lessons: Lesson[];
+}
+
 // ── STATUS_META ──────────────────────────────────────────────────────────────
 const STATUS_META: Record<StudentStatus, { label: string; color: string; bg: string; dotColor: string }> = {
   concluiu: { label: "Concluiu", color: "#155724", bg: "#e6f9ee", dotColor: "#28a745" },
@@ -37,36 +49,70 @@ const COURSES_MOCK: Record<string, any> = {
     image: "https://images.unsplash.com/photo-1759661966728-4a02e3c6ed91?fit=max&fm=jpg&w=1080",
     hours: "30h",
     totalStudents: 35,
-    avgScore: 72
+    avgScore: 72,
+    modules: [
+      {
+        id: "mod-1",
+        name: "Módulo 01 — Introdução",
+        lessons: [
+          { id: "aula-1", name: "Aula 01 — Fundamentos" },
+          { id: "aula-2", name: "Aula 02 — Primeiros passos" }
+        ]
+      },
+      {
+        id: "mod-2",
+        name: "Módulo 02 — Análise Básica",
+        lessons: [
+          { id: "aula-3", name: "Aula 01 — Conectando dados" },
+          { id: "aula-4", name: "Aula 02 — Criando visualizações" }
+        ]
+      }
+    ]
   },
   "python": {
     title: "Python Iniciante",
     image: "https://images.unsplash.com/photo-1624953587687-daf255b6b80a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080",
     hours: "24h",
     totalStudents: 28,
-    avgScore: 68
+    avgScore: 68,
+    modules: [
+      {
+        id: "mod-1",
+        name: "Módulo 01 — Sintaxe Básica",
+        lessons: [
+          { id: "aula-1", name: "Aula 01 — Variáveis" },
+          { id: "aula-2", name: "Aula 02 — Tipos de dados" }
+        ]
+      }
+    ]
   },
   "matematica": {
     title: "Matemática básica",
     image: "https://images.unsplash.com/photo-1747654804155-ffd62d5dfb51?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080",
     hours: "36h",
     totalStudents: 42,
-    avgScore: 61
+    avgScore: 61,
+    modules: []
   }
 };
 
 // ── Estado Dinâmico ───────────────────────────────────────────────────────────
 const router = useRouter();
-const route = useRoute(); //
+const route = useRoute();
 const activeTab = ref<"dashboard" | "modulos">("dashboard");
 const showParticipants = ref(false);
 const currentFilter = ref<StudentStatus | "todos">("todos");
 const generatingPDF = ref(false);
+const viewingLesson = ref<string | null>(null);
 
 // Captura o curso atual baseado no ID da URL
 const currentCourse = computed(() => {
   const id = (route.params.id as string) || "power-bi";
   return COURSES_MOCK[id] || COURSES_MOCK["power-bi"];
+});
+
+const modules = computed(() => {
+  return currentCourse.value.modules || [];
 });
 
 const students = ref<Student[]>([
@@ -171,6 +217,68 @@ const handleGeneratePDF = async () => {
           </div>
         </div>
       </div>
+
+      <section v-if="activeTab === 'modulos'" class="flex flex-col gap-[16px]">
+        <p v-if="modules.length === 0" class="font-['Figtree:Regular',sans-serif] text-[#8e8e8e] text-[15px] text-center py-[24px]">
+          Nenhum módulo disponível.
+        </p>
+
+        <div v-for="mod in modules" :key="mod.id" class="border border-[#e0e0e0] rounded-[8px] overflow-hidden">
+          <!-- Module header -->
+          <div class="flex items-center justify-between gap-[8px] bg-[#021b59] px-[16px] py-[12px]">
+            <p class="font-['Figtree:Bold',sans-serif] font-bold text-white text-[16px] flex-1 min-w-0 truncate">
+              {{ mod.name }}
+            </p>
+            <div class="flex items-center gap-[10px] shrink-0">
+              <button
+                type="button"
+                :aria-label="`Remover módulo ${mod.name}`"
+                class="size-[26px] flex items-center justify-center rounded hover:opacity-70 transition-opacity focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-white"
+              >
+                <svg class="size-full" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                  <path :d="CLOSE_SM" fill="white" fill-rule="evenodd" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Lessons -->
+          <div class="flex flex-col divide-y divide-[#e8e8e8]">
+            <p v-if="mod.lessons.length === 0" class="font-['Figtree:Regular',sans-serif] text-[#8e8e8e] text-[14px] px-[16px] py-[12px]">
+              Nenhuma aula neste módulo.
+            </p>
+            <div v-for="lesson in mod.lessons" :key="lesson.id" class="bg-[#c5d6ff] flex items-center justify-between px-[16px] py-[14px] gap-[8px]">
+              <button
+                type="button"
+                @click="viewingLesson = lesson.name"
+                class="flex-1 text-left font-['Figtree:Medium',sans-serif] font-medium text-black text-[16px] min-w-0 truncate hover:underline focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+              >
+                {{ lesson.name }}
+              </button>
+              <div class="flex items-center gap-[10px] shrink-0">
+                <button
+                  type="button"
+                  :aria-label="`Editar ${lesson.name}`"
+                  class="size-[22px] hover:opacity-70 transition-opacity focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded"
+                >
+                  <svg class="size-full" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                    <path :d="EDIT_PATH" fill="#021b59" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  :aria-label="`Remover ${lesson.name}`"
+                  class="size-[22px] hover:opacity-70 transition-opacity focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59] rounded"
+                >
+                  <svg class="size-full" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                    <path :d="CLOSE_SM" fill="#801436" fill-rule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
     <div v-if="showParticipants" class="fixed inset-0 z-50 flex items-center justify-center px-[20px]">
@@ -183,7 +291,27 @@ const handleGeneratePDF = async () => {
             <svg class="size-[20px]" fill="none" viewBox="0 0 24 24"><path :d="CLOSE_SM" fill="#333" /></svg>
           </button>
         </div>
+        <div class="flex-1 overflow-y-auto">
+          <div v-for="student in students" :key="student.id" class="px-[24px] py-[14px] border-b border-[#e0e0e0] last:border-b-0 hover:bg-[#f9f9f9]">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-[#333] text-[15px]">{{ student.name }}</p>
+                <p class="text-[#8e8e8e] text-[13px]">{{ student.email }}</p>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="font-bold text-[#021b59] text-[15px]">{{ student.progress }}%</p>
+                <p class="text-[#8e8e8e] text-[11px]">{{ STATUS_META[student.status].label }}</p>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+
+    <LessonContentModal
+      v-if="viewingLesson"
+      :lessonName="viewingLesson"
+      @close="viewingLesson = null"
+    />
   </div>
 </template>
