@@ -84,7 +84,7 @@ export const registerFormSchema = z
 
 export type RegisterFormValues = z.infer<typeof registerFormSchema>;
 
-export const loginSchema = z.object({
+export const loginFormSchema = z.object({
   emailOuUsuario: z
     .string()
     .trim()
@@ -98,16 +98,7 @@ export const loginSchema = z.object({
   senha: z.string().trim().min(6, "Mínimo 6 caracteres"),
 });
 
-export const forgotPasswordSchema = z.object({
-  email: z
-    .string()
-    .trim()
-    .min(1, "Email não informado")
-    .email("Email inválido"),
-});
-
-export type LoginFormValues = z.infer<typeof loginSchema>;
-export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
+export type LoginFormValues = z.infer<typeof loginFormSchema>;
 
 export function toLoginRequest(values: LoginFormValues): ILoginRequest {
   return {

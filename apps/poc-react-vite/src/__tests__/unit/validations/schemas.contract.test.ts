@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  forgotPasswordSchema,
+  forgotPasswordRequestSchema,
   loginRequestSchema,
   registerFormSchema,
 } from "@/validations/authSchema";
@@ -102,7 +102,7 @@ describe("schemas contract alignment", () => {
   });
 
   it("should fail forgot password when email is invalid", () => {
-    const result = forgotPasswordSchema.safeParse({
+    const result = forgotPasswordRequestSchema.safeParse({
       email: "invalid-email",
     });
 
