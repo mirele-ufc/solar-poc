@@ -65,7 +65,7 @@ const handleSaveLesson = async () => {
       aiText.value,
       file.value,
     );
-    savedLessonId.value = createdLesson.id;
+    savedLessonId.value = createdLesson!.id;
     successMessage.value = "Aula salva com sucesso";
   } catch (err) {
     error.value = `Erro ao salvar aula: ${err instanceof Error ? err.message : "Desconhecido"}`;
