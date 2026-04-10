@@ -10,6 +10,10 @@ overrides:
 importers:
 
   .:
+    dependencies:
+      lucide-vue-next:
+        specifier: ^1.0.0
+        version: 1.0.0(vue@3.5.31(typescript@5.9.3))
     devDependencies:
       '@tailwindcss/typography':
         specifier: ^0.5.19
@@ -2766,6 +2770,11 @@ packages:
     resolution: {integrity: sha512-aKqhOQ+YmFnwq8dWgGjOuLc8V1R9/c/yOd+zDY4+ohsR2Jo05lSGc3WsstYPIzcTpeosN7LoCkLReUUITvaIvw==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
+  lucide-vue-next@1.0.0:
+    resolution: {integrity: sha512-V6SPvx1IHTj/UY+FrIYWV5faISsPSb8BnWSFDxAtezWKvWc9ZZ40PDrdu1/Qb5vg4lHWr1hs1BAMGVGm6V1Xdg==}
+    peerDependencies:
+      vue: '>=3.0.1'
 
   lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
@@ -6035,6 +6044,10 @@ snapshots:
   lucide-react@0.487.0(react@18.3.1):
     dependencies:
       react: 18.3.1
+
+  lucide-vue-next@1.0.0(vue@3.5.31(typescript@5.9.3)):
+    dependencies:
+      vue: 3.5.31(typescript@5.9.3)
 
   lz-string@1.5.0: {}
 

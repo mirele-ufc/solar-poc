@@ -5,7 +5,10 @@
 
 import { ref, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { getCourseById, BackendCourseResponse } from "@/services/api/courseService";
+import {
+  getCourseById,
+  BackendCourseResponse,
+} from "@/services/api/courseService";
 
 export function useCourseFlow() {
   const route = useRoute();

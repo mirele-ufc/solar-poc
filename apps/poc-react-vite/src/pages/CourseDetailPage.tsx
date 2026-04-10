@@ -4,7 +4,10 @@ import { useCourseStore } from "@/store/useCourseStore";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Modal } from "@/components/ui/modal";
 import { toast } from "sonner";
-import { fetchCourseById, BackendCourseResponse } from "@/services/courseService";
+import {
+  fetchCourseById,
+  BackendCourseResponse,
+} from "@/services/courseService";
 
 const WARN_PATH = "M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z";
 const FALLBACK_IMAGE = "https://via.placeholder.com/800x300?text=Curso";
@@ -51,7 +54,9 @@ export function CourseDetailPage() {
   if (error || !course) {
     return (
       <div className="bg-white flex flex-col pb-[100px] px-[20px] md:px-[40px] pt-[24px]">
-        <p className="text-red-600 text-center">{error || "Curso não encontrado."}</p>
+        <p className="text-red-600 text-center">
+          {error || "Curso não encontrado."}
+        </p>
         <button
           onClick={() => navigate("/courses")}
           className="mt-4 mx-auto px-4 py-2 bg-blue-600 text-white rounded"

@@ -327,7 +327,7 @@ describe("quizService", () => {
       const result = await generateQuizForModuleWithBackend(moduleId);
 
       expect(mockedPost).toHaveBeenCalledWith(
-        `/modules/${moduleId}/quiz/generate-quiz-ia`,
+        `/modules/${moduleId}/quiz/gerar?quantidade=5`,
       );
       expect(result.questions).toHaveLength(1);
     });
@@ -363,7 +363,7 @@ describe("quizService", () => {
       const result = await regenerateQuizForModuleWithBackend(moduleId);
 
       expect(mockedPost).toHaveBeenCalledWith(
-        `/modules/${moduleId}/quiz/generate-quiz-ia`,
+        `/modules/${moduleId}/quiz/regerar?quantidade=5`,
       );
       expect(result.questions).toHaveLength(1);
     });
@@ -403,7 +403,9 @@ describe("quizService", () => {
 
       const result = await confirmQuizForModuleWithBackend(moduleId);
 
-      expect(mockedPost).toHaveBeenCalledWith(`/modules/${moduleId}/quiz`);
+      expect(mockedPost).toHaveBeenCalledWith(
+        `/modules/${moduleId}/quiz/confirmar`,
+      );
       expect(result.id).toBe(3);
       expect(result.questions[0].id).toBe(1);
     });

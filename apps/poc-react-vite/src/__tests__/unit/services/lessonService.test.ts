@@ -42,7 +42,7 @@ describe("lessonService", () => {
       const result = await generateLessonContentWithBackend(lessonId);
 
       expect(mockedPost).toHaveBeenCalledWith(
-        `/lessons/${lessonId}/generate-content`,
+        `/lessons/${lessonId}/gerar-conteudo`,
       );
       expect(result).toBe(generatedContent);
       expect(result).toContain("Introdução");
@@ -75,7 +75,7 @@ describe("lessonService", () => {
       const result = await regenerateLessonContentWithBackend(lessonId);
 
       expect(mockedPost).toHaveBeenCalledWith(
-        `/lessons/${lessonId}/regenerate-content`,
+        `/lessons/${lessonId}/regerar-conteudo`,
       );
       expect(result).toBe(newContent);
     });
@@ -96,7 +96,7 @@ describe("lessonService", () => {
 
       // Verifica que usa endpoint correto
       expect(mockedPost).toHaveBeenCalledWith(
-        `/lessons/${lessonId}/regenerate-content`,
+        `/lessons/${lessonId}/regerar-conteudo`,
       );
     });
   });
@@ -129,7 +129,7 @@ describe("lessonService", () => {
       const result = await confirmGeneratedLessonContentWithBackend(lessonId);
 
       expect(mockedPost).toHaveBeenCalledWith(
-        `/lessons/${lessonId}/confirm-content`,
+        `/lessons/${lessonId}/confirmar-conteudo`,
       );
       expect(result).toEqual(responseData);
       expect(result.contentGenerated).toBe("# Conteúdo Confirmado");

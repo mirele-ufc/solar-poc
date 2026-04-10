@@ -24,14 +24,10 @@ const {
 // Dados do curso
 const title = computed(() => course.value?.title || "");
 const description = computed(() => course.value?.description || "");
-const imageUrl = computed(
-  () => course.value?.imagePath || FALLBACK_IMAGE,
-);
+const imageUrl = computed(() => course.value?.imagePath || FALLBACK_IMAGE);
 const category = computed(() => course.value?.category || "");
 
-const enrolled = computed(() =>
-  courseStore.isEnrolledInCourse(courseId),
-);
+const enrolled = computed(() => courseStore.isEnrolledInCourse(courseId));
 
 const handleInscrever = () => {
   if (enrolled.value) {
@@ -65,7 +61,9 @@ const handleConfirmCancel = () => {
     v-else-if="error || !isValid"
     class="bg-white flex flex-col pb-[100px] px-[20px] md:px-[40px] pt-[24px]"
   >
-    <p class="text-red-600 text-center">{{ error || "Curso não encontrado." }}</p>
+    <p class="text-red-600 text-center">
+      {{ error || "Curso não encontrado." }}
+    </p>
     <button
       @click="router.push('/courses')"
       class="mt-4 mx-auto px-4 py-2 bg-blue-600 text-white rounded"
@@ -80,7 +78,11 @@ const handleConfirmCancel = () => {
         :alt="`${title} – curso`"
         class="w-full h-full object-cover"
         :src="imageUrl"
-        @error="(e: any) => { e.target.src = FALLBACK_IMAGE }"
+        @error="
+          (e: any) => {
+            e.target.src = FALLBACK_IMAGE;
+          }
+        "
       />
     </div>
 

@@ -13,7 +13,7 @@ export interface ApiResponse<T> {
 export const quizService = {
   async generateAIQuiz(moduleId: string) {
     const response = await apiClient.post<ApiResponse<any>>(
-      `/modules/${moduleId}/quiz/generate-quiz-ia`,
+      `/modules/${moduleId}/quiz/gerar?quantidade=5`,
     );
 
     return response.data.dados || response.data.data || "";
@@ -21,7 +21,7 @@ export const quizService = {
 
   async regenerateAIQuiz(moduleId: string) {
     const response = await apiClient.post<ApiResponse<any>>(
-      `/modules/${moduleId}/quiz/generate-quiz-ia`,
+      `/modules/${moduleId}/quiz/regerar?quantidade=5`,
     );
 
     return response.data.dados || response.data.data || "";
@@ -29,7 +29,7 @@ export const quizService = {
 
   async confirmAIQuiz(moduleId: string) {
     const response = await apiClient.post<ApiResponse<any>>(
-      `/modules/${moduleId}/quiz`,
+      `/modules/${moduleId}/quiz/confirmar`,
     );
 
     return response.data.dados || response.data.data || "ok";

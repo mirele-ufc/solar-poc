@@ -86,7 +86,7 @@ export async function generateQuizForModuleWithBackend(
 ): Promise<BackendGeneratedQuizResponse> {
   const response = await apiClient.post<
     ApiEnvelope<BackendGeneratedQuizResponse>
-  >(`/modules/${moduleId}/quiz/generate-quiz-ia`);
+  >(`/modules/${moduleId}/quiz/gerar?quantidade=5`);
 
   return response.data.dados;
 }
@@ -96,7 +96,7 @@ export async function regenerateQuizForModuleWithBackend(
 ): Promise<BackendGeneratedQuizResponse> {
   const response = await apiClient.post<
     ApiEnvelope<BackendGeneratedQuizResponse>
-  >(`/modules/${moduleId}/quiz/generate-quiz-ia`);
+  >(`/modules/${moduleId}/quiz/regerar?quantidade=5`);
 
   return response.data.dados;
 }
@@ -106,7 +106,7 @@ export async function confirmQuizForModuleWithBackend(
 ): Promise<BackendConfirmedQuizResponse> {
   const response = await apiClient.post<
     ApiEnvelope<BackendConfirmedQuizResponse>
-  >(`/modules/${moduleId}/quiz`);
+  >(`/modules/${moduleId}/quiz/confirmar`);
 
   return response.data.dados;
 }

@@ -59,15 +59,15 @@ export const lessonService = {
 
   async generateContent(lessonId: number): Promise<string> {
     const response = await apiClient.post<ApiResponse<string>>(
-      `/lessons/${lessonId}/generate-content`,
+      `/lessons/${lessonId}/gerar-conteudo`,
     );
 
     return response.data.dados || response.data.data || "";
   },
 
   async approveContent(lessonId: number, contentGenerated: string) {
-    const response = await apiClient.put<ApiResponse<Lesson>>(
-      `/lessons/${lessonId}/confirm-content`,
+    const response = await apiClient.post<ApiResponse<Lesson>>(
+      `/lessons/${lessonId}/confirmar-conteudo`,
       { contentGenerated },
     );
 
@@ -76,7 +76,7 @@ export const lessonService = {
 
   async regenerateContent(lessonId: number): Promise<string> {
     const response = await apiClient.post<ApiResponse<string>>(
-      `/lessons/${lessonId}/regenerate-content`,
+      `/lessons/${lessonId}/regerar-conteudo`,
     );
 
     return response.data.dados || response.data.data || "";
@@ -84,7 +84,7 @@ export const lessonService = {
 
   async confirmContent(lessonId: number) {
     const response = await apiClient.post<ApiResponse<Lesson>>(
-      `/lessons/${lessonId}/confirm-content`,
+      `/lessons/${lessonId}/confirmar-conteudo`,
     );
 
     return response.data.dados;
