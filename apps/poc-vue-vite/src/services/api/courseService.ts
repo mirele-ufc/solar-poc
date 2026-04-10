@@ -1,8 +1,7 @@
 import { apiClient } from "@/services/api";
 import type { CourseInfoData } from "@/views/CreateCourseView.vue";
 
-import { createCourseSchema } from "@/validations/courseSchema";
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+import { courseCreateFormSchema } from "@/validations/courseSchema";
 
 export interface Curso {
   id: number;
@@ -37,7 +36,7 @@ export const courseService = {
   },
 
   async createCourse(courseData: CourseInfoData, file: File | null) {
-    await createCourseSchema.parseAsync({
+    await courseCreateFormSchema.parseAsync({
       title: courseData.title,
       description: courseData.description,
       category: courseData.category,
