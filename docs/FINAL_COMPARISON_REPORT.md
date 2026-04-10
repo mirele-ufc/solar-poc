@@ -24,22 +24,25 @@
 
 ## 2. Performance Metrics
 
-| Métrica             | React         | Vue           | Vencedor       |
-| ------------------- | ------------- | ------------- | -------------- |
-| Bundle JS (gzip)    | 300 KB        | ~163 KB       | **Vue** (-46%) |
-| Bundle CSS (gzip)   | 18 KB         | ~10 KB        | **Vue** (-43%) |
-| Total gzip          | ~318 KB       | ~173 KB       | **Vue** (-46%) |
-| Initial load (gzip) | 318 KB (tudo) | ~61 KB (core) | **Vue** (-81%) |
-| Code-split por rota | ❌            | ✅            | **Vue**        |
-| Maior chunk single  | 300 KB        | 45 KB         | **Vue**        |
-| Build time          | 7.8s          | 5.7s          | **Vue**        |
+| Métrica             | React                     | Vue              | Vencedor        |
+| ------------------- | ------------------------- | ---------------- | --------------- |
+| Bundle JS (gzip)    | ~225 KB (29 chunks)       | ~163 KB          | **Vue** (-28%)  |
+| Bundle CSS (gzip)   | ~10 KB                    | ~10 KB           | Empate          |
+| Total gzip          | ~235 KB                   | ~173 KB          | **Vue** (-26%)  |
+| Initial load (gzip) | ~127 KB (core + app)      | ~61 KB (core)    | **Vue** (-52%)  |
+| Code-split por rota | ✅ React.lazy() + Suspense | ✅ Vue Router     | Empate          |
+| Maior chunk single  | 118 KB (vendor)           | 45 KB            | **Vue**         |
+| Build time          | 4.1s                      | 5.7s             | **React**       |
+| Chunks lazy-loaded  | 27 route chunks           | ~20 view chunks  | Comparável      |
 
 ### Análise
 
-- Vue se beneficia enormemente do code-splitting automático do Vue Router
-- React carrega todo o bundle na primeira requisição (1,041 KB raw / 300 KB gzip)
-- Vue carrega apenas o core (~61 KB gzip) e lazy-loads cada view sob demanda
-- O React pode ser otimizado com `React.lazy()` + `Suspense`, mas requer refatoração manual
+- Ambas PoCs agora usam code-splitting por rota
+- React usa `React.lazy()` + `Suspense` com SuspenseWrapper para 15 rotas
+- Vue usa code-splitting automático via Vue Router
+- React otimizado: remoção de 48 deps mortas, 46 componentes Shadcn UI não-usados, recharts (905 KB) substituído por DonutChart SVG (~2 KB)
+- Bundle React reduziu de 318 KB (monolítico) → 235 KB (total) / 127 KB (initial load)
+- Vue mantém vantagem em initial load (61 KB vs 127 KB) por vendor bundle menor
 
 ---
 
@@ -47,8 +50,8 @@
 
 | Teste                                | React                      | Vue                             | Cobertura       |
 | ------------------------------------ | -------------------------- | ------------------------------- | --------------- |
-| **XSS Prevention**                   | ✅ JSX escape automático   | ✅ Template escape + DOMPurify  | 100%            |
-| **v-html / dangerouslySetInnerHTML** | ❌ Não usado               | ✅ v-html com sanitize.ts       | N/A             |
+| **XSS Prevention**                   | ✅ JSX escape + DOMPurify  | ✅ Template escape + DOMPurify  | 100%            |
+| **v-html / dangerouslySetInnerHTML** | ✅ dangerouslySetInnerHTML com sanitize.ts | ✅ v-html com sanitize.ts | 100%  |
 | **CSP Headers**                      | ✅ Meta tag adicionada     | ✅ Meta tag adicionada          | 100%            |
 | **CSRF (X-Requested-With)**          | ✅ Header adicionado       | ✅ Header adicionado            | Parcial\*       |
 | **Session Timeout (30min)**          | ✅ useSessionTimeout hook  | ✅ useSessionTimeout composable | 100%            |
@@ -63,11 +66,12 @@
 
 ### Diferenças Notáveis
 
-| Aspecto             | React                                    | Vue                                                                  |
-| ------------------- | ---------------------------------------- | -------------------------------------------------------------------- |
-| Sanitização HTML    | Não necessário (sem rich content render) | DOMPurify com ALLOWED_TAGS whitelist                                 |
-| Refresh token Axios | Mesma instância com `_retry` flag        | Instância separada `apiClientRefresh` (mais seguro — evita recursão) |
-| File validation     | Magic bytes (portado de Vue)             | Magic bytes (implementação original)                                 |
+| Aspecto             | React                                                    | Vue                                                                  |
+| ------------------- | -------------------------------------------------------- | -------------------------------------------------------------------- |
+| Sanitização HTML    | DOMPurify com ALLOWED_TAGS whitelist (sanitize.ts)       | DOMPurify com ALLOWED_TAGS whitelist (sanitize.ts)                   |
+| Refresh token Axios | Mesma instância com `_retry` flag                        | Instância separada `apiClientRefresh` (mais seguro — evita recursão) |
+| File validation     | Magic bytes (portado de Vue)                             | Magic bytes (implementação original)                                 |
+| Code-splitting      | React.lazy() + Suspense (manual)                         | Vue Router automático                                                |
 
 ---
 
@@ -134,9 +138,8 @@
 
 **Contras:**
 
-- ❌ Sem code-splitting automático — requer `React.lazy()` manual
-- ❌ Bundle monolítico de 300 KB gzip
-- ❌ Sem sanitização HTML nativa (não precisou nesta PoC, mas seria necessário com rich content)
+- ⚠️ Code-splitting requer `React.lazy()` manual (implementado)
+- ⚠️ Vendor bundle ainda maior que Vue (118 KB vs 45 KB gzip)
 - ❌ Routing mais verboso (createBrowserRouter)
 
 ### Vue
@@ -144,9 +147,9 @@
 **Prós:**
 
 - ✅ Code-splitting automático via Vue Router (zero configuração)
-- ✅ Bundle 46% menor que React
-- ✅ Initial load 81% menor (61 KB vs 318 KB)
-- ✅ DOMPurify integrado para sanitização HTML
+- ✅ Bundle 26% menor que React
+- ✅ Initial load 52% menor (61 KB vs 127 KB)
+- ✅ DOMPurify integrado para sanitização HTML (React agora também possui)
 - ✅ SFC (.vue) encapsula template + script + style naturalmente
 - ✅ Composables são idiomáticos e testáveis
 - ✅ Refresh token com instância separada (mais robusto)
@@ -166,13 +169,13 @@
 
 **Justificativa técnica:**
 
-1. **Performance:** Vue domina em todas as métricas de bundle e initial load (-46% gzip, -81% initial). Code-splitting automático é uma vantagem competitiva significativa para LMS com muitas páginas.
+1. **Performance:** Vue ainda lidera em initial load (-52%) e bundle total (-26%), mas o gap reduziu significativamente. React agora tem code-splitting completo com React.lazy() + Suspense. Build time React é mais rápido (4.1s vs 5.7s).
 
-2. **Segurança:** Vue tem implementação ligeiramente superior: DOMPurify integrado, refresh token com Axios separado (evita recursão), mesma cobertura OWASP que React.
+2. **Segurança:** Paridade completa — ambas usam DOMPurify com ALLOWED_TAGS para sanitização de conteúdo gerado por IA, mesma cobertura OWASP. Vue tem vantagem marginal no refresh token (instância Axios separada).
 
-3. **Paridade funcional:** 100% equivalente — ambas PoCs implementam todas as features com a mesma qualidade.
+3. **Paridade funcional:** 100% equivalente — ambas PoCs implementam todas as features com a mesma qualidade, incluindo renderização formatada de conteúdo de aula gerado por IA.
 
-4. **Qualidade de código:** Ambas passam em zero-any, Zod normalization, Slots Pattern. Vue ganha em encapsulamento natural via SFC.
+4. **Qualidade de código:** Ambas passam em zero-any, Zod normalization, Slots Pattern. Vue ganha em encapsulamento natural via SFC. React teve limpeza significativa (46 componentes e 48 deps mortas removidas).
 
 5. **Manutenção:** Vue Composition API (composables) é tão ou mais expressiva que React hooks, com lifecycle hooks mais explícitos (`onMounted`, `onUnmounted`).
 
@@ -189,20 +192,20 @@ Se a equipe tiver maior experiência com React, o custo de migração e a curva 
 
 ## 9. Resumo Executivo
 
-| Critério                  | React      | Vue             | Peso  |
-| ------------------------- | ---------- | --------------- | ----- |
-| Paridade Funcional        | 100%       | 100%            | —     |
-| Bundle Size               | ⚠️ 318 KB  | ✅ 173 KB       | Alto  |
-| Initial Load              | ⚠️ 318 KB  | ✅ 61 KB        | Alto  |
-| Code-splitting            | ❌ Manual  | ✅ Automático   | Alto  |
-| XSS Prevention            | ✅         | ✅+ (DOMPurify) | Médio |
-| CSRF Mitigation           | ✅         | ✅              | Médio |
-| Auth Hardening            | ✅         | ✅              | Médio |
-| Input Validation          | ✅         | ✅              | Médio |
-| TypeScript Strict         | ✅         | ✅              | Médio |
-| Zero `any`                | ✅         | ✅              | Médio |
-| Slots Pattern             | ✅         | ✅              | Baixo |
-| DX (Developer Experience) | ✅         | ✅              | Baixo |
-| **Score Final**           | **7.5/10** | **9/10**        | —     |
+| Critério                  | React              | Vue             | Peso  |
+| ------------------------- | ------------------ | --------------- | ----- |
+| Paridade Funcional        | 100%               | 100%            | —     |
+| Bundle Size               | ✅ 235 KB           | ✅ 173 KB       | Alto  |
+| Initial Load              | ⚠️ 127 KB           | ✅ 61 KB        | Alto  |
+| Code-splitting            | ✅ React.lazy()     | ✅ Automático   | Alto  |
+| XSS Prevention            | ✅ JSX + DOMPurify | ✅ Template + DOMPurify | Médio |
+| CSRF Mitigation           | ✅                 | ✅              | Médio |
+| Auth Hardening            | ✅                 | ✅              | Médio |
+| Input Validation          | ✅                 | ✅              | Médio |
+| TypeScript Strict         | ✅                 | ✅              | Médio |
+| Zero `any`                | ✅                 | ✅              | Médio |
+| Slots Pattern             | ✅                 | ✅              | Baixo |
+| DX (Developer Experience) | ✅                 | ✅              | Baixo |
+| **Score Final**           | **8.5/10**         | **9/10**        | —     |
 
-**Recomendação: Vue** — superior em performance e segurança, equivalente em funcionalidade e qualidade.
+**Recomendação: Vue** — ligeiramente superior em performance (initial load 52% menor), equivalente em segurança, funcionalidade e qualidade. Gap reduziu significativamente após otimização do React.

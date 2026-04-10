@@ -6,15 +6,24 @@
 
 ## 1. Bundle Size (Produção — gzip)
 
-### React (Single Bundle)
+### React (Code-Split por Rota — React.lazy + Suspense)
 
-| Asset            | Raw             | gzip          |
-| ---------------- | --------------- | ------------- |
-| `index.js`       | 1,041.53 KB     | **300.06 KB** |
-| `index.css`      | 105.46 KB       | **17.98 KB**  |
-| **Total JS+CSS** | **1,146.99 KB** | **318.04 KB** |
+| Asset                                  | Raw         | gzip        |
+| -------------------------------------- | ----------- | ----------- |
+| `index.js` (core vendor)               | 370.89 KB   | 117.90 KB   |
+| `index.js` (app entry/shared)          | 33.73 KB    | 9.51 KB     |
+| `api.js` (Axios + interceptors)        | 40.58 KB    | 16.08 KB    |
+| `CreateModulesPage.js` (maior page)    | 46.60 KB    | 15.22 KB    |
+| `ManageCoursePage.js`                  | 37.88 KB    | 10.71 KB    |
+| `CreateExamPage.js`                    | 30.98 KB    | 7.46 KB     |
+| Demais chunks (23 arquivos)            | ~142 KB     | ~48 KB      |
+| `index.css`                            | 47.72 KB    | 9.76 KB     |
+| **Total JS+CSS (all chunks)**          | **~750 KB** | **~235 KB** |
 
-⚠️ **Alerta:** Bundle JS excede 500 KB (raw). Sem code-splitting por rota.
+✅ React agora usa code-splitting com `React.lazy()` + `Suspense` para 15 rotas (29 chunks JS).
+✅ Otimizações aplicadas: remoção de 48 deps mortas, 46 componentes Shadcn UI, recharts (905 KB) → DonutChart SVG (~2 KB).
+
+> **Antes da otimização:** 1,041 KB raw / 300 KB gzip (bundle monolítico único, sem code-splitting).
 
 ### Vue (Code-Split por Rota)
 
@@ -33,16 +42,18 @@
 
 ### Comparação Direta
 
-| Métrica             | React     | Vue       | Vencedor       |
-| ------------------- | --------- | --------- | -------------- |
-| JS gzip total       | 300.06 KB | ~163 KB   | **Vue** (-46%) |
-| CSS gzip total      | 17.98 KB  | ~10.30 KB | **Vue** (-43%) |
-| Total gzip          | ~318 KB   | ~173 KB   | **Vue** (-46%) |
-| Code-split por rota | ❌ Não    | ✅ Sim    | **Vue**        |
-| Maior chunk         | 300 KB    | 45 KB     | **Vue**        |
-| Initial load (core) | 300 KB    | 61 KB\*   | **Vue**        |
+| Métrica             | React              | Vue       | Vencedor        |
+| ------------------- | ------------------ | --------- | --------------- |
+| JS gzip total       | ~225 KB            | ~163 KB   | **Vue** (-28%)  |
+| CSS gzip total      | ~9.76 KB           | ~10.30 KB | Empate          |
+| Total gzip          | ~235 KB            | ~173 KB   | **Vue** (-26%)  |
+| Code-split por rota | ✅ React.lazy()    | ✅ Sim    | Empate          |
+| Maior chunk         | 118 KB             | 45 KB     | **Vue**         |
+| Initial load (core) | ~127 KB            | 61 KB\*   | **Vue** (-52%)  |
+| Build time          | 4.1s               | 5.7s      | **React**       |
 
 \*Vue initial load = `index.js` (45 KB) + `api.js` (16 KB) = ~61 KB gzip
+\*\*React initial load = `index.js` (118 KB) + app entry (9.5 KB) = ~127 KB gzip
 
 ---
 
@@ -155,12 +166,12 @@
 
 ### Fatores que afetam TTI
 
-| Fator              | React         | Vue                   | Impacto          |
-| ------------------ | ------------- | --------------------- | ---------------- |
-| Bundle parse time  | Alto (300 KB) | Baixo (45 KB initial) | **Vue vantagem** |
-| Hydration cost     | N/A (SPA)     | N/A (SPA)             | Empate           |
-| Route lazy loading | Não           | Sim (automático)      | **Vue vantagem** |
-| CSS parsing        | 18 KB gzip    | 10 KB gzip            | **Vue vantagem** |
+| Fator              | React                    | Vue                   | Impacto          |
+| ------------------ | ------------------------ | --------------------- | ---------------- |
+| Bundle parse time  | Médio (118 KB initial)   | Baixo (45 KB initial) | **Vue vantagem** |
+| Hydration cost     | N/A (SPA)                | N/A (SPA)             | Empate           |
+| Route lazy loading | Sim (React.lazy)         | Sim (automático)      | Empate           |
+| CSS parsing        | 10 KB gzip               | 10 KB gzip            | Empate           |
 
 ---
 
@@ -207,19 +218,21 @@ npx source-map-explorer dist/assets/index-*.js
 
 ## 6. Recomendações
 
-### React — Prioridade Alta
+### React — Concluído / Manutenção
 
-1. **Implementar code-splitting por rota** — Usar `React.lazy()` + `Suspense` no `routes.tsx`
-2. **Tree-shaking de dependências** — Verificar se `sonner`, `react-hook-form` estão sendo totalmente importados
-3. **Considerar manual chunks** — Separar vendor (react, axios, zod) de app code
+1. ✅ ~~Implementar code-splitting por rota~~ — Implementado com `React.lazy()` + `Suspense` em `routes.tsx`
+2. ✅ ~~Tree-shaking de dependências~~ — 48 deps mortas removidas, 46 componentes Shadcn UI removidos
+3. ✅ ~~Reduzir bundle~~ — recharts (905 KB) substituído por DonutChart SVG (~2 KB)
+4. ⚠️ Considerar manual chunks — Separar vendor (react, react-dom) de shared libs (axios, zod)
 
 ### Vue — Manutenção
 
 1. ✅ Code-splitting já funciona automaticamente via Vue Router
 2. ✅ Bundle está dentro de targets (<200 KB gzip total)
-3. ⚠️ `fileSchema.js` chunk (17 KB gzip) — Zod é pesado; considerar validação nativa para schemas simples
+3. ✅ Dead code limpo (12 componentes/assets removidos, lucide-vue-next declarado)
+4. ⚠️ `fileSchema.js` chunk (17 KB gzip) — Zod é pesado; considerar validação nativa para schemas simples
 
 ### Ambas PoCs
 
-- Comprimir imagens estáticas (8.3 MB PNG detectado no React build)
+- Comprimir imagens estáticas (8.3 MB PNG detectado em ambas PoCs)
 - Considerar `vite-plugin-compression` para pre-compress assets

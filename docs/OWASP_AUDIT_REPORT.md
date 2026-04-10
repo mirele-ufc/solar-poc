@@ -9,15 +9,15 @@
 
 ### Estado Atual: ✅ PASS
 
-| Verificação                    | React              | Vue                               |
-| ------------------------------ | ------------------ | --------------------------------- |
-| Escape automático de templates | ✅ JSX auto-escape | ✅ Template auto-escape           |
-| `dangerouslySetInnerHTML`      | ❌ Não usado       | N/A                               |
-| `v-html` sem sanitização       | N/A                | ❌ Não existe (usa DOMPurify)     |
-| `eval()` / `Function()`        | ❌ Não encontrado  | ❌ Não encontrado                 |
-| `innerHTML` direto             | ❌ Não encontrado  | ❌ Não encontrado                 |
-| DOMPurify para rich content    | ❌ Não necessário  | ✅ `sanitize.ts` com ALLOWED_TAGS |
-| CSP meta tag                   | ✅ Adicionado      | ✅ Adicionado                     |
+| Verificação                    | React                       | Vue                               |
+| ------------------------------ | --------------------------- | --------------------------------- |
+| Escape automático de templates | ✅ JSX auto-escape          | ✅ Template auto-escape           |
+| `dangerouslySetInnerHTML`      | ✅ Usado com DOMPurify      | N/A                               |
+| `v-html` sem sanitização       | N/A                         | ❌ Não existe (usa DOMPurify)     |
+| `eval()` / `Function()`        | ❌ Não encontrado           | ❌ Não encontrado                 |
+| `innerHTML` direto             | ❌ Não encontrado           | ❌ Não encontrado                 |
+| DOMPurify para rich content    | ✅ `sanitize.ts` com ALLOWED_TAGS | ✅ `sanitize.ts` com ALLOWED_TAGS |
+| CSP meta tag                   | ✅ Adicionado               | ✅ Adicionado                     |
 
 ### Implementação CSP
 
@@ -124,15 +124,15 @@
 
 ## 5. Padrões Perigosos — Auditoria
 
-| Padrão                      | React                 | Vue                   | Status        |
-| --------------------------- | --------------------- | --------------------- | ------------- |
-| `eval()`                    | ❌ Nenhum             | ❌ Nenhum             | ✅ Seguro     |
-| `Function()` constructor    | ❌ Nenhum             | ❌ Nenhum             | ✅ Seguro     |
-| `innerHTML` =               | ❌ Nenhum             | ❌ Nenhum             | ✅ Seguro     |
-| `dangerouslySetInnerHTML`   | ❌ Nenhum             | N/A                   | ✅ Seguro     |
-| `v-html` sem sanitização    | N/A                   | ❌ Nenhum             | ✅ Seguro     |
-| `document.write()`          | ❌ Nenhum             | ❌ Nenhum             | ✅ Seguro     |
-| Hardcoded secrets no bundle | ⚠️ Mock credentials\* | ⚠️ Mock credentials\* | Aceitável\*\* |
+| Padrão                      | React                            | Vue                   | Status        |
+| --------------------------- | -------------------------------- | --------------------- | ------------- |
+| `eval()`                    | ❌ Nenhum                        | ❌ Nenhum             | ✅ Seguro     |
+| `Function()` constructor    | ❌ Nenhum                        | ❌ Nenhum             | ✅ Seguro     |
+| `innerHTML` =               | ❌ Nenhum                        | ❌ Nenhum             | ✅ Seguro     |
+| `dangerouslySetInnerHTML`   | ✅ 1 uso (com DOMPurify sanitize) | N/A                   | ✅ Seguro     |
+| `v-html` sem sanitização    | N/A                              | ❌ Nenhum             | ✅ Seguro     |
+| `document.write()`          | ❌ Nenhum                        | ❌ Nenhum             | ✅ Seguro     |
+| Hardcoded secrets no bundle | ⚠️ Mock credentials\*             | ⚠️ Mock credentials\* | Aceitável\*\* |
 
 \* Mock credentials existem por design (PoC sem backend real)
 \*\* Em produção, remover MOCK_USERS e usar autenticação real via API
@@ -148,6 +148,7 @@
 | Session timeout 30min      | `b54934a`                        | `useSessionTimeout.ts` + `ProtectedRoute.tsx` + `App.vue` |
 | Magic bytes (React parity) | `b54934a`                        | `fileSchema.ts` (React)                                   |
 | DOMPurify sanitize.ts      | `319f857` (cherry-pick anterior) | `sanitize.ts` (Vue)                                       |
+| DOMPurify sanitize.ts      | `f124613`                        | `sanitize.ts` (React) + `CreateModulesPage.tsx`           |
 | Zero `any` TypeScript      | `368f972` (Bloco F)              | 17 arquivos                                               |
 
 ---
