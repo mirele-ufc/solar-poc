@@ -11,6 +11,8 @@ export interface Curso {
   updatedAt: string;
 }
 
+export type BackendCourseResponse = Curso;
+
 export interface ApiResponse<T> {
   sucesso: boolean;
   mensagem: string;
@@ -22,6 +24,13 @@ export const courseService = {
   async getCourses(): Promise<Curso[]> {
     const response = await apiClient.get<ApiResponse<Curso[]>>("/courses");
     return response.data.dados || [];
+  },
+
+  async getCourseById(courseId: string): Promise<BackendCourseResponse> {
+    const response = await apiClient.get<ApiResponse<BackendCourseResponse>>(
+      `/courses/${courseId}`,
+    );
+    return response.data.dados;
   },
 
   async createCourse(courseData: CourseInfoData, file: File | null) {
@@ -53,3 +62,6 @@ export const courseService = {
     return response.data;
   },
 };
+
+// Export função getCourseById seperadamente para compatibilidade com composables
+export const getCourseById = courseService.getCourseById;

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useCourseFlow } from "@/composables/useCourseFlow";
+import { flushPromises } from "@vue/test-utils";
 
 vi.mock("vue-router", () => ({
   useRoute: vi.fn(() => ({
@@ -10,12 +11,15 @@ vi.mock("vue-router", () => ({
   })),
 }));
 
-vi.mock("@/config/coursesConfig", () => ({
-  isValidCourseId: vi.fn((id: string) => ["python", "power-bi"].includes(id)),
-  getCourseConfig: vi.fn((id: string) => ({
-    id,
+vi.mock("@/services/api/courseService", () => ({
+  getCourseById: vi.fn(async (id: string) => ({
+    id: id === "python" ? 1 : 2,
     title: `Course ${id}`,
     description: "Test course",
+    category: "test",
+    imagePath: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   })),
 }));
 
@@ -29,19 +33,27 @@ describe("useCourseFlow composable", () => {
     expect(courseId).toBe("python");
   });
 
-  it("valida courseId contra config", () => {
-    const { courseId, isValid, courseConfig } = useCourseFlow();
+  it("valida courseId contra config", async () => {
+    const { courseId, isValid } = useCourseFlow();
 
     expect(courseId).toBe("python");
-    expect(isValid).toBe(true);
-    expect(courseConfig).toBeDefined();
+
+    // Aguarda o fetch assíncrono
+    await flushPromises();
+
+    // isValid é um computed que retorna !!course.value
+    expect(isValid.value).toBe(true);
   });
 
-  it("retorna courseConfig válido", () => {
+  it("retorna courseConfig válido", async () => {
     const { courseConfig } = useCourseFlow();
 
-    expect(courseConfig).toBeDefined();
-    expect(courseConfig?.title).toContain("Course");
+    // Aguarda o fetch assíncrono
+    await flushPromises();
+
+    // courseConfig é um computed que retorna course.value
+    expect(courseConfig.value).toBeDefined();
+    expect(courseConfig.value?.title).toContain("Course");
   });
 
   it("navega para modules", () => {

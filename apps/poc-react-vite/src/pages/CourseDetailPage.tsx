@@ -1,24 +1,57 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCourseStore } from "@/store/useCourseStore";
-import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Modal } from "@/components/ui/modal";
 import { toast } from "sonner";
-import { getCourseConfig, isValidCourseId } from "@/config/coursesConfig";
+import { fetchCourseById, BackendCourseResponse } from "@/services/courseService";
 
 const WARN_PATH = "M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z";
+const FALLBACK_IMAGE = "https://via.placeholder.com/800x300?text=Curso";
 
 export function CourseDetailPage() {
   const { id: courseId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isEnrolledInCourse, unenrollFromCourse } = useCourseStore();
 
-  // Validar e carregar configuração do curso
-  if (!courseId || !isValidCourseId(courseId)) {
+  const [course, setCourse] = useState<BackendCourseResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+
+  // Carregar curso via API
+  useEffect(() => {
+    if (!courseId) return;
+
+    const loadCourse = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const data = await fetchCourseById(courseId);
+        setCourse(data);
+      } catch (err) {
+        setError("Falha ao carregar curso. Tente novamente mais tarde.");
+        console.error("Erro ao buscar curso:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadCourse();
+  }, [courseId]);
+
+  if (isLoading) {
     return (
       <div className="bg-white flex flex-col pb-[100px] px-[20px] md:px-[40px] pt-[24px]">
-        <p className="text-red-600 text-center">Curso não encontrado.</p>
+        <p className="text-center">Carregando curso...</p>
+      </div>
+    );
+  }
+
+  if (error || !course) {
+    return (
+      <div className="bg-white flex flex-col pb-[100px] px-[20px] md:px-[40px] pt-[24px]">
+        <p className="text-red-600 text-center">{error || "Curso não encontrado."}</p>
         <button
           onClick={() => navigate("/courses")}
           className="mt-4 mx-auto px-4 py-2 bg-blue-600 text-white rounded"
@@ -29,23 +62,8 @@ export function CourseDetailPage() {
     );
   }
 
-  const courseConfig = getCourseConfig(courseId);
-  if (!courseConfig) {
-    return null;
-  }
-
-  const {
-    title,
-    description,
-    longDescription,
-    loading,
-    bullets,
-    heroImageUrl,
-    enrollmentKey,
-  } = courseConfig;
-
-  const enrolled = isEnrolledInCourse(enrollmentKey);
-  const [showCancelModal, setShowCancelModal] = useState(false);
+  const { title, description } = course;
+  const enrolled = isEnrolledInCourse(courseId || "");
 
   const handleInscrever = () => {
     if (enrolled) navigate(`/courses/${courseId}/modules`);
@@ -53,10 +71,10 @@ export function CourseDetailPage() {
   };
 
   const handleConfirmCancel = () => {
-    unenrollFromCourse(enrollmentKey);
+    unenrollFromCourse(courseId || "");
     setShowCancelModal(false);
     toast.success("Matrícula cancelada com sucesso.", {
-      description: `Seu acesso ao conteúdo de ${courseConfig.name} foi removido.`,
+      description: `Seu acesso ao conteúdo de ${course?.title} foi removido.`,
       duration: 5000,
     });
     navigate("/courses");
@@ -66,10 +84,13 @@ export function CourseDetailPage() {
     <div className="bg-white flex flex-col pb-[100px]">
       {/* Hero image - full width */}
       <div className="w-full h-[218px] md:h-[320px] overflow-hidden">
-        <ImageWithFallback
-          alt={`${courseConfig.name} – curso`}
+        <img
+          alt={`${title} – curso`}
           className="w-full h-full object-cover"
-          src={heroImageUrl}
+          src={course?.imagePath || FALLBACK_IMAGE}
+          onError={(e) => {
+            e.currentTarget.src = FALLBACK_IMAGE;
+          }}
         />
       </div>
 
@@ -85,7 +106,7 @@ export function CourseDetailPage() {
             {title}
           </h1>
           <p className="font-['Figtree:Medium',sans-serif] font-medium leading-[30px] text-[#595959] text-[18px] shrink-0">
-            {loading}
+            Categoría: {course?.category || "N/A"}
           </p>
         </div>
 
@@ -95,56 +116,7 @@ export function CourseDetailPage() {
             Sobre o curso
           </h2>
           <p className="font-['Figtree:Regular',sans-serif] font-normal leading-[26px] text-black text-[16px]">
-            {description} {longDescription}
-          </p>
-        </div>
-
-        {/* O que irá aprender */}
-        <div className="flex flex-col gap-[10px]">
-          <h2 className="font-['Figtree:Bold',sans-serif] font-bold leading-[30px] text-black text-[20px]">
-            O que você irá aprender?
-          </h2>
-          <p className="font-['Figtree:Regular',sans-serif] font-normal leading-[26px] text-black text-[16px]">
-            Serão abordados temas como:
-          </p>
-          <ul className="flex flex-col gap-[8px] pl-[4px] md:grid md:grid-cols-2 md:gap-x-[20px]">
-            {bullets.map((item) => (
-              <li key={item} className="flex gap-[8px] items-start">
-                <span aria-hidden="true" className="text-[#021b59] mt-[2px]">
-                  •
-                </span>
-                <span className="font-['Figtree:Regular',sans-serif] font-normal leading-[24px] text-black text-[16px]">
-                  {item}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Público-alvo */}
-        <div className="flex flex-col gap-[10px]">
-          <h2 className="font-['Figtree:Bold',sans-serif] font-bold leading-[30px] text-black text-[20px]">
-            Público-alvo
-          </h2>
-          <p className="font-['Figtree:Regular',sans-serif] font-normal leading-[26px] text-black text-[16px]">
-            Este curso é destinado a profissionais de diversas áreas que
-            trabalham com análise de dados, estudantes e recém-formados
-            interessados em Business Intelligence, gestores que desejam tomar
-            decisões baseadas em dados, e analistas que buscam aprimorar suas
-            habilidades em visualização de dados.
-          </p>
-        </div>
-
-        {/* Pré-requisitos */}
-        <div className="flex flex-col gap-[10px]">
-          <h2 className="font-['Figtree:Bold',sans-serif] font-bold leading-[30px] text-black text-[20px]">
-            Pré-requisitos
-          </h2>
-          <p className="font-['Figtree:Regular',sans-serif] font-normal leading-[26px] text-black text-[16px]">
-            Para realizar este curso, é necessário ter conhecimentos básicos de
-            informática e navegação na web, além de familiaridade com planilhas
-            eletrônicas (Excel ou similar). Não é necessário conhecimento prévio
-            em programação.
+            {description}
           </p>
         </div>
       </div>

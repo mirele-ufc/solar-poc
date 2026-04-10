@@ -1,35 +1,36 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useCourseStore } from "@/store/useCourseStore";
 import { useCourseFlow } from "@/composables/useCourseFlow";
-import ImageWithFallback from "@/components/shared/ImageWithFallback.vue";
 import PageHeader from "@/components/shared/PageHeader.vue";
 import { toast } from "vue-sonner";
 
 const WARN_PATH = "M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z";
+const FALLBACK_IMAGE = "https://via.placeholder.com/800x300?text=Curso";
 
 const router = useRouter();
 const courseStore = useCourseStore();
-const { courseId, courseConfig, isValid, navigateTo } = useCourseFlow();
-
-// Validação
-if (!isValid || !courseConfig) {
-  router.push("/courses");
-}
+const showCancelModal = ref(false);
+const {
+  courseId,
+  courseConfig: course,
+  isValid,
+  isLoading,
+  error,
+  navigateTo,
+} = useCourseFlow();
 
 // Dados do curso
-const title = computed(() => courseConfig?.title || "");
-const description = computed(() => courseConfig?.description || "");
-const longDescription = computed(() => courseConfig?.longDescription || "");
-const loading = computed(() => courseConfig?.loading || "");
-const bullets = computed(() => courseConfig?.bullets || []);
-const heroImageUrl = computed(() => courseConfig?.heroImageUrl || "");
-const enrollmentKey = computed(() => courseConfig?.enrollmentKey || "");
+const title = computed(() => course.value?.title || "");
+const description = computed(() => course.value?.description || "");
+const imageUrl = computed(
+  () => course.value?.imagePath || FALLBACK_IMAGE,
+);
+const category = computed(() => course.value?.category || "");
 
-const showCancelModal = ref(false);
 const enrolled = computed(() =>
-  courseStore.isEnrolledInCourse(enrollmentKey.value),
+  courseStore.isEnrolledInCourse(courseId),
 );
 
 const handleInscrever = () => {
@@ -41,11 +42,10 @@ const handleInscrever = () => {
 };
 
 const handleConfirmCancel = () => {
-  courseStore.unenrollFromCourse(enrollmentKey.value);
-  showCancelModal.value = false;
+  courseStore.unenrollFromCourse(courseId);
 
   toast.success("Matrícula cancelada com sucesso.", {
-    description: `Seu acesso ao conteúdo de ${courseConfig?.name} foi removido.`,
+    description: `Seu acesso ao conteúdo de ${title.value} foi removido.`,
     duration: 5000,
   });
 
@@ -55,10 +55,17 @@ const handleConfirmCancel = () => {
 
 <template>
   <div
-    v-if="!isValid"
+    v-if="isLoading"
     class="bg-white flex flex-col pb-[100px] px-[20px] md:px-[40px] pt-[24px]"
   >
-    <p class="text-red-600 text-center">Curso não encontrado.</p>
+    <p class="text-center">Carregando curso...</p>
+  </div>
+
+  <div
+    v-else-if="error || !isValid"
+    class="bg-white flex flex-col pb-[100px] px-[20px] md:px-[40px] pt-[24px]"
+  >
+    <p class="text-red-600 text-center">{{ error || "Curso não encontrado." }}</p>
     <button
       @click="router.push('/courses')"
       class="mt-4 mx-auto px-4 py-2 bg-blue-600 text-white rounded"
@@ -69,10 +76,11 @@ const handleConfirmCancel = () => {
 
   <div v-else class="bg-white flex flex-col pb-[100px]">
     <div class="w-full h-[218px] md:h-[320px] overflow-hidden">
-      <ImageWithFallback
-        :alt="`${courseConfig?.name} – curso`"
+      <img
+        :alt="`${title} – curso`"
         class="w-full h-full object-cover"
-        :src="heroImageUrl"
+        :src="imageUrl"
+        @error="(e: any) => { e.target.src = FALLBACK_IMAGE }"
       />
     </div>
 
@@ -96,7 +104,7 @@ const handleConfirmCancel = () => {
         <p
           class="font-['Figtree:Medium',sans-serif] font-medium leading-[30px] text-[#595959] text-[18px] shrink-0"
         >
-          {{ loading }}
+          Categoría: {{ category }}
         </p>
       </div>
 
@@ -109,69 +117,7 @@ const handleConfirmCancel = () => {
         <p
           class="font-['Figtree:Regular',sans-serif] font-normal leading-[26px] text-black text-[16px]"
         >
-          {{ description }} {{ longDescription }}
-        </p>
-      </div>
-
-      <div class="flex flex-col gap-[10px]">
-        <h2
-          class="font-['Figtree:Bold',sans-serif] font-bold leading-[30px] text-black text-[20px]"
-        >
-          O que você irá aprender?
-        </h2>
-        <p
-          class="font-['Figtree:Regular',sans-serif] font-normal leading-[26px] text-black text-[16px]"
-        >
-          Serão abordados temas como:
-        </p>
-        <ul
-          class="flex flex-col gap-[8px] pl-[4px] md:grid md:grid-cols-2 md:gap-x-[20px]"
-        >
-          <li
-            v-for="item in bullets"
-            :key="item"
-            class="flex gap-[8px] items-start"
-          >
-            <span aria-hidden="true" class="text-[#021b59] mt-[2px]"> • </span>
-            <span
-              class="font-['Figtree:Regular',sans-serif] font-normal leading-[24px] text-black text-[16px]"
-            >
-              {{ item }}
-            </span>
-          </li>
-        </ul>
-      </div>
-
-      <div class="flex flex-col gap-[10px]">
-        <h2
-          class="font-['Figtree:Bold',sans-serif] font-bold leading-[30px] text-black text-[20px]"
-        >
-          Público-alvo
-        </h2>
-        <p
-          class="font-['Figtree:Regular',sans-serif] font-normal leading-[26px] text-black text-[16px]"
-        >
-          Este curso é destinado a profissionais de diversas áreas que trabalham
-          com análise de dados, estudantes e recém-formados interessados em
-          Business Intelligence, gestores que desejam tomar decisões baseadas em
-          dados, e analistas que buscam aprimorar suas habilidades em
-          visualização de dados.
-        </p>
-      </div>
-
-      <div class="flex flex-col gap-[10px]">
-        <h2
-          class="font-['Figtree:Bold',sans-serif] font-bold leading-[30px] text-black text-[20px]"
-        >
-          Pré-requisitos
-        </h2>
-        <p
-          class="font-['Figtree:Regular',sans-serif] font-normal leading-[26px] text-black text-[16px]"
-        >
-          Para realizar este curso, é necessário ter conhecimentos básicos de
-          informática e navegação na web, além de familiaridade com planilhas
-          eletrônicas (Excel ou similar). Não é necessário conhecimento prévio
-          em programação.
+          {{ description }}
         </p>
       </div>
     </div>
