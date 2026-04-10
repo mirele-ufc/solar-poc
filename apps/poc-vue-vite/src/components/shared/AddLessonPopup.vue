@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { lessonService } from '@/services/api/lessonService';
 import { validateFileBeforeUpload } from '@/services/validation/fileValidator';
+import { sanitizeHtml } from '@/utils/sanitize';
 
 const props = defineProps<{
   moduleId: number;
@@ -242,8 +243,8 @@ const handleConfirmQuiz = async () => {
         </div>
 
        <div v-if="successMessage" class="px-[12px] py-[10px] bg-[#27ae60]/10 border border-[#27ae60] rounded-[8px] transition-all">
-  <p class="text-[13px] text-[#27ae60] font-['Figtree:Medium',sans-serif]">✓ {{ successMessage }}</p>
-</div>
+          <p class="text-[13px] text-[#27ae60] font-['Figtree:Medium',sans-serif]">✓ {{ successMessage }}</p>
+        </div>
 
         <div class="flex flex-col gap-[12px] mt-[8px] p-[16px] border border-[#e0e0e0] bg-[#f9f9f9] rounded-[12px]">
           <p class="font-['Figtree:Medium',sans-serif] font-medium text-[#333] text-[16px]">Conteúdo gerado</p>
@@ -252,7 +253,7 @@ const handleConfirmQuiz = async () => {
             <p v-if="!generatedContent" class="text-[14px] text-[#8e8e8e] italic">
               O conteúdo gerado pela IA aparecerá aqui...
             </p>
-            <div v-else class="prose prose-sm max-w-none prose-headings:text-[#021b59] prose-p:leading-relaxed" v-html="generatedContent"></div>
+            <div v-else class="prose prose-sm max-w-none prose-headings:text-[#021b59] prose-p:leading-relaxed" v-html="sanitizeHtml(generatedContent)"></div>
           </div>
 
           <div class="flex items-center gap-[12px]">

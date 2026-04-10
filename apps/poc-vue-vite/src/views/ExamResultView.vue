@@ -4,33 +4,19 @@ import { useRouter } from 'vue-router';
 import { fetchExamQuestions, fetchOptionLabels, type Question } from '@/services/mocks/examMock';
 import { useEnrollmentGuard } from '@/hooks/useEnrollmentGuard';
 
-// --- Ícones SVG ---
-const checkSvg = (color: string) => `
-  <svg class="size-[13px]" fill="none" viewBox="0 0 20 16">
-    <path d="M1 7L7 13L19 1" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-  </svg>
-`;
+import IconCheck from '@/components/icons/IconCheck.vue';
+import IconClose from '@/components/icons/IconClose.vue';
 
-const xSvg = (color: string) => `
-  <svg class="size-[11px]" fill="none" viewBox="0 0 14 14">
-    <path d="M1 1L13 13M13 1L1 13" stroke="${color}" stroke-width="2.5" stroke-linecap="round" />
-  </svg>
-`;
-
-// --- Hooks e Guards ---
 const router = useRouter();
 useEnrollmentGuard("power-bi");
 
-// --- Estado ---
 const questions = ref<Question[]>([]);
 const optionLabels = ref<string[]>([]);
 const isLoading = ref(true);
 const userAnswers = ref<Record<string, number>>({});
 
-// --- Lógica de Processamento ---
 onMounted(async () => {
   try {
-    // 1. Carregar dados da prova
     const [questionsData, labelsData] = await Promise.all([
       fetchExamQuestions(),
       fetchOptionLabels(),
@@ -38,13 +24,10 @@ onMounted(async () => {
     questions.value = questionsData;
     optionLabels.value = labelsData;
 
-    // 2. Recuperar respostas do history.state (equivalente ao location.state do React)
-    // O Vue Router armazena o state em history.state
     const state = window.history.state;
     if (state && state.answers) {
       userAnswers.value = state.answers;
     } else {
-      // Fallback para sessionStorage caso o state se perca no refresh
       const stored = sessionStorage.getItem("prova_answers");
       if (stored) {
         userAnswers.value = JSON.parse(stored);
@@ -58,7 +41,6 @@ onMounted(async () => {
   }
 });
 
-// --- Computeds para Cálculos ---
 const totalCorrect = computed(() => {
   return questions.value.filter(q => userAnswers.value[q.id] === q.correctIndex).length;
 });
@@ -72,7 +54,6 @@ const percentage = computed(() => {
   return Math.round((totalCorrect.value / questions.value.length) * 100);
 });
 
-// --- Métodos ---
 const handleReturn = () => {
   router.push("/courses/power-bi/modules");
 };
@@ -117,7 +98,7 @@ const handleReturn = () => {
               <p class="font-['Figtree:Medium',sans-serif] font-medium text-black text-[16px] leading-[24px] mt-[4px]">{{ q.text }}</p>
             </div>
             <span class="shrink-0 flex items-center gap-[5px] px-[10px] py-[4px] rounded-full bg-[#d4edda]">
-              <span v-html="checkSvg('#155724')"></span>
+              <IconCheck color="#155724" class="size-[13px]" />
               <span class="font-['Figtree:Medium',sans-serif] font-medium text-[#155724] text-[13px] whitespace-nowrap">Correto — 1,0 pt</span>
             </span>
           </div>
@@ -125,7 +106,7 @@ const handleReturn = () => {
             <div v-for="(opt, idx) in q.options" :key="idx" 
               :class="['flex items-center gap-[10px] py-[10px] px-[12px] rounded-[10px] border-2', idx === q.correctIndex ? 'bg-[#e8f8ee] border-[#28a745]' : 'bg-white border-[#e0e0e0]']">
               <div :class="['shrink-0 size-[20px] border-2 rounded-[4px] flex items-center justify-center', idx === q.correctIndex ? 'bg-[#28a745] border-[#28a745]' : 'bg-white border-[#ccc]']">
-                <span v-if="idx === q.correctIndex" v-html="checkSvg('white')"></span>
+                <IconCheck v-if="idx === q.correctIndex" color="white" class="size-[13px]" />
               </div>
               <span class="font-['Figtree:Medium',sans-serif] font-medium text-[15px] text-[#021b59] shrink-0">{{ optionLabels[idx] }})</span>
               <span :class="['font-[\'Figtree:Regular\',sans-serif] text-[15px] leading-[22px] flex-1', idx === q.correctIndex ? 'text-[#155724]' : 'text-black']">{{ opt }}</span>
@@ -164,11 +145,11 @@ const handleReturn = () => {
             <p class="font-['Figtree:Medium',sans-serif] font-medium text-black text-[16px] leading-[25px] mt-[4px]">{{ q.text }}</p>
           </div>
           <span v-if="userAnswers[q.id] === q.correctIndex" class="shrink-0 flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[#d4edda]">
-            <span v-html="checkSvg('#155724')"></span>
+            <IconCheck color="#155724" class="size-[13px]" />
             <span class="font-['Figtree:Medium',sans-serif] font-medium text-[#155724] text-[13px] whitespace-nowrap">Correto — 1,0 pt</span>
           </span>
           <span v-else class="shrink-0 flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[#f8d7da]">
-            <span v-html="xSvg('#721c24')"></span>
+            <IconClose color="#721c24" class="size-[11px]" />
             <span class="font-['Figtree:Medium',sans-serif] font-medium text-[#721c24] text-[13px] whitespace-nowrap">Incorreto — 0,0 pt</span>
           </span>
         </div>
@@ -185,8 +166,8 @@ const handleReturn = () => {
               idx === q.correctIndex ? 'bg-[#28a745] border-[#28a745]' : 
               (idx === userAnswers[q.id] ? 'bg-[#e74c3c] border-[#e74c3c]' : 'bg-white border-[#ccc]')
             ]">
-              <span v-if="idx === q.correctIndex" v-html="checkSvg('white')"></span>
-              <span v-else-if="idx === userAnswers[q.id]" v-html="xSvg('white')"></span>
+              <IconCheck v-if="idx === q.correctIndex" color="white" class="size-[13px]" />
+              <IconClose v-else-if="idx === userAnswers[q.id]" color="white" class="size-[11px]" />
             </div>
             <span class="font-['Figtree:Medium',sans-serif] font-medium text-[15px] text-[#021b59] shrink-0">{{ optionLabels[idx] }})</span>
             <span :class="['font-[\'Figtree:Regular\',sans-serif] text-[15px] leading-[23px] flex-1', idx === q.correctIndex ? 'text-[#155724]' : (idx === userAnswers[q.id] ? 'text-[#c0392b]' : 'text-black')]">

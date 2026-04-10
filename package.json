@@ -23,6 +23,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
+    "@types/dompurify": "^3.0.5",
     "@types/node": "^25.5.0",
     "@types/react-dom": "^19.2.3",
     "jsdom": "^29.0.1",
@@ -30,5 +31,8 @@
     "turbo": "latest",
     "typescript": "^5.9.3",
     "vitest": "^4.1.1"
+  },
+  "dependencies": {
+    "dompurify": "^3.3.3"
   }
 }
