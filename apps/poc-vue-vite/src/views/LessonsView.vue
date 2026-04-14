@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useEnrollmentGuard } from '@/hooks/useEnrollmentGuard';
-import PageHeader from '@/components/shared/PageHeader.vue';
-import imgRectangle30 from '@/assets/22ebf3a06cf8215c6bd0946f42302bc2204ed790.png';
+import { ref, computed, onMounted, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useEnrollmentGuard } from "@/hooks/useEnrollmentGuard";
+import PageHeader from "@/components/shared/PageHeader.vue";
+import imgRectangle30 from "@/assets/22ebf3a06cf8215c6bd0946f42302bc2204ed790.png";
 
 // --- Dados e Constantes ---
-const ARROW_PATH = "M6 7L12 13L18 7L20 9L12 17L4 9L6 7Z";
 const VISITED_KEY = "solar_visited_lessons";
 
 interface AulaContent {
@@ -136,14 +135,18 @@ function loadVisited(): Set<string> {
   try {
     const raw = localStorage.getItem(VISITED_KEY);
     if (raw) return new Set(JSON.parse(raw) as string[]);
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
   return new Set();
 }
 
 function saveVisited(visited: Set<string>) {
   try {
     localStorage.setItem(VISITED_KEY, JSON.stringify([...visited]));
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 }
 
 // --- Lógica da Página ---
@@ -153,7 +156,9 @@ const router = useRouter();
 useEnrollmentGuard("power-bi");
 
 const modId = computed(() => (route.params.modId as string) || "1");
-const aulas = computed(() => aulasPorModulo[modId.value] || aulasPorModulo["1"]);
+const aulas = computed(
+  () => aulasPorModulo[modId.value] || aulasPorModulo["1"],
+);
 const moduloTitle = computed(() => moduloTitles[modId.value] || "Módulo 01");
 
 // Recupera o índice inicial do estado da história do navegador (ou 0)
@@ -191,8 +196,9 @@ const handleNext = () => {
 <template>
   <main id="main-content" class="bg-white flex flex-col min-h-screen">
     <div class="flex-1 overflow-y-auto pb-[96px]">
-      <div class="max-w-[600px] mx-auto flex flex-col gap-[20px] px-[16px] md:px-[24px] pt-[20px] w-full">
-
+      <div
+        class="max-w-[600px] mx-auto flex flex-col gap-[20px] px-[16px] md:px-[24px] pt-[20px] w-full"
+      >
         <PageHeader
           :title="currentAula.title"
           backPath="/courses/power-bi/modules"
@@ -205,11 +211,15 @@ const handleNext = () => {
           ]"
         />
 
-        <h2 class="font-['Figtree:Bold',sans-serif] font-bold text-[24px] leading-[36px] text-black">
+        <h2
+          class="font-['Figtree:Bold',sans-serif] font-bold text-[24px] leading-[36px] text-black"
+        >
           Power BI - Fundamentos
         </h2>
 
-        <div class="bg-[#c5d6ff] rounded-[12px] w-full overflow-hidden flex flex-col gap-[15px] px-[18px] pt-[18px] pb-[18px]">
+        <div
+          class="bg-[#c5d6ff] rounded-[12px] w-full overflow-hidden flex flex-col gap-[15px] px-[18px] pt-[18px] pb-[18px]"
+        >
           <div class="w-full aspect-[16/9] rounded-[10px] overflow-hidden">
             <img
               :alt="`${currentAula.title}: ${currentAula.subtitle}`"
@@ -219,16 +229,31 @@ const handleNext = () => {
           </div>
 
           <div class="flex items-center justify-between w-full">
-            <h3 class="font-['Figtree:Bold',sans-serif] font-bold text-[24px] leading-[36px] text-black">
+            <h3
+              class="font-['Figtree:Bold',sans-serif] font-bold text-[24px] leading-[36px] text-black"
+            >
               {{ currentAula.title }}: {{ currentAula.subtitle }}
             </h3>
-            <svg aria-hidden="true" class="size-[24px] shrink-0 rotate-180" fill="none" viewBox="0 0 24 24">
-              <path clip-rule="evenodd" d="M6 7L12 13L18 7L20 9L12 17L4 9L6 7Z" fill="#021b59" fill-rule="evenodd" />
+            <svg
+              aria-hidden="true"
+              class="size-[24px] shrink-0 rotate-180"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                clip-rule="evenodd"
+                d="M6 7L12 13L18 7L20 9L12 17L4 9L6 7Z"
+                fill="#021b59"
+                fill-rule="evenodd"
+              />
             </svg>
           </div>
         </div>
 
-        <p class="font-['Figtree:Regular',sans-serif] font-normal text-[14px] leading-[20px] text-[#8e8e8e]" aria-live="polite">
+        <p
+          class="font-['Figtree:Regular',sans-serif] font-normal text-[14px] leading-[20px] text-[#8e8e8e]"
+          aria-live="polite"
+        >
           {{ aulaIndex + 1 }} de {{ aulas.length }} aulas do {{ moduloTitle }}
         </p>
 
@@ -244,14 +269,22 @@ const handleNext = () => {
       </div>
     </div>
 
-    <div class="fixed bottom-0 left-0 right-0 z-20 bg-white flex items-center justify-center px-[18px] py-[16px] shadow-[0px_0px_12px_0px_rgba(51,51,51,0.2)]">
+    <div
+      class="fixed bottom-0 left-0 right-0 z-20 bg-white flex items-center justify-center px-[18px] py-[16px] shadow-[0px_0px_12px_0px_rgba(51,51,51,0.2)]"
+    >
       <button
         type="button"
         @click="handleNext"
         class="bg-[#ffeac4] flex h-[50px] items-center justify-center rounded-[26px] w-full max-w-[360px] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-[#021b59] focus-visible:outline-offset-[2px] hover:bg-[#ffd98a] transition-colors active:scale-[0.98]"
-        :aria-label="isLastAula ? 'Ir para a prova do módulo' : `Ir para a próxima aula (${aulaIndex + 2} de ${aulas.length})`"
+        :aria-label="
+          isLastAula
+            ? 'Ir para a prova do módulo'
+            : `Ir para a próxima aula (${aulaIndex + 2} de ${aulas.length})`
+        "
       >
-        <span class="font-['Figtree:Medium',sans-serif] font-medium text-[20px] leading-[30px] text-[#333] text-center whitespace-nowrap">
+        <span
+          class="font-['Figtree:Medium',sans-serif] font-medium text-[20px] leading-[30px] text-[#333] text-center whitespace-nowrap"
+        >
           {{ isLastAula ? "Ir para a prova" : "Ir para próxima aula" }}
         </span>
       </button>

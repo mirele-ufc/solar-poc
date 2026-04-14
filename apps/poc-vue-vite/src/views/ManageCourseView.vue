@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from "vue";
+import { ref, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import LessonContentModal from "@/components/LessonContentModal.vue"; //
 
@@ -26,17 +26,6 @@ interface Student {
   status: StudentStatus;
   lastAccess?: string;
   stoppedAt?: string;
-}
-
-interface Lesson {
-  id: string;
-  name: string;
-}
-
-interface Module {
-  id: string;
-  name: string;
-  lessons: Lesson[];
 }
 
 // ── STATUS_META ──────────────────────────────────────────────────────────────
@@ -145,7 +134,6 @@ const router = useRouter();
 const route = useRoute();
 const activeTab = ref<"dashboard" | "modulos">("dashboard");
 const showParticipants = ref(false);
-const currentFilter = ref<StudentStatus | "todos">("todos");
 const generatingPDF = ref(false);
 const viewingLesson = ref<string | null>(null);
 
@@ -193,11 +181,6 @@ const students = ref<Student[]>([
     lastAccess: "05/03/2026",
   },
 ]);
-
-const filteredStudents = computed(() => {
-  if (currentFilter.value === "todos") return students.value;
-  return students.value.filter((s) => s.status === currentFilter.value);
-});
 
 const stoppedStudents = computed(() =>
   students.value.filter((s) => s.status === "parou"),
