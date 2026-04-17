@@ -14,3 +14,15 @@ cd apps/poc-vue-vite && pnpm dev
 pnpm build
 
 ```
+
+## Credenciais de Acesso
+
+### React
+
+- **Usuário:** professor
+- **Senha:** senha123
+
+### Vue
+
+- **Usuário:** professor
+- **Senha:** professor
