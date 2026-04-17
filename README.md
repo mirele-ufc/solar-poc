@@ -1,11 +1,16 @@
+# 🎓 UFC AVA POC — Plataforma de Aprendizado
 
-  # Solar 3.0 - Devs
+```bash
+# 1. Clonar e instalar
+git clone <seu-repo> && cd ava-poc-react && pnpm install
 
-  This is a code bundle for Solar 3.0 - Devs. The original project is available at https://www.figma.com/design/wUTsBsPkU6c8iQy3gJtgmL/Solar-3.0---Devs.
+# 2. Rodar aplicação React
+cd apps/poc-react-vite && pnpm dev
 
-  ## Running the code
+# 3. Rodar aplicação Vue
+cd apps/poc-vue-vite && pnpm dev
 
-  Run `npm i` to install the dependencies.
+# 4. Buildar aplicação
+pnpm build
 
-  Run `npm run dev` to start the development server.
-  
+```

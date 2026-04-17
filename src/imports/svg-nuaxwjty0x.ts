@@ -1,3 +1,0 @@
-export default {
-p39066800: "M5 9L3 11L9 17L19 7L17 5L9 13L5 9Z",
-}

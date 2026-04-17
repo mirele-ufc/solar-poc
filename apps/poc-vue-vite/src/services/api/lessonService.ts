@@ -1,0 +1,100 @@
+import { apiClient } from "@/services/api";
+
+export interface Lesson {
+  id: number;
+  name: string;
+  orderNum: number;
+  filePath: string | null;
+  fileType: string | null;
+  contentEditor: string | null;
+  contentGenerated: string | null;
+  moduleId: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ApiResponse<T> {
+  sucesso?: boolean;
+  success?: boolean;
+  mensagem?: string;
+  message?: string;
+  dados?: T;
+  data?: T;
+  timestamp?: string;
+}
+
+export const lessonService = {
+  async createLesson(
+    moduleId: number,
+    name: string,
+    contentText: string,
+    file: File | null,
+  ) {
+    const formData = new FormData();
+
+    if (file) {
+      const dadosPayload = { name: name };
+      // Send dados as Blob with application/json type (matches React implementation)
+      formData.append(
+        "dados",
+        new Blob([JSON.stringify(dadosPayload)], { type: "application/json" }),
+      );
+      formData.append("arquivo", file);
+    } else {
+      const dadosPayload = { name: name, contentEditor: contentText };
+      // Send dados as Blob with application/json type (matches React implementation)
+      formData.append(
+        "dados",
+        new Blob([JSON.stringify(dadosPayload)], { type: "application/json" }),
+      );
+    }
+
+    const response = await apiClient.post<ApiResponse<Lesson>>(
+      `/modules/${moduleId}/lessons`,
+      formData,
+    );
+
+    return response.data.dados;
+  },
+
+  async generateContent(lessonId: number): Promise<string> {
+    const response = await apiClient.post<ApiResponse<string>>(
+      `/lessons/${lessonId}/gerar-conteudo`,
+    );
+
+    return response.data.dados || response.data.data || "";
+  },
+
+  async approveContent(lessonId: number, contentGenerated: string) {
+    const response = await apiClient.post<ApiResponse<Lesson>>(
+      `/lessons/${lessonId}/confirmar-conteudo`,
+      { contentGenerated },
+    );
+
+    return response.data.dados;
+  },
+
+  async regenerateContent(lessonId: number): Promise<string> {
+    const response = await apiClient.post<ApiResponse<string>>(
+      `/lessons/${lessonId}/regerar-conteudo`,
+    );
+
+    return response.data.dados || response.data.data || "";
+  },
+
+  async confirmContent(lessonId: number) {
+    const response = await apiClient.post<ApiResponse<Lesson>>(
+      `/lessons/${lessonId}/confirmar-conteudo`,
+    );
+
+    return response.data.dados;
+  },
+
+  async getLessonsByModule(moduleId: number) {
+    const response = await apiClient.get<ApiResponse<Lesson[]>>(
+      `/modules/${moduleId}/lessons`,
+    );
+
+    return response.data.dados || [];
+  },
+};

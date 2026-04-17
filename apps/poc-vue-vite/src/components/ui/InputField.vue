@@ -1,0 +1,83 @@
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+
+interface Props {
+  label: string;
+  placeholder: string;
+  type?: string;
+  modelValue: string;
+  hasError?: boolean;
+  errorMessage?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  type: 'text'
+});
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: string): void
+}>();
+
+const showPw = ref(false);
+const isPw = computed(() => props.type === 'password');
+const id = computed(() => props.label.toLowerCase().replace(/\s+/g, '-'));
+const errorId = computed(() => `${id.value}-error`);
+
+const eyePath = "M2 12C2.945 7.436 7.063 4 12 4C16.937 4 21.055 7.436 22 12C21.055 16.564 16.937 20 12 20C7.063 20 2.945 16.564 2 12ZM12 17C13.3261 17 14.5979 16.4732 15.5355 15.5355C16.4732 14.5979 17 13.3261 17 12C17 10.6739 16.4732 9.40215 15.5355 8.46447C14.5979 7.52678 13.3261 7 12 7C10.6739 7 9.40215 7.52678 8.46447 8.46447C7.52678 9.40215 7 10.6739 7 12C7 13.3261 7.52678 14.5979 8.46447 15.5355C9.40215 16.4732 10.6739 17 12 17ZM12 15C12.7956 15 13.5587 14.6839 14.1213 14.1213C14.6839 13.5587 15 12.7956 15 12C15 11.2044 14.6839 10.4413 14.1213 9.87868C13.5587 9.31607 12.7956 9 12 9C11.2044 9 10.4413 9.31607 9.87868 9.87868C9.31607 10.4413 9 11.2044 9 12C9 12.7956 9.31607 13.5587 9.87868 14.1213C10.4413 14.6839 11.2044 15 12 15Z";
+
+const onInput = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  emit('update:modelValue', target.value);
+};
+</script>
+
+<template>
+  <div class="flex flex-col items-start w-full gap-[2px]">
+    <label
+      :for="id"
+      class="font-['Figtree:Medium',sans-serif] font-medium leading-[30px] text-[#ffeac4] text-[20px]"
+    >
+      {{ label }}
+    </label>
+    <div
+      :class="[
+        'bg-white h-[60px] w-full rounded-[12px] relative transition-all',
+        hasError ? 'border-2 border-[#c0392b]' : 'border border-[#5f5f5f]'
+      ]"
+    >
+      <div class="flex items-center gap-[10px] px-[20px] py-[12px] h-full">
+        <input
+          :id="id"
+          :type="isPw && showPw ? 'text' : type"
+          :placeholder="placeholder"
+          :value="modelValue"
+          @input="onInput"
+          :aria-invalid="hasError ? 'true' : undefined"
+          :aria-describedby="hasError && errorMessage ? errorId : undefined"
+          class="flex-1 font-['Figtree:Regular',sans-serif] font-normal text-[16px] text-[#1a1a1a] placeholder-[#595959] bg-transparent outline-none min-w-0 focus-visible:outline-none"
+        />
+        <button
+          v-if="isPw"
+          type="button"
+          @click="showPw = !showPw"
+          :aria-label="showPw ? 'Ocultar senha' : 'Mostrar senha'"
+          class="shrink-0 size-[24px] focus-visible:outline focus-visible:outline-[2px] focus-visible:outline-[#021b59]"
+        >
+          <svg class="block size-full" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+            <path clip-rule="evenodd" :d="eyePath" fill="#021B59" fill-rule="evenodd" />
+          </svg>
+        </button>
+      </div>
+      <div
+        aria-hidden="true"
+        :class="[
+          'absolute inset-0 pointer-events-none rounded-[12px]',
+          hasError ? '' : 'focus-within:outline focus-within:outline-[3px] focus-within:outline-[#ffeac4] focus-within:outline-offset-[-1px]'
+        ]"
+      />
+    </div>
+    <p v-if="hasError && errorMessage" :id="errorId" role="alert" class="font-['Figtree:Regular',sans-serif] font-normal text-[14px] mt-[4px] text-[#ff6f6f]">
+      {{ errorMessage }}
+    </p>
+  </div>
+</template>

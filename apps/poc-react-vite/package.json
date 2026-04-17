@@ -1,0 +1,51 @@
+{
+  "name": "@figma/my-make-file",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ava-poc/types": "workspace:*",
+    "@hookform/resolvers": "^5.2.2",
+    "axios": "^1.13.6",
+    "clsx": "2.1.1",
+    "dompurify": "^3.3.3",
+    "lucide-react": "0.487.0",
+    "react-hook-form": "7.55.0",
+    "react-router": "7.13.0",
+    "react-router-dom": "^7.13.2",
+    "sonner": "2.0.3",
+    "tailwind-merge": "3.2.0",
+    "zod": "^4.3.6",
+    "zustand": "^5.0.12"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.1.12",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@types/react": "^19.2.14",
+    "@vitejs/plugin-react": "4.7.0",
+    "@vitest/coverage-v8": "^4.1.4",
+    "tailwindcss": "4.1.12",
+    "vite": "6.3.5"
+  },
+  "peerDependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  }
+}
